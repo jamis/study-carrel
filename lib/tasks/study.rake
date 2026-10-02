@@ -9,3 +9,10 @@ namespace :study do
     puts "Created #{email}"
   end
 end
+
+namespace :study do
+  desc "Load (or reload) the bundled texts from db/texts/*.txt"
+  task load_texts: :environment do
+    TextLoader.load_all.each { |w| puts "Loaded #{w.name}: #{w.sections.count} section(s)" }
+  end
+end

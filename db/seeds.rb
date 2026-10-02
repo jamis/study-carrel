@@ -2,3 +2,5 @@
 if Rails.env.development? && !User.exists?
   User.create!(email_address: "jamis.buck@gmail.com", password: "password")
 end
+
+TextLoader.load_all
