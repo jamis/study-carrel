@@ -10,7 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_02_145817) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_02_151239) do
+  create_table "foci", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "description"
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "sections", force: :cascade do |t|
     t.integer "work_id", null: false
     t.integer "number", null: false

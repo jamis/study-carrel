@@ -1,0 +1,11 @@
+<% content_for :title, "New focus · Study" %>
+<main class="signin">
+  <h1 class="brand">Study</h1>
+  <p class="signin-notice"><%= Focus.current_one ? "What will you ponder next?" : "What do you want to ponder as you read?" %></p>
+  <%= form_with model: @focus, class: "signin-form" do |form| %>
+    <% if @focus.errors.any? %><p class="signin-alert">Give your focus a title.</p><% end %>
+    <%= form.text_field :title, required: true, autofocus: true, placeholder: "A question, metaphor, or thesis" %>
+    <%= form.text_area :description, rows: 4, placeholder: "Why this? (optional)" %>
+    <%= form.submit "Begin", class: "primary" %>
+  <% end %>
+</main>

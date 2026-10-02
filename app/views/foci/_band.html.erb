@@ -1,0 +1,12 @@
+<section class="focus" data-controller="focus" data-action="click@document->focus#closeOutside">
+  <button class="focus-head" type="button" aria-expanded="false" title="About this focus" data-focus-target="head" data-action="focus#toggle">
+    <span class="focus-label">Focus</span>
+    <h1 class="focus-title"><%= focus.title %></h1>
+    <% if focus.description.present? %><span class="focus-caret">▾</span><% end %>
+  </button>
+  <% if focus.description.present? %>
+    <div class="focus-body"><div class="focus-body-in">
+      <%= simple_format(h(focus.description)) %>
+    </div></div>
+  <% end %>
+</section>

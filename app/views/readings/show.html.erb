@@ -9,17 +9,7 @@
       <button class="icon-btn" type="button" title="Toggle light / dark" aria-label="Toggle theme" data-action="theme#toggle">◐</button>
     </div>
   </div>
-  <section class="focus" data-controller="focus" data-action="click@document->focus#closeOutside">
-    <button class="focus-head" type="button" aria-expanded="false" title="About this focus" data-focus-target="head" data-action="focus#toggle">
-      <span class="focus-label">Focus</span>
-      <h1 class="focus-title">What does it mean to be holy?</h1>
-      <span class="focus-caret">▾</span>
-    </button>
-    <div class="focus-body"><div class="focus-body-in">
-      <p>Holiness keeps showing up as something God is, and something we’re asked to be. I want to understand the difference between holy as “set apart” and holy as “good”.</p>
-      <div class="focus-actions"><span style="font-size:13px">4 notes</span><button class="chip" type="button">Edit focus</button></div>
-    </div></div>
-  </section>
+  <%= render "foci/band", focus: @focus %>
 </header>
 
 <main class="layout" data-controller="lectio"
@@ -57,7 +47,7 @@
     </button>
     <div class="panel-head">
       <div class="ref" data-lectio-target="ref"><%= unit_ref(@section, @current) %></div>
-      <div class="pfocus">What does it mean to be holy?</div>
+      <div class="pfocus"><%= @focus.title %></div>
     </div>
     <div class="notes"></div>
     <div class="composer">

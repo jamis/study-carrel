@@ -9,6 +9,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "redirects to the first section when signed in" do
+    Focus.start!(title: "Holy")
     sign_in_as users(:one)
     get root_path
     assert_redirected_to reading_path("isaiah-kjv", 40)

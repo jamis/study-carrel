@@ -217,11 +217,11 @@
 .signin { max-width: 340px; margin: 18vh auto 0; padding: 0 20px; text-align: center; }
 .signin .brand { font-size: 28px; font-weight: 400; margin: 0 0 24px; }
 .signin-form { display: flex; flex-direction: column; gap: 10px; }
-.signin-form input[type="email"], .signin-form input[type="password"] {
+.signin-form input[type="email"], .signin-form input[type="password"], .signin-form input[type="text"], .signin-form textarea {
   font: inherit; font-family: var(--sans); font-size: 15px; color: var(--ink); background: var(--paper);
   border: 1px solid var(--rule); border-radius: 10px; padding: 11px 12px; outline: none;
 }
-.signin-form input:focus { border-color: var(--accent); }
+.signin-form input:focus, .signin-form textarea:focus { border-color: var(--accent); }
 .signin-form .primary { padding: 11px 16px; margin-top: 4px; }
 .signin-alert, .signin-notice { font-family: var(--sans); font-size: 14px; margin: 0 0 14px; }
 .signin-alert { color: #b3402a; }
