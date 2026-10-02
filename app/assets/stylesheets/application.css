@@ -229,7 +229,7 @@
 .signin-notice { color: var(--ink-soft); }
 
 .signout { margin: 0; }
-.signin-form + .signin-notice { margin-top: 22px; }
+.signin-form + .signin-notice { margin-top: 11px; }
 
 /* ---------- foci pages ---------- */
 a:not(.chip) { color: var(--accent); }
