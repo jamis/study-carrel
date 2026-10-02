@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_02_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_02_180100) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -68,7 +68,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_170000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "last_unit_id"
+    t.integer "user_id", null: false
     t.index ["last_unit_id"], name: "index_foci_on_last_unit_id"
+    t.index ["user_id"], name: "index_foci_on_user_id"
   end
 
   create_table "notes", force: :cascade do |t|
@@ -114,6 +116,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_170000) do
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "admin", default: false, null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
@@ -134,6 +137,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_170000) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "collections", "collections", column: "parent_id", on_delete: :nullify
   add_foreign_key "foci", "units", column: "last_unit_id", on_delete: :nullify
+  add_foreign_key "foci", "users"
   add_foreign_key "notes", "foci"
   add_foreign_key "notes", "units"
   add_foreign_key "sections", "works"

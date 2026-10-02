@@ -9,6 +9,6 @@ module RequiresFocus
   private
 
   def require_focus
-    @focus = Focus.current_one or redirect_to new_focus_path
+    @focus = Current.user.foci.current_one or redirect_to new_focus_path
   end
 end

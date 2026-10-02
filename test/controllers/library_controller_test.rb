@@ -6,7 +6,7 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
     TextLoader.new("work: Genesis\nedition: KJV\ncollection: old-testament\nposition: 1\n\nsection: 1\n1. a\n2. b\n\nsection: 2\n1. c\n").load
     TextLoader.new("work: Exodus\nedition: KJV\ncollection: old-testament\nposition: 2\n\nsection: 1\n1. d\n\nsection: 2\n1. e\n").load
     TextLoader.new("work: Walden\nunit: paragraph\ncollection: prose\nposition: 200\n\nsection: 1\nlabel: Economy\n1. p\n").load
-    Focus.start!(title: "Holy")
+    users(:one).foci.start!(title: "Holy")
     sign_in_as users(:one)
   end
 
@@ -54,7 +54,7 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
 
   test "a numbered work shows a chapter grid linking to each chapter, marking those with notes" do
     exodus = Work.find_by!(slug: "exodus-kjv")
-    Focus.current_one.notes.create!(unit: exodus.sections.find_by!(number: 2).units.first, content: "x")
+    users(:one).foci.current_one.notes.create!(unit: exodus.sections.find_by!(number: 2).units.first, content: "x")
     get work_path("exodus-kjv")
     assert_select "nav.chapters a.tick", 2
     assert_select "nav.chapters a.tick[href=?]", reading_path("exodus-kjv", 2, 1)

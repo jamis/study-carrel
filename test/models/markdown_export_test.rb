@@ -3,7 +3,7 @@ require "test_helper"
 class MarkdownExportTest < ActiveSupport::TestCase
   setup do
     load_isaiah
-    @focus = Focus.start!(title: "What does it mean to be holy?", description: "Set apart, or good?")
+    @focus = users(:one).foci.start!(title: "What does it mean to be holy?", description: "Set apart, or good?")
   end
 
   test "renders the focus, quoted verses and converted notes in reading order" do
@@ -26,7 +26,7 @@ class MarkdownExportTest < ActiveSupport::TestCase
   end
 
   test "other foci's notes are not included" do
-    old = Focus.create!(title: "Old", archived_at: 1.day.ago)
+    old = users(:one).foci.create!(title: "Old", archived_at: 1.day.ago)
     old.notes.create!(unit: verse(1), content: "<p>not mine</p>")
     refute_includes MarkdownExport.new(@focus).to_s, "not mine"
   end

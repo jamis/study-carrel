@@ -3,7 +3,7 @@ require "test_helper"
 class NotesControllerTest < ActionDispatch::IntegrationTest
   setup do
     load_isaiah
-    @focus = Focus.start!(title: "Holy")
+    @focus = users(:one).foci.start!(title: "Holy")
     @unit = verse(25)
     sign_in_as users(:one)
   end
@@ -39,7 +39,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
   test "cannot delete a note from another focus" do
     old = Focus.find(@focus.id)
     note = old.notes.create!(unit: @unit, content: "old")
-    Focus.start!(title: "Next")
+    users(:one).foci.start!(title: "Next")
     assert_no_difference "Note.count" do
       delete note_path(note), as: :turbo_stream
     end
@@ -48,7 +48,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
 
   test "the reading page shows only the current focus's notes, under the right verse" do
     @focus.notes.create!(unit: @unit, content: "Old focus note")
-    Focus.start!(title: "Other").notes.create!(unit: @unit, content: "Current focus note")
+    users(:one).foci.start!(title: "Other").notes.create!(unit: @unit, content: "Current focus note")
     get reading_path("isaiah-kjv", 40, 25)
     assert_select "#notes_unit_#{@unit.id} .note", 1
     assert_select "#notes_unit_#{@unit.id} .note", /Current focus note/
@@ -78,7 +78,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
 
   test "cannot edit a note from another focus" do
     note = @focus.notes.create!(unit: @unit, content: "x")
-    Focus.start!(title: "Other")
+    users(:one).foci.start!(title: "Other")
     patch note_path(note), params: { note: { content: "hijack" } }, as: :turbo_stream
     assert_response :not_found
   end
@@ -87,7 +87,7 @@ end
 class VerseStripMarkersTest < ActionDispatch::IntegrationTest
   test "verses with notes are marked on the strip" do
     load_isaiah
-    focus = Focus.start!(title: "Holy")
+    focus = users(:one).foci.start!(title: "Holy")
     focus.notes.create!(unit: verse(11), content: "a")
     focus.notes.create!(unit: verse(11), content: "b")
     sign_in_as users(:one)
@@ -101,7 +101,7 @@ end
 class AllNotesTest < ActionDispatch::IntegrationTest
   setup do
     load_isaiah
-    @focus = Focus.start!(title: "Holy")
+    @focus = users(:one).foci.start!(title: "Holy")
     sign_in_as users(:one)
   end
 
@@ -109,7 +109,7 @@ class AllNotesTest < ActionDispatch::IntegrationTest
     @focus.notes.create!(unit: verse(25), content: "late")
     @focus.notes.create!(unit: verse(3), content: "early one")
     @focus.notes.create!(unit: verse(3), content: "early two")
-    old = Focus.create!(title: "Old", archived_at: 1.day.ago)
+    old = users(:one).foci.create!(title: "Old", archived_at: 1.day.ago)
     old.notes.create!(unit: verse(1), content: "not mine")
 
     get notes_path
@@ -148,7 +148,7 @@ end
 class ExportTest < ActionDispatch::IntegrationTest
   setup do
     load_isaiah
-    @focus = Focus.start!(title: "Holy")
+    @focus = users(:one).foci.start!(title: "Holy")
     @focus.notes.create!(unit: verse(3), content: "<p>hello</p>")
     sign_in_as users(:one)
   end

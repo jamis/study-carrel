@@ -9,7 +9,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "redirects to the first section when signed in" do
-    Focus.start!(title: "Holy")
+    users(:one).foci.start!(title: "Holy")
     sign_in_as users(:one)
     get root_path
     assert_redirected_to reading_path("isaiah-kjv", 1)
@@ -17,7 +17,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
   test "explains when no texts are loaded" do
     Section.destroy_all
-    Focus.start!(title: "Holy")
+    users(:one).foci.start!(title: "Holy")
     sign_in_as users(:one)
     get root_path
     assert_response :success

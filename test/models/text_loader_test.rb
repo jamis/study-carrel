@@ -28,7 +28,7 @@ class TextLoaderTest < ActiveSupport::TestCase
   test "reloading updates in place and keeps notes" do
     work = TextLoader.new(SAMPLE).load
     unit = work.sections.first.units.first
-    note = Focus.start!(title: "F").notes.create!(unit: unit, content: "<p>keep me</p>")
+    note = users(:one).foci.start!(title: "F").notes.create!(unit: unit, content: "<p>keep me</p>")
 
     changed = SAMPLE.sub("First line", "First line, revised")
     TextLoader.new(changed).load

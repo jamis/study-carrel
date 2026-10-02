@@ -16,3 +16,15 @@ namespace :study_carrel do
     TextLoader.load_all.each { |w| puts "Loaded #{w.name}: #{w.sections.count} section(s)" }
   end
 end
+
+namespace :study_carrel do
+  desc "Make a user an admin (they can create invitations): bin/rails study_carrel:make_admin EMAIL=you@example.com"
+  task make_admin: :environment do
+    email = ENV["EMAIL"]
+    abort "Usage: bin/rails study_carrel:make_admin EMAIL=you@example.com" if email.blank?
+
+    user = User.find_by(email_address: email.strip.downcase) or abort "No user with that email address."
+    user.update!(admin: true)
+    puts "#{user.email_address} is an admin."
+  end
+end

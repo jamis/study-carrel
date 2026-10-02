@@ -3,7 +3,7 @@ require "test_helper"
 class PositionsControllerTest < ActionDispatch::IntegrationTest
   setup do
     load_isaiah
-    @focus = Focus.start!(title: "Holy")
+    @focus = users(:one).foci.start!(title: "Holy")
     sign_in_as users(:one)
   end
 
@@ -31,7 +31,7 @@ class PositionsControllerTest < ActionDispatch::IntegrationTest
 
   test "each focus remembers its own place" do
     @focus.update!(last_unit: verse(25))
-    Focus.start!(title: "Next")
+    users(:one).foci.start!(title: "Next")
     get root_path
     assert_redirected_to reading_path("isaiah-kjv", 1)
   end

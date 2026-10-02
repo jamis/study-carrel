@@ -32,9 +32,9 @@ class FociControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "a new focus archives the previous one" do
-    Focus.start!(title: "Old")
+    users(:one).foci.start!(title: "Old")
     post foci_path, params: { focus: { title: "New" } }
-    assert_equal "New", Focus.current_one.title
+    assert_equal "New", users(:one).foci.current_one.title
     assert_equal 1, Focus.current.count
     assert_equal 2, Focus.count
   end
@@ -44,7 +44,7 @@ class FociManagementTest < ActionDispatch::IntegrationTest
   setup do
     load_isaiah
     sign_in_as users(:one)
-    @focus = Focus.start!(title: "Holy", description: "Set apart?")
+    @focus = users(:one).foci.start!(title: "Holy", description: "Set apart?")
   end
 
   test "edit updates the focus" do
@@ -62,13 +62,13 @@ class FociManagementTest < ActionDispatch::IntegrationTest
 
   test "past foci list shows archived foci and can restore one" do
     @focus.archive!
-    other = Focus.start!(title: "Light")
+    other = users(:one).foci.start!(title: "Light")
     get foci_path
     assert_select ".list-row-title", "Light"
     assert_select ".list-row-title", "Holy"
 
     patch restore_focus_path(@focus)
-    assert_equal "Holy", Focus.current_one.title
+    assert_equal "Holy", users(:one).foci.current_one.title
     assert other.reload.archived?
     assert_equal 1, Focus.current.count
   end

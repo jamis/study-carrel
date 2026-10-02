@@ -1,4 +1,5 @@
 class Focus < ApplicationRecord
+  belongs_to :user
   has_many :notes, dependent: :destroy
   belongs_to :last_unit, class_name: "Unit", optional: true
 
@@ -6,6 +7,7 @@ class Focus < ApplicationRecord
 
   scope :current, -> { where(archived_at: nil) }
 
+  # Called on a user's foci (user.foci.current_one), so each reader has their own current focus.
   def self.current_one = current.order(:created_at).last
 
   scope :past, -> { where.not(archived_at: nil).order(archived_at: :desc) }
@@ -19,15 +21,15 @@ class Focus < ApplicationRecord
   def archived? = archived_at.present?
   def archive! = update!(archived_at: Time.current)
 
-  # Bring a past focus back; whatever is current moves to the archive.
+  # Bring a past focus back; whatever else is current for this user moves to the archive.
   def restore!
     self.class.transaction do
-      self.class.current.where.not(id: id).update_all(archived_at: Time.current)
+      user.foci.current.where.not(id: id).update_all(archived_at: Time.current)
       update!(archived_at: nil)
     end
   end
 
-  # Only one focus is current at a time: starting a new one archives the old.
+  # Only one focus is current at a time per user: user.foci.start! archives the old one.
   def self.start!(attrs)
     transaction do
       current.update_all(archived_at: Time.current)

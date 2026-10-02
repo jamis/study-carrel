@@ -6,7 +6,7 @@ class RandomReadingsControllerTest < ActionDispatch::IntegrationTest
     TextLoader.new("work: Genesis\nedition: KJV\ncollection: old-testament\nposition: 1\n\nsection: 1\n1. a\n2. b\n").load
     TextLoader.new("work: Exodus\nedition: KJV\ncollection: old-testament\nposition: 2\n\nsection: 1\n1. c\n").load
     TextLoader.new("work: Walden\nunit: paragraph\ncollection: prose\nposition: 200\n\nsection: 1\nlabel: Economy\n1. p\n").load
-    Focus.start!(title: "Holy")
+    users(:one).foci.start!(title: "Holy")
     sign_in_as users(:one)
   end
 

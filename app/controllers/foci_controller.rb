@@ -2,18 +2,18 @@ class FociController < ApplicationController
   before_action :set_focus, only: %i[edit update restore]
 
   def index
-    @current = Focus.current_one
-    @past = Focus.past
+    @current = foci.current_one
+    @past = foci.past
   end
 
   def new
-    @focus = Focus.new
+    @focus = foci.new
   end
 
   def create
-    @focus = Focus.new(focus_params)
+    @focus = foci.new(focus_params)
     if @focus.valid?
-      Focus.start!(focus_params)
+      foci.start!(focus_params)
       redirect_to root_path
     else
       render :new, status: :unprocessable_entity
@@ -38,7 +38,9 @@ class FociController < ApplicationController
 
   private
 
-  def set_focus = @focus = Focus.find(params[:id])
+  def foci = Current.user.foci
+
+  def set_focus = @focus = foci.find(params[:id])
 
   def focus_params = params.expect(focus: [ :title, :description ])
 end
