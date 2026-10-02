@@ -5,7 +5,7 @@
     <% if @notes.any? %>
       <span class="page-bar-actions" data-controller="clipboard" data-clipboard-text-value="<%= MarkdownExport.new(@focus) %>">
         <button class="chip" type="button" data-action="clipboard#copy" data-clipboard-target="button">Copy Markdown</button>
-        <%= link_to "Download .md", export_notes_path, class: "chip" %>
+        <%= link_to "Download .md", export_notes_path, class: "chip", data: { turbo: false } %>
       </span>
     <% end %>
   </div>
