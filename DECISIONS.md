@@ -18,7 +18,7 @@ Example: read Isaiah 40 while pondering "What does it mean to be holy?"
 | Texts | The app ships with a **bundled corpus**. No import or external API in v1. |
 | Mobile | Same functionality as desktop. One responsive design, no cut-down phone version. |
 | Platform | Web application, usable from laptop and phone. |
-| Stack / editor | No preference from the user; Claude decides. **Rails + Hotwire + SQLite** (user OK'd Rails). Lexxy for notes if the step 9 spike passes; otherwise Action Text/Trix. |
+| Stack / editor | No preference from the user; Claude decides. **Rails + Hotwire + SQLite** (user OK'd Rails). **Lexxy 1.0.0** for notes (step 9 spike passed), on Action Text. |
 | Reading model | **Lectio mode only** for v1 (one verse at a time, neighbors faded, verse strip for jumping). Full-chapter reading view deferred as a possible future option. |
 | Focus presentation | The focus is the hero of the screen: compact, accent-colored band under the nav, sticky so it stays visible while scrolling. Prototype feedback: a thin bar felt lost; a large hero banner was too big. Description opens as a dropdown. |
 | Text alignment | Left-aligned (ragged right), not centered, with a ~34em measure. Type size steps down for longer units (prose paragraphs); neighbors clamp to 2 lines. Demo of long prose: open `prototype/index.html?text=prose`. |
@@ -56,7 +56,7 @@ Example: read Isaiah 40 while pondering "What does it mean to be holy?"
 
 ## Open questions
 
-1. **Stack.** Leaning Rails + Hotwire + Lexxy. Unconfirmed, and Lexxy's current state needs checking before committing.
+1. ~~Stack~~ Settled: Rails + Hotwire + SQLite + Lexxy.
 2. **First texts.** Suggested: KJV Bible (Isaiah 40 is the motivating example), plus one poetry collection and one prose work.
 3. **Offline.** Online-only for v1, or must it work without signal?
 4. **Next step.** Clickable HTML wireframes first, or scaffold the app and iterate on the real thing?

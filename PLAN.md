@@ -32,7 +32,7 @@ Each step is small, can be checked on its own, and leaves the app working.
 8. ✅ **Focus details.** Dropdown with description and edit, plus archive and a simple past-foci list.
 
 ### D. Notes
-9. **Editor spike.** Try Lexxy in an isolated page and confirm it works on a phone. Decide Lexxy or Trix.
+9. ✅ **Editor spike.** Try Lexxy in an isolated page and confirm it works on a phone. Decide Lexxy or Trix. **Result: Lexxy 1.0.0 passes; use it.** Bold and Markdown lists worked on desktop; typing, bold and the collapsing toolbar worked in a 390px mobile emulation (not a real phone, so recheck at step 20). Theming is via `--lexxy-*` CSS variables.
 10. **Notes, plain.** Create and delete notes attached to the current unit, shown in the side panel, with the mobile bottom sheet. Plain text only, to prove the data flow.
 11. **Rich notes.** Swap in the chosen editor, with the compact field and an expand control.
 12. **Verse-strip markers and counts.** Show which verses have notes.
