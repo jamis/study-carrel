@@ -5,4 +5,11 @@ class ApplicationController < ActionController::Base
 
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
+
+  private
+
+  # Admin-only pages look like they don't exist to everyone else.
+  def require_admin
+    head :not_found unless Current.user&.admin?
+  end
 end

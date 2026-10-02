@@ -12,6 +12,7 @@
           <%= link_to "Library", library_path, class: "menu-item menu-library" %>
           <%= link_to "Random", random_path, class: "menu-item chip" %>
           <button class="menu-item icon-btn" type="button" title="Toggle light / dark" aria-label="Toggle light / dark" data-action="theme#toggle"><span aria-hidden="true">◐</span><span class="menu-label">Light / dark</span></button>
+          <% if Current.user.admin? %><%= link_to "Invitations", admin_invitations_path, class: "menu-item chip" %><% end %>
           <%= button_to "Sign out", session_path, method: :delete, class: "menu-item chip", form_class: "signout" %>
         </div>
       </div>

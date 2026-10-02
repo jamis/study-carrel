@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_02_180100) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_02_181000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -71,6 +71,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_180100) do
     t.integer "user_id", null: false
     t.index ["last_unit_id"], name: "index_foci_on_last_unit_id"
     t.index ["user_id"], name: "index_foci_on_user_id"
+  end
+
+  create_table "invitations", force: :cascade do |t|
+    t.string "token_digest", null: false
+    t.integer "created_by_id", null: false
+    t.string "label"
+    t.datetime "expires_at", null: false
+    t.datetime "redeemed_at"
+    t.integer "redeemed_by_id"
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_invitations_on_created_by_id"
+    t.index ["redeemed_by_id"], name: "index_invitations_on_redeemed_by_id"
+    t.index ["token_digest"], name: "index_invitations_on_token_digest", unique: true
   end
 
   create_table "notes", force: :cascade do |t|
@@ -138,6 +153,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_180100) do
   add_foreign_key "collections", "collections", column: "parent_id", on_delete: :nullify
   add_foreign_key "foci", "units", column: "last_unit_id", on_delete: :nullify
   add_foreign_key "foci", "users"
+  add_foreign_key "invitations", "users", column: "created_by_id"
+  add_foreign_key "invitations", "users", column: "redeemed_by_id", on_delete: :nullify
   add_foreign_key "notes", "foci"
   add_foreign_key "notes", "units"
   add_foreign_key "sections", "works"

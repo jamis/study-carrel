@@ -53,7 +53,7 @@ Each step is small, can be checked on its own, and leaves the app working.
 ## Later (wanted, not scheduled)
 
 - **History.** Show where you've been recently (random hops make this matter) and jump straight back to any of those places. Likely a per-focus list of recently visited units, written when the position is saved.
-- **New user signups.** Allow new users to sign up. Probably via a protected link (e.g. invitation only) at first, to prevent spam.
+- **New user signups.** Done (invitation links). Not yet: password reset, removing users or revoking access, emailing invitations, encrypting notes.
 - **More works**. Religious texts, as well as more classics and poetry. Done: KJV New Testament, Book of Mormon, Poe, Frost, Dhammapada, Tao Te Ching, Bhagavad Gita, Quran (Rodwell, traditional sura order restored), Marcus Aurelius. Candidates: Upanishads, Analects, Zhuangzi, Apocrypha, Augustine, Thomas à Kempis, Whitman, Blake, Shakespeare's sonnets, Emerson.
 - **Doctrine and Covenants and Pearl of Great Price.** Deferred: no clean public-domain text exists online. The Wikisource D&C is the modern copyrighted text. Options are OCR of the 1908 Deseret News D&C (archive.org `thedoctrineandco00smituoft`) cross-checked against two other pre-1923 scans, and the 1913 Pearl of Great Price on Wikisource. Label both as older public-domain editions; D&C 138 and the Official Declarations would be missing.
 - **Random, extended.** An "Another" button inside the reader to roll again in the same scope; configurable weighting (uniform today).

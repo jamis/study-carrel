@@ -1,0 +1,44 @@
+<% content_for :title, "Invitations · Study Carrel" %>
+<main class="page">
+  <div class="page-bar">
+    <%= link_to "← Back to reading", root_path, class: "chip" %>
+  </div>
+  <h2 class="page-title">Invitations</h2>
+  <p class="page-lede">An invitation is a single-use link that lets one person sign up, good for <%= Invitation::EXPIRES_IN.inspect %>. Anyone who has the link can use it, so send it only to the person you mean.</p>
+
+  <% if flash[:invitation_link] %>
+    <div class="invite-new" data-controller="clipboard" data-clipboard-text-value="<%= flash[:invitation_link] %>">
+      <p class="page-sub">New invitation<%= " for #{flash[:invitation_label]}" if flash[:invitation_label] %></p>
+      <input class="invite-link" type="text" readonly value="<%= flash[:invitation_link] %>" aria-label="Invitation link" onfocus="this.select()">
+      <p class="signin-notice">Copy it now: it won't be shown again.</p>
+      <button class="chip" type="button" data-action="clipboard#copy" data-clipboard-target="button">Copy link</button>
+    </div>
+  <% end %>
+
+  <%= form_with url: admin_invitations_path, class: "signin-form invite-form" do |form| %>
+    <%= form.text_field :label, placeholder: "Who is it for? (optional, just for your own list)", maxlength: 100 %>
+    <%= form.submit "Create invitation", class: "primary" %>
+  <% end %>
+
+  <h3 class="page-sub">All invitations</h3>
+  <% if @invitations.empty? %>
+    <p class="page-empty">None yet.</p>
+  <% end %>
+  <% @invitations.each do |invitation| %>
+    <div class="list-row">
+      <div class="list-row-title"><%= invitation.label.presence || "Unnamed invitation" %></div>
+      <div class="list-row-meta">
+        <% if invitation.status == :used %>
+          Used by <%= invitation.redeemed_by&.email_address || "a removed user" %> on <%= l invitation.redeemed_at.to_date, format: :long %>
+        <% elsif invitation.status == :revoked %>
+          Revoked
+        <% elsif invitation.status == :expired %>
+          Expired <%= l invitation.expires_at.to_date, format: :long %>
+        <% else %>
+          Pending, expires <%= l invitation.expires_at.to_date, format: :long %>
+          · <%= button_to "Revoke", revoke_admin_invitation_path(invitation), method: :patch, class: "chip", form_class: "inline-form" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</main>

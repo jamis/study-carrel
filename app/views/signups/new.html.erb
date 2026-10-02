@@ -1,0 +1,14 @@
+<% content_for :title, "Join · Study Carrel" %>
+<main class="signin">
+  <h1 class="brand">Study Carrel</h1>
+  <p class="signin-notice">You've been invited. Choose a password to begin.</p>
+  <% if @user.errors.any? %>
+    <p class="signin-alert"><%= @user.errors.full_messages.to_sentence %>.</p>
+  <% end %>
+  <%= form_with model: @user, url: join_path(token: params[:token]), class: "signin-form" do |form| %>
+    <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Email address" %>
+    <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Password (8 characters or more)", minlength: 8, maxlength: 72 %>
+    <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Password again", maxlength: 72 %>
+    <%= form.submit "Create account", class: "primary" %>
+  <% end %>
+</main>

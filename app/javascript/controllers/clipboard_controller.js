@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Copies the Markdown export (carried in a value) to the clipboard.
+// Copies text (carried in a value, e.g. the Markdown export or an invitation link) to the clipboard.
 export default class extends Controller {
   static targets = ["button"]
   static values = { text: String }
@@ -15,7 +15,7 @@ export default class extends Controller {
   }
 
   #flash(message) {
-    const original = "Copy Markdown"
+    const original = (this.buttonTarget.dataset.original ??= this.buttonTarget.textContent)
     this.buttonTarget.textContent = message
     setTimeout(() => (this.buttonTarget.textContent = original), 1600)
   }

@@ -89,6 +89,19 @@ ssh -t deploy@studycarrel.jamisbuck.org 'cd study_carrel/current && RAILS_ENV=pr
 > User.create!(email_address: "you@example.com", password: "...")
 ```
 
+## Admins and invitations
+
+Make yourself an admin once (the first deploy that includes invitations also runs the migration
+that gives every existing focus to your account):
+
+```
+ssh -t deploy@studycarrel.jamisbuck.org 'cd study_carrel/current && RAILS_ENV=production ~/.local/bin/mise exec -- bin/rails study_carrel:make_admin EMAIL=you@example.com'
+```
+
+Admins see an "Invitations" link in the reader's menu (`/admin/invitations`). Create an
+invitation there, copy the link (it is shown once) and send it to the person. It works once and
+expires after 7 days.
+
 ## Everyday
 
 - Deploy: `bundle exec cap production deploy`

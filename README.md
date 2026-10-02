@@ -17,6 +17,8 @@ bin/dev
 
 In development, `db/seeds.rb` creates a throwaway login (`dev@example.com` /
 `password`). In production, create your user from a Rails console (see `SERVER.md`).
+Make an admin with `bin/rails study_carrel:make_admin EMAIL=you@example.com`; admins invite
+others from the Invitations page in the reader's menu.
 
 `bin/rails test` runs the tests.
 

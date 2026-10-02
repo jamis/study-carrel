@@ -256,6 +256,9 @@
 
 .signout { margin: 0; }
 .signin-form + .signin-notice { margin-top: 6px; }
+.invite-new { border: 1px solid var(--accent); border-radius: 10px; padding: 4px 16px 16px; margin: 0 0 22px; }
+.invite-link { width: 100%; box-sizing: border-box; font-family: ui-monospace, monospace; font-size: 13px; padding: 9px 10px; margin: 0 0 6px; border: 1px solid var(--rule); border-radius: 8px; background: transparent; color: var(--ink); }
+.invite-form { max-width: none; margin: 0 0 8px; }
 
 /* ---------- foci pages ---------- */
 a:not(.chip):not(.where):not(.brand):not(.tick):not(.work-link):not(.menu-item) { color: var(--accent); }

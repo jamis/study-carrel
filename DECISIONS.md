@@ -14,7 +14,7 @@ Example: read Isaiah 40 while pondering "What does it mean to be holy?"
 |---|---|
 | Foci | One focus at a time. No parallel foci in v1. |
 | Notes | Mostly short, but a full rich-text editor should be available. 37signals' **Lexxy** editor is worth trying. |
-| Users | Just the owner, initially. Sharing is manual (copy/paste). |
+| Users | **A few invited people** (decided 2026-10-02). Foci and notes belong to a user, and nobody (admins included) can read another user's notes; the library is shared. Sign-up is by **invitation only**: an admin creates a single-use link (stored as a digest, shown once, expires in 7 days, open to whoever holds it) and sends it themselves; no email delivery. `users.admin` is set with `bin/rails study_carrel:make_admin EMAIL=...`. No password reset yet. Possible later: encrypting notes. Sharing notes is still manual (copy/paste). |
 | Texts | The app ships with a **bundled corpus**. No import or external API in v1. |
 | Mobile | Same functionality as desktop. One responsive design, no cut-down phone version. |
 | Platform | Web application, usable from laptop and phone. |

@@ -1,5 +1,12 @@
 Rails.application.routes.draw do
   resource :session
+  get "join/:token", to: "signups#new", as: :join
+  post "join/:token", to: "signups#create"
+  namespace :admin do
+    resources :invitations, only: %i[index create] do
+      patch :revoke, on: :member
+    end
+  end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
