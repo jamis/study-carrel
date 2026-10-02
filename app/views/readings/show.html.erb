@@ -5,8 +5,16 @@
       <%= link_to "Study Carrel", library_path, class: "brand", title: "Library" %>
       <%= link_to work_path(@section.work), class: "where", title: "Chapters in #{@section.work.title}" do %><%= @section.name %><small><%= @section.work.edition %></small><% end %>
       <%= render "notes/all_link", focus: @focus %>
-      <%= button_to "Sign out", session_path, method: :delete, class: "chip", form_class: "signout" %>
-      <button class="icon-btn" type="button" title="Toggle light / dark" aria-label="Toggle theme" data-action="theme#toggle">◐</button>
+      <div class="menu" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
+        <button class="icon-btn menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-menu"
+                data-menu-target="button" data-action="menu#toggle">⋯</button>
+        <div class="menu-panel" id="nav-menu" data-menu-target="panel">
+          <%= link_to "Library", library_path, class: "menu-item menu-library" %>
+          <%= link_to "Random", random_path, class: "menu-item chip" %>
+          <button class="menu-item icon-btn" type="button" title="Toggle light / dark" aria-label="Toggle light / dark" data-action="theme#toggle"><span aria-hidden="true">◐</span><span class="menu-label">Light / dark</span></button>
+          <%= button_to "Sign out", session_path, method: :delete, class: "menu-item chip", form_class: "signout" %>
+        </div>
+      </div>
     </div>
   </div>
   <%= render "foci/band", focus: @focus %>
