@@ -1,8 +1,8 @@
 class HomeController < ApplicationController
   def index
-    return redirect_to new_focus_path unless Focus.current_one
+    focus = Focus.current_one or return redirect_to new_focus_path
 
-    if (unit = Focus.current_one.last_unit)
+    if (unit = focus.last_unit)
       return redirect_to reading_path(unit.section.work.slug, unit.section.number, unit.number)
     end
 

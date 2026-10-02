@@ -6,7 +6,7 @@
     <%= link_to "Random", random_collection_path(@collection.slug), class: "chip" %>
   </div>
   <h2 class="page-title"><%= @collection.name %></h2>
-  <% if @collection.description.present? %><p class="all-notes-sub"><%= @collection.description %></p><% end %>
+  <% if @collection.description.present? %><p class="page-lede"><%= @collection.description %></p><% end %>
 
   <div class="works">
     <% @works.each do |work| %>

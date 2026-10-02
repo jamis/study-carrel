@@ -1,5 +1,5 @@
 class ReadingsController < ApplicationController
-  before_action :require_focus
+  include RequiresFocus
 
   def show
     work = Work.find_by!(slug: params[:slug])
@@ -15,8 +15,4 @@ class ReadingsController < ApplicationController
   private
 
   def resume_unit = @units.find { |u| u.id == @focus.last_unit_id }
-
-  def require_focus
-    @focus = Focus.current_one or redirect_to new_focus_path
-  end
 end

@@ -43,6 +43,11 @@ class ReadingsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".composer [data-composer-target=error][role=alert][hidden]"
   end
 
+  test "the page title names the chapter" do
+    get reading_path("isaiah-kjv", 40, 25)
+    assert_select "title", "Isaiah 40 · Study Carrel"
+  end
+
   test "requires sign in" do
     delete session_path
     get reading_path("isaiah-kjv", 40)

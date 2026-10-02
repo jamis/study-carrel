@@ -12,9 +12,9 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
 
   test "library lists collections in order" do
     get library_path
-    assert_select ".focus-row-title a", text: "Old Testament"
-    assert_select ".focus-row-title a", text: "Prose"
-    assert_select ".focus-row-meta", "2 works"
+    assert_select ".list-row-title a", text: "Old Testament"
+    assert_select ".list-row-title a", text: "Prose"
+    assert_select ".list-row-meta", "2 works"
   end
 
   test "a collection lists its books in order" do

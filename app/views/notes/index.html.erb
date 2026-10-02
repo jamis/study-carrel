@@ -10,7 +10,7 @@
     <% end %>
   </div>
   <h2 class="page-title all-notes-title"><%= @focus.title %></h2>
-  <p class="all-notes-sub"><%= pluralize(@notes.size, "note") %> across <%= pluralize(@groups.size, "verse") %>, in reading order</p>
+  <p class="page-lede"><%= pluralize(@notes.size, "note") %> across <%= pluralize(@groups.size, "verse") %>, in reading order</p>
 
   <% if @groups.empty? %>
     <p class="page-empty">No notes yet. Open a verse and write what it says to your question.</p>

@@ -8,9 +8,9 @@
 
   <% if @current %>
     <h3 class="page-sub">Current</h3>
-    <div class="focus-row">
-      <div class="focus-row-title"><%= @current.title %></div>
-      <div class="focus-row-meta">since <%= l @current.created_at.to_date, format: :long %></div>
+    <div class="list-row">
+      <div class="list-row-title"><%= @current.title %></div>
+      <div class="list-row-meta">since <%= l @current.created_at.to_date, format: :long %></div>
     </div>
   <% end %>
 
@@ -19,10 +19,10 @@
     <p class="page-empty">Nothing here yet. Foci you set aside will be kept here.</p>
   <% end %>
   <% @past.each do |focus| %>
-    <div class="focus-row">
-      <div class="focus-row-title"><%= focus.title %></div>
-      <% if focus.description.present? %><div class="focus-row-desc"><%= focus.description %></div><% end %>
-      <div class="focus-row-meta">
+    <div class="list-row">
+      <div class="list-row-title"><%= focus.title %></div>
+      <% if focus.description.present? %><div class="list-row-desc"><%= focus.description %></div><% end %>
+      <div class="list-row-meta">
         <%= l focus.created_at.to_date, format: :long %> – <%= l focus.archived_at.to_date, format: :long %>
         · <%= button_to "Make current", restore_focus_path(focus), method: :patch, class: "chip", form_class: "inline-form" %>
       </div>

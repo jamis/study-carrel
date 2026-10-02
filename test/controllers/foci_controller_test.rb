@@ -64,8 +64,8 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     @focus.archive!
     other = Focus.start!(title: "Light")
     get foci_path
-    assert_select ".focus-row-title", "Light"
-    assert_select ".focus-row-title", "Holy"
+    assert_select ".list-row-title", "Light"
+    assert_select ".list-row-title", "Holy"
 
     patch restore_focus_path(@focus)
     assert_equal "Holy", Focus.current_one.title
