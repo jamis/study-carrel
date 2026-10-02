@@ -16,7 +16,7 @@ Rails.application.routes.draw do
       patch :restore
     end
   end
-  resources :notes, only: %i[create destroy]
+  resources :notes, only: %i[index create destroy]
   get "read/:slug/:section(/:number)", to: "readings#show", as: :reading
 
   root "home#index"

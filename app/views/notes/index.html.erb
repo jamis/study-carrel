@@ -1,0 +1,22 @@
+<% content_for :title, "All notes · Study" %>
+<main class="page">
+  <div class="page-bar">
+    <%= link_to "← Back to reading", root_path, class: "chip" %>
+  </div>
+  <h2 class="page-title all-notes-title"><%= @focus.title %></h2>
+  <p class="all-notes-sub"><%= pluralize(@notes.size, "note") %> across <%= pluralize(@groups.size, "verse") %>, in reading order</p>
+
+  <% if @groups.empty? %>
+    <p class="page-empty">No notes yet. Open a verse and write what it says to your question.</p>
+  <% end %>
+
+  <% @groups.each do |unit, notes| %>
+    <section class="fv-item">
+      <%= link_to unit_ref(unit.section, unit), reading_path(unit.section.work.slug, unit.section.number, unit.number), class: "fv-ref" %>
+      <p class="fv-quote"><%= unit.body %></p>
+      <% notes.each do |note| %>
+        <div class="fv-note"><%= note.content %></div>
+      <% end %>
+    </section>
+  <% end %>
+</main>

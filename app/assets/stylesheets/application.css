@@ -274,3 +274,11 @@ lexxy-editor, .lexxy-content {
 .note .lexxy-content { font-size: inherit; line-height: inherit; }
 .note .lexxy-content > :first-child { margin-top: 0; }
 .note .lexxy-content > :last-child { margin-bottom: 0; }
+
+/* ---------- all-notes page ---------- */
+.all-notes-title { font-style: italic; color: var(--accent); line-height: 1.2; margin-bottom: 4px; }
+.all-notes-sub { color: var(--ink-soft); font-family: var(--sans); font-size: 13px; margin: 0 0 28px; }
+a.fv-ref { text-decoration: none; }
+a.fv-ref:hover { text-decoration: underline; }
+.fv-note .lexxy-content > :first-child { margin-top: 0; }
+.fv-note .lexxy-content > :last-child { margin-bottom: 0; }

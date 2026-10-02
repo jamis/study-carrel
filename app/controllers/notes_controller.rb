@@ -1,6 +1,13 @@
 class NotesController < ApplicationController
   before_action :require_focus
 
+  def index
+    @notes = @focus.notes.includes(:rich_text_content, unit: { section: :work })
+                   .joins(unit: { section: :work })
+                   .order("works.id", "sections.number", "units.number", :created_at, :id)
+    @groups = @notes.group_by(&:unit)
+  end
+
   def create
     @note = @focus.notes.build(note_params)
     if @note.save

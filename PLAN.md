@@ -36,7 +36,7 @@ Each step is small, can be checked on its own, and leaves the app working.
 10. ✅ **Notes, plain.** Create and delete notes attached to the current unit, shown in the side panel, with the mobile bottom sheet. Plain text only, to prove the data flow.
 11. ✅ **Rich notes.** Swap in the chosen editor, with the compact field and an expand control.
 12. ✅ **Verse-strip markers and counts.** Show which verses have notes.
-13. **All-notes view.** All notes in reading order, with a jump back to the verse.
+13. ✅ **All-notes view.** All notes in reading order, with a jump back to the verse.
 14. **Markdown export.** Copy or download as Markdown.
 
 ### E. Finish

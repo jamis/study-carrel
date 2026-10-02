@@ -66,3 +66,40 @@ class VerseStripMarkersTest < ActionDispatch::IntegrationTest
     assert_select ".tick.has[aria-label=?]", "Verse 11, 2 notes"
   end
 end
+
+class AllNotesTest < ActionDispatch::IntegrationTest
+  setup do
+    TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt"))
+    @focus = Focus.start!(title: "Holy")
+    sign_in_as users(:one)
+  end
+
+  test "lists notes in reading order, grouped by verse, linking back" do
+    @focus.notes.create!(unit: Unit.find_by!(number: 25), content: "late")
+    @focus.notes.create!(unit: Unit.find_by!(number: 3), content: "early one")
+    @focus.notes.create!(unit: Unit.find_by!(number: 3), content: "early two")
+    old = Focus.create!(title: "Old", archived_at: 1.day.ago)
+    old.notes.create!(unit: Unit.find_by!(number: 1), content: "not mine")
+
+    get notes_path
+    assert_response :success
+    assert_select ".fv-ref", count: 2
+    assert_select ".fv-ref" do |refs|
+      assert_equal [ "Isaiah 40:3", "Isaiah 40:25" ], refs.map { |r| r.text.strip }
+    end
+    assert_select ".fv-item:first-of-type .fv-note", 2
+    assert_select ".fv-ref[href=?]", reading_path("isaiah-kjv", 40, 25)
+    assert_select ".fv-note", text: /not mine/, count: 0
+  end
+
+  test "empty state" do
+    get notes_path
+    assert_select ".page-empty"
+  end
+
+  test "the reading page links to it with a count" do
+    @focus.notes.create!(unit: Unit.find_by!(number: 3), content: "x")
+    get reading_path("isaiah-kjv", 40)
+    assert_select "a.chip[href=?]", notes_path, text: "All notes (1)"
+  end
+end
