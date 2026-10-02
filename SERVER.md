@@ -118,15 +118,18 @@ private B2 bucket, continuously. The other three databases are disposable.
 ```
 curl -fsSLO https://github.com/benbjohnson/litestream/releases/download/v0.5.17/litestream-0.5.17-linux-x86_64.deb
 dpkg -i litestream-0.5.17-linux-x86_64.deb && rm litestream-0.5.17-linux-x86_64.deb
-
-# Credentials: type them yourself so they never land in a shell history or a repo.
-install -m 600 /dev/null /etc/litestream.env
-nano /etc/litestream.env     # two lines, no quotes:
-#   LITESTREAM_ACCESS_KEY_ID=<keyID>
-#   LITESTREAM_SECRET_ACCESS_KEY=<applicationKey>
 ```
 
-Edit `config/server/litestream.yml` (bucket, endpoint, region), commit, then from the laptop:
+Write the credentials with a prompt (the secret is hidden as you type it; the exact variable
+names matter, since systemd silently ignores a misspelled one and logs its value):
+
+```
+read -p "keyID: " K; read -sp "applicationKey: " S; echo; umask 077
+printf "LITESTREAM_ACCESS_KEY_ID=%s\nLITESTREAM_SECRET_ACCESS_KEY=%s\n" "$K" "$S" > /etc/litestream.env
+```
+
+`config/server/litestream.yml` already has this bucket, endpoint and region (change them
+if you use another bucket). From the laptop:
 
 ```
 scp config/server/litestream.yml root@studycarrel.jamisbuck.org:/etc/litestream.yml
