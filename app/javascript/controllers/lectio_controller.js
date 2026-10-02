@@ -70,7 +70,11 @@ export default class extends Controller {
     this.nowTarget.className = "now" + (body.length > 450 ? " long" : body.length > 180 ? " mid" : "")
     this.bodyTarget.textContent = body
     this.refTargets.forEach(r => r.textContent = this.refTemplateValue.replace("{n}", n))
-    this.tickTargets.forEach(t => t.classList.toggle("current", Number(t.dataset.number) === n))
+    this.tickTargets.forEach(t => {
+      const current = Number(t.dataset.number) === n
+      t.classList.toggle("current", current)
+      t.setAttribute("aria-current", current)
+    })
     this.scrollStripToCurrent()
 
     this.notesTargets.forEach(el => { el.hidden = Number(el.dataset.number) !== n })

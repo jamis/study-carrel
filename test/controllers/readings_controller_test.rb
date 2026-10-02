@@ -28,6 +28,16 @@ class ReadingsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "marks the language, the current verse and the live region for assistive tech" do
+    get reading_path("isaiah-kjv", 40, 25)
+    assert_select "html[lang=en]"
+    assert_select ".tick[aria-current=true]", 1
+    assert_select ".tick[aria-current=true]", "25"
+    assert_select ".now[aria-live=polite]"
+    assert_select ".near[aria-hidden=true]", 2
+    assert_select ".panel-handle[aria-expanded=false]"
+  end
+
   test "requires sign in" do
     delete session_path
     get reading_path("isaiah-kjv", 40)
