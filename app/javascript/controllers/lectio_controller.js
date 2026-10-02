@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 // Switches verses client-side; the whole section is already on the page.
 export default class extends Controller {
   static targets = ["unit", "prev", "now", "body", "next", "ref", "tick", "notes", "count", "unitField"]
-  static values = { current: Number, base: String, refPrefix: String }
+  static values = { current: Number, base: String, refPrefix: String, positionUrl: String }
 
   connect() {
     this.bodies = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.textContent.trim()]))
@@ -13,9 +13,13 @@ export default class extends Controller {
     this.observer = new MutationObserver(() => this.updateCount())
     this.notesTargets.forEach(el => this.observer.observe(el, { childList: true }))
     this.updateCount()
+    this.savePosition()
   }
 
-  disconnect() { this.observer?.disconnect() }
+  disconnect() {
+    this.observer?.disconnect()
+    clearTimeout(this.saveTimer)
+  }
 
   next() { this.step(1) }
   previous() { this.step(-1) }
@@ -31,6 +35,22 @@ export default class extends Controller {
     this.currentValue = number
     history.replaceState(null, "", `${this.baseValue}/${number}`)
     this.render()
+    this.savePosition()
+  }
+
+  // Tell the server where we are (debounced), so the app reopens here.
+  savePosition() {
+    clearTimeout(this.saveTimer)
+    this.saveTimer = setTimeout(() => {
+      const unitId = this.currentNotes?.dataset.unitId
+      if (!unitId) return
+      fetch(this.positionUrlValue, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "X-CSRF-Token": document.querySelector("meta[name=csrf-token]")?.content },
+        body: JSON.stringify({ unit_id: unitId }),
+        keepalive: true
+      })
+    }, 400)
   }
 
   render() {

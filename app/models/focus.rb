@@ -1,5 +1,6 @@
 class Focus < ApplicationRecord
   has_many :notes, dependent: :destroy
+  belongs_to :last_unit, class_name: "Unit", optional: true
 
   validates :title, presence: true
 

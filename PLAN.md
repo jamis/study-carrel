@@ -40,7 +40,7 @@ Each step is small, can be checked on its own, and leaves the app working.
 14. ✅ **Markdown export.** Copy or download as Markdown.
 
 ### E. Finish
-15. **Remember position.** Save the current verse per focus, so the app reopens where you left off.
+15. ✅ **Remember position.** Save the current verse per focus, so the app reopens where you left off.
 16. **More texts.** Add 2-3 more: one poetry collection and one prose work. Prose will test chunking and long-paragraph sizing. **Choose the texts at this step, not before.**
 17. **Chapter navigation.** Pick a work and chapter, and move between chapters. First real browsing UI.
 18. **PWA basics.** Manifest, icon, installable on a phone.

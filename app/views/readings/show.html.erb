@@ -14,6 +14,7 @@
 
 <main class="layout" data-controller="lectio"
       data-lectio-current-value="<%= @current.number %>"
+      data-lectio-position-url-value="<%= position_path %>"
       data-lectio-base-value="<%= reading_path(@section.work.slug, @section.number) %>"
       data-lectio-ref-prefix-value="<%= @section.name %>">
   <div hidden>

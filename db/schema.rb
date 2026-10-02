@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_02_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_02_160919) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -55,6 +55,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_160000) do
     t.datetime "archived_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "last_unit_id"
+    t.index ["last_unit_id"], name: "index_foci_on_last_unit_id"
   end
 
   create_table "notes", force: :cascade do |t|
@@ -114,6 +116,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_160000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "foci", "units", column: "last_unit_id", on_delete: :nullify
   add_foreign_key "notes", "foci"
   add_foreign_key "notes", "units"
   add_foreign_key "sections", "works"
