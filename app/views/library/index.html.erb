@@ -6,6 +6,10 @@
   </div>
   <h2 class="page-title">Library</h2>
 
+  <% if @collections.empty? && @loose_works.empty? %>
+    <p class="page-empty">No texts are loaded yet. Run <code>bin/rails db:seed</code> on the server.</p>
+  <% end %>
+
   <% @collections.each do |collection| %>
     <div class="list-row">
       <div class="list-row-title"><%= link_to collection.name, collection_path(collection) %></div>

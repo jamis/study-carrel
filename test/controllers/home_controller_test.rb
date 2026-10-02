@@ -14,4 +14,13 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_path
     assert_redirected_to reading_path("isaiah-kjv", 1)
   end
+
+  test "explains when no texts are loaded" do
+    Section.destroy_all
+    Focus.start!(title: "Holy")
+    sign_in_as users(:one)
+    get root_path
+    assert_response :success
+    assert_select "h2", "No texts yet"
+  end
 end

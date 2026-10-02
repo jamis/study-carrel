@@ -8,7 +8,7 @@
     <% if focus.description.present? %>
       <%= simple_format(h(focus.description)) %>
     <% else %>
-      <p><em>No description yet.</em></p>
+      <p><em>No description yet. <%= link_to "Add one", edit_focus_path(focus) %>.</em></p>
     <% end %>
     <div class="focus-actions">
       <%= link_to "Edit focus", edit_focus_path(focus), class: "chip" %>
