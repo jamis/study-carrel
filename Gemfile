@@ -56,6 +56,10 @@ group :development do
   # Deployment: cap production deploy
   gem "capistrano", "~> 3.19", require: false
   gem "capistrano-rails", require: false
+
+  # net-ssh needs these for ed25519 keys
+  gem "ed25519", ">= 1.2", "< 2.0", require: false
+  gem "bcrypt_pbkdf", ">= 1.0", "< 2.0", require: false
 end
 
 group :test do
