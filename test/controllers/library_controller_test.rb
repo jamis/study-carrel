@@ -1,0 +1,73 @@
+require "test_helper"
+
+class LibraryControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    TextLoader.load_collections(Rails.root.join("db/texts/collections.yml"))
+    TextLoader.new("work: Genesis\nedition: KJV\ncollection: old-testament\nposition: 1\n\nsection: 1\n1. a\n2. b\n\nsection: 2\n1. c\n").load
+    TextLoader.new("work: Exodus\nedition: KJV\ncollection: old-testament\nposition: 2\n\nsection: 1\n1. d\n\nsection: 2\n1. e\n").load
+    TextLoader.new("work: Walden\nunit: paragraph\ncollection: prose\nposition: 200\n\nsection: 1\nlabel: Economy\n1. p\n").load
+    Focus.start!(title: "Holy")
+    sign_in_as users(:one)
+  end
+
+  test "library lists collections in order" do
+    get library_path
+    assert_select ".focus-row-title a", text: "Old Testament"
+    assert_select ".focus-row-title a", text: "Prose"
+    assert_select ".focus-row-meta", "2 works"
+  end
+
+  test "a collection lists its books in order" do
+    get collection_path("old-testament")
+    assert_select ".work-link-title" do |titles|
+      assert_equal %w[Genesis Exodus], titles.map { |t| t.text.strip }
+    end
+  end
+
+  test "a numbered work shows a chapter grid linking to each chapter, marking those with notes" do
+    exodus = Work.find_by!(slug: "exodus-kjv")
+    Focus.current_one.notes.create!(unit: exodus.sections.find_by!(number: 2).units.first, content: "x")
+    get work_path("exodus-kjv")
+    assert_select "nav.chapters a.tick", 2
+    assert_select "nav.chapters a.tick[href=?]", reading_path("exodus-kjv", 2, 1)
+    assert_select "nav.chapters a.tick.has", 1
+  end
+
+  test "a work with named sections lists them" do
+    get work_path("walden")
+    assert_select ".section-list a", "Economy"
+  end
+
+  test "unknown collection or work is a 404" do
+    get collection_path("nope")
+    assert_response :not_found
+    get work_path("nope")
+    assert_response :not_found
+  end
+
+  test "reading continues from the end of a chapter into the next chapter and book" do
+    genesis2 = Section.joins(:work).find_by!(works: { slug: "genesis-kjv" }, number: 2)
+    assert_equal [ "genesis-kjv", 1 ], [ genesis2.previous_section.work.slug, genesis2.previous_section.number ]
+    assert_equal [ "exodus-kjv", 1 ], [ genesis2.next_section.work.slug, genesis2.next_section.number ]
+
+    exodus1 = Section.joins(:work).find_by!(works: { slug: "exodus-kjv" }, number: 1)
+    assert_equal genesis2, exodus1.previous_section
+    assert_nil Section.joins(:work).find_by!(works: { slug: "exodus-kjv" }, number: 2).next_section
+    assert_nil Section.joins(:work).find_by!(works: { slug: "genesis-kjv" }, number: 1).previous_section
+  end
+
+  test "the reader links to the neighboring chapters" do
+    get reading_path("genesis-kjv", 2, 1)
+    assert_select "[data-lectio-next-url-value=?]", reading_path("exodus-kjv", 1, 1)
+    assert_select "[data-lectio-prev-url-value=?]", reading_path("genesis-kjv", 1, 2)
+    assert_select "[data-lectio-prev-label-value=?]", "Genesis 1"
+    assert_select ".near.edge", 2
+    assert_select ".where[href=?]", work_path("genesis-kjv")
+    assert_select "a.brand[href=?]", library_path
+  end
+
+  test "units are named for the text in labels" do
+    get reading_path("walden", 1, 1)
+    assert_select ".tick[aria-label=?]", "Paragraph 1"
+  end
+end

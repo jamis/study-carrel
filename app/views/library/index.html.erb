@@ -1,0 +1,21 @@
+<% content_for :title, "Library · Study" %>
+<main class="page">
+  <div class="page-bar">
+    <%= link_to "← Continue reading", root_path, class: "chip" %>
+  </div>
+  <h2 class="page-title">Library</h2>
+
+  <% @collections.each do |collection| %>
+    <div class="focus-row">
+      <div class="focus-row-title"><%= link_to collection.name, collection_path(collection) %></div>
+      <% if collection.description.present? %><div class="focus-row-desc"><%= collection.description %></div><% end %>
+      <div class="focus-row-meta"><%= pluralize(collection.works.size, "work") %></div>
+    </div>
+  <% end %>
+
+  <% @loose_works.each do |work| %>
+    <div class="focus-row">
+      <div class="focus-row-title"><%= link_to work.name, work_path(work) %></div>
+    </div>
+  <% end %>
+</main>

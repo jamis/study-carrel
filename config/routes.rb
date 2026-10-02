@@ -20,6 +20,9 @@ Rails.application.routes.draw do
   resources :notes, only: %i[index create destroy] do
     get :export, on: :collection
   end
+  get "library", to: "library#index"
+  resources :collections, only: :show, param: :slug
+  resources :works, only: :show, param: :slug
   get "read/:slug/:section(/:number)", to: "readings#show", as: :reading
 
   root "home#index"

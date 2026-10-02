@@ -1,0 +1,18 @@
+<% content_for :title, "#{@collection.name} · Study" %>
+<main class="page">
+  <div class="page-bar">
+    <%= link_to "← Library", library_path, class: "chip" %>
+    <%= link_to "Continue reading", root_path, class: "chip" %>
+  </div>
+  <h2 class="page-title"><%= @collection.name %></h2>
+  <% if @collection.description.present? %><p class="all-notes-sub"><%= @collection.description %></p><% end %>
+
+  <div class="works">
+    <% @works.each do |work| %>
+      <%= link_to work_path(work), class: "work-link" do %>
+        <span class="work-link-title"><%= work.title %></span>
+        <span class="work-link-meta"><%= work.edition.presence || pluralize(work.sections.size, "section") %></span>
+      <% end %>
+    <% end %>
+  </div>
+</main>

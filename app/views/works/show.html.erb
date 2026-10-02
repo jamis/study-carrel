@@ -1,0 +1,33 @@
+<% content_for :title, "#{@work.name} · Study" %>
+<% numbered = @sections.all?(&:numbered?) %>
+<main class="page">
+  <div class="page-bar">
+    <% if @work.collection %>
+      <%= link_to "← #{@work.collection.name}", collection_path(@work.collection), class: "chip" %>
+    <% else %>
+      <%= link_to "← Library", library_path, class: "chip" %>
+    <% end %>
+    <%= link_to "Continue reading", root_path, class: "chip" %>
+  </div>
+  <h2 class="page-title"><%= @work.title %></h2>
+  <% if @work.edition.present? %><p class="all-notes-sub"><%= @work.edition %> · <%= pluralize(@sections.size, "section") %></p><% end %>
+
+  <% if numbered %>
+    <nav class="strip chapters" aria-label="Chapters">
+      <% @sections.each do |section| %>
+        <%= link_to section.number, reading_path(@work.slug, section.number, section.units.first.number),
+              class: "tick#{" has" if @noted_section_ids.include?(section.id)}",
+              aria: { label: "#{section.name}#{", has notes" if @noted_section_ids.include?(section.id)}" } %>
+      <% end %>
+    </nav>
+  <% else %>
+    <ol class="section-list">
+      <% @sections.each do |section| %>
+        <li>
+          <%= link_to section.label.presence || section.number, reading_path(@work.slug, section.number, section.units.first.number) %>
+          <% if @noted_section_ids.include?(section.id) %><span class="noted-dot" title="Has notes"></span><% end %>
+        </li>
+      <% end %>
+    </ol>
+  <% end %>
+</main>

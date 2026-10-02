@@ -1,9 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
+import { Turbo } from "@hotwired/turbo-rails"
 
 // Switches verses client-side; the whole section is already on the page.
 export default class extends Controller {
-  static targets = ["unit", "prev", "now", "body", "next", "ref", "tick", "notes", "count", "unitField"]
-  static values = { current: Number, base: String, refTemplate: String, positionUrl: String }
+  static targets = ["unit", "prev", "now", "body", "next", "ref", "tick", "notes", "count", "unitField", "strip"]
+  static values = { current: Number, base: String, refTemplate: String, positionUrl: String, unitName: String,
+    prevUrl: String, prevLabel: String, nextUrl: String, nextLabel: String }
 
   connect() {
     this.bodies = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.textContent.trim()]))
@@ -13,6 +15,7 @@ export default class extends Controller {
     this.observer = new MutationObserver(() => this.updateCount())
     this.notesTargets.forEach(el => this.observer.observe(el, { childList: true }))
     this.updateCount()
+    this.scrollStripToCurrent()
     this.savePosition()
   }
 
@@ -25,9 +28,13 @@ export default class extends Controller {
   previous() { this.step(-1) }
   go(event) { this.select(Number(event.currentTarget.dataset.number)) }
 
+  // Past either end of the chapter, carry on into the neighboring one.
   step(delta) {
     const i = this.numbers.indexOf(this.currentValue) + delta
-    if (i >= 0 && i < this.numbers.length) this.select(this.numbers[i])
+    if (i >= 0 && i < this.numbers.length) return this.select(this.numbers[i])
+
+    const url = delta > 0 ? this.nextUrlValue : this.prevUrlValue
+    if (url) Turbo.visit(url)
   }
 
   select(number) {
@@ -56,18 +63,27 @@ export default class extends Controller {
   render() {
     const n = this.currentValue
     const i = this.numbers.indexOf(n)
-    this.fillNear(this.prevTarget, this.numbers[i - 1])
-    this.fillNear(this.nextTarget, this.numbers[i + 1])
+    this.fillNear(this.prevTarget, this.numbers[i - 1], "←", this.prevLabelValue)
+    this.fillNear(this.nextTarget, this.numbers[i + 1], "→", this.nextLabelValue)
 
     const body = this.bodies.get(n)
     this.nowTarget.className = "now" + (body.length > 450 ? " long" : body.length > 180 ? " mid" : "")
     this.bodyTarget.textContent = body
     this.refTargets.forEach(r => r.textContent = this.refTemplateValue.replace("{n}", n))
     this.tickTargets.forEach(t => t.classList.toggle("current", Number(t.dataset.number) === n))
+    this.scrollStripToCurrent()
 
     this.notesTargets.forEach(el => { el.hidden = Number(el.dataset.number) !== n })
     this.unitFieldTarget.value = this.currentNotes?.dataset.unitId
     this.updateCount()
+  }
+
+  // A long chapter's strip is a single scrolling row; keep the current number in view.
+  scrollStripToCurrent() {
+    if (!this.hasStripTarget || !this.stripTarget.classList.contains("scrolling")) return
+    const tick = this.tickTargets.find(t => Number(t.dataset.number) === this.currentValue)
+    const strip = this.stripTarget
+    if (tick) strip.scrollLeft = tick.offsetLeft - (strip.clientWidth - tick.offsetWidth) / 2
   }
 
   get currentNotes() {
@@ -88,16 +104,23 @@ export default class extends Controller {
       const tick = this.tickTargets.find(t => Number(t.dataset.number) === n)
       if (!tick) return
       tick.classList.toggle("has", count > 0)
-      tick.setAttribute("aria-label", count ? `Verse ${n}, ${count} note${count === 1 ? "" : "s"}` : `Verse ${n}`)
+      tick.setAttribute("aria-label", count ? `${this.unitNameValue} ${n}, ${count} note${count === 1 ? "" : "s"}` : `${this.unitNameValue} ${n}`)
     })
   }
 
-  fillNear(el, number) {
+  // The faded neighbor above or below; at a chapter's edge it names the adjacent chapter instead.
+  fillNear(el, number, arrow, edgeLabel) {
     el.replaceChildren()
-    if (number === undefined) return
+    el.classList.remove("edge")
     const b = document.createElement("b")
-    b.textContent = number
-    el.append(b, this.bodies.get(number))
+    if (number !== undefined) {
+      b.textContent = number
+      el.append(b, this.bodies.get(number))
+    } else if (edgeLabel) {
+      b.textContent = arrow
+      el.classList.add("edge")
+      el.append(b, edgeLabel)
+    }
   }
 
   touchStart(event) { this.touchX = event.touches[0].clientX }

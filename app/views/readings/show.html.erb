@@ -2,8 +2,8 @@
 <header class="top" data-controller="theme">
   <div class="nav">
     <div class="nav-in">
-      <span class="brand">Study</span>
-      <div class="where"><%= @section.name %><small><%= @section.work.edition %></small></div>
+      <%= link_to "Study", library_path, class: "brand", title: "Library" %>
+      <%= link_to work_path(@section.work), class: "where", title: "Chapters in #{@section.work.title}" do %><%= @section.name %><small><%= @section.work.edition %></small><% end %>
       <%= render "notes/all_link", focus: @focus %>
       <%= button_to "Sign out", session_path, method: :delete, class: "chip", form_class: "signout" %>
       <button class="icon-btn" type="button" title="Toggle light / dark" aria-label="Toggle theme" data-action="theme#toggle">◐</button>
@@ -16,7 +16,12 @@
       data-lectio-current-value="<%= @current.number %>"
       data-lectio-position-url-value="<%= position_path %>"
       data-lectio-base-value="<%= reading_path(@section.work.slug, @section.number) %>"
-      data-lectio-ref-template-value="<%= @section.reference_template %>">
+      data-lectio-ref-template-value="<%= @section.reference_template %>"
+      data-lectio-unit-name-value="<%= unit_noun(@section) %>"
+      data-lectio-prev-url-value="<%= edge_url(@previous_section, :previous) %>"
+      data-lectio-prev-label-value="<%= @previous_section&.name %>"
+      data-lectio-next-url-value="<%= edge_url(@next_section, :next) %>"
+      data-lectio-next-label-value="<%= @next_section&.name %>">
   <div hidden>
     <% @units.each do |u| %>
       <span data-lectio-target="unit" data-number="<%= u.number %>"><%= u.body %></span>
@@ -26,17 +31,17 @@
   <% prev_unit = @units.find { |u| u.number == @current.number - 1 } %>
   <% next_unit = @units.find { |u| u.number == @current.number + 1 } %>
   <article class="lectio" data-action="touchstart->lectio#touchStart touchend->lectio#touchEnd keydown@document->lectio#key">
-    <div class="near" data-lectio-target="prev" data-action="click->lectio#previous"><% if prev_unit %><b><%= prev_unit.number %></b><%= prev_unit.body %><% end %></div>
+    <div class="near<%= " edge" if !prev_unit && @previous_section %>" data-lectio-target="prev" data-action="click->lectio#previous"><% if prev_unit %><b><%= prev_unit.number %></b><%= prev_unit.body %><% elsif @previous_section %><b>←</b><%= @previous_section.name %><% end %></div>
     <div class="now <%= unit_size_class(@current.body) %>" data-lectio-target="now"><span class="ref" data-lectio-target="ref"><%= unit_ref(@section, @current) %></span><span data-lectio-target="body"><%= @current.body %></span></div>
-    <div class="near" data-lectio-target="next" data-action="click->lectio#next"><% if next_unit %><b><%= next_unit.number %></b><%= next_unit.body %><% end %></div>
+    <div class="near<%= " edge" if !next_unit && @next_section %>" data-lectio-target="next" data-action="click->lectio#next"><% if next_unit %><b><%= next_unit.number %></b><%= next_unit.body %><% elsif @next_section %><b>→</b><%= @next_section.name %><% end %></div>
     <div class="steps">
       <button class="chip" type="button" data-action="lectio#previous">← Previous</button>
       <button class="chip" type="button" data-action="lectio#next">Next →</button>
     </div>
-    <nav class="strip" aria-label="Verses">
+    <nav class="strip<%= " scrolling" if @units.size > 40 %>" aria-label="<%= unit_noun(@section).pluralize %>" data-lectio-target="strip">
       <% @units.each do |u| %>
         <% count = @notes_by_unit.fetch(u.id, []).size %>
-        <button type="button" class="tick<%= " current" if u == @current %><%= " has" if count > 0 %>" data-lectio-target="tick" data-number="<%= u.number %>" data-action="lectio#go" aria-label="Verse <%= u.number %><%= ", #{pluralize(count, 'note')}" if count > 0 %>"><%= u.number %></button>
+        <button type="button" class="tick<%= " current" if u == @current %><%= " has" if count > 0 %>" data-lectio-target="tick" data-number="<%= u.number %>" data-action="lectio#go" aria-label="<%= unit_noun(@section) %> <%= u.number %><%= ", #{pluralize(count, 'note')}" if count > 0 %>"><%= u.number %></button>
       <% end %>
     </nav>
   </article>
@@ -61,7 +66,7 @@
     <div class="composer" data-controller="composer">
       <%= form_with model: Note.new, url: notes_path, data: { action: "turbo:submit-end->composer#reset keydown->composer#key", composer_target: "form" } do |form| %>
         <%= form.hidden_field :unit_id, value: @current.id, data: { lectio_target: "unitField" } %>
-        <%= form.rich_textarea :content, preset: "notes", rows: 2, placeholder: "How does this verse speak to your question?", data: { composer_target: "body" } %>
+        <%= form.rich_textarea :content, preset: "notes", rows: 2, placeholder: "How does this passage speak to your question?", data: { composer_target: "body" } %>
         <div class="composer-row">
           <button class="chip" type="button" data-action="composer#toggle" data-composer-target="toggle">Expand</button>
           <%= form.submit "Add note", class: "primary" %>
