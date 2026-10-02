@@ -127,8 +127,8 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_equal 23_145, Unit.where(section: ot_sections).count
     assert_equal 176, ot_sections.find_by!(works: { slug: "psalms-kjv" }, number: 119).units.count
 
-    assert_equal %w[Bible Old\ Testament New\ Testament Poetry Prose], Collection.ordered.reorder(:id).map(&:name)
-    assert_equal %w[Bible Poetry Prose], Collection.top_level.ordered.map(&:name)
+    assert_equal %w[Bible Old\ Testament New\ Testament LDS\ Scripture Book\ of\ Mormon Poetry Prose], Collection.reorder(:id).map(&:name)
+    assert_equal %w[Bible LDS\ Scripture Poetry Prose], Collection.top_level.ordered.map(&:name)
 
     nt = Collection.find_by!(slug: "new-testament")
     nt_sections = Section.joins(:work).where(works: { collection_id: nt.id })
@@ -139,6 +139,15 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_equal 7_957, Unit.where(section: nt_sections).count
     assert_equal "Malachi", nt.works.first.previous_work.title
     assert_nil nt.works.last.next_work
+
+    bom = Collection.find_by!(slug: "book-of-mormon")
+    bom_sections = Section.joins(:work).where(works: { collection_id: bom.id })
+    assert_equal "LDS Scripture", bom.parent.name
+    assert_equal 15, bom.works.count
+    assert_equal %w[1\ Nephi 2\ Nephi], bom.works.first(2).map(&:title)
+    assert_equal 239, bom_sections.count
+    assert_equal 6_604, Unit.where(section: bom_sections).count
+    assert_equal "Public-domain text", bom.works.first.edition
     assert_equal 18, Work.find_by!(slug: "walden").sections.count
     assert_equal "Walden: Economy", Work.find_by!(slug: "walden").sections.first.name
     success = Work.find_by!(slug: "dickinson").sections.find_by!(label: "Success")

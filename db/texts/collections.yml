@@ -12,11 +12,20 @@
   parent: bible
   position: 2
   description: The books of the New Testament, in the King James Version.
+- slug: lds-scripture
+  name: LDS Scripture
+  position: 2
+  description: The standard works of The Church of Jesus Christ of Latter-day Saints, in older public-domain editions rather than the Church's current copyrighted text.
+- slug: book-of-mormon
+  name: Book of Mormon
+  parent: lds-scripture
+  position: 1
+  description: Public-domain text (Project Gutenberg #17), with the traditional chapter and verse numbering. Not the Church's current edition, whose headings, footnotes and some wording are under copyright.
 - slug: poetry
   name: Poetry
-  position: 2
+  position: 3
   description: Poems, read a stanza at a time.
 - slug: prose
   name: Prose
-  position: 3
+  position: 4
   description: Essays and books, read a paragraph at a time.
