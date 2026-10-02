@@ -127,7 +127,7 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_equal 23_145, Unit.where(section: ot_sections).count
     assert_equal 176, ot_sections.find_by!(works: { slug: "psalms-kjv" }, number: 119).units.count
 
-    assert_equal %w[Bible Old\ Testament New\ Testament LDS\ Scripture Book\ of\ Mormon Poetry Prose], Collection.reorder(:id).map(&:name)
+    assert_equal %w[Bible Old\ Testament New\ Testament LDS\ Scripture Book\ of\ Mormon Poetry Emily\ Dickinson Robert\ Frost Edgar\ Allan\ Poe Prose], Collection.reorder(:id).map(&:name)
     assert_equal %w[Bible LDS\ Scripture Poetry Prose], Collection.top_level.ordered.map(&:name)
 
     nt = Collection.find_by!(slug: "new-testament")
@@ -148,6 +148,20 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_equal 239, bom_sections.count
     assert_equal 6_604, Unit.where(section: bom_sections).count
     assert_equal "Public-domain text", bom.works.first.edition
+
+    frost = Collection.find_by!(slug: "robert-frost")
+    assert_equal "Poetry", frost.parent.name
+    assert_equal [ "The Pasture", "A Boy’s Will", "North of Boston", "Mountain Interval", "New Hampshire", "West-Running Brook" ], frost.works.map(&:title)
+    assert_equal 163, Section.joins(:work).where(works: { collection_id: frost.id }).count
+    stopping = Section.joins(:work).find_by!(works: { slug: "frost-new-hampshire" }, label: "Stopping by Woods on a Snowy Evening")
+    assert_equal 4, stopping.units.count
+    assert_equal "Whose woods these are I think I know.\nHis house is in the village though;\nHe will not see me stopping here\nTo watch his woods fill up with snow.", stopping.units.first.body
+
+    poe = Collection.find_by!(slug: "edgar-allan-poe")
+    assert_equal [ "Poems", "Poems Written in Youth", "Tamerlane", "Al Aaraaf" ], poe.works.map(&:title)
+    raven = Section.joins(:work).find_by!(works: { slug: "poe-poems" }, label: "The Raven")
+    assert_equal 18, raven.units.count
+    assert_equal "Emily Dickinson", Work.find_by!(slug: "dickinson").collection.name
     assert_equal 18, Work.find_by!(slug: "walden").sections.count
     assert_equal "Walden: Economy", Work.find_by!(slug: "walden").sections.first.name
     success = Work.find_by!(slug: "dickinson").sections.find_by!(label: "Success")

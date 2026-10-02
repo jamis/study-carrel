@@ -25,6 +25,21 @@
   name: Poetry
   position: 3
   description: Poems, read a stanza at a time.
+- slug: emily-dickinson
+  name: Emily Dickinson
+  parent: poetry
+  position: 1
+  description: The three series of her poems, a stanza at a time.
+- slug: robert-frost
+  name: Robert Frost
+  parent: poetry
+  position: 2
+  description: His first five books, as gathered in the 1930 Collected Poems (public domain from 2026), plus "The Pasture".
+- slug: edgar-allan-poe
+  name: Edgar Allan Poe
+  parent: poetry
+  position: 3
+  description: The poems, from the 1900 Bell edition (public domain). Without the prose, the notes, or Politian.
 - slug: prose
   name: Prose
   position: 4

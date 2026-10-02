@@ -81,7 +81,7 @@ def build_dickinson(path):
         if stanzas:
             label = title_case(title) if title else stanzas[0].split("\n")[0].rstrip(",;:—- ")
             poems.append((typography(label), stanzas))
-    out = ["work: Emily Dickinson", "slug: dickinson", "collection: poetry", "position: 100", "unit: stanza", "lines: keep", ""]
+    out = ["work: Emily Dickinson", "slug: dickinson", "collection: emily-dickinson", "position: 100", "unit: stanza", "lines: keep", ""]
     for n, (label, stanzas) in enumerate(poems, start=1):
         out += [f"section: {n}", f"label: {label}"]
         for k, st in enumerate(stanzas, start=1):

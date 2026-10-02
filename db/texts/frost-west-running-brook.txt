@@ -1,0 +1,822 @@
+work: West-Running Brook
+edition: Collected Poems (1930)
+slug: frost-west-running-brook
+collection: robert-frost
+position: 5
+unit: stanza
+lines: keep
+
+section: 1
+label: Spring Pools
+1. These pools that, though in forests, still reflect
+The total sky almost without defect,
+And like the flowers beside them, chill and shiver,
+Will like the flowers beside them soon be gone,
+And yet not out by any brook or river,
+But up by roots to bring dark foliage on.
+2. The trees that have it in their pent-up buds
+To darken nature and be summer woods—
+Let them think twice before they use their powers
+To blot out and drink up and sweep away
+These flowery waters and these watery flowers
+From snow that melted only yesterday.
+
+section: 2
+label: The Freedom of the Moon
+1. I’ve tried the new moon tilted in the air
+Above a hazy tree-and-farmhouse cluster
+As you might try a jewel in your hair.
+I’ve tried it fine with little breadth of lustre,
+Alone, or in one ornament combining
+With one first-water star almost as shining.
+2. I put it shining anywhere I please.
+By walking slowly on some evening later,
+I’ve pulled it from a crate of crooked trees,
+And brought it over glossy water, greater,
+And dropped it in, and seen the image wallow,
+The color run, all sorts of wonder follow.
+
+section: 3
+label: The Rose Family
+1. The rose is a rose,
+And was always a rose.
+But the theory now goes
+That the apple’s a rose,
+And the pear is, and so’s
+The plum, I suppose.
+The dear only knows
+What will next prove a rose.
+You, of course, are a rose—
+But were always a rose.
+
+section: 4
+label: Fireflies in the Garden
+1. Here come real stars to fill the upper skies,
+And here on earth come emulating flies,
+That though they never equal stars in size,
+(And they were never really stars at heart)
+Achieve at times a very star-like start.
+Only, of course, they can’t sustain the part.
+
+section: 5
+label: Atmosphere
+1. Inscription for a Garden Wall
+Winds blow the open grassy places bleak;
+But where this old wall burns a sunny cheek,
+They eddy over it too toppling weak
+To blow the earth or anything self-clear;
+Moisture and color and odor thicken here.
+The hours of daylight gather atmosphere.
+
+section: 6
+label: Devotion
+1. The heart can think of no devotion
+Greater than being shore to the ocean—
+Holding the curve of one position,
+Counting an endless repetition.
+
+section: 7
+label: On Going Unnoticed
+1. As vain to raise a voice as a sigh
+In the tumult of free leaves on high.
+What are you in the shadow of trees
+Engaged up there with the light and breeze?
+2. Less than the coral-root you know
+That is content with the daylight low,
+And has no leaves at all of its own;
+Whose spotted flowers hang meanly down.
+3. You grasp the bark by a rugged pleat,
+And look up small from the forest’s feet.
+The only leaf it drops goes wide,
+Your name not written on either side.
+4. You linger your little hour and are gone,
+And still the woods sweep leafily on,
+Not even missing the coral-root flower
+You took as a trophy of the hour.
+
+section: 8
+label: The Cocoon
+1. As far as I can see this autumn haze
+That spreading in the evening air both ways,
+Makes the new moon look anything but new,
+And pours the elm-tree meadow full of blue,
+Is all the smoke from one poor house alone
+With but one chimney it can call its own;
+So close it will not light an early light,
+Keeping its life so close and out of sight
+No one for hours has set a foot outdoors
+So much as to take care of evening chores.
+The inmates may be lonely women-folk.
+I want to tell them that with all this smoke
+They prudently are spinning their cocoon
+And anchoring it to an earth and moon
+From which no winter gale can hope to blow it,—
+Spinning their own cocoon did they but know it.
+
+section: 9
+label: A Passing Glimpse
+1. To Ridgley Torrence
+On Last Looking Into His ‘Hesperides’
+I often see flowers from a passing car
+That are gone before I can tell what they are.
+2. I want to get out of the train and go back
+To see what they were beside the track.
+3. I name all the flowers I am sure they weren’t:
+Not fireweed loving where woods have burnt—
+4. Not blue bells gracing a tunnel mouth—
+Not lupine living on sand and drouth.
+5. Was something brushed across my mind
+That no one on earth will ever find?
+6. Heaven gives its glimpses only to those
+Not in position to look too close.
+
+section: 10
+label: A Peck of Gold
+1. Dust always blowing about the town,
+Except when sea-fog laid it down,
+And I was one of the children told
+Some of the blowing dust was gold.
+2. All the dust the wind blew high
+Appeared like gold in the sunset sky,
+But I was one of the children told
+Some of the dust was really gold.
+3. Such was life in the Golden Gate:
+Gold dusted all we drank and ate,
+And I was one of the children told,
+‘We all must eat our peck of gold.’
+
+section: 11
+label: Acceptance
+1. When the spent sun throws up its rays on cloud
+And goes down burning into the gulf below,
+No voice in nature is heard to cry aloud
+At what has happened. Birds, at least, must know
+It is the change to darkness in the sky.
+Murmuring something quiet in her breast,
+One bird begins to close a faded eye;
+Or overtaken too far from his nest,
+Hurrying low above the grove, some waif
+Swoops just in time to his remembered tree.
+At most he thinks or twitters softly, ‘Safe!
+Now let the night be dark for all of me.
+Let the night be too dark for me to see
+Into the future. Let what will be, be.’
+
+section: 12
+label: Once by the Pacific
+1. The shattered water made a misty din.
+Great waves looked over others coming in,
+And thought of doing something to the shore
+That water never did to land before.
+The clouds were low and hairy in the skies,
+Like locks blown forward in the gleam of eyes.
+You could not tell, and yet it looked as if
+The shore was lucky in being backed by cliff,
+The cliff in being backed by continent;
+It looked as if a night of dark intent
+Was coming, and not only a night, an age.
+Someone had better be prepared for rage.
+There would be more than ocean-water broken
+Before God’s last Put out the Light was spoken.
+
+section: 13
+label: Lodged
+1. The rain to the wind said
+‘You push and I’ll pelt.’
+They so smote the garden bed
+That the flowers actually knelt,
+And lay lodged—though not dead.
+I know how the flowers felt.
+
+section: 14
+label: A Minor Bird
+1. I have wished a bird would fly away,
+And not sing by my house all day;
+2. Have clapped my hands at him from the door
+When it seemed as if I could bear no more.
+3. The fault must partly have been in me.
+The bird was not to blame for his key.
+4. And of course there must be something wrong
+In wanting to silence any song.
+
+section: 15
+label: Bereft
+1. Where had I heard this wind before
+Change like this to a deeper roar?
+What would it take my standing there for,
+Holding open a restive door,
+Looking down hill to a frothy shore?
+Summer was past and day was past.
+Sombre clouds in the west were massed.
+Out in the porch’s sagging floor,
+Leaves got up in a coil and hissed,
+Blindly struck at my knee and missed.
+Something sinister in the tone
+Told me my secret must be known:
+Word I was in the house alone
+Somehow must have gotten abroad,
+Word I was in my life alone,
+Word I had no one left but God.
+
+section: 16
+label: Tree at My Window
+1. Tree at my window, window tree,
+My sash is lowered when night comes on;
+But let there never be curtain drawn
+Between you and me.
+2. Vague dream-head lifted out of the ground,
+And thing next most diffuse to cloud,
+Not all your light tongues talking aloud
+Could be profound.
+3. But tree, I have seen you taken and tossed,
+And if you have seen me when I slept,
+You have seen me when I was taken and swept
+And all but lost.
+4. That day she put our heads together,
+Fate had her imagination about her,
+Your head so much concerned with outer,
+Mine with inner, weather.
+
+section: 17
+label: The Peaceful Shepherd
+1. If heaven were to do again,
+And on the pasture bars,
+I leaned to line the figures in
+Between the dotted stars,
+2. I should be tempted to forget,
+I fear, the Crown of Rule,
+The Scales of Trade, the Cross of Faith,
+As hardly worth renewal.
+3. For these have governed in our lives,
+And see how men have warred.
+The Cross, the Crown, the Scales may all
+As well have been the Sword.
+
+section: 18
+label: The Thatch
+1. Out alone in the winter rain,
+Intent on giving and taking pain.
+But never was I far out of sight
+Of a certain upper-window light.
+The light was what it was all about:
+I would not go in till the light went out;
+It would not go out till I came in.
+Well, we should see which one would win,
+We should see which one would be first to yield.
+The world was a black invisible field.
+The rain by rights was snow for cold.
+The wind was another layer of mould.
+But the strangest thing: in the thick old thatch,
+Where summer birds had been given hatch,
+Had fed in chorus, and lived to fledge,
+Some still were living in hermitage.
+2. And as I passed along the eaves,
+So low I brushed the straw with my sleeves,
+I flushed birds out of hole after hole,
+Into the darkness. It grieved my soul,
+It started a grief within a grief,
+To think their case was beyond relief—
+They could not go flying about in search
+Of their nest again, nor find a perch.
+They must brood where they fell in mulch and mire,
+Trusting feathers and inward fire
+Till daylight made it safe for a flyer.
+My greater grief was by so much reduced
+As I thought of them without nest or roost.
+That was how that grief started to melt.
+They tell me the cottage where we dwelt,
+Its wind-torn thatch goes now unmended;
+Its life of hundreds of years has ended
+By letting the rain I knew outdoors
+In on to the upper chamber floors.
+
+section: 19
+label: A Winter Eden
+1. A winter garden in an alder swamp,
+Where conies now come out to sun and romp,
+As near a paradise as it can be
+And not melt snow or start a dormant tree.
+2. It lifts existence on a plane of snow
+One level higher than the earth below,
+One level nearer heaven overhead,
+And last year’s berries shining scarlet red.
+3. It lifts a gaunt luxuriating beast
+Where he can stretch and hold his highest feast
+On some wild apple tree’s young tender bark,
+What well may prove the year’s high girdle mark.
+4. So near to paradise all pairing ends:
+Here loveless birds now flock as winter friends,
+Content with bud-inspecting. They presume
+To say which buds are leaf and which are bloom.
+5. A feather-hammer gives a double knock.
+This Eden day is done at two o’clock.
+An hour of winter day might seem too short
+To make it worth life’s while to wake and sport.
+
+section: 20
+label: The Flood
+1. Blood has been harder to dam back than water.
+Just when we think we have it impounded safe
+Behind new barrier walls (and let it chafe!),
+It breaks away in some new kind of slaughter.
+We choose to say it is let loose by the devil;
+But power of blood itself releases blood.
+It goes by might of being such a flood
+Held high at so unnatural a level.
+It will have outlet, brave and not so brave.
+Weapons of war and implements of peace
+Are but the points at which it finds release.
+And now it is once more the tidal wave
+That when it has swept by leaves summits stained.
+Oh, blood will out. It cannot be contained.
+
+section: 21
+label: Acquainted With the Night
+1. I have been one acquainted with the night.
+I have walked out in rain—and back in rain.
+I have outwalked the furthest city light.
+2. I have looked down the saddest city lane.
+I have passed by the watchman on his beat
+And dropped my eyes, unwilling to explain.
+3. I have stood still and stopped the sound of feet
+When far away an interrupted cry
+Came over houses from another street,
+4. But not to call me back or say good-bye;
+And further still at an unearthly height,
+One luminary clock against the sky
+5. Proclaimed the time was neither wrong nor right.
+I have been one acquainted with the night.
+
+section: 22
+label: The Lovely Shall Be Choosers
+1. The Voice said, ‘Hurl her down!’
+2. The Voices, ‘How far down?’
+3. ‘Seven levels of the world.’
+4. ‘How much time have we?’
+5. ‘Take twenty years.
+She would refuse love safe with wealth and honor!
+The lovely shall be choosers, shall they?
+Then let them choose!’
+6. ‘Then we shall let her choose?’
+7. ‘Yes, let her choose.
+Take up the task beyond her choosing.’
+8. Invisible hands crowded on her shoulder
+In readiness to weigh upon her.
+But she stood straight still,
+In broad round ear-rings, gold and jet with pearls
+And broad round suchlike brooch,
+Her cheeks high colored,
+Proud and the pride of friends.
+9. The Voice asked, ‘You can let her choose?’
+10. ‘Yes, we can let her and still triumph.’
+11. ‘Do it by joys, and leave her always blameless.
+Be her first joy her wedding,
+That though a wedding,
+Is yet—well something they know, he and she.
+And after that her next joy
+That though she grieves, her grief is secret:
+Those friends know nothing of her grief to make it shameful.
+Her third joy that though now they cannot help but know,
+They move in pleasure too far off
+To think much or much care.
+Give her a child at either knee for fourth joy
+To tell once and once only, for them never to forget,
+How once she walked in brightness,
+And make them see it in the winter firelight.
+But give her friends for then she dare not tell
+For their foregone incredulousness.
+12. And be her next joy this:
+Her never having deigned to tell them.
+Make her among the humblest even
+Seem to them less than they are.
+Hopeless of being known for what she has been,
+Failing of being loved for what she is,
+Give her the comfort for her sixth of knowing
+She fails from strangeness to a way of life
+She came to from too high too late to learn.
+Then send some one with eyes to see
+And wonder at her where she is,
+And words to wonder in her hearing how she came there,
+But without time to linger for her story.
+Be her last joy her heart’s going out to this one
+So that she almost speaks.
+You know them—seven in all.’
+13. ‘Trust us,’ the Voices said.
+
+section: 23
+label: West-running Brook
+1. ‘Fred, where is north?’
+2. ‘North? North is there, my love.
+The brook runs west.’
+3. ‘West-running Brook then call it.’
+(West-running Brook men call it to this day.)
+‘What does it think it’s doing running west
+When all the other country brooks flow east
+To reach the ocean? It must be the brook
+Can trust itself to go by contraries
+The way I can with you—and you with me—
+Because we’re—we’re—I don’t know what we are.
+What are we?’
+4. ‘Young or new?’
+5. ‘We must be something.
+We’ve said we two. Let’s change that to we three.
+As you and I are married to each other,
+We’ll both be married to the brook. We’ll build
+Our bridge across it, and the bridge shall be
+Our arm thrown over it asleep beside it.
+Look, look, it’s waving to us with a wave
+To let us know it hears me.’
+6. ‘Why, my dear,
+That wave’s been standing off this jut of shore—’
+(The black stream, catching on a sunken rock,
+Flung backward on itself in one white wave,
+And the white water rode the black forever,
+Not gaining but not losing, like a bird
+White feathers from the struggle of whose breast
+Flecked the dark stream and flecked the darker pool
+Below the point, and were at last driven wrinkled
+In a white scarf against the far shore alders.)
+‘That wave’s been standing off this jut of shore
+Ever since rivers, I was going to say,
+Were made in heaven. It wasn’t waved to us.’
+7. ‘It wasn’t, yet it was. If not to you
+It was to me—in an annunciation.’
+8. ‘Oh, if you take it off to lady-land,
+As’t were the country of the Amazons
+We men must see you to the confines of
+And leave you there, ourselves forbid to enter,—
+It is your brook! I have no more to say.’
+9. ‘Yes, you have, too. Go on. You thought of something.’
+10. ‘Speaking of contraries, see how the brook
+In that white wave runs counter to itself.
+It is from that in water we were from
+Long, long before we were from any creature.
+Here we, in our impatience of the steps,
+Get back to the beginning of beginnings,
+The stream of everything that runs away.
+Some say existence like a Pirouot
+And Pirouette, forever in one place,
+Stands still and dances, but it runs away,
+It seriously, sadly, runs away
+To fill the abyss’ void with emptiness.
+It flows beside us in this water brook,
+But it flows over us. It flows between us
+To separate us for a panic moment.
+It flows between us, over us, and with us.
+And it is time, strength, tone, light, life and love—
+And even substance lapsing unsubstantial;
+11. The universal cataract of death
+That spends to nothingness—and unresisted,
+Save by some strange resistance in itself,
+Not just a swerving, but a throwing back,
+As if regret were in it and were sacred.
+It has this throwing backward on itself
+So that the fall of most of it is always
+Raising a little, sending up a little.
+Our life runs down in sending up the clock.
+The brook runs down in sending up our life.
+The sun runs down in sending up the brook.
+And there is something sending up the sun.
+It is this backward motion toward the source,
+Against the stream, that most we see ourselves in,
+The tribute of the current to the source.
+It is from this in nature we are from.
+It is most us.’
+12. ‘Today will be the day
+You said so.’
+13. ‘No, today will be the day
+You said the brook was called West-running Brook.’
+14. ‘Today will be the day of what we both said.’
+
+section: 24
+label: Sand Dunes
+1. Sea waves are green and wet,
+But up from where they die,
+Rise others vaster yet,
+And those are brown and dry.
+2. They are the sea made land
+To come at the fisher town,
+And bury in solid sand
+The men she could not drown.
+3. She may know cove and cape,
+But she does not know mankind
+If by any change of shape,
+She hopes to cut off mind.
+4. Men left her a ship to sink:
+They can leave her a hut as well;
+And be but more free to think
+For the one more cast off shell.
+
+section: 25
+label: Canis Major
+1. The great Overdog,
+That heavenly beast
+With a star in one eye,
+Gives a leap in the east.
+2. He dances upright
+All the way to the west
+And never once drops
+On his forefeet to rest.
+3. I’m a poor underdog,
+But tonight I will bark
+With the great Overdog
+That romps through the dark.
+
+section: 26
+label: A Soldier
+1. He is that fallen lance that lies as hurled,
+That lies unlifted now, come dew, come rust,
+But still lies pointed as it plowed the dust.
+If we who sight along it round the world,
+See nothing worthy to have been its mark,
+It is because like men we look too near,
+Forgetting that as fitted to the sphere,
+Our missiles always make too short an arc.
+They fall, they rip the grass, they intersect
+The curve of earth, and striking, break their own;
+They make us cringe for metal-point on stone.
+But this we know, the obstacle that checked
+And tripped the body, shot the spirit on
+Further than target ever showed or shone.
+
+section: 27
+label: Immigrants
+1. No ship of all that under sail or steam
+Have gathered people to us more and more
+But Pilgrim-manned the Mayflower in a dream
+Has been her anxious convoy in to shore.
+
+section: 28
+label: Hannibal
+1. Was there ever a cause too lost,
+Ever a cause that was lost too long,
+Or that showed with the lapse of time too vain
+For the generous tears of youth and song?
+
+section: 29
+label: The Flower Boat
+1. The fisherman’s swapping a yarn for a yarn
+Under the hand of the village barber,
+And here in the angle of house and barn
+His deep-sea dory has found a harbor.
+2. At anchor she rides the sunny sod
+As full to the gunnel of flowers growing
+As ever she turned her home with cod
+From George’s bank when winds were blowing.
+3. And I judge from that Elysian freight
+That all they ask is rougher weather,
+And dory and master will sail by fate
+To seek for the Happy Isles together.
+
+section: 30
+label: The Times Table
+1. More than half way up the pass
+Was a spring with a broken drinking glass,
+And whether the farmer drank or not
+His mare was sure to observe the spot
+By cramping the wheel on a water-bar,
+Turning her forehead with a star,
+And straining her ribs for a monster sigh;
+To which the farmer would make reply,
+‘A sigh for every so many breath,
+And for every so many sigh a death.
+That’s what I always tell my wife
+Is the multiplication table of life.’
+The saying may be ever so true;
+But it’s just the kind of a thing that you,
+Nor I, nor nobody else may say,
+Unless our purpose is doing harm,
+And then I know of no better way
+To close a road, abandon a farm,
+Reduce the births of the human race,
+And bring back nature in people’s place.
+
+section: 31
+label: The Investment
+1. Over back where they speak of life as staying
+(‘You couldn’t call it living, for it ain’t’),
+There was an old, old house renewed with paint,
+And in it a piano loudly playing.
+2. Out in the ploughed ground in the cold a digger,
+Among unearthed potatoes standing still,
+Was counting winter dinners, one a hill,
+With half an ear to the piano’s vigor.
+3. All that piano and new paint back there,
+Was it some money suddenly come into?
+Or some extravagance young love had been to?
+Or old love on an impulse not to care—
+4. Not to sink under being man and wife,
+But get some color and music out of life?
+
+section: 32
+label: The Last Mowing
+1. There’s a place called Far-away Meadow
+We never shall mow in again,
+Or such is the talk at the farmhouse:
+The meadow is finished with men.
+Then now is the chance for the flowers
+That can’t stand mowers and plowers.
+It must be now; though, in season
+Before the not mowing brings trees on,
+Before trees, seeing the opening,
+March into a shadowy claim.
+The trees are all I’m afraid of,
+That flowers can’t bloom in the shade of;
+It’s no more men I’m afraid of;
+The meadow is done with the tame.
+The place for the moment is ours
+For you, oh tumultuous flowers,
+To go to waste and go wild in,
+All shapes and colors of flowers,
+I needn’t call you by name.
+
+section: 33
+label: The Birthplace
+1. Here further up the mountain slope
+Than there was ever any hope,
+My father built, enclosed a spring,
+Strung chains of wall round everything,
+Subdued the growth of earth to grass,
+And brought our various lives to pass.
+A dozen girls and boys we were.
+The mountain seemed to like the stir,
+And made of us a little while—
+With always something in her smile.
+Today she wouldn’t know our name.
+(No girl’s, of course, has stayed the same.)
+The mountain pushed us off her knees.
+And now her lap is full of trees.
+
+section: 34
+label: The Door in the Dark
+1. In going from room to room in the dark,
+I reached out blindly to save my face,
+But neglected, however lightly, to lace
+My fingers and close my arms in an arc.
+A slim door got in past my guard,
+And hit me a blow in the head so hard
+I had my native simile jarred.
+So people and things don’t pair any more
+With what they used to pair with before.
+
+section: 35
+label: Dust in the Eyes
+1. If, as they say, some dust thrown in my eyes
+Will keep my talk from getting overwise,
+I’m not the one for putting off the proof.
+Let it be overwhelming, off a roof
+And round a corner, blizzard snow for dust,
+And blind me to a standstill if it must.
+
+section: 36
+label: Sitting by a Bush in Broad Sunlight
+1. When I spread out my hand here today,
+I catch no more than a ray
+To feel of between thumb and fingers;
+No lasting effect of it lingers.
+2. There was one time and only the one
+When dust really took in the sun;
+And from that one intake of fire
+All creatures still warmly suspire.
+3. And if men have watched a long time
+And never seen sun-smitten slime
+Again come to life and crawl off,
+We must not be too ready to scoff.
+4. God once declared he was true
+And then took the veil and withdrew,
+And remember how final a hush
+Then descended of old on the bush.
+5. God once spoke to people by name.
+The sun once imparted its flame.
+One impulse persists as our breath;
+The other persists as our faith.
+
+section: 37
+label: The Armful
+1. For every parcel I stoop down to seize,
+I lose some other off my arms and knees,
+And the whole pile is slipping, bottles, buns,
+Extremes too hard to comprehend at once,
+Yet nothing I should care to leave behind.
+With all I have to hold with, hand and mind
+And heart, if need be, I will do my best
+To keep their building balanced at my breast.
+I crouch down to prevent them as they fall;
+Then sit down in the middle of them all.
+I had to drop the armful in the road
+And try to stack them in a better load.
+
+section: 38
+label: What Fifty Said
+1. When I was young my teachers were the old.
+I gave up fire for form till I was cold.
+I suffered like a metal being cast.
+I went to school to age to learn the past.
+2. Now I am old my teachers are the young.
+What can’t be moulded must be cracked and sprung.
+I strain at lessons fit to start a suture.
+I go to school to youth to learn the future.
+
+section: 39
+label: Riders
+1. The surest thing there is is we are riders,
+And though none too successful at it, guiders,
+Through everything presented, land and tide
+And now the very air, of what we ride.
+2. What is this talked-of mystery of birth
+But being mounted bareback on the earth?
+We can just see the infant up astride,
+His small fist buried in the bushy hide.
+3. There is our wildest mount—a headless horse.
+But though it runs unbridled off its course,
+And all our blandishments would seem defied,
+We have ideas yet that we haven’t tried.
+
+section: 40
+label: On Looking Up By Chance at the Constellations
+1. You’ll wait a long, long time for anything much
+To happen in heaven beyond the floats of cloud
+And the Northern Lights that run like tingling nerves.
+The sun and moon get crossed, but they never touch,
+Nor strike out fire from each other, nor crash out loud.
+The planets seem to interfere in their curves,
+But nothing ever happens, no harm is done.
+We may as well go patiently on with our life,
+And look elsewhere than to stars and moon and sun
+For the shocks and changes we need to keep us sane.
+It is true the longest drouth will end in rain,
+The longest peace in China will end in strife.
+Still it wouldn’t reward the watcher to stay awake
+In hopes of seeing the calm of heaven break
+On his particular time and personal sight.
+That calm seems certainly safe to last tonight.
+
+section: 41
+label: The Bear
+1. The bear puts both arms around the tree above her
+And draws it down as if it were a lover
+And its choke cherries lips to kiss good-bye,
+Then lets it snap back upright in the sky.
+Her next step rocks a boulder on the wall
+(She’s making her cross-country in the fall).
+Her great weight creaks the barbed-wire in its staples
+As she flings over and off down through the maples,
+Leaving on one wire tooth a lock of hair.
+Such is the uncaged progress of the bear.
+The world has room to make a bear feel free;
+The universe seems cramped to you and me.
+Man acts more like the poor bear in a cage
+That all day fights a nervous inward rage,
+His mood rejecting all his mind suggests.
+2. He paces back and forth and never rests
+The toe-nail click and shuffle of his feet,
+The telescope at one end of his beat,
+And at the other end the microscope,
+Two instruments of nearly equal hope,
+And in conjunction giving quite a spread.
+Or if he rests from scientific tread,
+’Tis only to sit back and sway his head
+Through ninety odd degrees of arc, it seems,
+Between two metaphysical extremes.
+He sits back on his fundamental butt
+With lifted snout and eyes (if any) shut,
+(He almost looks religious but he’s not),
+And back and forth he sways from cheek to cheek,
+At one extreme agreeing with one Greek,
+At the other agreeing with another Greek
+Which may be thought, but only so to speak.
+A baggy figure, equally pathetic
+When sedentary and when peripatetic.
+
+section: 42
+label: The Egg and the Machine
+1. He gave the solid rail a hateful kick.
+From far away there came an answering tick
+And then another tick. He knew the code:
+His hate had roused an engine up the road.
+He wished when he had had the track alone
+He had attacked it with a club or stone
+And bent some rail wide open like a switch
+So as to wreck the engine in the ditch.
+Too late though, now, he had himself to thank.
+Its click was rising to a nearer clank.
+Here it came breasting like a horse in skirts.
+(He stood well back for fear of scalding squirts.)
+Then for a moment all there was was size
+Confusion and a roar that drowned the cries
+He raised against the gods in the machine.
+2. Then once again the sandbank lay serene.
+The traveler’s eye picked up a turtle trail,
+Between the dotted feet a streak of tail,
+And followed it to where he made out vague
+But certain signs of buried turtle’s egg;
+And probing with one finger not too rough,
+He found suspicious sand, and sure enough,
+The pocket of a little turtle mine.
+If there was one egg in it there were nine,
+Torpedo-like, with shell of gritty leather
+All packed in sand to wait the trump together.
+‘You’d better not disturb me any more,’
+He told the distance, ‘I am armed for war.
+The next machine that has the power to pass
+Will get this plasm in its goggle glass.’

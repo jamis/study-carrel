@@ -1,6 +1,6 @@
 work: Emily Dickinson
 slug: dickinson
-collection: poetry
+collection: emily-dickinson
 position: 100
 unit: stanza
 lines: keep
