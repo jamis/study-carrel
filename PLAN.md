@@ -1,4 +1,4 @@
-# Study App: Plan to v1
+# Study Carrel: Plan to v1
 
 Last updated: 2026-10-02
 See `DECISIONS.md` for decisions and `prototype/index.html` for the reference design.
@@ -44,8 +44,13 @@ Each step is small, can be checked on its own, and leaves the app working.
 16. ✅ **More texts.** Add 2-3 more: one poetry collection and one prose work. Prose will test chunking and long-paragraph sizing. **Choose the texts at this step, not before.** **Done:** the whole KJV Old Testament (39 books, cross-checked against two other sources), Emily Dickinson's poems (442, a stanza per unit) and Thoreau's *Walden* (18 chapters, a paragraph per unit). Build scripts are in `script/texts/`. Left as candidates: (see `collections.yml` and the `collection:`/`position:` headers; the loader is non-destructive and uses bulk upserts).
 17. ✅ **Chapter navigation.** First real browsing UI: collection pages (e.g. an "Old Testament" page listing its books), a book page with a chapter grid, Next/Previous that continues into the next chapter and book, and a compact verse strip for long chapters (Psalm 119 has 176 verses).
 18. ✅ **PWA basics.** Manifest, icon, installable on a phone.
-19. **Deploy.** Put it somewhere reachable from a phone, with backups of the SQLite file. **Hosting is undecided and must not block earlier steps.**
+19. **Deploy.** A DigitalOcean droplet (Ubuntu 24.04) at `studycarrel.jamisbuck.org`, no Docker: Capistrano deploys to a `deploy` user, Puma runs under systemd, Caddy does HTTPS. Setup is in `SERVER.md`; config in `config/deploy.rb` and `config/server/`. Then backups of the SQLite files, off the droplet.
+19b. **Random.** "Random" on the library, each collection and each work drops you into a random unit in lectio mode (uniform within a work or collection; the library picks a collection first). It moves your position like normal reading.
 20. **Polish.** Empty states, edit-note, keyboard and accessibility pass, real-device test.
+
+## Later (wanted, not scheduled)
+
+- **History.** Show where you've been recently (random hops make this matter) and jump straight back to any of those places. Likely a per-focus list of recently visited units, written when the position is saved.
 
 ## Notes
 
