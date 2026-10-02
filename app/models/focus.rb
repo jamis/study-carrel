@@ -13,7 +13,7 @@ class Focus < ApplicationRecord
   def notes_in_reading_order
     notes.includes(:rich_text_content, unit: { section: :work })
          .joins(unit: { section: :work })
-         .order("works.id", "sections.number", "units.number", :created_at, :id)
+         .order("works.position", "works.id", "sections.number", "units.number", :created_at, :id)
   end
 
   def archived? = archived_at.present?

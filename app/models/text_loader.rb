@@ -1,8 +1,19 @@
-# Loads a bundled text file into Work > Section > Unit. Format:
+# Loads the bundled texts into Collection > Work > Section > Unit.
+#
+# db/texts/collections.yml lists the collections:
+#
+#   - slug: old-testament
+#     name: Old Testament
+#     position: 1
+#     description: ...
+#
+# Each db/texts/*.txt file is one work:
 #
 #   work: Isaiah
 #   edition: KJV
 #   slug: isaiah-kjv        (optional; defaults to the parameterized name)
+#   collection: old-testament   (optional; a slug from collections.yml)
+#   position: 23            (optional; order within the whole library)
 #
 #   section: 40
 #   label: 40               (optional; defaults to the number)
@@ -10,15 +21,27 @@
 #   2. Speak ye comfortably...
 #
 # A unit continues on following lines until the next "N. " line, a blank line,
-# or a "section:" line, so a prose paragraph may be wrapped. Reloading a file
-# replaces that work (and anything attached to its units).
+# or a "section:" line, so a prose paragraph may be wrapped.
+#
+# Loading is an update in place: works, sections and units are matched by slug
+# and number and keep their ids, so notes attached to verses survive a reload.
+# Units that disappear from a file are left alone.
 class TextLoader
   class Error < StandardError; end
 
   UNIT = /\A(\d+)\.\s+(.*)\z/
 
   def self.load_all(dir = Rails.root.join("db/texts"))
+    load_collections(File.join(dir, "collections.yml"))
     Dir[File.join(dir, "*.txt")].sort.map { |path| load_file(path) }
+  end
+
+  def self.load_collections(path)
+    return unless File.exist?(path)
+
+    YAML.safe_load_file(path).each do |attrs|
+      Collection.find_or_initialize_by(slug: attrs.fetch("slug")).update!(attrs.slice("name", "position", "description"))
+    end
   end
 
   def self.load_file(path) = new(File.read(path), source: path).load
@@ -31,19 +54,31 @@ class TextLoader
     meta, sections = parse
     title = meta["work"] or fail_with("missing 'work:'")
     slug = meta["slug"].presence || [ title, meta["edition"] ].compact.join(" ").parameterize
+    collection = find_collection(meta["collection"])
 
     Work.transaction do
-      Work.find_by(slug: slug)&.destroy!
-      work = Work.create!(title: title, edition: meta["edition"], slug: slug)
-      sections.each do |s|
-        section = work.sections.create!(number: s[:number], label: s[:label])
-        s[:units].each { |number, body| section.units.create!(number: number, body: body) }
-      end
+      work = Work.find_or_initialize_by(slug: slug)
+      work.update!(title: title, edition: meta["edition"], collection: collection, position: meta["position"].to_i)
+      sections.each { |s| load_section(work, s) }
       work
     end
   end
 
   private
+
+  def load_section(work, data)
+    section = work.sections.find_or_initialize_by(number: data[:number])
+    section.update!(label: data[:label])
+
+    rows = data[:units].map { |number, body| { section_id: section.id, number: number, body: body } }
+    Unit.upsert_all(rows, unique_by: %i[section_id number]) if rows.any?
+  end
+
+  def find_collection(slug)
+    return if slug.blank?
+
+    Collection.find_by(slug: slug) or fail_with("unknown collection '#{slug}'")
+  end
 
   def fail_with(msg) = raise(Error, "#{@source}: #{msg}")
 

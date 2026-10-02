@@ -2,7 +2,7 @@ require "test_helper"
 
 class PositionsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt"))
+    TextLoader.load_all
     @focus = Focus.start!(title: "Holy")
     sign_in_as users(:one)
   end

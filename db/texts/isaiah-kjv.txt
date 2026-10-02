@@ -1,6 +1,8 @@
 work: Isaiah
 edition: KJV
 slug: isaiah-kjv
+collection: old-testament
+position: 23
 
 section: 40
 1. Comfort ye, comfort ye my people, saith your God.

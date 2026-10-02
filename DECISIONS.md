@@ -23,6 +23,7 @@ Example: read Isaiah 40 while pondering "What does it mean to be holy?"
 | Focus presentation | The focus is the hero of the screen: compact, accent-colored band under the nav, sticky so it stays visible while scrolling. Prototype feedback: a thin bar felt lost; a large hero banner was too big. Description opens as a dropdown. |
 | Text alignment | Left-aligned (ragged right), not centered, with a ~34em measure. Type size steps down for longer units (prose paragraphs); neighbors clamp to 2 lines. Demo of long prose: open `prototype/index.html?text=prose`. |
 | Design | **Committed** (2026-10-02): `prototype/index.html` is the reference for look and feel: lectio-only, compact sticky focus band, left-aligned text with length-adaptive sizing, verse strip, side panel / mobile bottom sheet for notes. |
+| Library structure | **Collection > Work > Section > Unit** (decided 2026-10-02). Collections are a real table (name, slug, position, description) so they can have their own pages, e.g. "Old Testament"; no nesting for now. Works have a `position` for canonical order. Loading texts updates in place and never deletes, so notes survive reloads. A Bible book is a Work, a chapter a Section, a verse a Unit. |
 | Process | Build a plain-HTML prototype first (`prototype/index.html`) to iterate on look and feel before committing to a stack. |
 
 ## Design implications

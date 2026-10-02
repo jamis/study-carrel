@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_02_160919) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_02_162444) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -47,6 +47,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_160919) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "collections", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.integer "position", default: 0, null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_collections_on_slug", unique: true
   end
 
   create_table "foci", force: :cascade do |t|
@@ -111,6 +121,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_160919) do
     t.string "slug", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "collection_id"
+    t.integer "position", default: 0, null: false
+    t.index ["collection_id"], name: "index_works_on_collection_id"
     t.index ["slug"], name: "index_works_on_slug", unique: true
   end
 
@@ -122,4 +135,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_160919) do
   add_foreign_key "sections", "works"
   add_foreign_key "sessions", "users"
   add_foreign_key "units", "sections"
+  add_foreign_key "works", "collections"
 end

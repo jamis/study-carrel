@@ -41,8 +41,8 @@ Each step is small, can be checked on its own, and leaves the app working.
 
 ### E. Finish
 15. ✅ **Remember position.** Save the current verse per focus, so the app reopens where you left off.
-16. **More texts.** Add 2-3 more: one poetry collection and one prose work. Prose will test chunking and long-paragraph sizing. **Choose the texts at this step, not before.**
-17. **Chapter navigation.** Pick a work and chapter, and move between chapters. First real browsing UI.
+16. **More texts.** Add 2-3 more: one poetry collection and one prose work. Prose will test chunking and long-paragraph sizing. **Choose the texts at this step, not before.** Candidates include the whole KJV Old Testament (see `collections.yml` and the `collection:`/`position:` headers; the loader is non-destructive and uses bulk upserts).
+17. **Chapter navigation.** First real browsing UI: collection pages (e.g. an "Old Testament" page listing its books), a book page with a chapter grid, Next/Previous that continues into the next chapter and book, and a compact verse strip for long chapters (Psalm 119 has 176 verses).
 18. **PWA basics.** Manifest, icon, installable on a phone.
 19. **Deploy.** Put it somewhere reachable from a phone, with backups of the SQLite file. **Hosting is undecided and must not block earlier steps.**
 20. **Polish.** Empty states, edit-note, keyboard and accessibility pass, real-device test.

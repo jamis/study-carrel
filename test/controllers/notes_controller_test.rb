@@ -2,7 +2,7 @@ require "test_helper"
 
 class NotesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt"))
+    TextLoader.load_all
     @focus = Focus.start!(title: "Holy")
     @unit = Unit.find_by!(number: 25)
     sign_in_as users(:one)
@@ -58,7 +58,7 @@ end
 
 class VerseStripMarkersTest < ActionDispatch::IntegrationTest
   test "verses with notes are marked on the strip" do
-    TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt"))
+    TextLoader.load_all
     focus = Focus.start!(title: "Holy")
     focus.notes.create!(unit: Unit.find_by!(number: 11), content: "a")
     focus.notes.create!(unit: Unit.find_by!(number: 11), content: "b")
@@ -72,7 +72,7 @@ end
 
 class AllNotesTest < ActionDispatch::IntegrationTest
   setup do
-    TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt"))
+    TextLoader.load_all
     @focus = Focus.start!(title: "Holy")
     sign_in_as users(:one)
   end
@@ -119,7 +119,7 @@ end
 
 class ExportTest < ActionDispatch::IntegrationTest
   setup do
-    TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt"))
+    TextLoader.load_all
     @focus = Focus.start!(title: "Holy")
     @focus.notes.create!(unit: Unit.find_by!(number: 3), content: "<p>hello</p>")
     sign_in_as users(:one)

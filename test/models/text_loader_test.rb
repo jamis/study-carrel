@@ -25,12 +25,30 @@ class TextLoaderTest < ActiveSupport::TestCase
     assert_equal "Sample Two", work.sections.last.name
   end
 
-  test "reloading replaces the work" do
-    TextLoader.new(SAMPLE).load
-    TextLoader.new(SAMPLE).load
+  test "reloading updates in place and keeps notes" do
+    work = TextLoader.new(SAMPLE).load
+    unit = work.sections.first.units.first
+    note = Focus.start!(title: "F").notes.create!(unit: unit, content: "<p>keep me</p>")
+
+    changed = SAMPLE.sub("First line", "First line, revised")
+    TextLoader.new(changed).load
 
     assert_equal 1, Work.count
     assert_equal 3, Unit.count
+    assert_equal "First line, revised wrapped here.", unit.reload.body
+    assert Note.exists?(note.id)
+  end
+
+  test "places the work in a collection with a position" do
+    Collection.create!(slug: "ot", name: "Old Testament", position: 1)
+    work = TextLoader.new(SAMPLE.sub("edition: KJV\n", "edition: KJV\ncollection: ot\nposition: 7\n")).load
+
+    assert_equal "Old Testament", work.collection.name
+    assert_equal 7, work.position
+  end
+
+  test "rejects an unknown collection" do
+    assert_raises(TextLoader::Error) { TextLoader.new(SAMPLE.sub("edition: KJV\n", "edition: KJV\ncollection: nope\n")).load }
   end
 
   test "rejects text outside a unit" do
@@ -43,8 +61,10 @@ class TextLoaderTest < ActiveSupport::TestCase
 end
 
 class BundledTextsTest < ActiveSupport::TestCase
-  test "Isaiah 40 loads with 31 verses" do
+  test "Isaiah 40 loads with 31 verses, in the Old Testament" do
+    TextLoader.load_collections(Rails.root.join("db/texts/collections.yml"))
     work = TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt"))
+    assert_equal "Old Testament", work.collection.name
     units = work.sections.find_by!(number: 40).units
 
     assert_equal (1..31).to_a, units.map(&:number)

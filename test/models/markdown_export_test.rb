@@ -2,7 +2,7 @@ require "test_helper"
 
 class MarkdownExportTest < ActiveSupport::TestCase
   setup do
-    TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt"))
+    TextLoader.load_all
     @focus = Focus.start!(title: "What does it mean to be holy?", description: "Set apart, or good?")
   end
 

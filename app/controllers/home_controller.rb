@@ -6,7 +6,7 @@ class HomeController < ApplicationController
       return redirect_to reading_path(unit.section.work.slug, unit.section.number, unit.number)
     end
 
-    section = Section.joins(:work).order("works.id", :number).first
+    section = Section.joins(:work).order("works.position", "works.id", :number).first
     return render plain: "No texts loaded. Run bin/rails db:seed" unless section
 
     redirect_to reading_path(section.work.slug, section.number)

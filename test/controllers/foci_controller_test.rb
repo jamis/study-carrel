@@ -2,7 +2,7 @@ require "test_helper"
 
 class FociControllerTest < ActionDispatch::IntegrationTest
   setup do
-    TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt"))
+    TextLoader.load_all
     sign_in_as users(:one)
   end
 
@@ -42,7 +42,7 @@ end
 
 class FociManagementTest < ActionDispatch::IntegrationTest
   setup do
-    TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt"))
+    TextLoader.load_all
     sign_in_as users(:one)
     @focus = Focus.start!(title: "Holy", description: "Set apart?")
   end

@@ -1,7 +1,7 @@
 require "test_helper"
 
 class HomeControllerTest < ActionDispatch::IntegrationTest
-  setup { TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt")) }
+  setup { TextLoader.load_all }
 
   test "requires sign in" do
     get root_path
