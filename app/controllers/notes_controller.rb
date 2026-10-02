@@ -11,6 +11,28 @@ class NotesController < ApplicationController
     send_data export.to_s, filename: export.filename, type: "text/markdown; charset=utf-8", disposition: "attachment"
   end
 
+  def show
+    @note = @focus.notes.find(params[:id])
+    redirect_to notes_path unless turbo_frame_request?
+  end
+
+  def edit
+    @note = @focus.notes.find(params[:id])
+    redirect_to notes_path unless turbo_frame_request?
+  end
+
+  def update
+    @note = @focus.notes.find(params[:id])
+    if @note.update(params.expect(note: [ :content ]))
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to notes_path }
+      end
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   def create
     @note = @focus.notes.build(note_params)
     if @note.save

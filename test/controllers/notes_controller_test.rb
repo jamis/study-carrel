@@ -54,6 +54,34 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     assert_select "#notes_unit_#{@unit.id} .note", /Current focus note/
     assert_select "#notes_unit_#{verse(24).id} .note", 0
   end
+  test "edit shows the form in a turbo frame" do
+    note = @focus.notes.create!(unit: @unit, content: "x")
+    get edit_note_path(note), headers: { "Turbo-Frame" => ActionView::RecordIdentifier.dom_id(note) }
+    assert_response :success
+    assert_select "form[action=?]", note_path(note)
+  end
+
+  test "updates a note via turbo stream" do
+    note = @focus.notes.create!(unit: @unit, content: "old")
+    patch note_path(note), params: { note: { content: "new words" } }, as: :turbo_stream
+    assert_response :success
+    assert_match %(action="replace" target="#{ActionView::RecordIdentifier.dom_id(note)}"), response.body
+    assert_equal "new words", note.reload.content.to_plain_text
+  end
+
+  test "blank edits are rejected and keep the form" do
+    note = @focus.notes.create!(unit: @unit, content: "old")
+    patch note_path(note), params: { note: { content: " " } }
+    assert_response :unprocessable_entity
+    assert_equal "old", note.reload.content.to_plain_text
+  end
+
+  test "cannot edit a note from another focus" do
+    note = @focus.notes.create!(unit: @unit, content: "x")
+    Focus.start!(title: "Other")
+    patch note_path(note), params: { note: { content: "hijack" } }, as: :turbo_stream
+    assert_response :not_found
+  end
 end
 
 class VerseStripMarkersTest < ActionDispatch::IntegrationTest

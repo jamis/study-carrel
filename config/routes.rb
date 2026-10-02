@@ -16,7 +16,7 @@ Rails.application.routes.draw do
       patch :restore
     end
   end
-  resources :notes, only: %i[index create destroy] do
+  resources :notes, only: %i[index show create edit update destroy] do
     get :export, on: :collection
   end
   get "library", to: "library#index"

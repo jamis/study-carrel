@@ -1,0 +1,12 @@
+<%= turbo_frame_tag @note, class: "note editing" do %>
+  <%= form_with model: @note, url: note_path(@note) do |form| %>
+    <%= form.rich_textarea :content, preset: "notes", rows: 2, aria: { label: "Edit note" } %>
+    <% if @note.errors.any? %>
+      <p class="composer-error" role="alert">Write a note before saving it.</p>
+    <% end %>
+    <div class="composer-row">
+      <%= link_to "Cancel", note_path(@note), class: "chip" %>
+      <%= form.submit "Save", class: "primary" %>
+    </div>
+  <% end %>
+<% end %>

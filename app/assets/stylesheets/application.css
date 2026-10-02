@@ -272,6 +272,10 @@ a:not(.chip):not(.where):not(.brand):not(.tick):not(.work-link):not(.menu-item) 
   display: block; color: var(--ink-soft); font-style: italic; padding: 14px 0; font-size: 16px;
 }
 .note-meta form { display: inline; }
+.note-actions { display: inline-flex; gap: 10px; }
+.note-meta a { color: var(--ink-soft); text-decoration: none; }
+.note-meta a:hover { color: var(--accent); }
+.note.editing .composer-row { margin-top: 8px; }
 
 /* Lexxy, themed to the paper palette (it follows light/dark through our variables). */
 lexxy-editor, .lexxy-content {
