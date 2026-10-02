@@ -128,6 +128,8 @@ export default class extends Controller {
   }
 
   touchStart(event) {
+    // Dragging the verse strip scrolls it; it must not also turn the page.
+    if (this.hasStripTarget && this.stripTarget.contains(event.target)) { this.touchStartPoint = undefined; return }
     const { clientX, clientY } = event.touches[0]
     this.touchStartPoint = { x: clientX, y: clientY }
   }
