@@ -9,6 +9,12 @@ class Focus < ApplicationRecord
 
   scope :past, -> { where.not(archived_at: nil).order(archived_at: :desc) }
 
+  def notes_in_reading_order
+    notes.includes(:rich_text_content, unit: { section: :work })
+         .joins(unit: { section: :work })
+         .order("works.id", "sections.number", "units.number", :created_at, :id)
+  end
+
   def archived? = archived_at.present?
   def archive! = update!(archived_at: Time.current)
 

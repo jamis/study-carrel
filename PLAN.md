@@ -37,7 +37,7 @@ Each step is small, can be checked on its own, and leaves the app working.
 11. ✅ **Rich notes.** Swap in the chosen editor, with the compact field and an expand control.
 12. ✅ **Verse-strip markers and counts.** Show which verses have notes.
 13. ✅ **All-notes view.** All notes in reading order, with a jump back to the verse.
-14. **Markdown export.** Copy or download as Markdown.
+14. ✅ **Markdown export.** Copy or download as Markdown.
 
 ### E. Finish
 15. **Remember position.** Save the current verse per focus, so the app reopens where you left off.

@@ -116,3 +116,27 @@ class AllNotesTest < ActionDispatch::IntegrationTest
     assert_select ".fv-more", 1
   end
 end
+
+class ExportTest < ActionDispatch::IntegrationTest
+  setup do
+    TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt"))
+    @focus = Focus.start!(title: "Holy")
+    @focus.notes.create!(unit: Unit.find_by!(number: 3), content: "<p>hello</p>")
+    sign_in_as users(:one)
+  end
+
+  test "downloads the Markdown" do
+    get export_notes_path
+    assert_response :success
+    assert_match "text/markdown", response.content_type
+    assert_match 'filename="holy.md"', response.headers["Content-Disposition"]
+    assert_includes response.body, "# Holy"
+    assert_includes response.body, "hello"
+  end
+
+  test "all-notes page offers copy and download" do
+    get notes_path
+    assert_select "[data-controller=clipboard][data-clipboard-text-value*=?]", "# Holy"
+    assert_select "a[href=?]", export_notes_path
+  end
+end
