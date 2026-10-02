@@ -1,2 +1,0 @@
-class Focu < ApplicationRecord
-end
