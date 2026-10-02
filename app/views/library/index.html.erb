@@ -10,13 +10,7 @@
     <p class="page-empty">No texts are loaded yet. Run <code>bin/rails db:seed</code> on the server.</p>
   <% end %>
 
-  <% @collections.each do |collection| %>
-    <div class="list-row">
-      <div class="list-row-title"><%= link_to collection.name, collection_path(collection) %></div>
-      <% if collection.description.present? %><div class="list-row-desc"><%= collection.description %></div><% end %>
-      <div class="list-row-meta"><%= pluralize(collection.works.size, "work") %></div>
-    </div>
-  <% end %>
+  <%= render partial: "collections/row", collection: @collections, as: :collection %>
 
   <% @loose_works.each do |work| %>
     <div class="list-row">

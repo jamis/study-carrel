@@ -5,6 +5,7 @@
 #   - slug: old-testament
 #     name: Old Testament
 #     position: 1
+#     parent: bible           (optional; the slug of the collection this one is nested in)
 #     description: ...
 #
 # Each db/texts/*.txt file is one work:
@@ -41,8 +42,16 @@ class TextLoader
   def self.load_collections(path)
     return unless File.exist?(path)
 
-    YAML.safe_load_file(path).each do |attrs|
+    entries = YAML.safe_load_file(path)
+    entries.each do |attrs|
       Collection.find_or_initialize_by(slug: attrs.fetch("slug")).update!(attrs.slice("name", "position", "description"))
+    end
+
+    # Parents are linked in a second pass so a file can list them in any order.
+    entries.each do |attrs|
+      parent = attrs["parent"] && (Collection.find_by(slug: attrs["parent"]) or
+        raise Error, "#{path}: unknown parent '#{attrs["parent"]}' for '#{attrs["slug"]}'")
+      Collection.find_by!(slug: attrs.fetch("slug")).update!(parent: parent)
     end
   end
 

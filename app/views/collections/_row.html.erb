@@ -1,0 +1,5 @@
+<div class="list-row">
+  <div class="list-row-title"><%= link_to collection.name, collection_path(collection) %></div>
+  <% if collection.description.present? %><div class="list-row-desc"><%= collection.description %></div><% end %>
+  <div class="list-row-meta"><%= pluralize(collection.all_works.count, "work") %></div>
+</div>

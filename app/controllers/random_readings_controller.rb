@@ -17,7 +17,7 @@ class RandomReadingsController < ApplicationController
   end
 
   def random_unit(scope)
-    scope ||= (Collection.all.to_a + Work.where(collection_id: nil).to_a).select { |s| units_in(s).exists? }.sample
+    scope ||= (Collection.top_level.to_a + Work.where(collection_id: nil).to_a).select { |s| units_in(s).exists? }.sample
     scope && pick(units_in(scope))
   end
 
@@ -31,7 +31,7 @@ class RandomReadingsController < ApplicationController
     units = Unit.joins(:section).includes(section: :work)
     case scope
     when Work then units.where(sections: { work_id: scope.id })
-    else units.where(sections: { work_id: scope.works.select(:id) })
+    else units.where(sections: { work_id: scope.all_works.select(:id) })
     end
   end
 end

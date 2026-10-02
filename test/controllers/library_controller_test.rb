@@ -24,6 +24,25 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "nested collections: the library shows the top level, the parent lists its children, and Random reaches them" do
+    scripture = Collection.create!(slug: "scripture", name: "Scripture", position: 0)
+    Collection.find_by!(slug: "old-testament").update!(parent: scripture)
+
+    get library_path
+    assert_select ".list-row-title a", text: "Scripture"
+    assert_select ".list-row-title a", text: "Old Testament", count: 0
+    assert_select ".list-row-meta", text: "2 works", count: 1
+
+    get collection_path("scripture")
+    assert_select ".list-row-title a[href=?]", collection_path("old-testament")
+
+    get collection_path("old-testament")
+    assert_select "a.chip", text: "← Scripture"
+
+    get random_collection_path("scripture")
+    assert_match %r{/read/(genesis|exodus)-kjv/}, response.location
+  end
+
   test "a numbered work shows a chapter grid linking to each chapter, marking those with notes" do
     exodus = Work.find_by!(slug: "exodus-kjv")
     Focus.current_one.notes.create!(unit: exodus.sections.find_by!(number: 2).units.first, content: "x")

@@ -47,6 +47,22 @@ class TextLoaderTest < ActiveSupport::TestCase
     assert_equal 7, work.position
   end
 
+  test "collections.yml can nest collections, in any order" do
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, "collections.yml")
+      File.write(path, <<~YAML)
+        - slug: ot
+          name: Old Testament
+          parent: bible
+        - slug: bible
+          name: Bible
+      YAML
+      TextLoader.load_collections(path)
+    end
+    assert_equal "Bible", Collection.find_by!(slug: "ot").parent.name
+    assert_nil Collection.find_by!(slug: "bible").parent
+  end
+
   test "rejects an unknown collection" do
     assert_raises(TextLoader::Error) { TextLoader.new(SAMPLE.sub("edition: KJV\n", "edition: KJV\ncollection: nope\n")).load }
   end
