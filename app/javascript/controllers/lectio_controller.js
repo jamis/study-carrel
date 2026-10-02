@@ -40,7 +40,7 @@ export default class extends Controller {
   select(number) {
     if (!this.bodies.has(number)) return
     this.currentValue = number
-    history.replaceState(null, "", `${this.baseValue}/${number}`)
+    history.replaceState(history.state, "", `${this.baseValue}/${number}`)
     this.render()
     this.savePosition()
   }
