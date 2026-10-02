@@ -4,7 +4,7 @@
     <div class="nav-in">
       <span class="brand">Study</span>
       <div class="where"><%= @section.name %><small><%= @section.work.edition %></small></div>
-      <%= link_to (@focus.notes.any? ? "All notes (#{@focus.notes.count})" : "All notes"), notes_path, class: "chip" %>
+      <%= render "notes/all_link", focus: @focus %>
       <%= button_to "Sign out", session_path, method: :delete, class: "chip", form_class: "signout" %>
       <button class="icon-btn" type="button" title="Toggle light / dark" aria-label="Toggle theme" data-action="theme#toggle">◐</button>
     </div>

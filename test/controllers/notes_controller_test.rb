@@ -16,6 +16,8 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     assert_equal @focus, Note.last.focus
     assert_match %(action="append" target="notes_unit_#{@unit.id}"), response.body
     assert_match "Incomparable.", response.body
+    assert_match %(action="replace" target="all_notes_link"), response.body
+    assert_match "All notes (1)", response.body
   end
 
   test "blank notes are rejected" do
@@ -31,6 +33,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
       delete note_path(note), as: :turbo_stream
     end
     assert_match %(action="remove" target="#{ActionView::RecordIdentifier.dom_id(note)}"), response.body
+    assert_match %(action="replace" target="all_notes_link"), response.body
   end
 
   test "cannot delete a note from another focus" do

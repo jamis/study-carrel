@@ -1,1 +1,2 @@
 <%= turbo_stream.append "notes_unit_#{@note.unit_id}", partial: "notes/note", locals: { note: @note } %>
+<%= turbo_stream.replace "all_notes_link", partial: "notes/all_link", locals: { focus: @focus } %>
