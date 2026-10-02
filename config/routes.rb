@@ -13,7 +13,6 @@ Rails.application.routes.draw do
   patch "position", to: "positions#update"
   resources :foci, only: %i[index new create edit update] do
     member do
-      patch :archive
       patch :restore
     end
   end

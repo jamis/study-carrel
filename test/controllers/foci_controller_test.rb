@@ -60,13 +60,6 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "archive leaves no current focus, so the app asks for a new one" do
-    patch archive_focus_path(@focus)
-    assert @focus.reload.archived?
-    get root_path
-    assert_redirected_to new_focus_path
-  end
-
   test "past foci list shows archived foci and can restore one" do
     @focus.archive!
     other = Focus.start!(title: "Light")
@@ -80,10 +73,10 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     assert_equal 1, Focus.current.count
   end
 
-  test "the band offers edit, archive and all foci" do
+  test "the band offers edit, new focus and all foci" do
     get reading_path("isaiah-kjv", 40)
     assert_select ".focus-actions a[href=?]", edit_focus_path(@focus)
-    assert_select ".focus-actions form[action=?]", archive_focus_path(@focus)
+    assert_select ".focus-actions a[href=?]", new_focus_path, text: "New focus"
     assert_select ".focus-actions a[href=?]", foci_path
   end
 end

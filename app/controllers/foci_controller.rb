@@ -1,5 +1,5 @@
 class FociController < ApplicationController
-  before_action :set_focus, only: %i[edit update archive restore]
+  before_action :set_focus, only: %i[edit update restore]
 
   def index
     @current = Focus.current_one
@@ -29,11 +29,6 @@ class FociController < ApplicationController
     else
       render :edit, status: :unprocessable_entity
     end
-  end
-
-  def archive
-    @focus.archive!
-    redirect_to root_path
   end
 
   def restore

@@ -3,5 +3,9 @@
   <h1 class="brand">Study</h1>
   <p class="signin-notice"><%= Focus.current_one ? "What will you ponder next?" : "What do you want to ponder as you read?" %></p>
   <%= render "form", focus: @focus, submit: "Begin" %>
-  <% if Focus.exists? %><p class="signin-notice"><%= link_to "Past foci", foci_path %></p><% end %>
+  <% if Focus.exists? %>
+    <p class="signin-notice">
+      <% if Focus.current_one %><%= link_to "Cancel", root_path %> · <% end %><%= link_to "Past foci", foci_path %>
+    </p>
+  <% end %>
 </main>
