@@ -111,6 +111,7 @@
     text-wrap: pretty;
   }
   .near:hover { opacity: .9; }
+  .now, .near { white-space: pre-line; }
   .near b { font-family: var(--sans); font-size: 11px; color: var(--accent); font-weight: 600; margin-right: 4px; }
   .now { font-size: clamp(22px, 3.6vw, 32px); line-height: 1.5; text-wrap: pretty; hyphens: auto; }
   .now.mid { font-size: clamp(20px, 3vw, 27px); line-height: 1.55; }
@@ -286,3 +287,4 @@ a.fv-ref:hover { text-decoration: underline; }
 .fv-more { border: 0; background: none; padding: 0 0 10px; color: var(--accent); font-family: var(--sans); font-size: 12px; cursor: pointer; }
 .fv-more:hover { text-decoration: underline; }
 .page-bar-actions { display: flex; gap: 8px; }
+.fv-quote { white-space: pre-line; }

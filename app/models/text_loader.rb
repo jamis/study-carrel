@@ -14,6 +14,8 @@
 #   slug: isaiah-kjv        (optional; defaults to the parameterized name)
 #   collection: old-testament   (optional; a slug from collections.yml)
 #   position: 23            (optional; order within the whole library)
+#   unit: paragraph         (optional; what a unit is called, default "verse")
+#   lines: keep             (optional; keep line breaks inside a unit, for poetry)
 #
 #   section: 40
 #   label: 40               (optional; defaults to the number)
@@ -58,7 +60,8 @@ class TextLoader
 
     Work.transaction do
       work = Work.find_or_initialize_by(slug: slug)
-      work.update!(title: title, edition: meta["edition"], collection: collection, position: meta["position"].to_i)
+      work.update!(title: title, edition: meta["edition"], collection: collection, position: meta["position"].to_i,
+                   unit_name: meta["unit"].presence || "verse")
       sections.each { |s| load_section(work, s) }
       work
     end
@@ -85,6 +88,7 @@ class TextLoader
   def parse
     meta, sections = {}, []
     section = unit = nil
+    @keep_lines = @text[/^lines:\s*keep\s*$/]
 
     @text.each_line.with_index(1) do |raw, lineno|
       line = raw.strip
@@ -104,7 +108,7 @@ class TextLoader
         unit = [ $1.to_i, +$2 ]
         section[:units] << unit
       elsif unit
-        unit[1] << " " << line
+        unit[1] << (@keep_lines ? "\n" : " ") << line
       else
         fail_with("line #{lineno}: text outside a numbered unit")
       end

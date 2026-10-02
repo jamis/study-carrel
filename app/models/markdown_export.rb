@@ -12,7 +12,7 @@ class MarkdownExport
     out << @focus.description.strip if @focus.description.present?
 
     @focus.notes_in_reading_order.group_by(&:unit).each do |unit, notes|
-      out << "## #{unit.section.name}:#{unit.number}"
+      out << "## #{unit.reference}"
       out << quote(unit.body)
       notes.each { |note| out << note_markdown(note) }
     end

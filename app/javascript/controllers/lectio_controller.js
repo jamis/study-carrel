@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 // Switches verses client-side; the whole section is already on the page.
 export default class extends Controller {
   static targets = ["unit", "prev", "now", "body", "next", "ref", "tick", "notes", "count", "unitField"]
-  static values = { current: Number, base: String, refPrefix: String, positionUrl: String }
+  static values = { current: Number, base: String, refTemplate: String, positionUrl: String }
 
   connect() {
     this.bodies = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.textContent.trim()]))
@@ -62,7 +62,7 @@ export default class extends Controller {
     const body = this.bodies.get(n)
     this.nowTarget.className = "now" + (body.length > 450 ? " long" : body.length > 180 ? " mid" : "")
     this.bodyTarget.textContent = body
-    this.refTargets.forEach(r => r.textContent = `${this.refPrefixValue}:${n}`)
+    this.refTargets.forEach(r => r.textContent = this.refTemplateValue.replace("{n}", n))
     this.tickTargets.forEach(t => t.classList.toggle("current", Number(t.dataset.number) === n))
 
     this.notesTargets.forEach(el => { el.hidden = Number(el.dataset.number) !== n })

@@ -4,4 +4,6 @@ class Unit < ApplicationRecord
 
   validates :number, presence: true, uniqueness: { scope: :section_id }
   validates :body, presence: true
+
+  def reference = section.reference(number)
 end

@@ -16,7 +16,7 @@
       data-lectio-current-value="<%= @current.number %>"
       data-lectio-position-url-value="<%= position_path %>"
       data-lectio-base-value="<%= reading_path(@section.work.slug, @section.number) %>"
-      data-lectio-ref-prefix-value="<%= @section.name %>">
+      data-lectio-ref-template-value="<%= @section.reference_template %>">
   <div hidden>
     <% @units.each do |u| %>
       <span data-lectio-target="unit" data-number="<%= u.number %>"><%= u.body %></span>
