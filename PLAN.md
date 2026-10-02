@@ -29,7 +29,7 @@ Each step is small, can be checked on its own, and leaves the app working.
 
 ### C. Focus
 7. ✅ **Focus model.** One current focus, shown in the sticky band. Minimal create form, plus a first-run state when none exists.
-8. **Focus details.** Dropdown with description and edit, plus archive and a simple past-foci list.
+8. ✅ **Focus details.** Dropdown with description and edit, plus archive and a simple past-foci list.
 
 ### D. Notes
 9. **Editor spike.** Try Lexxy in an isolated page and confirm it works on a phone. Decide Lexxy or Trix.

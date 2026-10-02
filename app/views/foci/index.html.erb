@@ -1,0 +1,31 @@
+<% content_for :title, "Foci · Study" %>
+<main class="page">
+  <div class="page-bar">
+    <%= link_to "← Back to reading", root_path, class: "chip" %>
+    <%= link_to "New focus", new_focus_path, class: "chip" %>
+  </div>
+  <h2 class="page-title">Foci</h2>
+
+  <% if @current %>
+    <h3 class="page-sub">Current</h3>
+    <div class="focus-row">
+      <div class="focus-row-title"><%= @current.title %></div>
+      <div class="focus-row-meta">since <%= l @current.created_at.to_date, format: :long %></div>
+    </div>
+  <% end %>
+
+  <h3 class="page-sub">Past</h3>
+  <% if @past.empty? %>
+    <p class="page-empty">Nothing here yet. Foci you set aside will be kept here.</p>
+  <% end %>
+  <% @past.each do |focus| %>
+    <div class="focus-row">
+      <div class="focus-row-title"><%= focus.title %></div>
+      <% if focus.description.present? %><div class="focus-row-desc"><%= focus.description %></div><% end %>
+      <div class="focus-row-meta">
+        <%= l focus.created_at.to_date, format: :long %> – <%= l focus.archived_at.to_date, format: :long %>
+        · <%= button_to "Make current", restore_focus_path(focus), method: :patch, class: "chip", form_class: "inline-form" %>
+      </div>
+    </div>
+  <% end %>
+</main>

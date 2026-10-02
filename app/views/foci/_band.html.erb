@@ -2,11 +2,19 @@
   <button class="focus-head" type="button" aria-expanded="false" title="About this focus" data-focus-target="head" data-action="focus#toggle">
     <span class="focus-label">Focus</span>
     <h1 class="focus-title"><%= focus.title %></h1>
-    <% if focus.description.present? %><span class="focus-caret">▾</span><% end %>
+    <span class="focus-caret">▾</span>
   </button>
-  <% if focus.description.present? %>
-    <div class="focus-body"><div class="focus-body-in">
+  <div class="focus-body"><div class="focus-body-in">
+    <% if focus.description.present? %>
       <%= simple_format(h(focus.description)) %>
-    </div></div>
-  <% end %>
+    <% else %>
+      <p><em>No description yet.</em></p>
+    <% end %>
+    <div class="focus-actions">
+      <%= link_to "Edit focus", edit_focus_path(focus), class: "chip" %>
+      <%= button_to "Archive", archive_focus_path(focus), method: :patch, class: "chip", form_class: "inline-form",
+            form: { data: { turbo_confirm: "Archive this focus? You can bring it back from Past foci." } } %>
+      <%= link_to "All foci", foci_path, class: "chip" %>
+    </div>
+  </div></div>
 </section>

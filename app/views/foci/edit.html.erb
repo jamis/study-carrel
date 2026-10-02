@@ -1,0 +1,6 @@
+<% content_for :title, "Edit focus · Study" %>
+<main class="signin">
+  <h1 class="brand">Study</h1>
+  <%= render "form", focus: @focus, submit: "Save" %>
+  <p class="signin-notice"><%= link_to "Cancel", root_path %></p>
+</main>

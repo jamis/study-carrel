@@ -10,7 +10,12 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  resources :foci, only: %i[new create]
+  resources :foci, only: %i[index new create edit update] do
+    member do
+      patch :archive
+      patch :restore
+    end
+  end
   get "read/:slug/:section(/:number)", to: "readings#show", as: :reading
 
   root "home#index"
