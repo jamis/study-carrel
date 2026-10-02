@@ -282,3 +282,6 @@ a.fv-ref { text-decoration: none; }
 a.fv-ref:hover { text-decoration: underline; }
 .fv-note .lexxy-content > :first-child { margin-top: 0; }
 .fv-note .lexxy-content > :last-child { margin-bottom: 0; }
+.fv-quote.clamped { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.fv-more { border: 0; background: none; padding: 0 0 10px; color: var(--accent); font-family: var(--sans); font-size: 12px; cursor: pointer; }
+.fv-more:hover { text-decoration: underline; }

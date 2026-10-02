@@ -105,4 +105,14 @@ class AllNotesTest < ActionDispatch::IntegrationTest
     get reading_path("isaiah-kjv", 40)
     assert_select "a.chip[href=?]", notes_path, text: "All notes (1)"
   end
+
+  test "long passages are clamped with a way to expand them" do
+    long = Unit.find_by!(number: 3)
+    long.update!(body: "word " * 100)
+    @focus.notes.create!(unit: long, content: "x")
+    @focus.notes.create!(unit: Unit.find_by!(number: 4), content: "y")
+    get notes_path
+    assert_select ".fv-quote.clamped", 1
+    assert_select ".fv-more", 1
+  end
 end
