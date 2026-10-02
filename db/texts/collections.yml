@@ -21,9 +21,13 @@
   parent: lds-scripture
   position: 1
   description: Public-domain text (Project Gutenberg #17), with the traditional chapter and verse numbering. Not the Church's current edition, whose headings, footnotes and some wording are under copyright.
+- slug: world-scripture
+  name: World Scripture
+  position: 3
+  description: Sacred texts of other traditions, in public-domain translations from the 19th century. Older translations read differently from modern ones.
 - slug: poetry
   name: Poetry
-  position: 3
+  position: 4
   description: Poems, read a stanza at a time.
 - slug: emily-dickinson
   name: Emily Dickinson
@@ -42,5 +46,5 @@
   description: The poems, from the 1900 Bell edition (public domain). Without the prose, the notes, or Politian.
 - slug: prose
   name: Prose
-  position: 4
+  position: 5
   description: Essays and books, read a paragraph at a time.

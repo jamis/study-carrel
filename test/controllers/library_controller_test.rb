@@ -94,6 +94,12 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
     assert_select "a.brand[href=?]", library_path
   end
 
+  test "a text whose verse numbers skip ahead renders neighbors by position" do
+    TextLoader.new("work: Skippy\ncollection: prose\n\nsection: 1\nlabel: One\n58. a\n60. b\n61. c\n").load
+    get reading_path("skippy", 1, 58)
+    assert_select "[data-lectio-target=next] b", "60"
+  end
+
   test "units are named for the text in labels" do
     get reading_path("walden", 1, 1)
     assert_select ".tick[aria-label=?]", "Paragraph 1"

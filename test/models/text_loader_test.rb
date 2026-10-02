@@ -127,8 +127,8 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_equal 23_145, Unit.where(section: ot_sections).count
     assert_equal 176, ot_sections.find_by!(works: { slug: "psalms-kjv" }, number: 119).units.count
 
-    assert_equal %w[Bible Old\ Testament New\ Testament LDS\ Scripture Book\ of\ Mormon Poetry Emily\ Dickinson Robert\ Frost Edgar\ Allan\ Poe Prose], Collection.reorder(:id).map(&:name)
-    assert_equal %w[Bible LDS\ Scripture Poetry Prose], Collection.top_level.ordered.map(&:name)
+    assert_equal %w[Bible Old\ Testament New\ Testament LDS\ Scripture Book\ of\ Mormon World\ Scripture Poetry Emily\ Dickinson Robert\ Frost Edgar\ Allan\ Poe Prose], Collection.reorder(:id).map(&:name)
+    assert_equal %w[Bible LDS\ Scripture World\ Scripture Poetry Prose], Collection.top_level.ordered.map(&:name)
 
     nt = Collection.find_by!(slug: "new-testament")
     nt_sections = Section.joins(:work).where(works: { collection_id: nt.id })
@@ -162,6 +162,29 @@ class BundledTextsTest < ActiveSupport::TestCase
     raven = Section.joins(:work).find_by!(works: { slug: "poe-poems" }, label: "The Raven")
     assert_equal 18, raven.units.count
     assert_equal "Emily Dickinson", Work.find_by!(slug: "dickinson").collection.name
+
+    world = Collection.find_by!(slug: "world-scripture")
+    assert_equal %w[Dhammapada Tao\ Te\ Ching Bhagavad\ Gita\ (The\ Song\ Celestial) Quran], world.works.map(&:title)
+    counts = ->(slug) { Section.joins(:work).where(works: { slug: slug }).then { |s| [ s.count, Unit.where(section: s).count ] } }
+    assert_equal [ 26, 414 ], counts.("dhammapada")
+    assert_equal [ 81, 253 ], counts.("tao-te-ching")
+    assert_equal [ 18, 240 ], counts.("bhagavad-gita")
+    assert_equal [ 114, 6_245 ], counts.("quran")
+    assert_equal [ 12, 418 ], counts.("meditations")
+    assert_equal "Prose", Work.find_by!(slug: "meditations").collection.name
+
+    # The Quran is in the traditional order, not Rodwell's chronological one.
+    cow = Section.joins(:work).find_by!(works: { slug: "quran" }, number: 2)
+    assert_equal "2. The Cow", cow.label
+    assert_equal "Al-Fatihah", Section.joins(:work).find_by!(works: { slug: "quran" }, number: 1).label.delete_prefix("1. ")
+    assert_equal 4, Section.joins(:work).find_by!(works: { slug: "quran" }, number: 112).units.count
+    assert_no_match(/\d/, Section.joins(:work).find_by!(works: { slug: "quran" }, number: 96).units.map(&:body).join)
+
+    # Müller prints verses 58 and 59 as one passage.
+    dhp = Work.find_by!(slug: "dhammapada").sections
+    assert_equal (21..32).to_a, dhp.find_by!(number: 2).units.map(&:number)
+    assert_includes dhp.find_by!(label: "The Fool").units.map(&:number), 60
+    assert_not_includes Unit.where(section: dhp).map(&:number), 59
     assert_equal 18, Work.find_by!(slug: "walden").sections.count
     assert_equal "Walden: Economy", Work.find_by!(slug: "walden").sections.first.name
     success = Work.find_by!(slug: "dickinson").sections.find_by!(label: "Success")

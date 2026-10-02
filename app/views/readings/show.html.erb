@@ -36,8 +36,9 @@
     <% end %>
   </div>
 
-  <% prev_unit = @units.find { |u| u.number == @current.number - 1 } %>
-  <% next_unit = @units.find { |u| u.number == @current.number + 1 } %>
+  <% at = @units.index(@current) %>
+  <% prev_unit = (@units[at - 1] if at.positive?) %>
+  <% next_unit = @units[at + 1] %>
   <article class="lectio" data-action="touchstart->lectio#touchStart touchend->lectio#touchEnd keydown@document->lectio#key">
     <div class="near<%= " edge" if !prev_unit && @previous_section %>" aria-hidden="true" data-lectio-target="prev" data-action="click->lectio#previous"><% if prev_unit %><b><%= prev_unit.number %></b><%= prev_unit.body %><% elsif @previous_section %><b>←</b><%= @previous_section.name %><% end %></div>
     <div class="now <%= unit_size_class(@current.body) %>" aria-live="polite" data-lectio-target="now"><span class="ref" data-lectio-target="ref"><%= unit_ref(@section, @current) %></span><span data-lectio-target="body"><%= @current.body %></span></div>
