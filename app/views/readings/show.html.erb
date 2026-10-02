@@ -64,9 +64,10 @@
       <% end %>
     </div>
     <div class="composer" data-controller="composer">
-      <%= form_with model: Note.new, url: notes_path, data: { action: "turbo:submit-end->composer#reset keydown->composer#key", composer_target: "form" } do |form| %>
+      <%= form_with model: Note.new, url: notes_path, data: { action: "turbo:submit-end->composer#reset keydown->composer#key input->composer#clearError", composer_target: "form" } do |form| %>
         <%= form.hidden_field :unit_id, value: @current.id, data: { lectio_target: "unitField" } %>
         <%= form.rich_textarea :content, preset: "notes", rows: 2, placeholder: "How does this passage speak to your question?", data: { composer_target: "body" } %>
+        <p class="composer-error" role="alert" hidden data-composer-target="error"></p>
         <div class="composer-row">
           <button class="chip" type="button" data-action="composer#toggle" data-composer-target="toggle">Expand</button>
           <%= form.submit "Add note", class: "primary" %>

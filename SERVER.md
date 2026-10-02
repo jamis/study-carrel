@@ -95,3 +95,62 @@ ssh -t deploy@studycarrel.jamisbuck.org 'cd study_carrel/current && RAILS_ENV=pr
 - Roll back: `bundle exec cap production deploy:rollback`
 - Logs: `ssh root@studycarrel.jamisbuck.org journalctl -u study_carrel -f`
 - Reload texts after changing `db/texts`: `cap production study_carrel:load_texts`
+
+## Backups (Litestream to Backblaze B2)
+
+Litestream streams the primary database (`production.sqlite3`, where the notes live) to a
+private B2 bucket, continuously. The other three databases are disposable.
+
+**In the B2 console (once):**
+
+1. Buckets → *Create a Bucket*: a unique name (e.g. `studycarrel-backups-<something>`),
+   **Private**, default encryption on. Note its **Endpoint** (like
+   `s3.us-west-004.backblazeb2.com`); the region is the middle part (`us-west-004`).
+2. On the bucket, *Lifecycle Settings* → *Use custom lifecycle rules*: keep prior versions
+   for **30 days**. (B2 keeps deleted/replaced files as hidden versions; Litestream prunes
+   its own files constantly, so without this the bucket only grows. Thirty days also gives
+   you time to recover from a bad write.)
+3. App Keys → *Add a New Application Key*: restrict it to **this bucket only**, read and
+   write. Copy the **keyID** and **applicationKey** now: B2 shows the secret once.
+
+**On the droplet (as root):**
+
+```
+curl -fsSLO https://github.com/benbjohnson/litestream/releases/download/v0.5.17/litestream-0.5.17-linux-x86_64.deb
+dpkg -i litestream-0.5.17-linux-x86_64.deb && rm litestream-0.5.17-linux-x86_64.deb
+
+# Credentials: type them yourself so they never land in a shell history or a repo.
+install -m 600 /dev/null /etc/litestream.env
+nano /etc/litestream.env     # two lines, no quotes:
+#   LITESTREAM_ACCESS_KEY_ID=<keyID>
+#   LITESTREAM_SECRET_ACCESS_KEY=<applicationKey>
+```
+
+Edit `config/server/litestream.yml` (bucket, endpoint, region), commit, then from the laptop:
+
+```
+scp config/server/litestream.yml root@studycarrel.jamisbuck.org:/etc/litestream.yml
+scp config/server/litestream.service root@studycarrel.jamisbuck.org:/etc/systemd/system/litestream.service
+```
+
+and on the droplet:
+
+```
+systemctl daemon-reload && systemctl enable --now litestream
+journalctl -u litestream -n 20 --no-pager
+```
+
+**Restore test (do this once, now, and again after big changes).** Restore into a scratch
+file and open it; never over the live database:
+
+```
+set -a; . /etc/litestream.env; set +a      # as root: load the B2 credentials
+litestream restore -o /tmp/restore-test.sqlite3 /home/deploy/study_carrel/shared/storage/production.sqlite3
+sqlite3 /tmp/restore-test.sqlite3 'select count(*) from units; select count(*) from notes;'
+rm /tmp/restore-test.sqlite3*
+```
+
+**Disaster recovery** (the droplet is gone): rebuild the server from sections 1-5, create
+`/etc/litestream.env` and `/etc/litestream.yml`, deploy, stop the app, then
+`litestream restore -o <storage>/production.sqlite3 <that db path>` (load the credentials as above, then `chown deploy:deploy` the result), start the
+app, and enable `litestream`.

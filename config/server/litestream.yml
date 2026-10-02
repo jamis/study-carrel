@@ -1,0 +1,7 @@
+# Replicates the primary database to Backblaze B2 (S3-compatible). Credentials come
+# from /etc/litestream.env (LITESTREAM_ACCESS_KEY_ID / LITESTREAM_SECRET_ACCESS_KEY).
+# The cache, queue and cable databases are disposable and are not replicated.
+dbs:
+  - path: /home/deploy/study_carrel/shared/storage/production.sqlite3
+    replica:
+      url: s3://BUCKET/production?endpoint=ENDPOINT&region=REGION

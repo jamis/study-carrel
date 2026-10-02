@@ -1,0 +1,14 @@
+[Unit]
+Description=Litestream: replicate Study Carrel's database to B2
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=deploy
+EnvironmentFile=/etc/litestream.env
+ExecStart=/usr/bin/litestream replicate -config /etc/litestream.yml
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

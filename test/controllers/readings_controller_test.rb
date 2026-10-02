@@ -38,6 +38,11 @@ class ReadingsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".panel-handle[aria-expanded=false]"
   end
 
+  test "the note composer has a place to report a failed save" do
+    get reading_path("isaiah-kjv", 40)
+    assert_select ".composer [data-composer-target=error][role=alert][hidden]"
+  end
+
   test "requires sign in" do
     delete session_path
     get reading_path("isaiah-kjv", 40)

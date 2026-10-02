@@ -183,6 +183,7 @@
   .composer.expanded .editor { min-height: 180px; max-height: 40vh; }
   .editor:focus { border-color: var(--accent); }
   .editor:empty::before { content: attr(data-placeholder); color: var(--ink-soft); opacity: .8; font-style: italic; pointer-events: none; }
+  .composer-error { margin: 6px 0 0; font-family: var(--sans); font-size: 13px; color: var(--accent); }
   .composer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
   .primary { background: var(--accent); color: var(--paper); border: 0; border-radius: 999px; padding: 7px 16px; font-family: var(--sans); font-size: 14px; }
   .primary:hover { filter: brightness(1.08); }
