@@ -1,8 +1,9 @@
-<% content_for :title, "#{@collection.name} · Study" %>
+<% content_for :title, "#{@collection.name} · Study Carrel" %>
 <main class="page">
   <div class="page-bar">
     <%= link_to "← Library", library_path, class: "chip" %>
     <%= link_to "Continue reading", root_path, class: "chip" %>
+    <%= link_to "Random", random_collection_path(@collection.slug), class: "chip" %>
   </div>
   <h2 class="page-title"><%= @collection.name %></h2>
   <% if @collection.description.present? %><p class="all-notes-sub"><%= @collection.description %></p><% end %>

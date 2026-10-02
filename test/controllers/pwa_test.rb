@@ -6,7 +6,7 @@ class PwaTest < ActionDispatch::IntegrationTest
     assert_response :success
     manifest = JSON.parse(response.body)
 
-    assert_equal "Study", manifest["name"]
+    assert_equal "Study Carrel", manifest["name"]
     assert_equal "standalone", manifest["display"]
     assert_equal "/", manifest["start_url"]
     assert_includes manifest["icons"].map { |i| i["sizes"] }, "192x192"

@@ -1,4 +1,4 @@
-# Study App: Decisions
+# Study Carrel: Decisions
 
 Last updated: 2026-10-02
 

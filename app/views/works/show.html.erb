@@ -1,4 +1,4 @@
-<% content_for :title, "#{@work.name} · Study" %>
+<% content_for :title, "#{@work.name} · Study Carrel" %>
 <% numbered = @sections.all?(&:numbered?) %>
 <main class="page">
   <div class="page-bar">
@@ -8,6 +8,7 @@
       <%= link_to "← Library", library_path, class: "chip" %>
     <% end %>
     <%= link_to "Continue reading", root_path, class: "chip" %>
+    <%= link_to "Random", random_work_path(@work.slug), class: "chip" %>
   </div>
   <h2 class="page-title"><%= @work.title %></h2>
   <% if @work.edition.present? %><p class="all-notes-sub"><%= @work.edition %> · <%= pluralize(@sections.size, "section") %></p><% end %>

@@ -20,6 +20,9 @@ Rails.application.routes.draw do
     get :export, on: :collection
   end
   get "library", to: "library#index"
+  get "random", to: "random_readings#show", as: :random
+  get "collections/:collection/random", to: "random_readings#show", as: :random_collection
+  get "works/:work/random", to: "random_readings#show", as: :random_work
   resources :collections, only: :show, param: :slug
   resources :works, only: :show, param: :slug
   get "read/:slug/:section(/:number)", to: "readings#show", as: :reading

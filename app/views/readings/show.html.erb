@@ -1,8 +1,8 @@
-<% content_for :title, "Study" %>
+<% content_for :title, "Study Carrel" %>
 <header class="top" data-controller="theme">
   <div class="nav">
     <div class="nav-in">
-      <%= link_to "Study", library_path, class: "brand", title: "Library" %>
+      <%= link_to "Study Carrel", library_path, class: "brand", title: "Library" %>
       <%= link_to work_path(@section.work), class: "where", title: "Chapters in #{@section.work.title}" do %><%= @section.name %><small><%= @section.work.edition %></small><% end %>
       <%= render "notes/all_link", focus: @focus %>
       <%= button_to "Sign out", session_path, method: :delete, class: "chip", form_class: "signout" %>
