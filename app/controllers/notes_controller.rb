@@ -28,5 +28,5 @@ class NotesController < ApplicationController
     @focus = Focus.current_one or redirect_to new_focus_path
   end
 
-  def note_params = params.expect(note: [ :unit_id, :body ])
+  def note_params = params.expect(note: [ :unit_id, :content ])
 end

@@ -10,7 +10,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
 
   test "creates a note on the current focus and appends it via turbo stream" do
     assert_difference "Note.count", 1 do
-      post notes_path, params: { note: { unit_id: @unit.id, body: "Incomparable." } }, as: :turbo_stream
+      post notes_path, params: { note: { unit_id: @unit.id, content: "Incomparable." } }, as: :turbo_stream
     end
     assert_response :success
     assert_equal @focus, Note.last.focus
@@ -20,13 +20,13 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
 
   test "blank notes are rejected" do
     assert_no_difference "Note.count" do
-      post notes_path, params: { note: { unit_id: @unit.id, body: " " } }, as: :turbo_stream
+      post notes_path, params: { note: { unit_id: @unit.id, content: " " } }, as: :turbo_stream
     end
     assert_response :unprocessable_entity
   end
 
   test "deletes a note via turbo stream" do
-    note = @focus.notes.create!(unit: @unit, body: "x")
+    note = @focus.notes.create!(unit: @unit, content: "x")
     assert_difference "Note.count", -1 do
       delete note_path(note), as: :turbo_stream
     end
@@ -35,7 +35,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
 
   test "cannot delete a note from another focus" do
     old = Focus.find(@focus.id)
-    note = old.notes.create!(unit: @unit, body: "old")
+    note = old.notes.create!(unit: @unit, content: "old")
     Focus.start!(title: "Next")
     assert_no_difference "Note.count" do
       delete note_path(note), as: :turbo_stream
@@ -44,8 +44,8 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "the reading page shows only the current focus's notes, under the right verse" do
-    @focus.notes.create!(unit: @unit, body: "Old focus note")
-    Focus.start!(title: "Other").notes.create!(unit: @unit, body: "Current focus note")
+    @focus.notes.create!(unit: @unit, content: "Old focus note")
+    Focus.start!(title: "Other").notes.create!(unit: @unit, content: "Current focus note")
     get reading_path("isaiah-kjv", 40, 25)
     assert_select "#notes_unit_#{@unit.id} .note", 1
     assert_select "#notes_unit_#{@unit.id} .note", /Current focus note/

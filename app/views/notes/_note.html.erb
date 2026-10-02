@@ -4,5 +4,5 @@
     <span><%= button_to "Delete", note_path(note), method: :delete, form_class: "inline-form",
           form: { data: { turbo_confirm: "Delete this note?" } } %></span>
   </div>
-  <%= simple_format(h(note.body)) %>
+  <%= note.content %>
 </div>

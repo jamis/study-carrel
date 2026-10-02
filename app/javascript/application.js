@@ -2,5 +2,8 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 
-import "lexxy"
+import { configure } from "lexxy"
 import "@rails/actiontext"
+
+// Notes are prose: no uploads or attachments.
+configure({ notes: { attachments: false } })

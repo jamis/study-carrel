@@ -244,10 +244,33 @@ a:not(.chip) { color: var(--accent); }
 .focus-row-desc { color: var(--ink-soft); font-size: 16px; margin-top: 4px; }
 .focus-row-meta { font-family: var(--sans); font-size: 13px; color: var(--ink-soft); margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
-/* ---------- notes (plain composer) ---------- */
+/* ---------- notes ---------- */
 .notes-unit:not(:has(.note))::before {
   content: "Nothing here yet. What does this verse say to your question?";
   display: block; color: var(--ink-soft); font-style: italic; padding: 14px 0; font-size: 16px;
 }
-textarea.editor { display: block; width: 100%; box-sizing: border-box; resize: none; color: var(--ink); }
 .note-meta form { display: inline; }
+
+/* Lexxy, themed to the paper palette (it follows light/dark through our variables). */
+lexxy-editor, .lexxy-content {
+  --lexxy-color-ink: var(--ink);
+  --lexxy-color-text: var(--ink);
+  --lexxy-color-ink-medium: var(--ink-soft);
+  --lexxy-color-text-subtle: var(--ink-soft);
+  --lexxy-color-ink-lighter: var(--rule);
+  --lexxy-color-ink-lightest: var(--accent-soft);
+  --lexxy-color-canvas: var(--bg);
+  --lexxy-color-accent-dark: var(--accent);
+  --lexxy-color-link: var(--accent);
+  --lexxy-color-selected: var(--accent-soft);
+  --lexxy-color-selected-hover: var(--accent-soft);
+  --lexxy-color-code-bg: var(--accent-soft);
+  font-family: var(--serif);
+}
+.composer lexxy-editor { --lexxy-editor-rows: 2lh; font-size: 16.5px; border-radius: 10px; }
+.composer lexxy-toolbar { display: none; }
+.composer.expanded lexxy-editor { --lexxy-editor-rows: 9lh; }
+.composer.expanded lexxy-toolbar { display: flex; }
+.note .lexxy-content { font-size: inherit; line-height: inherit; }
+.note .lexxy-content > :first-child { margin-top: 0; }
+.note .lexxy-content > :last-child { margin-bottom: 0; }
