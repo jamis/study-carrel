@@ -70,4 +70,14 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_equal (1..31).to_a, units.map(&:number)
     assert_match(/\AComfort ye, comfort ye my people/, units.first.body)
   end
+
+  test "the whole bundled library loads: 39 Old Testament books, 929 chapters, 23,145 verses" do
+    TextLoader.load_all
+
+    assert_equal 39, Work.where(collection: Collection.find_by!(slug: "old-testament")).count
+    assert_equal %w[Genesis Exodus], Work.ordered.first(2).map(&:title)
+    assert_equal 929, Section.count
+    assert_equal 23_145, Unit.count
+    assert_equal 176, Section.joins(:work).find_by!(works: { slug: "psalms-kjv" }, number: 119).units.count
+  end
 end

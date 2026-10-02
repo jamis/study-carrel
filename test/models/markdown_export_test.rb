@@ -2,14 +2,14 @@ require "test_helper"
 
 class MarkdownExportTest < ActiveSupport::TestCase
   setup do
-    TextLoader.load_all
+    load_isaiah
     @focus = Focus.start!(title: "What does it mean to be holy?", description: "Set apart, or good?")
   end
 
   test "renders the focus, quoted verses and converted notes in reading order" do
-    @focus.notes.create!(unit: Unit.find_by!(number: 25), content: "<p>Later, <strong>bold</strong> thought.</p>")
-    @focus.notes.create!(unit: Unit.find_by!(number: 3), content: "<p>First.</p><ul><li>one</li><li>two</li></ul>")
-    @focus.notes.create!(unit: Unit.find_by!(number: 3), content: "<h2>Heading</h2><p>Second.</p>")
+    @focus.notes.create!(unit: verse(25), content: "<p>Later, <strong>bold</strong> thought.</p>")
+    @focus.notes.create!(unit: verse(3), content: "<p>First.</p><ul><li>one</li><li>two</li></ul>")
+    @focus.notes.create!(unit: verse(3), content: "<h2>Heading</h2><p>Second.</p>")
 
     md = MarkdownExport.new(@focus).to_s
 
@@ -27,7 +27,7 @@ class MarkdownExportTest < ActiveSupport::TestCase
 
   test "other foci's notes are not included" do
     old = Focus.create!(title: "Old", archived_at: 1.day.ago)
-    old.notes.create!(unit: Unit.find_by!(number: 1), content: "<p>not mine</p>")
+    old.notes.create!(unit: verse(1), content: "<p>not mine</p>")
     refute_includes MarkdownExport.new(@focus).to_s, "not mine"
   end
 end

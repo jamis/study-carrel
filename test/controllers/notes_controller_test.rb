@@ -2,9 +2,9 @@ require "test_helper"
 
 class NotesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    TextLoader.load_all
+    load_isaiah
     @focus = Focus.start!(title: "Holy")
-    @unit = Unit.find_by!(number: 25)
+    @unit = verse(25)
     sign_in_as users(:one)
   end
 
@@ -52,16 +52,16 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     get reading_path("isaiah-kjv", 40, 25)
     assert_select "#notes_unit_#{@unit.id} .note", 1
     assert_select "#notes_unit_#{@unit.id} .note", /Current focus note/
-    assert_select "#notes_unit_#{Unit.find_by!(number: 24).id} .note", 0
+    assert_select "#notes_unit_#{verse(24).id} .note", 0
   end
 end
 
 class VerseStripMarkersTest < ActionDispatch::IntegrationTest
   test "verses with notes are marked on the strip" do
-    TextLoader.load_all
+    load_isaiah
     focus = Focus.start!(title: "Holy")
-    focus.notes.create!(unit: Unit.find_by!(number: 11), content: "a")
-    focus.notes.create!(unit: Unit.find_by!(number: 11), content: "b")
+    focus.notes.create!(unit: verse(11), content: "a")
+    focus.notes.create!(unit: verse(11), content: "b")
     sign_in_as users(:one)
 
     get reading_path("isaiah-kjv", 40, 25)
@@ -72,17 +72,17 @@ end
 
 class AllNotesTest < ActionDispatch::IntegrationTest
   setup do
-    TextLoader.load_all
+    load_isaiah
     @focus = Focus.start!(title: "Holy")
     sign_in_as users(:one)
   end
 
   test "lists notes in reading order, grouped by verse, linking back" do
-    @focus.notes.create!(unit: Unit.find_by!(number: 25), content: "late")
-    @focus.notes.create!(unit: Unit.find_by!(number: 3), content: "early one")
-    @focus.notes.create!(unit: Unit.find_by!(number: 3), content: "early two")
+    @focus.notes.create!(unit: verse(25), content: "late")
+    @focus.notes.create!(unit: verse(3), content: "early one")
+    @focus.notes.create!(unit: verse(3), content: "early two")
     old = Focus.create!(title: "Old", archived_at: 1.day.ago)
-    old.notes.create!(unit: Unit.find_by!(number: 1), content: "not mine")
+    old.notes.create!(unit: verse(1), content: "not mine")
 
     get notes_path
     assert_response :success
@@ -101,16 +101,16 @@ class AllNotesTest < ActionDispatch::IntegrationTest
   end
 
   test "the reading page links to it with a count" do
-    @focus.notes.create!(unit: Unit.find_by!(number: 3), content: "x")
+    @focus.notes.create!(unit: verse(3), content: "x")
     get reading_path("isaiah-kjv", 40)
     assert_select "a.chip[href=?]", notes_path, text: "All notes (1)"
   end
 
   test "long passages are clamped with a way to expand them" do
-    long = Unit.find_by!(number: 3)
+    long = verse(3)
     long.update!(body: "word " * 100)
     @focus.notes.create!(unit: long, content: "x")
-    @focus.notes.create!(unit: Unit.find_by!(number: 4), content: "y")
+    @focus.notes.create!(unit: verse(4), content: "y")
     get notes_path
     assert_select ".fv-quote.clamped", 1
     assert_select ".fv-more", 1
@@ -119,9 +119,9 @@ end
 
 class ExportTest < ActionDispatch::IntegrationTest
   setup do
-    TextLoader.load_all
+    load_isaiah
     @focus = Focus.start!(title: "Holy")
-    @focus.notes.create!(unit: Unit.find_by!(number: 3), content: "<p>hello</p>")
+    @focus.notes.create!(unit: verse(3), content: "<p>hello</p>")
     sign_in_as users(:one)
   end
 

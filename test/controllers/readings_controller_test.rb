@@ -2,7 +2,7 @@ require "test_helper"
 
 class ReadingsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    TextLoader.load_all
+    load_isaiah
     Focus.start!(title: "What does it mean to be holy?")
     sign_in_as users(:one)
   end

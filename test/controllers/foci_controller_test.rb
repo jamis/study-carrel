@@ -2,7 +2,7 @@ require "test_helper"
 
 class FociControllerTest < ActionDispatch::IntegrationTest
   setup do
-    TextLoader.load_all
+    load_isaiah
     sign_in_as users(:one)
   end
 
@@ -42,7 +42,7 @@ end
 
 class FociManagementTest < ActionDispatch::IntegrationTest
   setup do
-    TextLoader.load_all
+    load_isaiah
     sign_in_as users(:one)
     @focus = Focus.start!(title: "Holy", description: "Set apart?")
   end
