@@ -6,14 +6,15 @@ export default class extends Controller {
   static targets = ["form", "body", "toggle"]
 
   toggle() {
-    const expanded = this.element.classList.toggle("expanded")
-    this.toggleTarget.textContent = expanded ? "Collapse" : "Expand"
+    this.#setExpanded(!this.element.classList.contains("expanded"))
     this.bodyTarget.focus()
   }
 
+  // After a save, collapse so the new note isn't hidden behind a tall editor.
   reset(event) {
     if (!event.detail.success) return
     this.bodyTarget.value = ""
+    this.#setExpanded(false)
     this.bodyTarget.focus()
   }
 
@@ -22,5 +23,10 @@ export default class extends Controller {
       event.preventDefault()
       this.formTarget.requestSubmit()
     }
+  }
+
+  #setExpanded(expanded) {
+    this.element.classList.toggle("expanded", expanded)
+    this.toggleTarget.textContent = expanded ? "Collapse" : "Expand"
   }
 }
