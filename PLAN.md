@@ -23,7 +23,7 @@ Each step is small, can be checked on its own, and leaves the app working.
 ### B. Texts
 4. ✅ **Text models.** Work > Section > Unit (number, text), plus a seed loader that reads plain-text files.
 5. ✅ **Load Isaiah 40.** Put the KJV text in a data file and seed it. Verify it against a trusted source (the prototype copy was typed from memory).
-6. **Read a chapter.** The reading view renders real units in lectio mode: focus band, verse, faded neighbors, verse strip. Navigation via a Stimulus controller (buttons, arrow keys, swipe). The URL reflects the verse.
+6. ✅ **Read a chapter.** The reading view renders real units in lectio mode: focus band, verse, faded neighbors, verse strip. Navigation via a Stimulus controller (buttons, arrow keys, swipe). The URL reflects the verse.
 
 > Check-in after step 6: first point where real text can be read in the real app.
 

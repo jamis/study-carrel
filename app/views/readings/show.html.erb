@@ -1,0 +1,71 @@
+<% content_for :title, "Study" %>
+<header class="top" data-controller="theme">
+  <div class="nav">
+    <div class="nav-in">
+      <span class="brand">Study</span>
+      <div class="where"><%= @section.name %><small><%= @section.work.edition %></small></div>
+      <button class="chip" type="button">All notes</button>
+      <%= button_to "Sign out", session_path, method: :delete, class: "chip", form_class: "signout" %>
+      <button class="icon-btn" type="button" title="Toggle light / dark" aria-label="Toggle theme" data-action="theme#toggle">◐</button>
+    </div>
+  </div>
+  <section class="focus" data-controller="focus" data-action="click@document->focus#closeOutside">
+    <button class="focus-head" type="button" aria-expanded="false" title="About this focus" data-focus-target="head" data-action="focus#toggle">
+      <span class="focus-label">Focus</span>
+      <h1 class="focus-title">What does it mean to be holy?</h1>
+      <span class="focus-caret">▾</span>
+    </button>
+    <div class="focus-body"><div class="focus-body-in">
+      <p>Holiness keeps showing up as something God is, and something we’re asked to be. I want to understand the difference between holy as “set apart” and holy as “good”.</p>
+      <div class="focus-actions"><span style="font-size:13px">4 notes</span><button class="chip" type="button">Edit focus</button></div>
+    </div></div>
+  </section>
+</header>
+
+<main class="layout" data-controller="lectio"
+      data-lectio-current-value="<%= @current.number %>"
+      data-lectio-base-value="<%= reading_path(@section.work.slug, @section.number) %>"
+      data-lectio-ref-prefix-value="<%= @section.name %>">
+  <div hidden>
+    <% @units.each do |u| %>
+      <span data-lectio-target="unit" data-number="<%= u.number %>"><%= u.body %></span>
+    <% end %>
+  </div>
+
+  <% prev_unit = @units.find { |u| u.number == @current.number - 1 } %>
+  <% next_unit = @units.find { |u| u.number == @current.number + 1 } %>
+  <article class="lectio" data-action="touchstart->lectio#touchStart touchend->lectio#touchEnd keydown@document->lectio#key">
+    <div class="near" data-lectio-target="prev" data-action="click->lectio#previous"><% if prev_unit %><b><%= prev_unit.number %></b><%= prev_unit.body %><% end %></div>
+    <div class="now <%= unit_size_class(@current.body) %>" data-lectio-target="now"><span class="ref" data-lectio-target="ref"><%= unit_ref(@section, @current) %></span><span data-lectio-target="body"><%= @current.body %></span></div>
+    <div class="near" data-lectio-target="next" data-action="click->lectio#next"><% if next_unit %><b><%= next_unit.number %></b><%= next_unit.body %><% end %></div>
+    <div class="steps">
+      <button class="chip" type="button" data-action="lectio#previous">← Previous</button>
+      <button class="chip" type="button" data-action="lectio#next">Next →</button>
+    </div>
+    <nav class="strip" aria-label="Verses">
+      <% @units.each do |u| %>
+        <button type="button" class="tick<%= " current" if u == @current %>" data-lectio-target="tick" data-number="<%= u.number %>" data-action="lectio#go" aria-label="Verse <%= u.number %>"><%= u.number %></button>
+      <% end %>
+    </nav>
+  </article>
+
+  <aside class="panel" data-controller="sheet">
+    <button class="panel-handle" type="button" data-action="sheet#toggle">
+      <span class="ref" data-lectio-target="ref"><%= unit_ref(@section, @current) %></span>
+      <span class="count">Notes</span>
+      <span class="go" data-sheet-target="label">Notes ▴</span>
+    </button>
+    <div class="panel-head">
+      <div class="ref" data-lectio-target="ref"><%= unit_ref(@section, @current) %></div>
+      <div class="pfocus">What does it mean to be holy?</div>
+    </div>
+    <div class="notes"></div>
+    <div class="composer">
+      <div class="editor" contenteditable="true" data-placeholder="How does this verse speak to your question?"></div>
+      <div class="composer-row">
+        <button class="chip" type="button">Expand</button>
+        <button class="primary" type="button">Add note</button>
+      </div>
+    </div>
+  </aside>
+</main>
