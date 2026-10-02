@@ -4,6 +4,7 @@
     <title><%= content_for(:title) || "Study" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Study">
     <meta name="application-name" content="Study">
     <meta name="mobile-web-app-capable" content="yes">
     <script>
@@ -14,12 +15,13 @@
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+    <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+    <meta name="theme-color" content="#f6f1e7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#17140f" media="(prefers-color-scheme: dark)">
 
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
