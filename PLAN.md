@@ -53,6 +53,8 @@ Each step is small, can be checked on its own, and leaves the app working.
 ## Later (wanted, not scheduled)
 
 - **History.** Show where you've been recently (random hops make this matter) and jump straight back to any of those places. Likely a per-focus list of recently visited units, written when the position is saved.
+- **New user signups.** Allow new users to sign up. Probably via a protected link (e.g. invitation only) at first, to prevent spam.
+- **More works**. Religious texts, as well as more classics and poetry.
 - **Random, extended.** An "Another" button inside the reader to roll again in the same scope; configurable weighting (uniform today).
 - **Backups, extended.** A scheduled restore check, and a resize to 1 GB if the 512 MB droplet feels tight.
 
