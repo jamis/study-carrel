@@ -127,13 +127,19 @@ export default class extends Controller {
     }
   }
 
-  touchStart(event) { this.touchX = event.touches[0].clientX }
+  touchStart(event) {
+    const { clientX, clientY } = event.touches[0]
+    this.touchStartPoint = { x: clientX, y: clientY }
+  }
 
+  // Only a mostly-horizontal swipe turns the page; scrolling a long passage drifts sideways too.
   touchEnd(event) {
-    if (this.touchX === undefined) return
-    const dx = event.changedTouches[0].clientX - this.touchX
-    this.touchX = undefined
-    if (Math.abs(dx) > 60) this.step(dx < 0 ? 1 : -1)
+    if (!this.touchStartPoint) return
+    const { clientX, clientY } = event.changedTouches[0]
+    const dx = clientX - this.touchStartPoint.x
+    const dy = clientY - this.touchStartPoint.y
+    this.touchStartPoint = undefined
+    if (Math.abs(dx) > 60 && Math.abs(dx) > 2 * Math.abs(dy)) this.step(dx < 0 ? 1 : -1)
   }
 
   key(event) {
