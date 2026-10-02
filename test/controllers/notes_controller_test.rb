@@ -52,3 +52,17 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     assert_select "#notes_unit_#{Unit.find_by!(number: 24).id} .note", 0
   end
 end
+
+class VerseStripMarkersTest < ActionDispatch::IntegrationTest
+  test "verses with notes are marked on the strip" do
+    TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt"))
+    focus = Focus.start!(title: "Holy")
+    focus.notes.create!(unit: Unit.find_by!(number: 11), content: "a")
+    focus.notes.create!(unit: Unit.find_by!(number: 11), content: "b")
+    sign_in_as users(:one)
+
+    get reading_path("isaiah-kjv", 40, 25)
+    assert_select ".tick.has", 1
+    assert_select ".tick.has[aria-label=?]", "Verse 11, 2 notes"
+  end
+end

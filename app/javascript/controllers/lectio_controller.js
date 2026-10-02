@@ -57,6 +57,19 @@ export default class extends Controller {
   updateCount() {
     const count = this.currentNotes?.querySelectorAll(".note").length ?? 0
     this.countTarget.textContent = count ? `${count} note${count === 1 ? "" : "s"}` : "No notes yet"
+    this.updateMarkers()
+  }
+
+  // The strip marks every verse that has notes.
+  updateMarkers() {
+    this.notesTargets.forEach(el => {
+      const n = Number(el.dataset.number)
+      const count = el.querySelectorAll(".note").length
+      const tick = this.tickTargets.find(t => Number(t.dataset.number) === n)
+      if (!tick) return
+      tick.classList.toggle("has", count > 0)
+      tick.setAttribute("aria-label", count ? `Verse ${n}, ${count} note${count === 1 ? "" : "s"}` : `Verse ${n}`)
+    })
   }
 
   fillNear(el, number) {

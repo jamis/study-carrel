@@ -34,7 +34,8 @@
     </div>
     <nav class="strip" aria-label="Verses">
       <% @units.each do |u| %>
-        <button type="button" class="tick<%= " current" if u == @current %>" data-lectio-target="tick" data-number="<%= u.number %>" data-action="lectio#go" aria-label="Verse <%= u.number %>"><%= u.number %></button>
+        <% count = @notes_by_unit.fetch(u.id, []).size %>
+        <button type="button" class="tick<%= " current" if u == @current %><%= " has" if count > 0 %>" data-lectio-target="tick" data-number="<%= u.number %>" data-action="lectio#go" aria-label="Verse <%= u.number %><%= ", #{pluralize(count, 'note')}" if count > 0 %>"><%= u.number %></button>
       <% end %>
     </nav>
   </article>
