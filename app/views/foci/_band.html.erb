@@ -1,4 +1,4 @@
-<section class="focus" data-controller="focus" data-action="click@document->focus#closeOutside">
+<section class="focus" data-controller="focus" data-action="click@document->focus#closeOutside keydown.esc@window->focus#escape">
   <button class="focus-head" type="button" aria-expanded="false" title="About this focus" data-focus-target="head" data-action="focus#toggle">
     <span class="focus-label">Focus</span>
     <h1 class="focus-title"><%= focus.title %></h1>

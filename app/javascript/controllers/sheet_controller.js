@@ -5,7 +5,17 @@ export default class extends Controller {
   static targets = ["label", "handle"]
 
   toggle() {
-    const open = this.element.classList.toggle("open")
+    this.#set(!this.element.classList.contains("open"))
+  }
+
+  escape() {
+    if (!this.element.classList.contains("open")) return
+    this.#set(false)
+    this.handleTarget.focus()
+  }
+
+  #set(open) {
+    this.element.classList.toggle("open", open)
     this.labelTarget.textContent = open ? "Close ▾" : "Notes ▴"
     this.handleTarget.setAttribute("aria-expanded", open)
   }

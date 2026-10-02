@@ -213,6 +213,10 @@
       padding-bottom: env(safe-area-inset-bottom);
     }
     .panel.open { transform: none; }
+    /* Offscreen controls must not take keyboard focus; hide them once the slide-down finishes. */
+    .panel > :not(.panel-handle) { transition: visibility 0s .28s; }
+    .panel:not(.open) > :not(.panel-handle) { visibility: hidden; }
+    .panel.open > :not(.panel-handle) { transition-delay: 0s; }
     .panel-handle {
       display: flex; align-items: center; gap: 10px; position: relative;
       height: 66px; padding: 0 16px; flex: none; cursor: pointer;

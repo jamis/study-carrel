@@ -74,6 +74,8 @@ export default class extends Controller {
       const current = Number(t.dataset.number) === n
       t.classList.toggle("current", current)
       t.setAttribute("aria-current", current)
+      t.tabIndex = current ? 0 : -1 // the strip is one tab stop; arrow keys move within it
+      if (current && this.tickTargets.includes(document.activeElement)) t.focus({ preventScroll: true })
     })
     this.scrollStripToCurrent()
 

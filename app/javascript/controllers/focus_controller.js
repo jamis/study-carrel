@@ -8,6 +8,12 @@ export default class extends Controller {
     this.#set(!this.element.classList.contains("open"))
   }
 
+  escape() {
+    if (!this.element.classList.contains("open")) return
+    this.#set(false)
+    this.headTarget.focus()
+  }
+
   closeOutside(event) {
     if (!this.element.contains(event.target)) this.#set(false)
   }

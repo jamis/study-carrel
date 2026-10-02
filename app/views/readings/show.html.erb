@@ -49,12 +49,12 @@
     <nav class="strip<%= " scrolling" if @units.size > 40 %>" aria-label="<%= unit_noun(@section).pluralize %>" data-lectio-target="strip">
       <% @units.each do |u| %>
         <% count = @notes_by_unit.fetch(u.id, []).size %>
-        <button type="button" class="tick<%= " current" if u == @current %><%= " has" if count > 0 %>" aria-current="<%= u == @current %>" data-lectio-target="tick" data-number="<%= u.number %>" data-action="lectio#go" aria-label="<%= unit_noun(@section) %> <%= u.number %><%= ", #{pluralize(count, 'note')}" if count > 0 %>"><%= u.number %></button>
+        <button type="button" class="tick<%= " current" if u == @current %><%= " has" if count > 0 %>" aria-current="<%= u == @current %>" tabindex="<%= u == @current ? 0 : -1 %>" data-lectio-target="tick" data-number="<%= u.number %>" data-action="lectio#go" aria-label="<%= unit_noun(@section) %> <%= u.number %><%= ", #{pluralize(count, 'note')}" if count > 0 %>"><%= u.number %></button>
       <% end %>
     </nav>
   </article>
 
-  <aside class="panel" data-controller="sheet">
+  <aside class="panel" data-controller="sheet" data-action="keydown.esc@window->sheet#escape">
     <button class="panel-handle" type="button" aria-expanded="false" data-sheet-target="handle" data-action="sheet#toggle">
       <span class="ref" data-lectio-target="ref"><%= unit_ref(@section, @current) %></span>
       <span class="count" data-lectio-target="count">Notes</span>
