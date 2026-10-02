@@ -1,0 +1,11 @@
+<% content_for :title, "Sign in · Study" %>
+<main class="signin">
+  <h1 class="brand">Study</h1>
+  <% if flash[:alert] %><p class="signin-alert"><%= flash[:alert] %></p><% end %>
+  <% if flash[:notice] %><p class="signin-notice"><%= flash[:notice] %></p><% end %>
+  <%= form_with url: session_path, class: "signin-form" do |form| %>
+    <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Email address", value: params[:email_address] %>
+    <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Password", maxlength: 72 %>
+    <%= form.submit "Sign in", class: "primary" %>
+  <% end %>
+</main>

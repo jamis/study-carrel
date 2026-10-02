@@ -1,0 +1,69 @@
+<% content_for :title, "Study" %>
+<header class="top" data-controller="theme">
+  <div class="nav">
+    <div class="nav-in">
+      <span class="brand">Study</span>
+      <div class="where">Isaiah 40<small>KJV</small></div>
+      <button class="chip" type="button">All notes (4)</button>
+      <%= button_to "Sign out", session_path, method: :delete, class: "chip", form_class: "signout" %>
+      <button class="icon-btn" type="button" title="Toggle light / dark" aria-label="Toggle theme" data-action="theme#toggle">◐</button>
+    </div>
+  </div>
+  <section class="focus" data-controller="focus" data-action="click@document->focus#closeOutside">
+    <button class="focus-head" type="button" aria-expanded="false" title="About this focus" data-focus-target="head" data-action="focus#toggle">
+      <span class="focus-label">Focus</span>
+      <h1 class="focus-title">What does it mean to be holy?</h1>
+      <span class="focus-caret">▾</span>
+    </button>
+    <div class="focus-body"><div class="focus-body-in">
+      <p>Holiness keeps showing up as something God is, and something we’re asked to be. I want to understand the difference between holy as “set apart” and holy as “good”.</p>
+      <div class="focus-actions"><span style="font-size:13px">4 notes</span><button class="chip" type="button">Edit focus</button></div>
+    </div></div>
+  </section>
+</header>
+
+<main class="layout">
+  <article class="lectio">
+    <div class="near"><b>24</b>Yea, they shall not be planted; yea, they shall not be sown: yea, their stock shall not take root in the earth: and he shall also blow upon them, and they shall wither, and the whirlwind shall take them away as stubble.</div>
+    <div class="now"><span class="ref">Isaiah 40:25</span>To whom then will ye liken me, or shall I be equal? saith the Holy One.</div>
+    <div class="near"><b>26</b>Lift up your eyes on high, and behold who hath created these things, that bringeth out their host by number: he calleth them all by names by the greatness of his might, for that he is strong in power; not one faileth.</div>
+    <div class="steps">
+      <button class="chip" type="button">← Previous</button>
+      <button class="chip" type="button">Next →</button>
+    </div>
+    <nav class="strip" aria-label="Verses">
+      <% (1..31).each do |n| %>
+        <button type="button" class="tick<%= " current" if n == 25 %><%= " has" if [1, 11, 25].include?(n) %>" aria-label="Verse <%= n %>"><%= n %></button>
+      <% end %>
+    </nav>
+  </article>
+
+  <aside class="panel" data-controller="sheet">
+    <button class="panel-handle" type="button" data-action="sheet#toggle">
+      <span class="ref">Isaiah 40:25</span>
+      <span class="count">2 notes</span>
+      <span class="go" data-sheet-target="label">Notes ▴</span>
+    </button>
+    <div class="panel-head">
+      <div class="ref">Isaiah 40:25</div>
+      <div class="pfocus">What does it mean to be holy?</div>
+    </div>
+    <div class="notes">
+      <div class="note">
+        <div class="note-meta"><span>3 days ago</span><span><button type="button">Delete</button></span></div>
+        <p>God asks, “To whom will ye liken me?” and answers with a name, <b>the Holy One</b>. Holiness here seems to mean <i>incomparable</i>: nothing else belongs in the same category.</p>
+      </div>
+      <div class="note">
+        <div class="note-meta"><span>yesterday</span><span><button type="button">Delete</button></span></div>
+        <p>So is holy about <i>otherness</i> before it’s about <i>goodness</i>? Compare the idol-makers in 19–20, who try to make God manageable.</p>
+      </div>
+    </div>
+    <div class="composer">
+      <div class="editor" contenteditable="true" data-placeholder="How does this verse speak to your question?"></div>
+      <div class="composer-row">
+        <button class="chip" type="button">Expand</button>
+        <button class="primary" type="button">Add note</button>
+      </div>
+    </div>
+  </aside>
+</main>
