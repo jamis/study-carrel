@@ -41,3 +41,13 @@ class TextLoaderTest < ActiveSupport::TestCase
     assert_raises(TextLoader::Error) { TextLoader.new("section: 1\n1. a\n").load }
   end
 end
+
+class BundledTextsTest < ActiveSupport::TestCase
+  test "Isaiah 40 loads with 31 verses" do
+    work = TextLoader.load_file(Rails.root.join("db/texts/isaiah-kjv.txt"))
+    units = work.sections.find_by!(number: 40).units
+
+    assert_equal (1..31).to_a, units.map(&:number)
+    assert_match(/\AComfort ye, comfort ye my people/, units.first.body)
+  end
+end
