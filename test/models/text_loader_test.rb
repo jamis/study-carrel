@@ -116,18 +116,29 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_match(/\AComfort ye, comfort ye my people/, units.first.body)
   end
 
-  test "the whole bundled library loads: the Old Testament, Dickinson's poems and Walden" do
+  test "the whole bundled library loads: the Bible, Dickinson's poems and Walden" do
     TextLoader.load_all
     ot = Collection.find_by!(slug: "old-testament")
     ot_sections = Section.joins(:work).where(works: { collection_id: ot.id })
 
     assert_equal 39, ot.works.count
-    assert_equal %w[Genesis Exodus], Work.ordered.first(2).map(&:title)
+    assert_equal %w[Genesis Exodus], ot.works.first(2).map(&:title)
     assert_equal 929, ot_sections.count
     assert_equal 23_145, Unit.where(section: ot_sections).count
     assert_equal 176, ot_sections.find_by!(works: { slug: "psalms-kjv" }, number: 119).units.count
 
-    assert_equal %w[Old\ Testament Poetry Prose], Collection.ordered.map(&:name)
+    assert_equal %w[Bible Old\ Testament New\ Testament Poetry Prose], Collection.ordered.reorder(:id).map(&:name)
+    assert_equal %w[Bible Poetry Prose], Collection.top_level.ordered.map(&:name)
+
+    nt = Collection.find_by!(slug: "new-testament")
+    nt_sections = Section.joins(:work).where(works: { collection_id: nt.id })
+    assert_equal 27, nt.works.count
+    assert_equal %w[Matthew Mark], nt.works.first(2).map(&:title)
+    assert_equal "Revelation", nt.works.last.title
+    assert_equal 260, nt_sections.count
+    assert_equal 7_957, Unit.where(section: nt_sections).count
+    assert_equal "Malachi", nt.works.first.previous_work.title
+    assert_nil nt.works.last.next_work
     assert_equal 18, Work.find_by!(slug: "walden").sections.count
     assert_equal "Walden: Economy", Work.find_by!(slug: "walden").sections.first.name
     success = Work.find_by!(slug: "dickinson").sections.find_by!(label: "Success")

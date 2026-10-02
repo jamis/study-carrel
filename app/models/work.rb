@@ -7,13 +7,15 @@ class Work < ApplicationRecord
 
   scope :ordered, -> { order(:position, :id) }
 
-  # Neighbors within the same collection, in library order.
+  # Neighbors in library order: within the collection, then on into the neighboring collection under
+  # the same parent (Malachi into Matthew), but never out of a top-level collection.
   def next_work
-    siblings.where("position > :p OR (position = :p AND id > :i)", p: position, i: id).first
+    siblings.where("position > :p OR (position = :p AND id > :i)", p: position, i: id).first || collection&.work_after
   end
 
   def previous_work
-    siblings.reorder(position: :desc, id: :desc).where("position < :p OR (position = :p AND id < :i)", p: position, i: id).first
+    siblings.reorder(position: :desc, id: :desc).where("position < :p OR (position = :p AND id < :i)", p: position, i: id).first ||
+      collection&.work_before
   end
 
   def to_param = slug

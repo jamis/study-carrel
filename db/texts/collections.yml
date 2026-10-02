@@ -1,7 +1,17 @@
+- slug: bible
+  name: Bible
+  position: 1
+  description: The King James Version, Old and New Testaments.
 - slug: old-testament
   name: Old Testament
+  parent: bible
   position: 1
   description: The books of the Old Testament, in the King James Version.
+- slug: new-testament
+  name: New Testament
+  parent: bible
+  position: 2
+  description: The books of the New Testament, in the King James Version.
 - slug: poetry
   name: Poetry
   position: 2

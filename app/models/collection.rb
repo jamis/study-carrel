@@ -35,6 +35,26 @@ class Collection < ApplicationRecord
     ids
   end
 
+  # Reading order runs through a collection's own works, then its child collections in order.
+  def first_work = works.first || children.lazy.filter_map(&:first_work).first
+  def last_work = children.reverse_order.lazy.filter_map(&:last_work).first || works.last
+
+  # The first work after (or last work before) this collection, among its parent's other children and
+  # onward up the tree. A top-level collection has no neighbors: reading stops at its edge.
+  def work_after
+    return unless parent
+
+    parent.children.where("position > :p OR (position = :p AND id > :i)", p: position, i: id)
+          .lazy.filter_map(&:first_work).first || parent.work_after
+  end
+
+  def work_before
+    return unless parent
+
+    parent.children.reorder(position: :desc, id: :desc).where("position < :p OR (position = :p AND id < :i)", p: position, i: id)
+          .lazy.filter_map(&:last_work).first || parent.work_before
+  end
+
   # Every work in this collection or any collection nested under it.
   def all_works = Work.where(collection_id: self_and_descendant_ids)
 

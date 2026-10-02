@@ -12,9 +12,19 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
 
   test "library lists collections in order" do
     get library_path
-    assert_select ".list-row-title a", text: "Old Testament"
+    assert_select ".list-row-title a", text: "Bible"
+    assert_select ".list-row-title a", text: "Old Testament", count: 0
     assert_select ".list-row-title a", text: "Prose"
     assert_select ".list-row-meta", "2 works"
+  end
+
+  test "the Bible lists its testaments, and each testament its books" do
+    get collection_path("bible")
+    assert_select ".list-row-title a" do |links|
+      assert_equal [ "Old Testament", "New Testament" ], links.map { |l| l.text.strip }
+    end
+    get collection_path("old-testament")
+    assert_select "a.chip", text: "← Bible"
   end
 
   test "a collection lists its books in order" do
@@ -24,23 +34,22 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "nested collections: the library shows the top level, the parent lists its children, and Random reaches them" do
-    scripture = Collection.create!(slug: "scripture", name: "Scripture", position: 0)
-    Collection.find_by!(slug: "old-testament").update!(parent: scripture)
-
-    get library_path
-    assert_select ".list-row-title a", text: "Scripture"
-    assert_select ".list-row-title a", text: "Old Testament", count: 0
-    assert_select ".list-row-meta", text: "2 works", count: 1
-
-    get collection_path("scripture")
-    assert_select ".list-row-title a[href=?]", collection_path("old-testament")
-
-    get collection_path("old-testament")
-    assert_select "a.chip", text: "← Scripture"
-
-    get random_collection_path("scripture")
+  test "Random on a parent collection reaches works in its children" do
+    get random_collection_path("bible")
     assert_match %r{/read/(genesis|exodus)-kjv/}, response.location
+  end
+
+  test "reading runs on from the end of one testament into the next, but not out of the Bible" do
+    TextLoader.new("work: Matthew\nedition: KJV\ncollection: new-testament\nposition: 1\n\nsection: 1\n1. x\n").load
+    exodus2 = Section.joins(:work).find_by!(works: { slug: "exodus-kjv" }, number: 2)
+    matthew1 = Section.joins(:work).find_by!(works: { slug: "matthew-kjv" }, number: 1)
+
+    assert_equal matthew1, exodus2.next_section
+    assert_equal exodus2, matthew1.previous_section
+    assert_nil matthew1.next_section
+
+    walden = Section.joins(:work).find_by!(works: { slug: "walden" }, number: 1)
+    assert_nil walden.previous_section
   end
 
   test "a numbered work shows a chapter grid linking to each chapter, marking those with notes" do
