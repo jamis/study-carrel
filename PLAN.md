@@ -44,13 +44,15 @@ Each step is small, can be checked on its own, and leaves the app working.
 16. ✅ **More texts.** Add 2-3 more: one poetry collection and one prose work. Prose will test chunking and long-paragraph sizing. **Choose the texts at this step, not before.** **Done:** the whole KJV Old Testament (39 books, cross-checked against two other sources), Emily Dickinson's poems (442, a stanza per unit) and Thoreau's *Walden* (18 chapters, a paragraph per unit). Build scripts are in `script/texts/`. Left as candidates: (see `collections.yml` and the `collection:`/`position:` headers; the loader is non-destructive and uses bulk upserts).
 17. ✅ **Chapter navigation.** First real browsing UI: collection pages (e.g. an "Old Testament" page listing its books), a book page with a chapter grid, Next/Previous that continues into the next chapter and book, and a compact verse strip for long chapters (Psalm 119 has 176 verses).
 18. ✅ **PWA basics.** Manifest, icon, installable on a phone.
-19. **Deploy.** A DigitalOcean droplet (Ubuntu 24.04) at `studycarrel.jamisbuck.org`, no Docker: Capistrano deploys to a `deploy` user, Puma runs under systemd, Caddy does HTTPS. Setup is in `SERVER.md`; config in `config/deploy.rb` and `config/server/`. Backups: Litestream streams the primary database to a private Backblaze B2 bucket (restore tested).
-19b. **Random.** "Random" on the library, each collection and each work drops you into a random unit in lectio mode (uniform within a work or collection; the library picks a collection first). It moves your position like normal reading.
-20. **Polish.** Empty states, edit-note, keyboard and accessibility pass, real-device test.
+19. ✅ **Deploy.** Live at https://studycarrel.jamisbuck.org on a DigitalOcean droplet (Ubuntu 24.04, 512 MB), no Docker: Capistrano deploys to a `deploy` user (`bundle exec cap production deploy`, rollback with `deploy:rollback`), Puma runs under systemd, Caddy does HTTPS. Setup is in `SERVER.md`; config in `config/deploy.rb` and `config/server/`. Backups: Litestream streams the primary database to a private Backblaze B2 bucket, with a 30-day lifecycle rule (restore tested). The repo is public (`jamis/study-carrel`, MIT). Gotchas on this small droplet: bundle with one job, and 1 GB of swap.
+19b. ✅ **Random.** "Random" on the library, each collection and each work (and in the reader's menu) drops you into a random unit in lectio mode: uniform within a work or collection; the library picks a collection first. It moves your position like normal reading.
+20. **Polish.** Partly done: an accessibility pass (lang, focus rings, live verse, aria state), feedback when a note fails to save, diagonal swipes ignored, and a phone pass (two-row nav with a ⋯ menu, no zoomed-out page on long chapters, strip drags no longer turn the page). Still to do: empty states, edit-note, a keyboard pass, and a real-phone check of the latest deploy (install, nav fit, strip, home-screen name).
 
 ## Later (wanted, not scheduled)
 
 - **History.** Show where you've been recently (random hops make this matter) and jump straight back to any of those places. Likely a per-focus list of recently visited units, written when the position is saved.
+- **Random, extended.** An "Another" button inside the reader to roll again in the same scope; configurable weighting (uniform today).
+- **Backups, extended.** A scheduled restore check, and a resize to 1 GB if the 512 MB droplet feels tight.
 
 ## Notes
 
