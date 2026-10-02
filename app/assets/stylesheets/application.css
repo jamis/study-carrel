@@ -243,3 +243,11 @@ a:not(.chip) { color: var(--accent); }
 .focus-row-title { font-size: 20px; font-style: italic; }
 .focus-row-desc { color: var(--ink-soft); font-size: 16px; margin-top: 4px; }
 .focus-row-meta { font-family: var(--sans); font-size: 13px; color: var(--ink-soft); margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+/* ---------- notes (plain composer) ---------- */
+.notes-unit:not(:has(.note))::before {
+  content: "Nothing here yet. What does this verse say to your question?";
+  display: block; color: var(--ink-soft); font-style: italic; padding: 14px 0; font-size: 16px;
+}
+textarea.editor { display: block; width: 100%; box-sizing: border-box; resize: none; color: var(--ink); }
+.note-meta form { display: inline; }

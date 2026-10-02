@@ -1,4 +1,6 @@
 class Focus < ApplicationRecord
+  has_many :notes, dependent: :destroy
+
   validates :title, presence: true
 
   scope :current, -> { where(archived_at: nil) }

@@ -42,20 +42,29 @@
   <aside class="panel" data-controller="sheet">
     <button class="panel-handle" type="button" data-action="sheet#toggle">
       <span class="ref" data-lectio-target="ref"><%= unit_ref(@section, @current) %></span>
-      <span class="count">Notes</span>
+      <span class="count" data-lectio-target="count">Notes</span>
       <span class="go" data-sheet-target="label">Notes ▴</span>
     </button>
     <div class="panel-head">
       <div class="ref" data-lectio-target="ref"><%= unit_ref(@section, @current) %></div>
       <div class="pfocus"><%= @focus.title %></div>
     </div>
-    <div class="notes"></div>
-    <div class="composer">
-      <div class="editor" contenteditable="true" data-placeholder="How does this verse speak to your question?"></div>
-      <div class="composer-row">
-        <button class="chip" type="button">Expand</button>
-        <button class="primary" type="button">Add note</button>
-      </div>
+    <div class="notes">
+      <% @units.each do |u| %>
+        <div class="notes-unit" id="notes_unit_<%= u.id %>" data-lectio-target="notes" data-number="<%= u.number %>" data-unit-id="<%= u.id %>" <%= "hidden" unless u == @current %>>
+          <%= render partial: "notes/note", collection: @notes_by_unit.fetch(u.id, []), as: :note %>
+        </div>
+      <% end %>
+    </div>
+    <div class="composer" data-controller="composer">
+      <%= form_with model: Note.new, url: notes_path, data: { action: "turbo:submit-end->composer#reset keydown->composer#key", composer_target: "form" } do |form| %>
+        <%= form.hidden_field :unit_id, value: @current.id, data: { lectio_target: "unitField" } %>
+        <%= form.text_area :body, class: "editor", rows: 2, required: true, placeholder: "How does this verse speak to your question?", data: { composer_target: "body" } %>
+        <div class="composer-row">
+          <span></span>
+          <%= form.submit "Add note", class: "primary" %>
+        </div>
+      <% end %>
     </div>
   </aside>
 </main>

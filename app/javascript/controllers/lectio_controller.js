@@ -2,13 +2,20 @@ import { Controller } from "@hotwired/stimulus"
 
 // Switches verses client-side; the whole section is already on the page.
 export default class extends Controller {
-  static targets = ["unit", "prev", "now", "body", "next", "ref", "tick"]
+  static targets = ["unit", "prev", "now", "body", "next", "ref", "tick", "notes", "count", "unitField"]
   static values = { current: Number, base: String, refPrefix: String }
 
   connect() {
     this.bodies = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.textContent.trim()]))
     this.numbers = [...this.bodies.keys()].sort((a, b) => a - b)
+
+    // Notes are added and removed by Turbo streams; keep the count in step.
+    this.observer = new MutationObserver(() => this.updateCount())
+    this.notesTargets.forEach(el => this.observer.observe(el, { childList: true }))
+    this.updateCount()
   }
+
+  disconnect() { this.observer?.disconnect() }
 
   next() { this.step(1) }
   previous() { this.step(-1) }
@@ -37,6 +44,19 @@ export default class extends Controller {
     this.bodyTarget.textContent = body
     this.refTargets.forEach(r => r.textContent = `${this.refPrefixValue}:${n}`)
     this.tickTargets.forEach(t => t.classList.toggle("current", Number(t.dataset.number) === n))
+
+    this.notesTargets.forEach(el => { el.hidden = Number(el.dataset.number) !== n })
+    this.unitFieldTarget.value = this.currentNotes?.dataset.unitId
+    this.updateCount()
+  }
+
+  get currentNotes() {
+    return this.notesTargets.find(el => Number(el.dataset.number) === this.currentValue)
+  }
+
+  updateCount() {
+    const count = this.currentNotes?.querySelectorAll(".note").length ?? 0
+    this.countTarget.textContent = count ? `${count} note${count === 1 ? "" : "s"}` : "No notes yet"
   }
 
   fillNear(el, number) {

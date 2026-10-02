@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_02_152623) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_02_152959) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -55,6 +55,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_152623) do
     t.datetime "archived_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "notes", force: :cascade do |t|
+    t.integer "unit_id", null: false
+    t.integer "focus_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["focus_id"], name: "index_notes_on_focus_id"
+    t.index ["unit_id"], name: "index_notes_on_unit_id"
   end
 
   create_table "sections", force: :cascade do |t|
@@ -105,6 +115,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_152623) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "notes", "foci"
+  add_foreign_key "notes", "units"
   add_foreign_key "sections", "works"
   add_foreign_key "sessions", "users"
   add_foreign_key "units", "sections"
