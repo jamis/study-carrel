@@ -23,7 +23,10 @@ Rails.application.routes.draw do
       patch :restore
     end
   end
-  resources :notes, only: %i[index show create edit update destroy] do
+  resources :units, only: [] do
+    resource :note, only: %i[show update], controller: "unit_notes"
+  end
+  resources :notes, only: :index do
     get :export, on: :collection
   end
   get "library", to: "library#index"

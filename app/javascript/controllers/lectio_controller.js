@@ -3,24 +3,23 @@ import { Turbo } from "@hotwired/turbo-rails"
 
 // Switches verses client-side; the whole section is already on the page.
 export default class extends Controller {
-  static targets = ["unit", "prev", "now", "body", "next", "ref", "tick", "notes", "count", "unitField", "strip"]
+  static targets = ["unit", "prev", "now", "body", "next", "ref", "tick", "count", "strip", "editor"]
   static values = { current: Number, base: String, refTemplate: String, positionUrl: String, unitName: String,
-    prevUrl: String, prevLabel: String, nextUrl: String, nextLabel: String }
+    noteUrlTemplate: String, prevUrl: String, prevLabel: String, nextUrl: String, nextLabel: String }
 
   connect() {
     this.bodies = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.textContent.trim()]))
     this.numbers = [...this.bodies.keys()].sort((a, b) => a - b)
 
-    // Notes are added and removed by Turbo streams; keep the count in step.
-    this.observer = new MutationObserver(() => this.updateCount())
-    this.notesTargets.forEach(el => this.observer.observe(el, { childList: true }))
+    this.unitIds = new Map(this.unitTargets.map(u => [Number(u.dataset.number), Number(u.dataset.unitId)]))
+    // Which verses have a note; the editor reports changes as it autosaves.
+    this.noted = new Set(this.tickTargets.filter(t => t.classList.contains("has")).map(t => Number(t.dataset.number)))
     this.updateCount()
     this.scrollStripToCurrent()
     this.savePosition()
   }
 
   disconnect() {
-    this.observer?.disconnect()
     clearTimeout(this.saveTimer)
   }
 
@@ -49,7 +48,7 @@ export default class extends Controller {
   savePosition() {
     clearTimeout(this.saveTimer)
     this.saveTimer = setTimeout(() => {
-      const unitId = this.currentNotes?.dataset.unitId
+      const unitId = this.unitIds.get(this.currentValue)
       if (!unitId) return
       fetch(this.positionUrlValue, {
         method: "PATCH",
@@ -79,8 +78,8 @@ export default class extends Controller {
     })
     this.scrollStripToCurrent()
 
-    this.notesTargets.forEach(el => { el.hidden = Number(el.dataset.number) !== n })
-    this.unitFieldTarget.value = this.currentNotes?.dataset.unitId
+    // Swapping the frame replaces the editor; the old one saves itself as it goes.
+    this.editorTarget.src = this.noteUrlTemplateValue.replace("%7Bid%7D", this.unitIds.get(n)).replace("{id}", this.unitIds.get(n))
     this.updateCount()
   }
 
@@ -92,25 +91,25 @@ export default class extends Controller {
     if (tick) strip.scrollLeft = tick.offsetLeft - (strip.clientWidth - tick.offsetWidth) / 2
   }
 
-  get currentNotes() {
-    return this.notesTargets.find(el => Number(el.dataset.number) === this.currentValue)
+  noteSaved({ detail: { unitId, noted } }) {
+    const number = [...this.unitIds].find(([, id]) => id === unitId)?.[0]
+    if (number === undefined) return
+    if (noted) this.noted.add(number); else this.noted.delete(number)
+    this.updateCount()
   }
 
   updateCount() {
-    const count = this.currentNotes?.querySelectorAll(".note").length ?? 0
-    this.countTarget.textContent = count ? `${count} note${count === 1 ? "" : "s"}` : "No notes yet"
+    this.countTarget.textContent = this.noted.has(this.currentValue) ? "Has a note" : "No note yet"
     this.updateMarkers()
   }
 
-  // The strip marks every verse that has notes.
+  // The strip marks every verse that has a note.
   updateMarkers() {
-    this.notesTargets.forEach(el => {
-      const n = Number(el.dataset.number)
-      const count = el.querySelectorAll(".note").length
-      const tick = this.tickTargets.find(t => Number(t.dataset.number) === n)
-      if (!tick) return
-      tick.classList.toggle("has", count > 0)
-      tick.setAttribute("aria-label", count ? `${this.unitNameValue} ${n}, ${count} note${count === 1 ? "" : "s"}` : `${this.unitNameValue} ${n}`)
+    this.tickTargets.forEach(tick => {
+      const n = Number(tick.dataset.number)
+      const has = this.noted.has(n)
+      tick.classList.toggle("has", has)
+      tick.setAttribute("aria-label", has ? `${this.unitNameValue} ${n}, has a note` : `${this.unitNameValue} ${n}`)
     })
   }
 

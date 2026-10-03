@@ -37,6 +37,7 @@ Each step is small, can be checked on its own, and leaves the app working.
 11. ✅ **Rich notes.** Swap in the chosen editor, with the compact field and an expand control.
 12. ✅ **Verse-strip markers and counts.** Show which verses have notes.
 13. ✅ **All-notes view.** All notes in reading order, with a jump back to the verse.
+13a. ✅ **One autosaved note per verse** (2026-10-03). Replaced the note list and composer with an always-open editor; unique index on `(focus_id, unit_id)`; old multi-note code removed.
 14. ✅ **Markdown export.** Copy or download as Markdown.
 
 ### E. Finish

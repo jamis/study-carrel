@@ -8,79 +8,18 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:one)
   end
 
-  test "creates a note on the current focus and appends it via turbo stream" do
-    assert_difference "Note.count", 1 do
-      post notes_path, params: { note: { unit_id: @unit.id, content: "Incomparable." } }, as: :turbo_stream
-    end
-    assert_response :success
-    assert_equal @focus, Note.last.focus
-    assert_match %(action="append" target="notes_unit_#{@unit.id}"), response.body
-    assert_match "Incomparable.", response.body
-    assert_match %(action="replace" target="all_notes_link"), response.body
-    assert_match "All notes (1)", response.body
-  end
-
-  test "blank notes are rejected" do
-    assert_no_difference "Note.count" do
-      post notes_path, params: { note: { unit_id: @unit.id, content: " " } }, as: :turbo_stream
-    end
-    assert_response :unprocessable_entity
-  end
-
-  test "deletes a note via turbo stream" do
-    note = @focus.notes.create!(unit: @unit, content: "x")
-    assert_difference "Note.count", -1 do
-      delete note_path(note), as: :turbo_stream
-    end
-    assert_match %(action="remove" target="#{ActionView::RecordIdentifier.dom_id(note)}"), response.body
-    assert_match %(action="replace" target="all_notes_link"), response.body
-  end
-
-  test "cannot delete a note from another focus" do
-    old = Focus.find(@focus.id)
-    note = old.notes.create!(unit: @unit, content: "old")
-    users(:one).foci.start!(title: "Next")
-    assert_no_difference "Note.count" do
-      delete note_path(note), as: :turbo_stream
-    end
-    assert_response :not_found
-  end
-
-  test "the reading page shows only the current focus's notes, under the right verse" do
+  test "the reading page edits only the current focus's note for the verse" do
     @focus.notes.create!(unit: @unit, content: "Old focus note")
     users(:one).foci.start!(title: "Other").notes.create!(unit: @unit, content: "Current focus note")
     get reading_path("isaiah-kjv", 40, 25)
-    assert_select "#notes_unit_#{@unit.id} .note", 1
-    assert_select "#notes_unit_#{@unit.id} .note", /Current focus note/
-    assert_select "#notes_unit_#{verse(24).id} .note", 0
-  end
-  test "edit shows the form in a turbo frame" do
-    note = @focus.notes.create!(unit: @unit, content: "x")
-    get edit_note_path(note), headers: { "Turbo-Frame" => ActionView::RecordIdentifier.dom_id(note) }
-    assert_response :success
-    assert_select "form[action=?]", note_path(note)
+    assert_match "Current focus note", css_select("turbo-frame#note_editor").to_s
+    assert_no_match "Old focus note", css_select("turbo-frame#note_editor").to_s
   end
 
-  test "updates a note via turbo stream" do
-    note = @focus.notes.create!(unit: @unit, content: "old")
-    patch note_path(note), params: { note: { content: "new words" } }, as: :turbo_stream
-    assert_response :success
-    assert_match %(action="replace" target="#{ActionView::RecordIdentifier.dom_id(note)}"), response.body
-    assert_equal "new words", note.reload.content.to_plain_text
-  end
-
-  test "blank edits are rejected and keep the form" do
-    note = @focus.notes.create!(unit: @unit, content: "old")
-    patch note_path(note), params: { note: { content: " " } }
-    assert_response :unprocessable_entity
-    assert_equal "old", note.reload.content.to_plain_text
-  end
-
-  test "cannot edit a note from another focus" do
-    note = @focus.notes.create!(unit: @unit, content: "x")
-    users(:one).foci.start!(title: "Other")
-    patch note_path(note), params: { note: { content: "hijack" } }, as: :turbo_stream
-    assert_response :not_found
+  test "a verse has at most one note per focus" do
+    @focus.notes.create!(unit: @unit, content: "a")
+    assert_not @focus.notes.build(unit: @unit, content: "b").valid?
+    assert users(:one).foci.start!(title: "Next").notes.build(unit: @unit, content: "b").valid?
   end
 end
 
@@ -89,12 +28,11 @@ class VerseStripMarkersTest < ActionDispatch::IntegrationTest
     load_isaiah
     focus = users(:one).foci.start!(title: "Holy")
     focus.notes.create!(unit: verse(11), content: "a")
-    focus.notes.create!(unit: verse(11), content: "b")
     sign_in_as users(:one)
 
     get reading_path("isaiah-kjv", 40, 25)
     assert_select ".tick.has", 1
-    assert_select ".tick.has[aria-label=?]", "Verse 11, 2 notes"
+    assert_select ".tick.has[aria-label=?]", "Verse 11, has a note"
   end
 end
 
@@ -105,10 +43,9 @@ class AllNotesTest < ActionDispatch::IntegrationTest
     sign_in_as users(:one)
   end
 
-  test "lists notes in reading order, grouped by verse, linking back" do
+  test "lists notes in reading order, linking back" do
     @focus.notes.create!(unit: verse(25), content: "late")
-    @focus.notes.create!(unit: verse(3), content: "early one")
-    @focus.notes.create!(unit: verse(3), content: "early two")
+    @focus.notes.create!(unit: verse(3), content: "early")
     old = users(:one).foci.create!(title: "Old", archived_at: 1.day.ago)
     old.notes.create!(unit: verse(1), content: "not mine")
 
@@ -118,7 +55,7 @@ class AllNotesTest < ActionDispatch::IntegrationTest
     assert_select ".fv-ref" do |refs|
       assert_equal [ "Isaiah 40:3", "Isaiah 40:25" ], refs.map { |r| r.text.strip }
     end
-    assert_select ".fv-item:first-of-type .fv-note", 2
+    assert_select ".fv-item:first-of-type .fv-note", 1
     assert_select ".fv-ref[href=?]", reading_path("isaiah-kjv", 40, 25)
     assert_select ".fv-note", text: /not mine/, count: 0
   end

@@ -9,7 +9,7 @@ class ReadingsController < ApplicationController
       raise ActiveRecord::RecordNotFound
     @previous_section = @section.previous_section
     @next_section = @section.next_section
-    @notes_by_unit = @focus.notes.where(unit: @units).chronological.group_by(&:unit_id)
+    @notes_by_unit = @focus.notes.where(unit: @units).index_by(&:unit_id)
   end
 
   private

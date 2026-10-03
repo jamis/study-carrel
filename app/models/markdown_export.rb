@@ -1,5 +1,5 @@
 # Renders a focus and its notes as Markdown: the focus, then each noted verse
-# (quoted) with its notes underneath, in reading order.
+# (quoted) with its note underneath, in reading order.
 class MarkdownExport
   def initialize(focus)
     @focus = focus
@@ -11,10 +11,10 @@ class MarkdownExport
     out = [ "# #{@focus.title}" ]
     out << @focus.description.strip if @focus.description.present?
 
-    @focus.notes_in_reading_order.group_by(&:unit).each do |unit, notes|
-      out << "## #{unit.reference}"
-      out << quote(unit.body)
-      notes.each { |note| out << note_markdown(note) }
+    @focus.notes_in_reading_order.each do |note|
+      out << "## #{note.unit.reference}"
+      out << quote(note.unit.body)
+      out << note_markdown(note)
     end
 
     out.join("\n\n") + "\n"

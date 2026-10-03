@@ -5,6 +5,7 @@ class Note < ApplicationRecord
   has_rich_text :content
 
   validates :content, presence: true
+  validates :unit_id, uniqueness: { scope: :focus_id }
 
   scope :chronological, -> { order(:created_at, :id) }
 end

@@ -13,7 +13,7 @@ Example: read Isaiah 40 while pondering "What does it mean to be holy?"
 | Topic | Decision |
 |---|---|
 | Foci | One focus at a time. No parallel foci in v1. |
-| Notes | Mostly short, but a full rich-text editor should be available. 37signals' **Lexxy** editor is worth trying. |
+| Notes | **One note per verse per focus** (decided 2026-10-03), in an always-open Lexxy editor in the side panel / bottom sheet that **autosaves** as you type (and on leaving the verse); clearing it deletes the note. Enforced by a unique index on `(focus_id, unit_id)`. Trade-off accepted: no per-note timeline of when each thought arrived (only the last-updated time), and last save wins across tabs. Toolbar shrunk (icons about 35% smaller). |
 | Users | **A few invited people** (decided 2026-10-02). Foci and notes belong to a user, and nobody (admins included) can read another user's notes; the library is shared. Sign-up is by **invitation only**: an admin creates a single-use link (stored as a digest, shown once, expires in 7 days, open to whoever holds it) and sends it themselves; no email delivery. `users.admin` is set with `bin/rails study_carrel:make_admin EMAIL=...`. No password reset yet. Possible later: encrypting notes. Sharing notes is still manual (copy/paste). |
 | Texts | The app ships with a **bundled corpus**. No import or external API in v1. |
 | Mobile | Same functionality as desktop. One responsive design, no cut-down phone version. |
@@ -32,7 +32,7 @@ Example: read Isaiah 40 while pondering "What does it mean to be holy?"
 - The focus is the app's current state: no switcher or lenses. Home is "continue where you left off". Past foci live in a simple archive list.
 - Layout is adaptive. Desktop shows text and notes side by side. Phone shows text with a bottom sheet for notes.
 - Lectio Mode (one verse at a time, large type) is a reading option on all screen sizes, and a candidate default on phones.
-- Notes start as a compact inline field and expand to the full editor.
+- Notes are a perpetually open editor for the current verse that autosaves; there is no add/expand step.
 - Texts need a generic addressable-unit model (work > section > numbered unit) covering verses, poetry lines/stanzas, and prose paragraphs.
 
 ## Proposed v1 scope
@@ -42,7 +42,7 @@ Example: read Isaiah 40 while pondering "What does it mean to be holy?"
 2. Create a focus (title, optional description) and mark it current
 3. Read a passage with the focus pinned on top
 4. Set the current verse, which highlights it
-5. Add notes to a verse or verse range (quick capture and rich editor)
+5. Write a note on a verse (always-open rich editor, autosaved; one note per verse per focus)
 6. See notes in the margin/side panel, and in the mobile bottom sheet
 7. Focus view: all notes in reading order
 8. Markdown export

@@ -42,20 +42,16 @@ class IsolationTest < ActionDispatch::IntegrationTest
     assert_no_match "Owner's private thought", response.body
   end
 
-  test "another reader's note can't be shown, edited, changed or deleted" do
+  test "another reader's note on the same verse can't be shown, changed or deleted" do
     @other.foci.start!(title: "Other's focus")
     sign_in_as @other
 
-    get note_path(@owner_note)
-    assert_response :not_found
-    get edit_note_path(@owner_note)
-    assert_response :not_found
-    patch note_path(@owner_note), params: { note: { content: "Hijacked" } }
-    assert_response :not_found
+    get unit_note_path(@owner_note.unit)
+    assert_no_match "Owner's private thought", response.body
     assert_no_difference -> { Note.count } do
-      delete note_path(@owner_note)
+      put unit_note_path(@owner_note.unit), params: { note: { content: "" } }, as: :turbo_stream
     end
-    assert_response :not_found
+    put unit_note_path(@owner_note.unit), params: { note: { content: "Mine" } }, as: :turbo_stream
     assert_match "Owner's private thought", @owner_note.reload.content.to_plain_text
   end
 

@@ -8,8 +8,7 @@ class MarkdownExportTest < ActiveSupport::TestCase
 
   test "renders the focus, quoted verses and converted notes in reading order" do
     @focus.notes.create!(unit: verse(25), content: "<p>Later, <strong>bold</strong> thought.</p>")
-    @focus.notes.create!(unit: verse(3), content: "<p>First.</p><ul><li>one</li><li>two</li></ul>")
-    @focus.notes.create!(unit: verse(3), content: "<h2>Heading</h2><p>Second.</p>")
+    @focus.notes.create!(unit: verse(3), content: "<p>First.</p><ul><li>one</li><li>two</li></ul><h2>Heading</h2><p>Second.</p>")
 
     md = MarkdownExport.new(@focus).to_s
 

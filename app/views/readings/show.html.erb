@@ -24,6 +24,8 @@
 <main class="layout" data-controller="lectio"
       data-lectio-current-value="<%= @current.number %>"
       data-lectio-position-url-value="<%= position_path %>"
+      data-lectio-note-url-template-value="<%= unit_note_path("{id}") %>"
+      data-action="note:saved@window->lectio#noteSaved"
       data-lectio-base-value="<%= reading_path(@section.work.slug, @section.number) %>"
       data-lectio-ref-template-value="<%= @section.reference_template %>"
       data-lectio-unit-name-value="<%= unit_noun(@section) %>"
@@ -33,7 +35,7 @@
       data-lectio-next-label-value="<%= @next_section&.name %>">
   <div hidden>
     <% @units.each do |u| %>
-      <span data-lectio-target="unit" data-number="<%= u.number %>"><%= u.body %></span>
+      <span data-lectio-target="unit" data-number="<%= u.number %>" data-unit-id="<%= u.id %>"><%= u.body %></span>
     <% end %>
   </div>
 
@@ -50,8 +52,8 @@
     </div>
     <nav class="strip<%= " scrolling" if @units.size > 40 %>" aria-label="<%= unit_noun(@section).pluralize %>" data-lectio-target="strip">
       <% @units.each do |u| %>
-        <% count = @notes_by_unit.fetch(u.id, []).size %>
-        <button type="button" class="tick<%= " current" if u == @current %><%= " has" if count > 0 %>" aria-current="<%= u == @current %>" tabindex="<%= u == @current ? 0 : -1 %>" data-lectio-target="tick" data-number="<%= u.number %>" data-action="lectio#go" aria-label="<%= unit_noun(@section) %> <%= u.number %><%= ", #{pluralize(count, 'note')}" if count > 0 %>"><%= u.number %></button>
+        <% noted = @notes_by_unit.key?(u.id) %>
+        <button type="button" class="tick<%= " current" if u == @current %><%= " has" if noted %>" aria-current="<%= u == @current %>" tabindex="<%= u == @current ? 0 : -1 %>" data-lectio-target="tick" data-number="<%= u.number %>" data-action="lectio#go" aria-label="<%= unit_noun(@section) %> <%= u.number %><%= ", has a note" if noted %>"><%= u.number %></button>
       <% end %>
     </nav>
   </article>
@@ -66,23 +68,8 @@
       <div class="ref" data-lectio-target="ref"><%= unit_ref(@section, @current) %></div>
       <div class="pfocus"><%= @focus.title %></div>
     </div>
-    <div class="notes">
-      <% @units.each do |u| %>
-        <div class="notes-unit" id="notes_unit_<%= u.id %>" data-lectio-target="notes" data-number="<%= u.number %>" data-unit-id="<%= u.id %>" <%= "hidden" unless u == @current %>>
-          <%= render partial: "notes/note", collection: @notes_by_unit.fetch(u.id, []), as: :note %>
-        </div>
-      <% end %>
-    </div>
-    <div class="composer" data-controller="composer">
-      <%= form_with model: Note.new, url: notes_path, data: { action: "turbo:submit-end->composer#reset keydown->composer#key input->composer#clearError", composer_target: "form" } do |form| %>
-        <%= form.hidden_field :unit_id, value: @current.id, data: { lectio_target: "unitField" } %>
-        <%= form.rich_textarea :content, preset: "notes", rows: 2, placeholder: "How does this passage speak to your question?", data: { composer_target: "body" } %>
-        <p class="composer-error" role="alert" hidden data-composer-target="error"></p>
-        <div class="composer-row">
-          <button class="chip" type="button" data-action="composer#toggle" data-composer-target="toggle">Expand</button>
-          <%= form.submit "Add note", class: "primary" %>
-        </div>
-      <% end %>
+    <div class="composer">
+      <%= render "unit_notes/editor", unit: @current, note: @notes_by_unit[@current.id] %>
     </div>
   </aside>
 </main>

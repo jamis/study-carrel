@@ -38,9 +38,9 @@ class ReadingsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".panel-handle[aria-expanded=false]"
   end
 
-  test "the note composer has a place to report a failed save" do
-    get reading_path("isaiah-kjv", 40)
-    assert_select ".composer [data-composer-target=error][role=alert][hidden]"
+  test "the reading page has an autosaving note editor for the current verse" do
+    get reading_path("isaiah-kjv", 40, 25)
+    assert_select "turbo-frame#note_editor form[action=?]", unit_note_path(verse(25))
   end
 
   test "the page title names the chapter" do
