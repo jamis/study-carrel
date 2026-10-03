@@ -200,9 +200,9 @@
   /* mobile bottom sheet */
   @media (max-width: 899px) {
     .panel {
-      position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 30;
+      position: fixed; left: 0; right: 0; bottom: var(--kb, 0px); top: auto; z-index: 30;
       border-radius: 16px 16px 0 0; border-bottom: 0;
-      max-height: 82vh; height: 82vh;
+      height: min(82vh, calc(var(--vvh, 100vh) - 8px)); max-height: none;
       transform: translateY(calc(100% - 66px - env(safe-area-inset-bottom)));
       transition: transform .28s cubic-bezier(.2,.8,.2,1);
       padding-bottom: env(safe-area-inset-bottom);
