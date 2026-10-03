@@ -68,9 +68,9 @@
     border-bottom: 2px solid var(--accent-soft);
   }
   .focus-head {
-    max-width: 1180px; margin: 0 auto; padding: 9px 16px;
-    display: flex; align-items: center; justify-content: center; gap: 14px;
-    width: 100%; border: 0; background: none; text-align: center; cursor: pointer;
+    max-width: 1180px; margin: 0 auto; padding: 18px 16px;
+    display: flex; align-items: center; justify-content: flex-start; gap: 14px;
+    width: 100%; border: 0; background: none; text-align: left; cursor: pointer;
   }
   .focus-label {
     flex: none; font-family: var(--sans); font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
@@ -78,7 +78,7 @@
   }
   .focus-title {
     margin: 0; font-weight: 400; font-style: italic; color: var(--accent);
-    font-size: clamp(18px, 2.6vw, 24px); line-height: 1.25; text-wrap: balance;
+    font-size: clamp(18px, 3.6vw, 32px); line-height: 1.25; text-wrap: balance;
   }
   .focus-caret { flex: none; color: var(--ink-soft); font-family: var(--sans); font-size: 12px; transition: transform .2s; }
   .focus.open .focus-caret { transform: rotate(180deg); }
@@ -88,7 +88,8 @@
     max-height: 60vh; overflow-y: auto;
   }
   .focus.open .focus-body { display: block; }
-  .focus-body-in { max-width: 60ch; margin: 0 auto; padding: 14px 16px 18px; color: var(--ink-soft); font-size: 17px; }
+  .focus-body-in { max-width: 1180px; margin: 0 auto; padding: 14px 16px 18px; color: var(--ink-soft); font-size: 17px; }
+  .focus-body-in > p { max-width: 60ch; }
   .focus-body p { margin: 0 0 10px; }
   .focus-actions { display: flex; gap: 8px; align-items: center; font-family: var(--sans); }
   @media (max-width: 599px) {
@@ -137,10 +138,11 @@
 
   /* ---------- lectio ---------- */
   .lectio {
-    max-width: 34em; margin: 0 auto; width: 100%; text-align: left;
+    max-width: 34em; margin: 0; width: 100%; text-align: left;
     display: flex; flex-direction: column; gap: 26px; padding: 8px 0 20px;
     touch-action: pan-y;
   }
+  @media (min-width: 900px) { .lectio { max-width: none; } }
   .near {
     font-size: 17px; color: var(--ink-soft); opacity: .5; cursor: pointer; line-height: 1.6;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
