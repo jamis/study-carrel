@@ -202,7 +202,7 @@
     .panel {
       position: fixed; left: 0; right: 0; bottom: var(--kb, 0px); top: auto; z-index: 30;
       border-radius: 16px 16px 0 0; border-bottom: 0;
-      height: min(82vh, calc(var(--vvh, 100vh) - 8px)); max-height: none;
+      height: calc(var(--vvh, 100vh) - 16px - env(safe-area-inset-top)); max-height: none;
       transform: translateY(calc(100% - 66px - env(safe-area-inset-bottom)));
       transition: transform .28s cubic-bezier(.2,.8,.2,1);
       padding-bottom: env(safe-area-inset-bottom);
@@ -224,7 +224,10 @@
     }
     .panel-handle .count { color: var(--ink-soft); flex: none; white-space: nowrap; }
     .panel-handle .go { color: var(--accent); flex: none; white-space: nowrap; }
-    .panel-head { padding-top: 4px; }
+    /* Open, the handle is just a header: trim its tall tap area so the focus sits close beneath the reference. */
+    .panel.open .panel-handle { height: 48px; }
+    .panel-head { padding-top: 0; }
+    .panel-head .pfocus { margin-top: 0; }
     .panel .composer lexxy-editor { --lexxy-editor-rows: 3lh; }
     .panel-head .ref { display: none; }
   }
