@@ -301,6 +301,8 @@ lexxy-editor, .lexxy-content {
   font-family: var(--serif);
 }
 .composer lexxy-editor { --lexxy-editor-rows: 2lh; font-size: 16.5px; border-radius: 10px; }
+.composer lexxy-editor:has(.lexxy-editor__content:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.composer .lexxy-editor__content:focus-visible { outline: none; }
 .composer lexxy-toolbar { display: none; }
 .composer.expanded lexxy-editor { --lexxy-editor-rows: 9lh; }
 .composer.expanded lexxy-toolbar { display: flex; }
