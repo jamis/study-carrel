@@ -80,7 +80,7 @@
     margin: 0; font-weight: 400; font-style: italic; color: var(--accent);
     font-size: clamp(18px, 3.6vw, 32px); line-height: 1.25; text-wrap: balance;
   }
-  .focus-caret { flex: none; color: var(--ink-soft); font-family: var(--sans); font-size: 12px; transition: transform .2s; }
+  .focus-caret { flex: none; color: var(--ink-soft); font-family: var(--sans); font-size: clamp(14px, 2.6vw, 22px); transition: transform .2s; }
   .focus.open .focus-caret { transform: rotate(180deg); }
   .focus-body {
     display: none; position: absolute; left: 0; right: 0; top: 100%;
