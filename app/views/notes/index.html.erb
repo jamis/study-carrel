@@ -1,11 +1,11 @@
 <% content_for :title, "All notes · Study Carrel" %>
 <main class="page">
   <div class="page-bar">
-    <%= link_to "← Back to reading", root_path, class: "chip" %>
+    <%= link_to safe_join(["← Back", tag.span(" to reading", class: "wide-only")]), root_path, class: "chip" %>
     <% if @notes.any? %>
       <span class="page-bar-actions" data-controller="clipboard" data-clipboard-text-value="<%= MarkdownExport.new(@focus) %>">
-        <button class="chip" type="button" data-action="clipboard#copy" data-clipboard-target="button">Copy Markdown</button>
-        <%= link_to "Download .md", export_notes_path, class: "chip", data: { turbo: false } %>
+        <button class="chip" type="button" data-action="clipboard#copy" data-clipboard-target="button">Copy<span class="wide-only"> Markdown</span></button>
+        <%= link_to safe_join(["Download", tag.span(" .md", class: "wide-only")]), export_notes_path, class: "chip", data: { turbo: false } %>
       </span>
     <% end %>
   </div>

@@ -15,8 +15,8 @@ export default class extends Controller {
   }
 
   #flash(message) {
-    const original = (this.buttonTarget.dataset.original ??= this.buttonTarget.textContent)
+    const original = (this.buttonTarget.dataset.original ??= this.buttonTarget.innerHTML)
     this.buttonTarget.textContent = message
-    setTimeout(() => (this.buttonTarget.textContent = original), 1600)
+    setTimeout(() => (this.buttonTarget.innerHTML = original), 1600)
   }
 }
