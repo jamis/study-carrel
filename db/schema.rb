@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_04_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_04_160000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -87,6 +87,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_04_150000) do
     t.index ["created_by_id"], name: "index_invitations_on_created_by_id"
     t.index ["redeemed_by_id"], name: "index_invitations_on_redeemed_by_id"
     t.index ["token_digest"], name: "index_invitations_on_token_digest", unique: true
+  end
+
+  create_table "keeps", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "unit_id", null: false
+    t.string "remark"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["unit_id"], name: "index_keeps_on_unit_id"
+    t.index ["user_id", "unit_id"], name: "index_keeps_on_user_id_and_unit_id", unique: true
+    t.index ["user_id"], name: "index_keeps_on_user_id"
   end
 
   create_table "notes", force: :cascade do |t|
@@ -169,6 +180,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_04_150000) do
   add_foreign_key "foci", "users"
   add_foreign_key "invitations", "users", column: "created_by_id"
   add_foreign_key "invitations", "users", column: "redeemed_by_id", on_delete: :nullify
+  add_foreign_key "keeps", "units"
+  add_foreign_key "keeps", "users"
   add_foreign_key "notes", "foci"
   add_foreign_key "notes", "units"
   add_foreign_key "sections", "works"

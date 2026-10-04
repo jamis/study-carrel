@@ -53,7 +53,7 @@ Each step is small, can be checked on its own, and leaves the app working.
 ## Needed for v1
 
 - **History.** Built (see DECISIONS.md). Show where you've been recently (random hops make this matter) and jump straight back to any of those places. Global per user, not per focus, so a trail survives starting a new focus.
-- **Bookmarks/Favorites**. Sometimes I'll stumble across something profound that's unrelated to my current focus, but which I want to remmember to come back to.
+- **Bookmarks/Favorites** (built as "Keep"; see DECISIONS.md). Sometimes I'll stumble across something profound that's unrelated to my current focus, but which I want to remember to come back to.
 - **Random, extended.** An "Another" button inside the reader to roll again in the same scope; configurable weighting (uniform today).
 - **Library Search**. Search the entire library, or within a collection or work.
 

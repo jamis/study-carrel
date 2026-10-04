@@ -2,7 +2,10 @@
 <main class="page">
   <div class="page-bar">
     <%= link_to "← Continue reading", root_path, class: "chip" %>
-    <%= link_to "Random", random_path, class: "chip" %>
+    <span class="page-bar-actions">
+      <%= link_to "Kept", kept_path, class: "chip" %>
+      <%= link_to "Random", random_path, class: "chip" %>
+    </span>
   </div>
   <h2 class="page-title">Library</h2>
 

@@ -123,12 +123,44 @@
     grid-column: 1 / -1; font-family: var(--serif); font-size: 14px; color: var(--ink-soft);
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
+  .hist-kept { display: inline-block; width: 7px; height: 10px; margin-left: 7px; background: var(--accent); vertical-align: middle; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%); }
   .hist-note { display: inline-block; width: 6px; height: 6px; margin-left: 7px; border-radius: 50%; background: var(--accent); vertical-align: middle; }
   @media (max-width: 719px) {
     .history { position: static; order: 1; }
     .nav-in { position: relative; }
     .history-panel { left: 12px; right: 12px; width: auto; }
   }
+
+  /* Keep: a bookmark ribbon beside the passage's reference. The whole row sticks below the header while a long passage scrolls. */
+  .now-head {
+    position: sticky; top: var(--top-h, 96px); z-index: 2; display: flex; align-items: center;
+    margin-bottom: 4px; padding: 4px 0 10px;
+    background: linear-gradient(var(--bg) calc(100% - 10px), transparent); /* text scrolling under it fades out instead of being cut */
+  }
+  .now-head .ref { margin: 0; }
+  .keep { position: relative; flex: none; display: flex; white-space: normal; } /* .now keeps line breaks; the popover mustn't */
+  .keep-btn {
+    display: flex; align-items: center; justify-content: center; padding: 8px 10px; margin: -8px 0 -8px -10px;
+    border: 0; background: transparent; color: var(--ink-soft);
+  }
+  .keep-btn svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; opacity: .6; transition: opacity .15s; }
+  .keep-btn:hover svg, .keep-btn:focus-visible svg { opacity: 1; color: var(--accent); }
+  .keep-btn.kept svg { fill: var(--accent); stroke: var(--accent); opacity: 1; }
+  .keep-toast, .keep-pop {
+    position: absolute; left: -10px; top: 100%; margin-top: 6px; z-index: 3; font-family: var(--sans); font-size: 13px; color: var(--ink);
+    background: var(--bg); border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+  }
+  .keep-toast[hidden], .keep-pop[hidden] { display: none; }
+  .keep-toast { display: flex; align-items: center; gap: 12px; padding: 8px 14px; white-space: nowrap; }
+  .keep-toast button, .keep-pop-actions button { border: 0; background: none; padding: 4px 0; color: var(--accent); font-size: 13px; text-decoration: underline; }
+  .keep-pop { width: min(320px, calc(100vw - 32px)); padding: 12px 14px; }
+  .keep-pop label { display: block; margin-bottom: 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+  .keep-pop input {
+    width: 100%; font: inherit; font-size: 15px; color: var(--ink); background: var(--paper);
+    border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px;
+  }
+  .keep-pop-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .keep-pop-actions a { font-size: 13px; }
 
   /* The menu holds the rare actions. Wide screens show them inline; phones fold them away. */
   .menu { position: relative; display: flex; align-items: center; }
@@ -195,7 +227,7 @@
   .now.long { font-size: clamp(18px, 2.5vw, 22px); line-height: 1.7; }
   .now .ref {
     display: block; font-family: var(--sans); font-size: 12px; letter-spacing: .14em;
-    text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+    text-transform: uppercase; color: var(--accent);
   }
   .steps { display: flex; justify-content: flex-start; gap: 12px; }
 
@@ -212,6 +244,11 @@
   }
   .tick.current { background: var(--accent); border-color: var(--accent); color: var(--paper); }
   .tick.current.has::after { background: var(--paper); }
+  .tick.kept::before {
+    content: ""; position: absolute; top: -3px; right: 5px; width: 7px; height: 10px; background: var(--accent);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
+  }
+  .tick.current.kept::before { background: var(--paper); }
 
   /* ---------- notes panel ---------- */
   .panel {
@@ -383,3 +420,6 @@ a.tick { display: inline-flex; align-items: center; justify-content: center; tex
 .section-list a { color: var(--ink); text-decoration: none; }
 .section-list a:hover { color: var(--accent); }
 .noted-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: none; }
+.page-bar-actions .chip.current { border-color: var(--accent); color: var(--accent); }
+.kept-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; font-family: var(--sans); }
+.start-from { margin-bottom: 18px; }

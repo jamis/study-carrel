@@ -1,0 +1,24 @@
+<%# A bookmark ribbon beside the passage's reference; keep_controller.js drives it. %>
+<div class="keep" data-controller="keep"
+     data-keep-kept-value="<%= kept.to_json %>" data-keep-unit-id-value="<%= unit.id %>"
+     data-keep-url-template-value="<%= unit_keep_path("{id}") %>"
+     data-action="lectio:changed@window->keep#sync keydown@window->keep#key keydown.esc@window->keep#escape click@window->keep#away">
+  <button class="keep-btn" type="button" aria-pressed="false" title="Keep this passage (b)" aria-label="Keep this passage"
+          data-keep-target="button" data-action="keep#press">
+    <svg viewBox="0 0 20 30" width="14" height="21" aria-hidden="true"><path d="M2.5 .75h15v27.2L10 22.2 2.5 27.95z"/></svg>
+  </button>
+  <div class="keep-toast" role="status" hidden data-keep-target="toast">
+    Kept
+    <button type="button" data-action="keep#openRemark">Add a remark</button>
+    <button type="button" data-action="keep#release">Undo</button>
+  </div>
+  <div class="keep-pop" hidden data-keep-target="pop">
+    <label for="keep-remark">Why keep this?</label>
+    <input id="keep-remark" type="text" maxlength="200" autocomplete="off" placeholder="A few words, if you like"
+           data-keep-target="remark" data-action="change->keep#saveRemark keydown.enter->keep#close">
+    <div class="keep-pop-actions">
+      <button type="button" data-action="keep#release">Release</button>
+      <%= link_to "See all kept", kept_path %>
+    </div>
+  </div>
+</div>

@@ -25,11 +25,13 @@ Rails.application.routes.draw do
   end
   resources :units, only: [] do
     resource :note, only: %i[show update], controller: "unit_notes"
+    resource :keep, only: %i[create update destroy]
   end
   resources :notes, only: :index do
     get :export, on: :collection
   end
   get "history", to: "history#index"
+  get "kept", to: "keeps#index"
   get "library", to: "library#index"
   get "random", to: "random_readings#show", as: :random
   get "collections/:collection/random", to: "random_readings#show", as: :random_collection

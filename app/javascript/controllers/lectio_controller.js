@@ -14,11 +14,14 @@ export default class extends Controller {
     this.unitIds = new Map(this.unitTargets.map(u => [Number(u.dataset.number), Number(u.dataset.unitId)]))
     // Which verses have a note; the editor reports changes as it autosaves.
     this.noted = new Set(this.tickTargets.filter(t => t.classList.contains("has")).map(t => Number(t.dataset.number)))
+    // Likewise for kept verses; the ribbon reports those.
+    this.kept = new Set(this.tickTargets.filter(t => t.classList.contains("kept")).map(t => Number(t.dataset.number)))
     this.fitRefs = () => this.refTargets.forEach(r => this.fitRef(r))
     this.refObserver = new ResizeObserver(this.fitRefs)
     this.refTargets.filter(r => r.closest(".panel")).forEach(r => this.refObserver.observe(r))
     this.updateCount()
     this.scrollStripToCurrent()
+    this.announce()
     this.savePosition()
   }
 
@@ -95,6 +98,19 @@ export default class extends Controller {
     // Swapping the frame replaces the editor; the old one saves itself as it goes.
     this.editorTarget.src = this.noteUrlTemplateValue.replace("%7Bid%7D", this.unitIds.get(n)).replace("{id}", this.unitIds.get(n))
     this.updateCount()
+    this.announce()
+  }
+
+  // The Keep ribbon follows the verse on screen.
+  announce() {
+    this.dispatch("changed", { detail: { unitId: this.unitIds.get(this.currentValue) } })
+  }
+
+  keepChanged({ detail: { unitId, kept } }) {
+    const number = [...this.unitIds].find(([, id]) => id === unitId)?.[0]
+    if (number === undefined) return
+    if (kept) this.kept.add(number); else this.kept.delete(number)
+    this.updateMarkers()
   }
 
   // A long chapter's strip is a single scrolling row; keep the current number in view.
@@ -117,13 +133,15 @@ export default class extends Controller {
     this.updateMarkers()
   }
 
-  // The strip marks every verse that has a note.
+  // The strip marks every verse that has a note, and every one that's kept.
   updateMarkers() {
     this.tickTargets.forEach(tick => {
       const n = Number(tick.dataset.number)
       const has = this.noted.has(n)
+      const kept = this.kept.has(n)
       tick.classList.toggle("has", has)
-      tick.setAttribute("aria-label", has ? `${this.unitNameValue} ${n}, has a note` : `${this.unitNameValue} ${n}`)
+      tick.classList.toggle("kept", kept)
+      tick.setAttribute("aria-label", `${this.unitNameValue} ${n}${has ? ", has a note" : ""}${kept ? ", kept" : ""}`)
     })
   }
 

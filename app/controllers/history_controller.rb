@@ -7,6 +7,7 @@ class HistoryController < ApplicationController
   def index
     @visits = Current.user.visits.recent.offset(1).limit(SHOWN).includes(unit: { section: :work })
     @noted_unit_ids = @focus.notes.where(unit_id: @visits.map(&:unit_id)).pluck(:unit_id).to_set
+    @kept_unit_ids = Current.user.keeps.where(unit_id: @visits.map(&:unit_id)).pluck(:unit_id).to_set
     render layout: false
   end
 end

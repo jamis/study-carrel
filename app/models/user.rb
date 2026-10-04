@@ -3,6 +3,7 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :foci, dependent: :destroy
   has_many :visits, dependent: :delete_all
+  has_many :keeps, dependent: :delete_all
   has_many :invitations, foreign_key: :created_by_id, inverse_of: :created_by, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }

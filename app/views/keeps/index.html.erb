@@ -1,0 +1,37 @@
+<% content_for :title, "Kept · Study Carrel" %>
+<main class="page">
+  <div class="page-bar">
+    <%= link_to safe_join(["← Back", tag.span(" to reading", class: "wide-only")]), root_path, class: "chip" %>
+    <% if @keeps.any? %>
+      <span class="page-bar-actions" aria-label="Order">
+        <%= link_to "Newest", kept_path, class: "chip#{" current" unless params[:order] == "reading"}" %>
+        <%= link_to "Reading order", kept_path(order: "reading"), class: "chip#{" current" if params[:order] == "reading"}" %>
+      </span>
+    <% end %>
+  </div>
+  <h2 class="page-title all-notes-title">Kept</h2>
+  <p class="page-lede"><%= pluralize(@keeps.size, "passage") %> you wanted to come back to</p>
+
+  <% if @keeps.empty? %>
+    <p class="page-empty">Nothing kept yet. When a verse stays with you, tap the ribbon beside the text.</p>
+  <% end %>
+
+  <% @keeps.each do |keep|
+    unit = keep.unit %>
+    <% long = unit.body.length > 300 %>
+    <section class="fv-item" <%= tag.attributes(data: { controller: "expand" }) if long %>>
+      <%= link_to unit.reference, reading_path(unit.section.work.slug, unit.section.number, unit.number), class: "fv-ref" %>
+      <p class="fv-quote<%= " clamped" if long %>" data-expand-target="text"><%= unit.body %></p>
+      <% if long %>
+        <button class="fv-more" type="button" data-action="expand#toggle" data-expand-target="button" aria-expanded="false">Show full passage</button>
+      <% end %>
+      <% if keep.remark %><div class="fv-note"><%= keep.remark %></div><% end %>
+      <div class="kept-actions">
+        <%= link_to "Start a focus from this", new_focus_path(unit_id: unit.id), class: "chip",
+              data: { turbo_confirm: ("Start a new focus? The current one will be archived; you can bring it back from All foci." if Current.user.foci.current_one) } %>
+        <%= button_to "Release", unit_keep_path(unit), method: :delete, class: "chip", form_class: "inline-form",
+              data: { turbo_confirm: "Release this passage?" } %>
+      </div>
+    </section>
+  <% end %>
+</main>

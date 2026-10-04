@@ -1,5 +1,6 @@
 <%= form_with model: focus, class: "signin-form" do |form| %>
   <% if focus.errors.any? %><p class="signin-alert">Give your focus a title.</p><% end %>
+  <%= hidden_field_tag :unit_id, local_assigns[:start_keep].unit_id if local_assigns[:start_keep] %>
   <%= form.text_field :title, required: true, autofocus: true, placeholder: "A question, metaphor, or thesis" %>
   <%= form.text_area :description, rows: 4, placeholder: "Why this? (optional)" %>
   <%= form.submit submit, class: "primary" %>

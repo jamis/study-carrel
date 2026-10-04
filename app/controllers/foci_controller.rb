@@ -8,12 +8,14 @@ class FociController < ApplicationController
 
   def new
     @focus = foci.new
+    @start_keep = Current.user.keeps.find_by(unit_id: params[:unit_id]) if params[:unit_id]
   end
 
   def create
     @focus = foci.new(focus_params)
+    @start_keep = Current.user.keeps.find_by(unit_id: params[:unit_id]) if params[:unit_id]
     if @focus.valid?
-      foci.start!(focus_params)
+      foci.start!(focus_params.merge(last_unit: @start_keep&.unit))
       redirect_to root_path
     else
       render :new, status: :unprocessable_entity

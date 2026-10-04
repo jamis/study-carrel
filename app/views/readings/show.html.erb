@@ -20,6 +20,7 @@
         <div class="menu-panel" id="nav-menu" data-menu-target="panel">
           <%= link_to "Library", library_path, class: "menu-item menu-library" %>
           <%= link_to "Random", random_path, class: "menu-item chip" %>
+          <%= link_to "Kept", kept_path, class: "menu-item chip" %>
           <button class="menu-item icon-btn" type="button" title="Toggle light / dark" aria-label="Toggle light / dark" data-action="theme#toggle"><span aria-hidden="true">◐</span><span class="menu-label">Light / dark</span></button>
           <% if Current.user.admin? %><%= link_to "Invitations", admin_invitations_path, class: "menu-item chip" %><% end %>
           <%= button_to "Sign out", session_path, method: :delete, class: "menu-item chip", form_class: "signout" %>
@@ -34,7 +35,7 @@
       data-lectio-current-value="<%= @current.number %>"
       data-lectio-position-url-value="<%= position_path %>"
       data-lectio-note-url-template-value="<%= unit_note_path("{id}") %>"
-      data-action="note:saved@window->lectio#noteSaved"
+      data-action="note:saved@window->lectio#noteSaved keep:changed@window->lectio#keepChanged"
       data-lectio-base-value="<%= reading_path(@section.work.slug, @section.number) %>"
       data-lectio-ref-template-value="<%= @section.reference_template %>"
       data-lectio-ref-unit-template-value="<%= @section.reference_unit_template %>"
@@ -54,7 +55,7 @@
   <% next_unit = @units[at + 1] %>
   <article class="lectio" data-action="touchstart->lectio#touchStart touchend->lectio#touchEnd keydown@document->lectio#key">
     <div class="near<%= " edge" if !prev_unit && @previous_section %>" aria-hidden="true" data-lectio-target="prev" data-action="click->lectio#previous"><% if prev_unit %><b><%= prev_unit.number %></b><%= prev_unit.body %><% elsif @previous_section %><b>←</b><%= @previous_section.name %><% end %></div>
-    <div class="now <%= unit_size_class(@current.body) %>" aria-live="polite" data-lectio-target="now"><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span><span data-lectio-target="body"><%= @current.body %></span></div>
+    <div class="now <%= unit_size_class(@current.body) %>" aria-live="polite" data-lectio-target="now"><div class="now-head"><%= render "keeps/ribbon", unit: @current, kept: @kept %><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span></div><span data-lectio-target="body"><%= @current.body %></span></div>
     <div class="near<%= " edge" if !next_unit && @next_section %>" aria-hidden="true" data-lectio-target="next" data-action="click->lectio#next"><% if next_unit %><b><%= next_unit.number %></b><%= next_unit.body %><% elsif @next_section %><b>→</b><%= @next_section.name %><% end %></div>
     <div class="steps">
       <button class="chip" type="button" data-action="lectio#previous">← Previous</button>
@@ -63,7 +64,8 @@
     <nav class="strip<%= " scrolling" if @units.size > 40 %>" aria-label="<%= unit_noun(@section).pluralize %>" data-lectio-target="strip">
       <% @units.each do |u| %>
         <% noted = @notes_by_unit.key?(u.id) %>
-        <button type="button" class="tick<%= " current" if u == @current %><%= " has" if noted %>" aria-current="<%= u == @current %>" tabindex="<%= u == @current ? 0 : -1 %>" data-lectio-target="tick" data-number="<%= u.number %>" data-action="lectio#go" aria-label="<%= unit_noun(@section) %> <%= u.number %><%= ", has a note" if noted %>"><%= u.number %></button>
+        <% kept = @kept.key?(u.id) %>
+        <button type="button" class="tick<%= " current" if u == @current %><%= " has" if noted %><%= " kept" if kept %>" aria-current="<%= u == @current %>" tabindex="<%= u == @current ? 0 : -1 %>" data-lectio-target="tick" data-number="<%= u.number %>" data-action="lectio#go" aria-label="<%= unit_noun(@section) %> <%= u.number %><%= ", has a note" if noted %><%= ", kept" if kept %>"><%= u.number %></button>
       <% end %>
     </nav>
   </article>
