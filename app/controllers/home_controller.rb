@@ -1,5 +1,9 @@
 class HomeController < ApplicationController
+  allow_unauthenticated_access only: :index
+
   def index
+    return render :landing, layout: "landing" unless authenticated?
+
     focus = Current.user.foci.current_one or return redirect_to new_focus_path
 
     if (unit = focus.last_unit)

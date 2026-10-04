@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="A quiet desk for slow reading: pose a question, focus your study, and gain insight from poetry, prose, and sacred texts.">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <meta name="theme-color" content="#f6f1e7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#17140f" media="(prefers-color-scheme: dark)">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <%# Inline, not in app/assets: `stylesheet_link_tag :app` would load these rules into every app page. %>
+    <style>
+  :root {
+    --bg: #f6f1e7; --paper: #fbf8f1; --ink: #2b2620; --ink-soft: #6b6256;
+    --rule: #e2d9c8; --accent: #8a4b2a; --accent-soft: #f0dcc9;
+    --shadow: 0 8px 30px rgba(60, 40, 20, .12);
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685;
+      --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d;
+      --shadow: 0 8px 30px rgba(0, 0, 0, .5);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--serif); line-height: 1.6; font-size: 19px; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+  nav { display: flex; justify-content: flex-end; align-items: center; padding: 18px 0; font-family: var(--sans); font-size: 14px; }
+  nav .links { display: flex; gap: 20px; }
+  nav .links a { color: var(--ink-soft); text-decoration: none; }
+  nav .links a:hover { color: var(--accent); }
+
+  .hero { padding: 72px 0 56px; max-width: 760px; }
+  h1 { font-size: clamp(45px, 8.8vw, 90px); line-height: 1; font-weight: 400; color: var(--accent); margin: 0 0 20px; letter-spacing: -.01em; }
+  .tagline { font-size: clamp(21px, 3vw, 28px); line-height: 1.25; font-weight: 400; color: var(--ink); margin: 0 0 28px; }
+  .lede { font-size: clamp(19px, 2.4vw, 23px); color: var(--ink); margin: 0 0 32px; }
+  .cta { display: inline-block; font-family: var(--sans); font-size: 15px; padding: 11px 22px; border-radius: 999px;
+    border: 1px solid var(--accent); color: var(--accent); text-decoration: none; margin-right: 8px; }
+  .cta.primary { background: var(--accent); color: var(--paper); }
+  .cta:hover { box-shadow: var(--shadow); }
+
+  h2 { font-weight: 400; font-size: clamp(26px, 4vw, 34px); margin: 0 0 8px; }
+  section.how { border-top: 1px solid var(--rule); padding: 56px 0 24px; }
+
+  .step { display: grid; grid-template-columns: 5fr 7fr; gap: 48px; align-items: center; padding: 48px 0; }
+  .step:nth-of-type(even) { grid-template-columns: 7fr 5fr; }
+  .step:nth-of-type(even) .text { order: 2; }
+  blockquote { margin: 22px 0 0; padding-left: 18px; border-left: 3px solid var(--accent-soft); font-style: italic; color: var(--ink-soft); font-size: 18px; }
+  blockquote cite { display: block; font-style: normal; font-family: var(--sans); font-size: 13px; letter-spacing: .04em; margin-top: 8px; color: var(--accent); }
+  .step p { margin: 0; }
+  .shot { margin: 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--rule); box-shadow: var(--shadow); background: var(--paper); }
+  .shot img { display: block; width: 100%; height: auto; }
+  .after { text-align: center; font-style: italic; color: var(--ink-soft); padding: 8px 0 56px; max-width: 640px; margin: 0 auto; }
+
+  section.works { background: var(--paper); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 56px 0; }
+  .works .intro { max-width: 660px; margin-bottom: 32px; }
+  .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+  .cols h3 { font-family: var(--sans); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; font-weight: 600; }
+  .cols ul { list-style: none; margin: 0; padding: 0; font-size: 17px; }
+  .cols li { padding: 8px 0; border-top: 1px solid var(--rule); line-height: 1.4; }
+  .cols li:first-child { border-top: 0; }
+
+  section.signup { padding: 64px 0 80px; max-width: 640px; }
+  footer { border-top: 1px solid var(--rule); padding: 24px 0 40px; font-family: var(--sans); font-size: 13px; color: var(--ink-soft); }
+
+  @media (max-width: 800px) {
+    body { font-size: 18px; }
+    .hero { padding: 40px 0 36px; }
+    .step, .step:nth-of-type(even) { grid-template-columns: 1fr; gap: 22px; padding: 32px 0; }
+    .step:nth-of-type(even) .text { order: 0; }
+    .cols { grid-template-columns: 1fr; gap: 28px; }
+  }
+    </style>
+  </head>
+
+  <body>
+    <%= yield %>
+  </body>
+</html>

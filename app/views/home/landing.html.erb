@@ -1,0 +1,108 @@
+<% content_for :title, "Study Carrel" %>
+
+<div class="wrap">
+  <nav>
+    <div class="links"><a href="#how">How it works</a><a href="#works">Library</a><a href="#signup">Sign up</a><a href="<%= new_session_path %>">Sign in</a></div>
+  </nav>
+
+  <header class="hero">
+    <h1>Study Carrel</h1>
+    <p class="tagline">Pose a question. Focus your study. Gain insight.</p>
+    <p class="lede">Study Carrel is your personal desk in a quiet library. It surrounds you with poetry, prose, and sacred texts. No distractions. All the time in the world. This is your space to focus on finding what you seek.</p>
+    <a class="cta primary" href="#how">How does it work?</a>
+  </header>
+</div>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <h2>How does it work?</h2>
+
+    <div class="step">
+      <div class="text">
+        <p>Begin your session by stating your <em>focus</em>: a question, metaphor, or thesis that you want to investigate.</p>
+        <blockquote>And ye shall seek me, and find me, when ye shall search for me with all your heart.<cite>Jeremiah 29:13</cite></blockquote>
+      </div>
+      <figure class="shot"><%= image_tag "landing/screenshot-00.png", alt: "Stating a focus", loading: "lazy" %></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <p>Select a work to study&mdash;Study Carrel includes a number of public domain works of poetry, prose, and scripture. Find one that speaks to you.</p>
+        <blockquote>Books are the treasured wealth of the world and the fit inheritance of generations and nations.<cite>Henry David Thoreau, <i>Walden</i></cite></blockquote>
+      </div>
+      <figure class="shot"><%= image_tag "landing/screenshot-01.png", alt: "Choosing a work", loading: "lazy" %></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <p>Read it one paragraph, stanza, or verse at a time. The rest of the text fades away, keeping you focused on what you're studying.</p>
+        <blockquote>This, what is it in itself, and by itself, according to its proper constitution? &hellip; Thus must thou examine all things, that present themselves unto thee.<cite>Marcus Aurelius, <i>Meditations</i></cite></blockquote>
+      </div>
+      <figure class="shot"><%= image_tag "landing/screenshot-02.png", alt: "Reading one stanza at a time with the focus pinned above", loading: "lazy" %></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <p>Record your insights. Your notebook is always right there, ready for you to jot down what occurs to you.</p>
+        <blockquote>Write the vision, and make it plain upon tables, that he may run that readeth it.<cite>Habakkuk 2:2</cite></blockquote>
+      </div>
+      <figure class="shot"><%= image_tag "landing/screenshot-03.png", alt: "Writing a note beside the passage", loading: "lazy" %></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <p>Later, review the thoughts you noted.</p>
+        <blockquote>Looking back is best that is left,<br>Or if it be before,<br>Retrospection is prospect's half,<br>Sometimes almost more.<cite>Emily Dickinson</cite></blockquote>
+      </div>
+      <figure class="shot"><%= image_tag "landing/screenshot-04.png", alt: "Reviewing notes", loading: "lazy" %></figure>
+    </div>
+
+    <p class="after">Change your study focus at any time, or jump back to a previous focus and pick up where you left off.</p>
+  </div>
+</section>
+
+<section class="works" id="works">
+  <div class="wrap">
+    <div class="intro">
+      <h2>What works are currently available?</h2>
+      <p>Study Carrel includes a list of public domain works that were selected for their potential to reward a slow, careful reading. Today the corpus contains:</p>
+    </div>
+    <div class="cols">
+      <div>
+        <h3>Sacred Texts</h3>
+        <ul>
+          <li>The Bible, King James Version: the complete Old and New Testaments</li>
+          <li>The Book of Mormon (public-domain text)</li>
+          <li>The Dhammapada (Müller translation)</li>
+          <li>The Tao Te Ching (Legge translation)</li>
+          <li>The Bhagavad Gita, as <i>The Song Celestial</i> (Arnold translation)</li>
+          <li>The Quran (Rodwell translation)</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Poetry</h3>
+        <ul>
+          <li>Emily Dickinson, <i>Poems</i> (all three series)</li>
+          <li>Robert Frost, <i>Collected Poems</i> (1930)</li>
+          <li>Edgar Allan Poe, <i>Poems</i></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Prose</h3>
+        <ul>
+          <li>Henry David Thoreau, <i>Walden</i></li>
+          <li>Marcus Aurelius, <i>Meditations</i> (Casaubon translation)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <section class="signup" id="signup">
+    <h2>I need this. How do I sign up?</h2>
+    <p>Study Carrel is still in limited beta. Signups are currently by invitation only.</p>
+  </section>
+  <footer>Study Carrel &middot; a quiet desk for slow reading</footer>
+</div>
+

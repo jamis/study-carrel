@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study Carrel: Pose a question. Focus your study.</title>
+<style>
+  :root {
+    --bg: #f6f1e7; --paper: #fbf8f1; --ink: #2b2620; --ink-soft: #6b6256;
+    --rule: #e2d9c8; --accent: #8a4b2a; --accent-soft: #f0dcc9;
+    --shadow: 0 8px 30px rgba(60, 40, 20, .12);
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685;
+      --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d;
+      --shadow: 0 8px 30px rgba(0, 0, 0, .5);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--serif); line-height: 1.6; font-size: 19px; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+  nav { display: flex; justify-content: flex-end; align-items: center; padding: 18px 0; font-family: var(--sans); font-size: 14px; }
+  nav .links { display: flex; gap: 20px; }
+  nav .links a { color: var(--ink-soft); text-decoration: none; }
+  nav .links a:hover { color: var(--accent); }
+
+  .hero { padding: 72px 0 56px; max-width: 760px; }
+  h1 { font-size: clamp(45px, 8.8vw, 90px); line-height: 1; font-weight: 400; color: var(--accent); margin: 0 0 20px; letter-spacing: -.01em; }
+  .tagline { font-size: clamp(21px, 3vw, 28px); line-height: 1.25; font-weight: 400; color: var(--ink); margin: 0 0 28px; }
+  .lede { font-size: clamp(19px, 2.4vw, 23px); color: var(--ink); margin: 0 0 32px; }
+  .cta { display: inline-block; font-family: var(--sans); font-size: 15px; padding: 11px 22px; border-radius: 999px;
+    border: 1px solid var(--accent); color: var(--accent); text-decoration: none; margin-right: 8px; }
+  .cta.primary { background: var(--accent); color: var(--paper); }
+  .cta:hover { box-shadow: var(--shadow); }
+
+  h2 { font-weight: 400; font-size: clamp(26px, 4vw, 34px); margin: 0 0 8px; }
+  section.how { border-top: 1px solid var(--rule); padding: 56px 0 24px; }
+
+  .step { display: grid; grid-template-columns: 5fr 7fr; gap: 48px; align-items: center; padding: 48px 0; }
+  .step:nth-of-type(even) { grid-template-columns: 7fr 5fr; }
+  .step:nth-of-type(even) .text { order: 2; }
+  blockquote { margin: 22px 0 0; padding-left: 18px; border-left: 3px solid var(--accent-soft); font-style: italic; color: var(--ink-soft); font-size: 18px; }
+  blockquote cite { display: block; font-style: normal; font-family: var(--sans); font-size: 13px; letter-spacing: .04em; margin-top: 8px; color: var(--accent); }
+  .step p { margin: 0; }
+  .shot { margin: 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--rule); box-shadow: var(--shadow); background: var(--paper); }
+  .shot img { display: block; width: 100%; height: auto; }
+  .after { text-align: center; font-style: italic; color: var(--ink-soft); padding: 8px 0 56px; max-width: 640px; margin: 0 auto; }
+
+  section.works { background: var(--paper); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 56px 0; }
+  .works .intro { max-width: 660px; margin-bottom: 32px; }
+  .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+  .cols h3 { font-family: var(--sans); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; font-weight: 600; }
+  .cols ul { list-style: none; margin: 0; padding: 0; font-size: 17px; }
+  .cols li { padding: 8px 0; border-top: 1px solid var(--rule); line-height: 1.4; }
+  .cols li:first-child { border-top: 0; }
+
+  section.signup { padding: 64px 0 80px; max-width: 640px; }
+  footer { border-top: 1px solid var(--rule); padding: 24px 0 40px; font-family: var(--sans); font-size: 13px; color: var(--ink-soft); }
+
+  @media (max-width: 800px) {
+    body { font-size: 18px; }
+    .hero { padding: 40px 0 36px; }
+    .step, .step:nth-of-type(even) { grid-template-columns: 1fr; gap: 22px; padding: 32px 0; }
+    .step:nth-of-type(even) .text { order: 0; }
+    .cols { grid-template-columns: 1fr; gap: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <div class="links"><a href="#how">How it works</a><a href="#works">Library</a><a href="#signup">Sign up</a><a href="/session/new">Sign in</a></div>
+  </nav>
+
+  <header class="hero">
+    <h1>Study Carrel</h1>
+    <p class="tagline">Pose a question. Focus your study. Gain insight.</p>
+    <p class="lede">Study Carrel is your personal desk in a quiet library. It surrounds you with poetry, prose, and sacred texts. No distractions. All the time in the world. This is your space to focus on finding what you seek.</p>
+    <a class="cta primary" href="#how">How does it work?</a>
+  </header>
+</div>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <h2>How does it work?</h2>
+
+    <div class="step">
+      <div class="text">
+        <p>Begin your session by stating your <em>focus</em>: a question, metaphor, or thesis that you want to investigate.</p>
+        <blockquote>And ye shall seek me, and find me, when ye shall search for me with all your heart.<cite>Jeremiah 29:13</cite></blockquote>
+      </div>
+      <figure class="shot"><img src="../screenshot-00.png" alt="Stating a focus" loading="lazy"></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <p>Select a work to study&mdash;Study Carrel includes a number of public domain works of poetry, prose, and scripture. Find one that speaks to you.</p>
+        <blockquote>Books are the treasured wealth of the world and the fit inheritance of generations and nations.<cite>Henry David Thoreau, <i>Walden</i></cite></blockquote>
+      </div>
+      <figure class="shot"><img src="../screenshot-01.png" alt="Choosing a work" loading="lazy"></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <p>Read it one paragraph, stanza, or verse at a time. The rest of the text fades away, keeping you focused on what you're studying.</p>
+        <blockquote>This, what is it in itself, and by itself, according to its proper constitution? &hellip; Thus must thou examine all things, that present themselves unto thee.<cite>Marcus Aurelius, <i>Meditations</i></cite></blockquote>
+      </div>
+      <figure class="shot"><img src="../screenshot-02.png" alt="Reading one stanza at a time with the focus pinned above" loading="lazy"></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <p>Record your insights. Your notebook is always right there, ready for you to jot down what occurs to you.</p>
+        <blockquote>Write the vision, and make it plain upon tables, that he may run that readeth it.<cite>Habakkuk 2:2</cite></blockquote>
+      </div>
+      <figure class="shot"><img src="../screenshot-03.png" alt="Writing a note beside the passage" loading="lazy"></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <p>Later, review the thoughts you noted.</p>
+        <blockquote>Looking back is best that is left,<br>Or if it be before,<br>Retrospection is prospect's half,<br>Sometimes almost more.<cite>Emily Dickinson</cite></blockquote>
+      </div>
+      <figure class="shot"><img src="../screenshot-04.png" alt="Reviewing notes" loading="lazy"></figure>
+    </div>
+
+    <p class="after">Change your study focus at any time, or jump back to a previous focus and pick up where you left off.</p>
+  </div>
+</section>
+
+<section class="works" id="works">
+  <div class="wrap">
+    <div class="intro">
+      <h2>What works are currently available?</h2>
+      <p>Study Carrel includes a list of public domain works that were selected for their potential to reward a slow, careful reading. Today the corpus contains:</p>
+    </div>
+    <div class="cols">
+      <div>
+        <h3>Sacred Texts</h3>
+        <ul>
+          <li>The Bible, King James Version: the complete Old and New Testaments</li>
+          <li>The Book of Mormon (public-domain text)</li>
+          <li>The Dhammapada (Müller translation)</li>
+          <li>The Tao Te Ching (Legge translation)</li>
+          <li>The Bhagavad Gita, as <i>The Song Celestial</i> (Arnold translation)</li>
+          <li>The Quran (Rodwell translation)</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Poetry</h3>
+        <ul>
+          <li>Emily Dickinson, <i>Poems</i> (all three series)</li>
+          <li>Robert Frost, <i>Collected Poems</i> (1930)</li>
+          <li>Edgar Allan Poe, <i>Poems</i></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Prose</h3>
+        <ul>
+          <li>Henry David Thoreau, <i>Walden</i></li>
+          <li>Marcus Aurelius, <i>Meditations</i> (Casaubon translation)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <section class="signup" id="signup">
+    <h2>I need this. How do I sign up?</h2>
+    <p>Study Carrel is still in limited beta. Signups are currently by invitation only.</p>
+  </section>
+  <footer>Study Carrel &middot; a quiet desk for slow reading</footer>
+</div>
+
+</body>
+</html>
