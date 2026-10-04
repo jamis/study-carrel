@@ -1,4 +1,16 @@
 module ReadingsHelper
+  # Breadcrumb trail for the reading nav: [[label, path_or_nil, title], ...], Library first, the section last.
+  # The work is skipped when the section's name already starts with its title ("Isaiah 40"), and the
+  # edition and author ride along as the work crumb's tooltip.
+  def reading_crumbs(section)
+    work = section.work
+    trail = [ [ "Library", library_path, nil ] ]
+    collections = work.collection ? work.collection.ancestors + [ work.collection ] : []
+    collections.each { |c| trail << [ c.name, collection_path(c), nil ] }
+    trail << [ work.title, work_path(work), [ work.byline, work.edition ].compact_blank.join(" · ").presence ] unless section.name.start_with?(work.title)
+    trail << [ section.name, work_path(work), "Chapters in #{work.title}#{" (#{work.edition})" if work.edition.present?}" ]
+  end
+
   def unit_ref(section, unit) = section.reference(unit.number)
 
   # Work title, section name and unit in separate spans (see .ref-work / .ref-section / .ref-unit); the browser updates the unit as the reader moves.

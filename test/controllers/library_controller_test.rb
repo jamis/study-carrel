@@ -92,8 +92,8 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-lectio-prev-url-value=?]", reading_path("genesis-kjv", 1, 2)
     assert_select "[data-lectio-prev-label-value=?]", "Genesis 1"
     assert_select ".near.edge", 2
-    assert_select ".where[href=?]", work_path("genesis-kjv")
-    assert_select "a.brand[href=?]", library_path
+    assert_select ".crumbs a.crumb[href=?]", work_path("genesis-kjv"), text: "Genesis 2"
+    assert_select ".crumbs a.crumb[href=?]", library_path, text: "Library"
   end
 
   test "a text whose verse numbers skip ahead renders neighbors by position" do

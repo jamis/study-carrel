@@ -2,10 +2,18 @@
 <header class="top" data-controller="theme">
   <div class="nav">
     <div class="nav-in">
-      <%= link_to "Study Carrel", library_path, class: "brand", title: "Library" %>
-      <%= link_to work_path(@section.work), class: "where", title: "#{@section.name}: chapters in #{@section.work.title}", data: { controller: "fit" } do %><%= @section.name %><small><%= [ @section.work.short_byline, @section.work.edition ].compact_blank.join(" · ") %></small><% end %>
+      <nav class="crumbs" aria-label="Breadcrumb" data-controller="crumbs">
+        <ol>
+          <% crumbs = reading_crumbs(@section) %>
+          <% crumbs.each_with_index do |(label, path, title), i| %>
+            <% last = i == crumbs.size - 1 %>
+            <% if i == 1 %><li class="crumb-more" hidden aria-hidden="true">…</li><% end %>
+            <li data-crumbs-target="item"<%= " class=crumb-last".html_safe if last %>><%= link_to label, path, class: "crumb", title: title, aria: { current: ("page" if last) } %></li>
+          <% end %>
+        </ol>
+      </nav>
       <div class="history" data-controller="menu history" data-history-url-value="<%= history_path %>"
-           data-action="keydown.esc@window->menu#escape click@window->menu#away keydown@window->history#key">
+           data-action="keydown.esc@window->menu#escape click@window->menu#away keydown@window->history#key click@window->history#fromMenu">
         <button class="icon-btn history-btn" type="button" title="Recent places (h)" aria-label="Recent places" aria-expanded="false" aria-controls="history-panel"
                 data-menu-target="button" data-history-target="button" data-action="menu#toggle history#refresh"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
         <div class="history-panel" id="history-panel" data-menu-target="panel" data-history-target="panel" data-action="keydown->history#arrow">
@@ -13,17 +21,17 @@
           <div data-history-target="list"></div>
         </div>
       </div>
-      <%= render "notes/all_link", focus: @focus %>
       <div class="menu" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
         <button class="icon-btn menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-menu"
                 data-menu-target="button" data-action="menu#toggle">⋯</button>
         <div class="menu-panel" id="nav-menu" data-menu-target="panel">
-          <%= link_to "Library", library_path, class: "menu-item menu-library" %>
-          <%= link_to "Random", random_path, class: "menu-item chip" %>
-          <%= link_to "Kept", kept_path, class: "menu-item chip" %>
-          <button class="menu-item icon-btn" type="button" title="Toggle light / dark" aria-label="Toggle light / dark" data-action="theme#toggle"><span aria-hidden="true">◐</span><span class="menu-label">Light / dark</span></button>
-          <% if Current.user.admin? %><%= link_to "Invitations", admin_invitations_path, class: "menu-item chip" %><% end %>
-          <%= button_to "Sign out", session_path, method: :delete, class: "menu-item chip", form_class: "signout" %>
+          <%= render "notes/all_link", focus: @focus %>
+          <button class="menu-item menu-history" type="button" data-history-open data-action="menu#close">Recent places<kbd>h</kbd></button>
+          <%= link_to "Random", random_path, class: "menu-item" %>
+          <%= link_to "Kept", kept_path, class: "menu-item" %>
+          <button class="menu-item" type="button" data-action="theme#toggle">Light / dark</button>
+          <% if Current.user.admin? %><%= link_to "Invitations", admin_invitations_path, class: "menu-item" %><% end %>
+          <%= button_to "Sign out", session_path, method: :delete, class: "menu-item", form_class: "signout" %>
         </div>
       </div>
     </div>

@@ -48,6 +48,16 @@ class ReadingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "title", "Isaiah 40 · Study Carrel"
   end
 
+  test "the nav shows breadcrumbs from the library down to the chapter" do
+    get reading_path("isaiah-kjv", 40, 25)
+    labels = css_select(".crumbs li").map { |i| i.text.strip }.reject { |t| t == "…" }
+    assert_equal "Library", labels.first
+    assert_equal "Isaiah 40", labels.last
+    assert_includes labels, "Old Testament"
+    assert_equal 1, labels.count { |t| t.start_with?("Isaiah") }
+    assert_select ".crumbs li:last-child a[aria-current=page]", "Isaiah 40"
+  end
+
   test "requires sign in" do
     delete session_path
     get reading_path("isaiah-kjv", 40)

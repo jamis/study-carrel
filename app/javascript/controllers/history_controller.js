@@ -22,6 +22,13 @@ export default class extends Controller {
     this.buttonTarget.click()
   }
 
+  // The menu's "Recent places" item (outside this element) asks for the list.
+  fromMenu(event) {
+    if (!event.target.closest("[data-history-open]")) return
+    this.focusFirst = true
+    this.buttonTarget.click()
+  }
+
   arrow(event) {
     if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return
     event.preventDefault()

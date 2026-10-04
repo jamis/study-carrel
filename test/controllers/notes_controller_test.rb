@@ -68,7 +68,7 @@ class AllNotesTest < ActionDispatch::IntegrationTest
   test "the reading page links to it with a count" do
     @focus.notes.create!(unit: verse(3), content: "x")
     get reading_path("isaiah-kjv", 40)
-    assert_select "a.chip[href=?]", notes_path, text: "All notes (1)"
+    assert_select "a.menu-item[href=?]", notes_path, text: "All notes (1)"
   end
 
   test "long passages are clamped with a way to expand them" do
