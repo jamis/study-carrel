@@ -11,6 +11,16 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href^=mailto]", false
   end
 
+  test "the landing page lists the library's collections and works" do
+    TextLoader.load_collections(Rails.root.join("db/texts/collections.yml"))
+    TextLoader.new("work: Walden\nauthor: Henry David Thoreau\ncollection: prose\nposition: 1\n\nsection: 1\n1. p\n").load
+    get root_path
+    assert_select ".works h3", "Prose"
+    assert_select ".works li", text: "Henry David Thoreau, Walden"
+    assert_select ".works li", text: "Bible" # a child collection is one item
+    assert_select ".works li", text: "Old Testament", count: 0
+  end
+
   test "sends a focus with no reading yet to the library" do
     users(:one).foci.start!(title: "Holy")
     sign_in_as users(:one)

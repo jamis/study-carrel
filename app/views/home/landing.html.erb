@@ -68,32 +68,17 @@
       <p>Study Carrel includes a list of public domain works that were selected for their potential to reward a slow, careful reading. Today the corpus contains:</p>
     </div>
     <div class="cols">
-      <div>
-        <h3>Sacred Texts</h3>
-        <ul>
-          <li>The Bible, King James Version: the complete Old and New Testaments</li>
-          <li>The Book of Mormon (public-domain text)</li>
-          <li>The Dhammapada (Müller translation)</li>
-          <li>The Tao Te Ching (Legge translation)</li>
-          <li>The Bhagavad Gita, as <i>The Song Celestial</i> (Arnold translation)</li>
-          <li>The Quran (Rodwell translation)</li>
-        </ul>
-      </div>
-      <div>
-        <h3>Poetry</h3>
-        <ul>
-          <li>Emily Dickinson, <i>Poems</i> (all three series)</li>
-          <li>Robert Frost, <i>Collected Poems</i> (1930)</li>
-          <li>Edgar Allan Poe, <i>Poems</i></li>
-        </ul>
-      </div>
-      <div>
-        <h3>Prose</h3>
-        <ul>
-          <li>Henry David Thoreau, <i>Walden</i></li>
-          <li>Marcus Aurelius, <i>Meditations</i> (Casaubon translation)</li>
-        </ul>
-      </div>
+      <% @collections.each do |collection| %>
+        <div>
+          <h3><%= collection.name %></h3>
+          <ul>
+            <% collection.children.each do |child| %><li><%= child.name %></li><% end %>
+            <% collection.works.each do |work| %>
+              <li><%= safe_join([ work.byline, tag.i(work.title), work.edition ].compact_blank, ", ") %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
     </div>
   </div>
 </section>
