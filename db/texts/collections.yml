@@ -30,7 +30,7 @@
   name: Emily Dickinson
   parent: poetry
   position: 1
-  description: The three series of her poems, a stanza at a time.
+  description: Her poems as first published after her death, a stanza at a time.
 - slug: robert-frost
   name: Robert Frost
   parent: poetry

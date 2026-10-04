@@ -1,0 +1,3216 @@
+work: Further Poems
+edition: 1929
+author: Emily Dickinson
+author_short: Dickinson
+slug: dickinson-further-poems
+collection: emily-dickinson
+position: 5
+unit: stanza
+lines: keep
+
+section: 1
+label: I fear a man of scanty speech
+1. I fear a man of scanty speech,
+I fear a silent man,
+Haranguer I can overtake
+Or babbler entertain—
+2. But he who waiteth
+While the rest
+Expend their inmost pound,
+Of this Man I am wary—
+I fear that He is Grand.
+
+section: 2
+label: Publication is the auction
+1. Publication is the auction
+Of the mind of man,
+Poverty be justifying
+For so foul a thing.
+2. Possibly,—but we would rather
+From our garret go
+White unto the White Creator,
+Than invest our snow.
+3. Thought belongs to Him who gave it—
+Then to him who bear
+Its corporeal illustration. Sell
+The Royal air
+In the parcel. Be the merchant
+Of the Heavenly Grace,
+But reduce no human spirit
+To disgrace of price!
+
+section: 3
+label: Some work for Immortality
+1. Some work for Immortality,
+The chiefer part of Time;
+He compensates immediately
+The former checks on Fame.
+2. Slow gold, but everlasting,
+The bullion of To-day
+Contrasted with the currency
+Of Immortality.
+3. A beggar here and there
+Is gifted to discern
+Beyond the broker’s insight—
+One’s Money—One’s the Mine.
+
+section: 4
+label: The popular Heart is a
+1. The popular Heart is a
+Cannon first,
+Subsequent a drum;
+Bells for an auxiliary
+And an afterward of rum.
+2. Not a to-morrow to know its name,
+Nor a past to stare,
+Ditches for realms and
+A trip to jail
+For a souvenir!
+
+section: 5
+label: Funny to be a Century
+1. Funny to be a Century
+And see the people going by,
+I should die of the oddity,
+But then I’m not so
+Staid as he.
+2. He keeps his secrets safely, very—
+Were he to tell, extremely sorry
+This bashful globe of ours
+Would be,
+So dainty of publicity!
+
+section: 6
+label: I cannot dance upon my toes
+1. I cannot dance upon my toes,
+No man instructed me,
+But often times among my mind
+A glee possesseth me
+That had I ballet knowledge
+Would put itself abroad
+In pirouette to blanch a troupe,
+Or lay a Prima mad!
+And though I had no gown of gauze,
+No ringlet to my hair,
+Nor hopped for audiences like birds,
+One claw upon the air,—
+Nor tossed my shape in
+Eider balls,
+Nor rolled on wheels of snow
+Till I was out of sight in sound,
+The house encored me so—
+Nor any knew I know the art
+I mention easy here—
+Nor any placard boast me,
+It ‘s full as opera!
+
+section: 7
+label: ’Tis opposites entice
+1. ’Tis opposites entice,
+Deformed men ponder grace,
+Bright fires, the blanketless—
+The lost, Day’s face.
+2. The blind esteem it be
+Enough estate to see;
+The captive strangles new
+For deeming beggars play.
+3. To lack enamour Thee,
+Tho’ the Divinity
+Be only
+Me.
+
+section: 8
+label: Color, Caste, Denomination
+1. Color, Caste, Denomination—
+These are Time’s affair,
+Death’s division classifying
+Does not know they are.
+2. As in sleep—all here forgotten,
+Tenets put behind,
+Death’s large democratic fingers
+Rub away the brand.
+3. If Circassian—He is careless—
+If He put away
+Chrysalis of Blonde or Umber,
+Equal butterfly—
+4. They emerge from His obscuring,
+What Death knows so well,
+Our minuter intuitions
+Deem incredible.
+
+section: 9
+label: I reckon, when I count at all
+1. I reckon, when I count at all,
+First Poets—then the Sun—
+Then Summer—then the
+Heaven of God—
+And then the list is done.
+But looking back—the first so seems
+To comprehend the whole—
+The others look a needless show,
+So I write Poets—All.
+This summer lasts a solid year,
+They can afford a sun
+The East would deem
+Extravagant,
+And if the final Heaven
+Be beautiful as they disclose
+To those who trust in them,
+It is too difficult a grace
+To justify the dream.
+
+section: 10
+label: This was a Poet
+1. This was a Poet—
+It is that
+Distills amazing sense
+From ordinary
+Meanings,
+And attars so immense
+From the familiar species
+That perished by the door,
+We wonder it was not
+Ourselves
+Arrested it before.
+2. Of pictures the discloser—
+The Poet, it is he,
+Entitles us by contrast
+To ceaseless poverty.
+3. Of portion so unconscious
+The robbing could not harm,
+Himself, to him, a fortune
+Exterior to Time.
+
+section: 11
+label: Strong draughts of their refreshing minds
+1. Strong draughts of their refreshing minds
+To drink, enables mine
+Through desert or the
+Wilderness,
+As bore it sealéd wine—
+To go elastic, or as One
+The camel’s trait attained,
+How powerful the stimulus
+Of an hermetic mind!
+
+section: 12
+label: We miss a kinsman more
+1. We miss a kinsman more
+When warranted to see
+Than when withheld by oceans
+From possibility.
+2. A furlong than a league
+Inflicts a pricklier pain—
+Till we, who smiled at Pyrenees,
+Of parishes complain!
+
+section: 13
+label: Who giants know, with
+1. Who giants know, with
+Lesser men
+Are incomplete and shy,
+For Greatness—that is ill at ease
+In minor company.
+2. A smaller could not be perturbed,
+The summer gnat displays
+Unconscious that his single sail
+Does not comprise the sky.
+
+section: 14
+label: Growth of Man like growth
+1. Growth of Man like growth
+Of Nature
+Gravitates within,
+Atmosphere and sun confirm it
+But it stirs alone.
+2. Each its difficult ideal
+Must achieve itself,
+Through the solitary prowess
+Of a silent life.
+3. Effort is the sole condition,
+Patience of itself—
+Patience of opposing forces,
+And distinct belief.
+4. Looking on is the department
+Of its audience,
+But transaction is assisted
+By no countenance.
+
+section: 15
+label: Doom is the House Without the Door
+1. Doom is the House Without the Door—
+‘T is entered from the sun,
+And then the ladder’s thrown away
+Because escape is done.
+2. ‘T is varied by the dream
+Of what they do outside,
+When squirrels play and berries die—
+And hundreds bow to God.
+
+section: 16
+label: Experience is the angled road
+1. Experience is the angled road
+Preferred against the mind
+By paradox, the mind itself
+Presuming it to lead
+Quite opposite. How complicate
+The discipline of man,
+Compelling him to choose himself
+His pre-appointed pain.
+
+section: 17
+label: I cautious scanned my little life
+1. I cautious scanned my little life
+I winnowed what would fade
+From what would last till heads like mine
+Should be a-dreaming laid.
+2. I put the latter in a barn,
+The former blew away—
+I went one winter morning,
+And lo! my priceless hay
+3. Was not upon the “scaffold”,
+Was not upon the “beam”,
+And from a thriving farmer
+A cynic I became.
+4. Whether a thief did it—
+Whether it was the wind—
+Whether Deity ‘s guiltless
+My business is to find.
+5. So I begin to ransack—
+How is it, Heart, with thee?
+Art thou within the little barn
+Love provided thee?
+
+section: 18
+label: A bird is of all beings
+1. A bird is of all beings
+The likest to the dawn,
+An easy breeze does put afloat
+The general Heavens upon.
+2. It soars and shifts and whirls
+And measures with the clouds
+In easy, ever dazzling pace,
+No different the birds—
+3. Except a wake of music
+Accompany their feet,
+As should the Dawn emit a tune
+For ecstasy of it.
+
+section: 19
+label: A prison gets to be a friend
+1. A prison gets to be a friend;
+Between its ponderous face
+And ours a kinsmanship exists,
+And in its narrow eyes
+We come to look with gratitude
+For the appointed beam
+It deals us—stated as our food,
+And hungered for the same.
+2. We learn to know the planks
+That answer to our feet,
+So miserable a sound at first
+Nor even now so sweet
+As plashing in the pools
+When memory was a boy,
+But a demurer circuit,
+A geometric joy.
+3. The posture of the key
+That interrupts the day
+To our endeavor,—not so real
+The cheek of Liberty
+As this companion steel,
+Whose features day and night
+Are present to us as our own
+And as escapeless quite.
+4. The narrow round, the stint,
+The slow exchange of hope
+For something passiver, content
+Too steep for looking up,
+The liberty we knew
+Avoided like a dream,
+Too wide for any night but Heaven,
+If that indeed redeem.
+
+section: 20
+label: Who court obtain
+1. Who court obtain
+Within himself
+Sees every man a king;
+So poverty of monarchy
+Is an interior thing.
+2. No fate depose
+Whom Fate ordain—
+And who can add a crown
+To him who doth continual
+Repudiate his own?
+
+section: 21
+label: The child’s faith is new
+1. The child’s faith is new,
+Whole—like his principle—
+Wide—like the sunrise
+On fresh eyes;
+Never had a doubt,
+Laughs at a scruple,
+Believes all sham
+But Paradise!
+2. Audits the world—
+Deems his dominion
+Broadest of sovreignties,
+And Caesar mean
+By comparison,
+Baseless emperor,
+Ruler of naught,
+Yet swaying all!
+3. Grown by and by
+To hold mistaken
+His pretty estimate
+Of prickly things,
+He gains the skill
+Sorrowful as certain,
+Men to propitiate
+Instead of kings.
+
+section: 22
+label: Forever is composed of Nows
+1. Forever is composed of Nows—
+‘T is not a different time,
+Except for infiniteness
+And latitude of home.
+2. From this, experienced here,
+Remove the dates to these,
+Let months dissolve in further months,
+And years exhale in years.
+3. Without certificate or pause
+Or celebrated days,
+As infinite our years would be
+As Anno Domini’s.
+
+section: 23
+label: A science—so the savants say
+1. A science—so the savants say,
+“Comparative Anatomy”,
+By which a single bone
+Is made a secret to unfold
+Of some rare tenant of the mold
+Else perished in the stone.
+So to the eye prospective led
+This meekest flower of the mead,
+Upon a winter’s day,
+Stands representative in gold
+Of rose and lily, marigold
+And countless butterfly!
+
+section: 24
+label: To offer brave assistance
+1. To offer brave assistance
+To lives that stand alone
+When one has failed to stop them
+Is human,—but divine
+To lend an ample sinew
+Unto a nameless man
+Whose homely benediction
+No other cared to earn.
+
+section: 25
+label: Drama’s vitalest expression
+1. Drama’s vitalest expression
+Is the Common Day
+That arises, sets, about us:
+Other tragedy
+Perish in the recitation,
+This the more exert
+When the audience is scattered,
+And the boxes shut.
+2. Hamlet to himself were Hamlet
+Had not Shakespeare wrote,
+Though the Romeo leave no second
+Of his Juliet,
+It were tenderer enacted
+In the human heart—
+Only theater recorded
+Owner cannot shut.
+
+section: 26
+label: A secret told
+1. A secret told
+Ceases to be a secret then.
+A secret kept—
+That can appal but one.
+Better of it continual be afraid,
+Than it
+And whom you told it to
+Beside.
+
+section: 27
+label: I dwell in Possibility
+1. I dwell in Possibility
+A fairer house than Prose,
+More numerous of windows,
+Superior of doors.
+2. Of chambers, as the cedars—
+Impregnable of eye;
+And for an everlasting roof
+The gables of the sky.
+3. Of visitors—the fairest—
+For occupation—this—
+The spreading wide my narrow hands
+To gather Paradise.
+
+section: 28
+label: Expectation is contentment
+1. Expectation is contentment;
+Gain, satiety.
+But satiety, conviction
+Of necessity.
+2. Of an austere trait in pleasure.
+Good, without alarm,
+Is a too serene possession—
+Danger deepens suns.
+
+section: 29
+label: She dealt her pretty
+1. She dealt her pretty
+Words like blades;
+As glittering they shone,
+And every one unbared
+A nerve
+Or wantoned with a bone.
+2. She never deemed she hurt;
+That is not steel’s
+Affair.
+A vulgar grimace in
+The flesh
+How ill the creatures bear!
+3. To ache is human, not
+Polite;
+The film upon the eye
+Mortality’s old custom—
+Just locking up to die.
+
+section: 30
+label: Revolution is the pod
+1. Revolution is the pod
+Systems rattle from;
+When the winds of
+Will are stirred,
+Excellent is bloom.
+2. But except its russet
+Base
+Every summer be
+The entomber of itself;
+So of Liberty.
+3. Left inactive on the
+Stalk,
+All its purple fled,
+Revolution shakes it
+For
+Test if it be dead.
+
+section: 31
+label: I’ve known a Heaven like a tent
+1. I’ve known a Heaven like a tent
+To wrap its shining yards,
+Pluck up its stakes and disappear
+Without the sound of boards
+Or rip of nail, or carpenter,
+But just the miles of stare
+That signalize a show’s retreat
+In North America.
+No trace, no figment of the thing
+That dazzled yesterday,
+No ring, no marvel;
+Men and feats
+Dissolved as utterly
+As birds’ far navigation
+Discloses just a hue;
+A plash of oars—a gayety,
+Then swallowed up to view.
+
+section: 32
+label: We see comparatively.
+1. We see comparatively.
+The thing so towering high
+We could not grasp its segment
+Unaided yesterday.
+2. This morning’s finer verdict
+Makes scarcely worth the toil—
+A furrow our Cordillera,
+Our Apennines a knoll.
+
+section: 33
+label: A still volcano—Life
+1. A still volcano—Life—
+That flickered in the night
+When it was dark enough to show
+Without endangering sight.
+2. A quiet, earthquake style,
+Too smoldering to suspect
+By natures this side Naples.
+The North cannot detect
+3. The solemn, torrid symbol,
+The lips that never lie,
+Whose hissing corals part and shut
+And cities slip away.
+4. Therefore we do Life’s labor
+Tho’ Life’s reward be done—
+With scrupulous exactness
+To hold our senses on.
+
+section: 34
+label: To make routine
+1. To make routine
+A stimulus,
+Remember it can cease—
+Capacity to terminate
+Is a specific
+Grace.
+
+section: 35
+label: It’s easy to invent a life
+1. It’s easy to invent a life,
+God does it every day—
+Creation but a gambol
+Of His authority.
+2. It’s easy to efface it,
+The thrifty Deity
+Could scarce afford eternity
+To spontaneity.
+3. The Perished Patterns murmur,
+But His perturbless plan
+Proceed—inserting here
+A Sun—
+There—leaving out a Man.
+
+section: 36
+label: The sweetest heresy received
+1. The sweetest heresy received
+That man and woman know,
+Each other’s convert—
+Though the faith accommodate but two.
+2. The churches are so frequent,
+The ritual so small,
+The Grace so unavoidable,
+To fail—is infidel.
+
+section: 37
+label: I never felt at home below
+1. I never felt at home below,
+And in the handsome skies
+I shall not feel at home
+I know,
+I don’t like Paradise.
+2. Because it’s Sunday all the time
+And recess never comes,
+And Eden’ll be so lonesome
+Bright Wednesday afternoons.
+3. If God could make a visit,
+Or ever took a nap—
+So not to see us—but they say
+Himself a telescope
+4. Perennial beholds us,—
+Myself would run away
+From Him and Holy Ghost and All—
+But—there’s the Judgment Day!
+
+section: 38
+label: Of course I prayed
+1. Of course I prayed—
+And did God care?
+He cared as much as
+On the air
+A bird had stamped her foot
+And cried “Give me!”
+2. My reason, life
+I had not had, but for
+Yourself,
+’Twere better charity
+To leave me in the atom’s
+Tomb,
+Merry and nought, and gay
+And numb,
+Than this smart misery.
+
+section: 39
+label: I prayed at first—a little girl
+1. I prayed at first—a little girl—
+Because they told me to,
+But stopped when qualified to guess
+How prayer would sound to me
+2. If I supposed God looked around
+Each time my childish eye
+Fixed full and steady on His own
+In solemn honesty—
+3. And told Him what I’d like to-day,
+And parts of His far plan
+That baffled me—the underside
+Of His divinity.
+4. And often since in danger
+I count the force ‘t would be
+To have a God so strong as that,
+To hold my life for me,
+5. Till I could catch the balance
+That slips so easily;
+It takes me all the while to poise,
+And then it doesn’t stay.
+
+section: 40
+label: It always felt to me a wrong
+1. It always felt to me a wrong
+To that old Moses done,
+To let him see the Canaan
+Without the entering.
+2. And though in soberer moments
+No Moses there can be,
+I’m satisfied the romance
+In point of injury
+3. Surpasses sharper stated
+Of Stephen or of Paul;
+For these were only put to death,
+While God’s adroiter will
+4. On Moses seemed to fasten
+In tantalizing play—
+As Boy should deal
+With lesser Boy
+To show supremacy.
+5. The fault was doubtless
+Israel’s;
+Myself had banned the Tribes,
+And ushered grand old Moses
+In pentateuchal robes
+6. Upon the broad possession
+But titled him to see.
+Old Man on Nebo! Late as this
+One Justice bleeds for thee!
+
+section: 41
+label: My period had come for prayer
+1. My period had come for prayer,
+No other art would do,
+My tactics missed a rudiment;
+Creator, was it you?
+2. God grows above, so those who pray
+Horizons must ascend,
+And so I stood upon the North
+To reach this curious Friend.
+3. His house was not; no sign had He
+By chimney nor by door,—
+Could I infer His residence?
+Wide prairies of the air
+4. Unbroken by a settler,
+Were all that I could see;
+Infinitude, hadst Thou no face
+That I might look at Thee?
+5. The silence condescended,
+The Heavens paused for me,
+But awed beyond my errand
+I worshiped—did not pray!
+
+section: 42
+label: We pray to Heaven
+1. We pray to Heaven,
+We prate of Heaven—
+Relate when neighbors die,
+At what o’clock to Heaven
+They fled.
+Who saw them wherefore fly?
+2. Is Heaven a place, and Sky a face?
+Location’s narrow way
+Is for ourselves;
+Unto the Dead
+There’s no geography.
+
+section: 43
+label: “Unto Me?”
+1. “Unto Me?”
+“I do not know you—
+Where may be your house?”
+2. “I am Jesus—late of
+Judea,
+Now of Paradise.”
+3. “Wagons have you, to
+Convey me?
+This is far from thence”—
+4. “Arms of mine sufficient
+Phaeton,
+Trust Omnipotence.”
+5. “I am spotted.”
+“I am Pardon.”
+“I am small.”
+“The least
+Is esteemed in Heaven
+The chiefest.
+Occupy my house.”
+
+section: 44
+label: Too much of proof affronts
+1. Too much of proof affronts
+Belief.
+The Turtle will not try
+Unless you leave him;
+Then return—
+And he has hauled away.
+
+section: 45
+label: The Sun went down
+1. The Sun went down—
+No man looked on;
+The Earth and I alone
+Were present at the majesty,
+He triumphed and went on.
+2. The Sun went up—
+No man looked on,
+The Earth and I and One—
+A nameless bird, a stranger,
+Were witness for the Crown.
+
+section: 46
+label: The tint I cannot take is best
+1. The tint I cannot take is best,
+The color too remote
+That I could show it in bazaar
+A guinea at a sight—
+2. The fine impalpable array
+That swaggers on the eye
+Like Cleopatra’s company
+Repeated in the sky—
+3. The moments of dominion
+That happen on the Soul
+And leave it with a discontent
+Too exquisite to tell—
+4. The eager look on landscapes
+As if they just repressed
+Some secret that was pushing,
+Like chariots, in the breast—
+5. The pleading of the Summer,
+That other prank of snow
+That covers mystery with tulle
+For fear the squirrels know—
+6. Their graspless manners mock us,
+Until the cheated eye
+Shuts arrogantly in the grave,
+Another way to see.
+
+section: 47
+label: Heaven has different signs to me
+1. Heaven has different signs to me;
+Sometimes I think that noon
+Is but a symbol of the place,
+And when again at dawn
+2. A mighty look runs round the world
+And settles in the hills,
+An awe if it should be like that
+Upon the ignorance steals.
+3. The orchard when the sun is on;
+The triumph of the birds
+When they together victory make;
+Some carnivals of clouds—
+4. The rapture of concluded day
+Returning to the West,—
+All these remind us of the place
+That men call “Paradise.”
+5. Itself a fairer we suppose,
+But how ourself shall be
+Adorned for a superior grace,
+Not yet our eyes can see.
+
+section: 48
+label: The rainbow never tells me
+1. The rainbow never tells me
+That gust and storm are by;
+Yet is she more convincing
+Than philosophy.
+2. My flowers turn from forums,
+Yet eloquent declare
+What Cato couldn’t prove to me
+Except the birds were here!
+
+section: 49
+label: Beauty is not caused
+1. Beauty is not caused,
+It is.
+Chase it and it ceases.
+Chase it not and it abides.
+Overtake the creases
+In the meadow when
+The Wind
+Runs his fingers thro’ it?
+Deity will see to it
+That you never do it.
+
+section: 50
+label: My faith is larger than the hills
+1. My faith is larger than the hills,
+So when the hills decay,
+My faith must take the purple wheel
+To show the Sun the way.
+2. ‘T is first he steps upon the vane
+And then upon the hill;
+And then abroad the world he goes
+To do his golden will.
+3. And if his yellow feet should miss,
+The birds would not arise,
+The flowers would slumber on their stems,—
+No bells have Paradise.
+4. How dare I therefore stint a faith
+On which so vast depends,
+Lest Firmament should fail for me—
+The rivet in the bands.
+
+section: 51
+label: Within my garden rides a bird
+1. Within my garden rides a bird
+Upon a single wheel,
+Whose spokes a dizzy music make
+As ‘t were a traveling mill.
+2. He never stops, but slackens
+Above the ripest rose,
+Partakes without alighting,
+And praises as he goes;
+3. Till every spice is tasted,
+And then his fairy gig
+Reels in remoter atmospheres,
+And I rejoin my dog.
+4. And he and I perplex us
+If positive ‘t were we—
+Or bore the garden in the brain
+This curiosity?
+5. But he, the best logician,
+Refers my duller eye
+To just vibrating blossoms—
+An exquisite reply!
+
+section: 52
+label: The Robin’s my criterion of tune
+1. The Robin’s my criterion of tune
+Because I grow where robins do—
+But were I Cuckoo born
+I’d swear by him—
+The ode familiar rules the morn.
+The Buttercup’s my whim
+For bloom—
+Because we’re orchard-sprung—
+But were I Britain-born
+I’d daisies spurn—
+None but the Nut October fits
+Because through dropping it
+The seasons flit, I’m taught.
+Without the snow’s tableau
+Winter were lie to me—
+Because I see New Englandly.
+The Queen discerns like me
+Provincially.
+
+section: 53
+label: We—Bee and I—live
+1. We—Bee and I—live
+In the quaffing.
+‘T isn’t all hock with us,
+Life has its ale—
+But it’s many a lay of
+The dim Burgundy
+We chant for cheer when
+The wines fail.
+Do we “get drunk?”
+Ask the jolly clovers!
+Do we “beat our wife?”
+I never wed.
+Bee pledges his in minutest
+Flagons,
+Dainty as the tress on her
+Deft head.
+While runs the Rhine
+He and I revel—
+First at the vat and
+Latest at the vine;
+Noon—our last cup.
+“Found dead of nectar”
+By a humming Coroner
+In a by-thyme.
+
+section: 54
+label: A fuzzy fellow without feet
+1. A fuzzy fellow without feet
+Yet doth exceeding run!
+Of velvet is his countenance
+And his complexion dun.
+2. Sometimes he dwelleth in the grass,
+Sometimes upon a bough
+From which he doth descend in plush
+Upon the passer-by.
+3. All this in summer—
+But when winds alarm the forest folk,
+He taketh damask residence
+And struts in sewing silk.
+4. Then, finer than a lady,
+Emerges in the spring,
+A feather on each shoulder—
+You’d scarce accredit him.
+5. By men yelept a caterpillar—
+By me—but who am I
+To tell the pretty secret
+Of the Butterfly!
+
+section: 55
+label: If Nature smiles—the Mother must
+1. If Nature smiles—the Mother must,
+I’m sure, at many a whim
+Of her eccentric family—
+Is she so much to blame?
+
+section: 56
+label: To intercept his yellow plan
+1. To intercept his yellow plan
+The sun does not allow
+Caprices of the atmosphere;
+And even when the snow
+2. Heaves balls of specks like vicious boy
+Directly in his eye,
+Does not so much as turn his head—
+Busy with majesty!
+3. ’Tis his to stimulate the earth,
+And magnetize the sea,
+And bind astronomy in place—
+Yet any passer-by
+4. Would deem Ourselves the busier,
+As the minutest bee
+That rides supports a thunder,
+A bomb to justify!
+
+section: 57
+label: By my window have I for scenery
+1. By my window have I for scenery
+Just a sea with a stem—
+If the bird and the farmer deem it a “Pine”,
+The opinion will serve for them.
+2. It has no “Port”, nor a “Line”, but the jays
+That split their route to the sky,
+Or a squirrel whose giddy peninsular
+May be easier gained this way.
+3. For inlands the Earth is the underside
+And the upper side is the Sun,
+And its commerce—if commerce it have—
+Of spice, I infer from the odors borne.
+4. Of its voice to affirm, when the wind is within
+Can the dumb divulge the Divine?
+The definition of melody is
+That definition is none.
+5. It suggests to our faith, they suggest to our sight,—
+When the latter is put away,
+I shall meet with conviction I somewhere met
+That Immortality.
+6. Was the Pine at my
+Window a “Fellow”
+Of the Royal Infinity?
+Apprehensions are God’s
+Introductions
+Extended inscrutably.
+
+section: 58
+label: Out of sight? What of that?
+1. Out of sight? What of that?
+See the bird reach it!
+Curve on curve, sweep on sweep,
+Round the steep air.
+Danger! What is that to her?
+Better ’tis to fail there
+Than debate here.
+2. Blue is blue the world through,
+Amber, amber; dew, dew.
+Seek friend, and see—
+Heaven is sky of earth
+That’s all—
+Bashful Heaven, thy lovers small
+Hide too, from thee.
+
+section: 59
+label: When they come back
+1. When they come back,
+If Blossoms do—
+I always feel a doubt
+If Blossoms can be
+Born again
+When once the art
+Is out.
+2. When they begin,
+If Robins may—
+I always had a fear
+I did not tell, it
+Was their last
+Experiment
+Last year.
+3. When it is May,
+If May return—
+Had nobody a pang
+Lest on a face so beautiful
+He might not look again?
+4. If I am there—
+One does not know
+What party one may be
+To-morrow,—but if I am
+There
+I take back all I say!
+
+section: 60
+label: I’ve nothing else to bring, you know
+1. I’ve nothing else to bring, you know,
+So I keep bringing these—
+Just as the night keeps fetching stars
+To our familiar eyes.
+Maybe we shouldn’t mind them
+Unless they didn’t come—
+Then maybe it would puzzle us
+To find our way home.
+
+section: 61
+label: I’m the little “Hearts’ Ease!”
+1. I’m the little “Hearts’ Ease!”
+I don’t care for pouting skies!
+If the butterfly delay
+Can I therefore stay away?
+2. If the coward bumblebee
+In his chimney-corner stay,
+I must resoluter be;
+Who’ll apologize for me?
+3. Dear old-fashioned little flower,
+Eden is old-fashioned too!
+Birds are antiquated fellows,
+Heaven does not change her blue—
+Nor may you, the little “Hearts’ Ease”,
+Ever be induced to do.
+
+section: 62
+label: I pay in satin cash
+1. I pay in satin cash—
+You did not state your price,
+A petal for a paragraph
+Is near as I can guess.
+
+section: 63
+label: What I can do—I will
+1. What I can do—I will,
+Though it be little as a
+Daffodil.
+What I cannot, must be
+Unknown to possibility.
+
+section: 64
+label: Defrauded I
+1. Defrauded I
+A butterfly—
+The lawful heir—
+For thee.
+
+section: 65
+label: Could I do more for thee
+1. Could I do more for thee
+Wert thou a bumblebee—
+Since for the Queen have I
+Nought but bouquet?
+
+section: 66
+label: These are the signs to Nature’s inns
+1. These are the signs to Nature’s inns,
+Her invitation broad
+For whomsoever famishing
+To taste her mystic bread.
+2. These are the rites of Nature’s house,
+The hospitality
+That opens with an equal width
+To beggar or to bee.
+3. For sureties of her staunch estate,
+Her undecaying cheer,
+The purple in the East is set
+And in the North, the star.
+
+section: 67
+label: Sunset at night is natural
+1. Sunset at night is natural,
+But sunset in the dawn
+Reverses Nature, Master,
+So midnight due at noon.
+2. Eclipses be predicted
+And Science bows them in,
+But so one face us suddenly—
+Jehovah’s watch is wrong.
+
+section: 68
+label: Through the dark sod
+1. Through the dark sod
+As education
+The Lily passes sure,
+Feels her white foot no
+Trepidation,
+Her faith no fear.
+2. Afterward in the meadow
+Swinging her beryl bell,
+The mold-life all
+Forgotten now—
+In ecstasy and dell.
+
+section: 69
+label: Delight is as the flight
+1. Delight is as the flight,
+Or in the ratio of it
+As the schools would say.
+The rainbow’s way
+A skein
+Flung colored after rain
+Would suit as bright,
+Except that flight
+Were aliment.
+2. “If it would last?”
+I asked the East
+When that bent stripe
+Struck up my childish
+Firmament,
+And I for glee
+Took rainbows as the common
+Way,
+And empty skies
+The eccentricity.
+3. And so with lives;
+And so with butterflies
+Seen magic, through
+The fright
+That they will cheat the sight
+And dower latitudes far on
+Some sudden morn,
+Our portion in the fashion
+Done.
+
+section: 70
+label: The mountains grow unnoticed
+1. The mountains grow unnoticed,
+Their purple figures rise
+Without attempt, exhaustion,
+Assistance or applause.
+2. In their eternal faces
+The sun with broad delight
+Looks long—and last,
+And golden,
+For fellowship at night.
+
+section: 71
+label: For every bird a nest
+1. For every bird a nest,
+Wherefore in timid quest
+Some little wren goes seeking round.
+2. Wherefore where boughs are free,
+Households in every tree,
+Pilgrim be found?
+3. Perhaps a home too high—
+Ah, aristocracy!—
+The little wren desires.
+4. The lark is not ashamed
+To build upon the ground
+Her modest house.
+5. Yet who of all the throng
+Dancing around the sun
+Does so rejoice?
+
+section: 72
+label: All the letters I can write
+1. All the letters I can write
+Are not fair as this,
+Syllables of velvet,
+Sentences of plush,
+Depths of ruby, undrained,
+Hid, lip, for thee—
+Play it were a humming bird
+And just sipped me!
+
+section: 73
+label: Most she touched me
+1. Most she touched me
+By her muteness;
+Most she won me
+By the way
+She presented her small
+Figure—
+Plea for charity.
+Were a crumb my whole
+Possession,
+Were there famine in
+The land,
+Were it my resource
+From starving,
+Could I such a face
+Withstand?
+Not upon her knee
+To thank me
+Sank this Beggar
+From the sky,
+But the crumb partook,
+Departed,
+And returned on high
+I supposed, when sudden—
+Such a praise began,
+’Twas as Space sat singing
+To herself and Man.
+’Twas the wingéd Beggar
+Afterward I learned,
+To her benefactor
+Paying gratitude.
+
+section: 74
+label: How many flowers fail in wood
+1. How many flowers fail in wood,
+Or perish from the hill
+Without the privilege to know
+That they are beautiful!
+2. How many cast a nameless pod
+Upon the nearest breeze,
+Unconscious of the scarlet freight
+It bears to other eyes!
+
+section: 75
+label: Autumn overlooked my knitting
+1. Autumn overlooked my knitting;
+“Dyes,” said he, “have I
+Could dishonor a flamingo.”
+“Give them me,” said I.
+2. Cochineal I chose for
+Deeming
+It resemble thee—
+And the little border dusker—
+That resembles me.
+
+section: 76
+label: Oh, Shadow on the Grass!
+1. Oh, Shadow on the Grass!
+Art thou a step,
+Or not?
+2. Go make thee fair,
+My candidate,
+My nominated Heart!
+3. Oh, Shadow on the Grass!
+While I delayed
+To guess,
+Some other thou
+Didst consecrate,
+Oh, unelected
+Face!
+
+section: 77
+label: The last of summer is delight
+1. The last of summer is delight
+Deterred by retrospect,
+’Tis ecstasy’s revealed review,
+Enchantment’s syndicate.
+2. To meet it, nameless as it is,
+Without celestial mail,
+Audacious as without a knock
+To walk within the vale.
+
+section: 78
+label: Conjecturing a climate
+1. Conjecturing a climate
+Of unsuspended suns
+Gives poignancy to Winter;
+The freezing fancy turns
+To a fictitious country
+To palliate a cold
+Not obviated of degree
+Nor eased of latitude.
+
+section: 79
+label: All but Death can be
+1. All but Death can be
+Adjusted;
+Dynasties repaired,
+Systems settled in their
+Sockets,
+Centuries removed,—
+2. Wastes of lives resown
+With colors
+By superior springs,
+Death—unto itself exception—
+Is exempt from change.
+
+section: 80
+label: How noteless men and
+1. How noteless men and
+Pleiads stand
+Until a sudden sky
+Reveals the fact that one is wrapt
+Forever from the eye.
+2. Members of the Invisible,
+Existing while we stare
+In leagueless opportunity
+O’er-take-less as the air.
+3. Why didn’t we detain them?
+The Heavens with a smile
+Sweep by our disappointed
+Heads,
+But deign no syllable.
+
+section: 81
+label: To fill a gap
+1. To fill a gap—
+Insert the thing that caused it.
+Block it up
+With other and ‘t will yawn
+The more;
+You cannot solder an abyss
+With air.
+
+section: 82
+label: Not any more to be lacked
+1. Not any more to be lacked,
+Not any more to be known—
+Denizens of
+Significance
+For a span so worn—
+Even Nature, Herself,
+Has forgot it is there—
+Too elate of her multitudes
+To retain despair.
+2. Of the ones that pursued it
+Suing it not to go—
+Some have solaced the longing
+To accompany;
+3. Some rescinded the wrench—
+Others—shall I say?
+Plated the residue of
+Woe
+With monotony.
+
+section: 83
+label: I rose because he sank.
+1. I rose because he sank.
+I thought it would be
+Opposite,
+But when his power bent,
+My Soul stood straight.
+I told him Best must pass
+Through this low arch of
+Flesh;
+No casque so brave
+It spurn the grave—
+I told him worlds I knew
+Where monarchs grew
+Who recollected us
+If we were true.
+And so with thews of hymn
+And sinew from within,
+In ways I knew not that
+I knew, till then—
+I lifted him.
+
+section: 84
+label: It feels a shame to be
+1. It feels a shame to be
+Alive
+When men so brave are dead.
+One envies the distinguished
+Dust
+Permitted such a head;
+2. The stone that tells defending
+Whom
+This Spartan put away
+What little of him we
+Possessed
+In pawn for liberty.
+3. The price is great, sublimely
+Paid,
+Do we deserve a thing—
+That lives, like dollars,
+Must be piled
+Before we may obtain?
+4. Are we that wait sufficient
+Worth,
+That such enormous pearl
+As Life should be dissolved
+For us
+In battle’s horrid bowl?
+5. It may be a renown
+To live;
+I think the men who die—
+Those unsustainéd Saviors—
+Present Divinity.
+
+section: 85
+label: The doomed regard the sunrise
+1. The doomed regard the sunrise
+With different delight
+Because when next it burns abroad
+They doubt to witness it.
+2. The man to die to-morrow
+Detects the meadow bird,
+Because its music stirs
+The axe
+That clamors for his head.
+3. Joyful to whom the sunrise
+Precedes enamored day—
+Joyful for whom the meadow bird
+Has aught but elegy!
+
+section: 86
+label: It is dead. Find it
+1. It is dead. Find it—
+Out of sound, out of sight.
+“Happy?” Which is wiser,
+Sun or the wind?
+“Conscious?” Won’t you ask that
+Of the low ground?
+2. “Homesick?” Many met it—
+Even through them, this
+Cannot testify—
+Themselves dumb.
+
+section: 87
+label: Midsummer was it when they died
+1. Midsummer was it when they died,
+A full and perfect time;
+The summer closed upon itself
+In consummated bloom.
+2. The corn her furthest kernel filled
+Before the coming flail,
+When these leaned into perfectness
+Through haze of burial.
+
+section: 88
+label: Three times we parted
+1. Three times we parted,
+Breath and I—
+Three times He would not go
+But stood to stir the
+Flickering fan
+The waters strove to stay.
+2. Three times the billows tossed
+Me up,
+Then caught me like a ball,
+Then made blue faces in my
+Face—
+And pushed away a sail
+3. That crawled leagues off,
+I liked to see
+For thinking, while I die,
+How pleasant to
+Behold a thing
+Where human faces be.
+4. The waves grew sleepy;
+Breath did not;
+The winds like children lulled;
+The sunrise kissed my
+Chrysalis—
+And I stood up and lived.
+
+section: 89
+label: We talked as girls do
+1. We talked as girls do,
+Fond and late—
+We speculated fair, on
+Every subject but the grave,
+Of ours—none affair.
+2. We handled destinies as cool
+As we disposers be,
+And God a quiet party
+To our authority.
+3. But fondest dwelt upon
+Ourselves,
+As we eventual be,
+When girls to women softly
+Raised,
+We occupy Degree.
+4. We parted with a contract
+To recollect—and write—
+But Heaven made both
+Impossible
+Before another night.
+
+section: 90
+label: ’Twas warm at first like us
+1. ’Twas warm at first like us,
+Until there crept thereon
+A chill, like frost upon a glass
+Till all the scene be gone.
+2. The forehead copied stone,
+The fingers grew too cold
+To ache, and like a skater’s brook
+The busy eyes congealed.
+3. It straightened—that was all.
+It crowded cold to cold—
+It multiplied indifference
+As Pride were all it could.
+4. And even when with cords
+’Twas lowered like a freight,
+It made no signal, nor demurred,
+But dropped like adamant.
+
+section: 91
+label: These fair, fictitious people
+1. These fair, fictitious people,
+The women plucked away
+From our familiar notice,
+The men of ivory—
+2. These boys and girls in canvas
+Who dwell upon the wall
+In everlasting childhood,
+Where are they—can you tell?
+3. Perhaps in places perfecter,
+Inheriting delight
+Beyond our small conjecture,
+Our scanty estimate.
+4. Remembering ourselves, we trust,
+But blesseder than we,
+Through knowing where we only hope—
+Receiving—where we pray.
+5. Of expectation also—
+Anticipating us
+With transport that would be a pain,
+Except for Holiness—
+Esteeming us, as exiles,
+Themselves admitted home
+Through gentle miracle of Death
+The way ourselves must come.
+
+section: 92
+label: ’Twas the old road
+1. ’Twas the old road
+Through pain,
+That unfrequented one
+With many a turn and thorn
+That stops at Heaven.
+2. This was the town
+She passed;
+There, where she rested last,
+Then stepped more fast,
+The little tracks close pressed.
+3. Then—not so swift,
+Slow—slow—as feet did
+Weary go,
+Then stopped—no other track.
+4. Wait! Look! Her little book,
+The leaf at love turned back,
+The very hat
+And this worn shoe
+Just fits the track—
+Herself, though—fled.
+5. Another bed, a short one
+Women make to-night
+In chambers bright,
+Too out of sight, though,
+For our hoarse Good Night
+To touch her hand.
+
+section: 93
+label: Don’t put up my thread and needle
+1. Don’t put up my thread and needle,
+I’ll begin to sew
+When the birds begin to whistle,
+Better stitches so.
+2. These were bent, my sight got crooked.
+When my mind is plain
+I’ll do seams a Queen’s endeavor
+Would not blush to own.
+3. Hems too fine for lady’s tracing
+To the sightless knot,
+Tucks of dainty interspersion
+Like a dotted dot.
+4. Leave my needle in the furrow,
+When I put it down—
+I can make the zigzag stitches
+Straight, when I am strong.
+5. Till then, dreaming I am sewing,
+Fetch the seam I missed
+Closer, so I, at my sleeping,
+Still surmise I stitch.
+
+section: 94
+label: Of nearness to her sundered things
+1. Of nearness to her sundered things
+The Soul has special times,
+When Dimness looks the oddity,
+Distinctness easy seems.
+2. The shapes we buried dwell about.
+Familiar in the rooms,
+Untarnished by the sepulcher
+Our moldering playmate comes
+3. In just the jacket that he wore,
+Long buttoned in the mold,
+Since we, old mornings, children played,
+Divided by a world.
+4. The grave yields back her robberies,
+The years are pilfered things,
+Bright knots of apparitions
+Salute us with their wings—
+5. As we it were that perished,
+Themselves had just remained
+Till we rejoin them,
+And ’twas They, and not Ourselves
+That mourned.
+
+section: 95
+label: You’ll find it when you come to die
+1. You’ll find it when you come to die
+The easier to let go,
+For recollecting such as went
+You could not spare, you know.
+2. And though their places somewhat filled—
+As did their marble names
+With moss—they never grew so full
+You chose the newer times.
+3. And when this world sets further back,
+As dying say it does,
+The former love distincter grows
+And supersedes the fresh.
+4. And thought of them so fair invites,
+It looks too tawdry grace
+To stay behind with just the toys
+We bought to ease their place.
+
+section: 96
+label: Life is what we make it
+1. Life is what we make it,
+Death we do not know;
+Christ’s acquaintance with him
+Justifies him, though.
+2. He would trust no stranger,
+Other could betray,
+Just His own endorsement
+That sufficeth me.
+3. All the other distance
+He hath traversed first,
+No new mile remaineth
+Far as Paradise.
+4. His sure feet preceding,
+Tender Pioneer—
+Base must be the cowards
+Dare not venture now.
+
+section: 97
+label: Why make it doubt—it hurts it so
+1. Why make it doubt—it hurts it so—
+So sick to guess
+So strong to know—
+So brave upon its little bed
+To tell the very last they said
+Unto Itself—and smile and shake
+For that dear, distant, dangerous sake.
+But, the Instead—
+The pinching fear
+That something it did do or dare
+Offend the Vision, and it flee,
+And They no more remember me
+Nor ever turn to tell me why—
+Oh, Master! this is misery!
+
+section: 98
+label: Heaven is so far of the mind
+1. Heaven is so far of the mind
+That were the mind dissolved,
+The site of it by architect
+Could not again be proved.
+2. ’Tis vast as our capacity
+As fair as our idea,
+To him of adequate desire
+No further ’tis than Here.
+
+section: 99
+label: The world feels dusty
+1. The world feels dusty
+When we stop to die;
+We want the dew then,
+Honors taste dry.
+2. Flags vex a dying face,
+But the least fan
+Stirred by a friend’s hand
+Cools like the rain.
+3. Mine be the ministry
+When thy thirst comes,
+Dews of thyself to fetch
+And holy balms.
+
+section: 100
+label: It’s coming—the postponeless Creature
+1. It’s coming—the postponeless Creature,
+It gains the block and now
+It gains the door,
+Chooses its latch from all
+The other fastenings,
+Enters with a—“You know me, Sir?”
+Simple salute and certain
+Recognition,
+Bold—were it enemy—brief
+Were it friend,
+Dresses each house in
+Crêpe and icicle,
+And carries one out of it
+To God.
+
+section: 101
+label: No crowd that has occurred
+1. No crowd that has occurred
+Exhibit, I suppose,
+The general attendance
+That Resurrection does.
+2. Circumference be free,
+The long-subjected Grave
+Assert his primogeniture,
+The Dust adjust and live.
+3. On atoms features place,
+All multitudes that were
+Efface in the comparison,
+As suns annul a star.
+4. Solemnity prevail,
+Its individual doom
+Possess each separate consciousness,
+August, resistless, dumb.
+5. What duplicate exist—
+What parallel can be—
+Of the stupendousness of this
+To universe and me?
+
+section: 102
+label: Over and over, like a tune
+1. Over and over, like a tune
+The recollection plays.
+Drums of the phantom battlements,
+Cornets of Paradise!
+2. Snatches from baptized generations,
+Cadences too grand
+But for the Justified
+Processions
+At the Lord’s right hand.
+
+section: 103
+label: The only news I know
+1. The only news I know
+Is bulletins all day
+From Immortality.
+2. The only shows I see
+To-morrow and To-day,
+Perchance Eternity.
+3. The only One I meet
+Is God,—the only street
+Existence, this traversed
+4. If other news there be,
+Or admirabler show—
+I’ll tell it you.
+
+section: 104
+label: The soul’s distinct
+1. The soul’s distinct
+Connection
+With immortality
+Is best disclosed
+By danger,
+Or quick calamity.
+2. As lightning on
+A landscape
+Exhibits sheets of place
+Not yet suspected but
+For flash and bolt and suddenness.
+
+section: 105
+label: Conscious am I in my chamber
+1. Conscious am I in my chamber
+Of a shapeless friend,
+He doth not attest by posture
+Nor confirm by word.
+2. Neither place need I present him,
+Fitter courtesy
+Hospitable intuition
+Of his company.
+3. Presence is his furthest license,
+Neither he to me
+Nor myself to him by accent
+Forfeit probity.
+4. Weariness of him were quainter
+Than monotony
+Knew a particle of space’s
+Vast society.
+5. Neither if he visit Other—
+Does he dwell—or nay—
+Know I,
+But instinct reports Him
+Immortality.
+
+section: 106
+label: Pain expands the time
+1. Pain expands the time,
+Ages coil within
+The minute circumference
+Of a single brain.
+2. Pain contracts the time
+Occupied with shot
+Triplets of eternities
+Are as they were not.
+
+section: 107
+label: The admirations and
+1. The admirations and
+Contempts of time
+Show justest through
+An open tomb—
+The dying, as it were
+A height,
+Reorganizes estimate,
+And what we saw
+Not—
+We distinguish clear,
+And mostly see not
+What we saw before.
+’Tis compound vision—
+Light enabling light—
+The Finite furnished
+With the Infinite—
+Convex and concave witness,
+Back toward time,
+And forward toward
+The God of Him.
+
+section: 108
+label: Had I presumed to hope.
+1. Had I presumed to hope.
+The loss had been to me
+A value for the Greatness’
+Sake,
+As giants gone away.
+2. Had I presumed to gain
+A favor so remote,
+The failure but confirm the
+Grace
+In further Infinite.
+3. ’Tis failure not of Hope
+But diligent Despair
+Advancing on celestial lists
+With faint terrestrial power—
+4. ’Tis Honor—though I die
+For that no man obtain
+Till he be justified by Death—
+This is the second gain!
+
+section: 109
+label: It was not Saint
+1. It was not Saint,
+It was too large—
+Nor Snow—it was
+Too small.
+It only held itself
+Aloof
+Like something spiritual.
+
+section: 110
+label: My soul accused me
+1. My soul accused me
+And I quailed
+As tongue of diamond
+Had reviled.
+2. All else accused me
+And I smiled,
+My soul that morning
+Was my friend.
+3. Her favor is the best
+Disdain
+Toward artifice of Time
+Or Men,
+But her disdain—’twere
+Cooler bear
+A finger of enameled fire!
+
+section: 111
+label: Me from Myself to banish
+1. Me from Myself to banish
+Had I art,
+Impregnable my fortress
+::Unto foreign heart.
+2. But since Myself assault Me
+How have I peace,
+Except by subjugating
+::Consciousness?
+3. And since We’re mutual
+Monarch,
+How this be
+Except by abdication
+::Me—or Me?
+
+section: 112
+label: Its Hour with itself
+1. Its Hour with itself
+The Spirit never shows,
+What terror would enthrall the street
+Could countenance disclose
+The subterranean freight,
+The cellars of the soul,
+Thank God the loudest place He made
+Is licensed to be still!
+
+section: 113
+label: The battle fought between the Soul
+1. The battle fought between the Soul
+And No Man is the one
+Of all the battles prevalent
+By far the greater one.
+2. No news of it is had abroad;
+Its bodiless campaign
+Establishes and terminates,
+Invisible, Unknown.
+3. Nor History record it,
+As legions of a night
+The sunrise scatters,—these
+Endure,
+Enact, and terminate.
+
+section: 114
+label: My portion is defeat to-day
+1. My portion is defeat to-day,
+A paler luck than victory,
+Less pæans, fewer bells—
+The drums don’t follow me with tunes;
+Defeat a something dumber means,
+More difficult than bells.
+’Tis populous with bone and stain,
+And men too straight to bend again,
+And piles of solid moan,
+And chips of blank in boyish eyes,
+And shreds of prayer
+And death’s surprise
+Stamped visible in stone.
+There’s something prouder
+Over there—
+The trumpets tell it in the air.
+How different victory
+To him who has it and
+The One
+Who to have had it
+Would have been
+Contenteder to die.
+
+section: 115
+label: Suspense is hostiler than Death.
+1. Suspense is hostiler than Death.
+Death, tho’ soever broad,
+Is just Death, and cannot increase—
+Suspense does not conclude,
+But perishes to live anew,
+But just anew to die,
+Annihilation plated fresh
+With Immortality.
+
+section: 116
+label: On a columnar self
+1. On a columnar self
+How ample to rely;
+In tumult or extremity
+How good the certainty
+2. That lever cannot pry,
+And wedge cannot divide
+Conviction, that the granite
+Base,
+Though none be on our side.
+3. Suffice us, for a crowd,
+Ourselves—and rectitude—
+And that companion
+Not far off
+From furthest good man—
+God.
+
+section: 117
+label: Faith is the pierless bridge
+1. Faith is the pierless bridge
+Supporting what we see
+Unto the scene that we do not,
+Too slender for the eye.
+2. It bears the soul as bold
+As it were rocked in steel,
+With arms of steel
+At either side
+It joins behind the rail—
+3. To what—could we presume—
+The bridge would cease to be—
+To our far vacillating feet
+A first necessity.
+
+section: 118
+label: The lonesome for they know not what
+1. The lonesome for they know not what—
+The Eastern exiles be,
+Who strayed beyond the amber line
+Some madder holiday.
+2. And ever since the purple West
+They strive to climb in vain—
+As birds that tremble from the clouds
+Do fumble at the strain
+The blessed ether taught them
+Some transatlantic morn,
+When heaven was too common to miss,
+Too sure to dote upon.
+
+section: 119
+label: Inconceivably solemn
+1. Inconceivably solemn,
+Things too gay
+Pierce by the very press
+Of imagery.
+2. Their far parades
+Halt on the eye
+With a mute pomp,
+A pleading pageantry.
+3. Flags are a brave sight,
+But no true eye
+Ever went by one
+Steadily.
+4. Music’s triumphant,
+But a fine ear
+Aches with delight
+The drums to hear.
+
+section: 120
+label: I should not dare to be so sad
+1. I should not dare to be so sad
+So many years again.
+A load is first impossible
+When we have put it down.
+2. The Superhuman then withdraws,
+And we who never saw
+The Giant at the other side
+Begin to perish now.
+
+section: 121
+label: I took one draught of life
+1. I took one draught of life,
+I’ll tell you what I paid,
+Precisely an existence—
+The market price, they said.
+2. They weighed me, dust by dust,
+They balanced film with film,
+Then handed me my being’s worth—
+A single dram of Heaven.
+
+section: 122
+label: So the eyes accost and sunder
+1. So the eyes accost and sunder
+In an audience,
+Stamped in instances forever,
+So may countenance
+Entertain without addressing
+Countenance of One
+In a neighboring horizon,
+Gone as soon as known.
+
+section: 123
+label: It was a quiet way
+1. It was a quiet way
+He asked if I was his.
+I made no answer of the
+Tongue,
+But answer of the eyes.
+2. And then he bore me high
+Before this mortal noise,
+With swiftness as of chariots
+And distance as of wheels.
+3. The world did drop away
+As countries from the feet
+Of him that leaneth in
+Balloon
+Upon an ether street.
+4. The gulf behind was not—
+The continents were new.
+Eternity it was—before
+Eternity was due.
+5. No seasons were to us;
+It was not night nor
+Noon;
+For sunrise stopped upon
+The place
+And fastened it in dawn.
+
+section: 124
+label: The Heart is the capital
+1. The Heart is the capital
+Of the Mind,
+The Mind is a single State.
+The Heart and the Mind
+Together make
+A single continent.
+2. One—is the population—
+Numerous enough.
+This ecstatic nation
+Seek—it is
+Yourself.
+
+section: 125
+label: I make his crescent fill or lack
+1. I make his crescent fill or lack,
+His nature is at full
+Or quarter—as I signify,
+His tides do I control.
+2. He holds superior in the sky
+Or gropes at my command
+Behind inferior clouds,
+Or round a mist’s slow colonnade.
+3. But since we hold a mutual disc
+And front a mutual day,
+Which is the despot neither knows—
+Nor whose the tyranny.
+
+section: 126
+label: I came to buy a smile to-day
+1. I came to buy a smile to-day
+But just a single smile,
+The smallest one upon your cheek
+Will suit me just as well,
+The one that no one else would miss
+It shone so very small—
+I’m pleading at the counter, Sir,
+Could you afford to sell?
+2. I’ve diamonds on my fingers—
+You know what diamonds are!
+I’ve rubies like the evening blood,
+And topaz like the star!
+3. ‘T would be a bargain for a Jew—
+Say, may I have it, Sir?
+
+section: 127
+label: I tend my flowers for thee
+1. I tend my flowers for thee,
+Bright Absentee!
+My fuchsia’s coral seams
+Rip, while the sower dreams.
+2. Geraniums tint and spot,
+Low daisies dot,
+My cactus splits a beard
+To show its throat.
+3. Carnations tip their spice
+And bees pick up.
+A hyacinth I hid
+Puts out a ruffled head,
+And odors fall
+From flasks so small
+You marvel how they held.
+4. Globe roses break their
+Satin flake
+Upon my garden floor,
+Yet Thou not there—
+I had as lief they bore
+::No crimson more.
+Thy flower be gay
+Her Lord away!
+5. It ill becometh me.
+I’ll dwell in calyx gray
+How modestly, alway
+Thy daisy,
+Draped for Thee.
+
+section: 128
+label: One Life of so much consequence
+1. One Life of so much consequence
+That I for it would pay
+My Soul’s entire income
+In ceaseless salary.
+One pearl of such proportion
+That I would instant dive
+Although I knew to take it
+Would cost me just a life.
+The sea is full—I know it!
+That does not blur my gem!
+It burns distinct from all the row
+Intact in diadem!
+Oh, Life is thick—I know it!
+Yet not so dense a crowd
+But monarchs are perceptible
+Far down the dustiest road!
+
+section: 129
+label: My life had stood a loaded gun
+1. My life had stood a loaded gun
+In corners, till a day
+The owner passed—identified,
+And carried me away.
+2. And now we roam the sov’reign woods,
+And now we hunt the doe—
+And every time I speak for him
+The mountains straight reply.
+3. And do I smile, such cordial light
+Upon the valley glow—
+It is as a Vesuvian face
+Had let its pleasure through.
+4. And when at night, our good day done,
+I guard my master’s head,
+’Tis better than the eider duck’s
+Deep pillow to have shared.
+5. To foe of his I’m deadly foe,
+None stir the second time
+On whom I lay a yellow eye
+Or an emphatic thumb.
+6. Though I than he may longer live,
+He longer must than I,
+For I have but the art to kill—
+Without the power to die.
+
+section: 130
+label: I cannot be ashamed
+1. I cannot be ashamed
+Because I cannot see
+The love you offer.
+Magnitude
+Reverses modesty.
+2. And I cannot be proud
+Because a height so high
+Involves Alpine
+Requirements,
+And services of snow.
+
+section: 131
+label: Love, thou art high
+1. Love, thou art high,
+I cannot climb thee,
+But, were it two,
+Who knows but we
+Taking turns at the Chimbarazu
+Ducal at last, stand up
+By thee?
+2. Love, thou art deep,
+I cannot cross thee,
+But were there two
+Instead of one,
+Rower and yacht some
+Sov’reign summer,
+Who knows but we’d
+Reach the sun?
+3. Love, thou art veiled,
+A few behold thee—
+Smile and alter and prattle
+And die.
+Bliss were an oddity
+Without thee,
+Nicknamed by God
+Eternity.
+
+section: 132
+label: Empty my heart of thee
+1. Empty my heart of thee—
+Its single artery,
+Begin to leave thee out—
+Simply extinction’s date.
+2. Much billow hath the sea,
+One Baltic—they.
+Subtract thyself, in play,
+And not enough of me
+Is left to put away—
+“Myself” meant thee.
+3. Erase the root, no tree;
+Thee—then no me—
+The Heavens stripped,
+Eternity’s wide pocket picked.
+
+section: 133
+label: The love a life can show
+1. The love a life can show
+Below,
+Is but a filament, I know,
+Of that diviner thing
+That faints upon the face
+Of noon
+And smites the tinder in
+The sun,
+And hinders Gabriel’s wing.
+2. ’Tis this in music hints
+And sways,
+And far abroad on
+Summer days
+Distills uncertain pain.
+’Tis this enamors in
+The East,
+And tints the transit in
+The West
+With harrowing iodine.
+’Tis this invites, appalls,
+Endows,
+Flits, glimmers, proves,
+Dissolves,
+Returns, suggests, convicts,
+Enchants—
+Then flings in
+Paradise!
+
+section: 134
+label: Forever at his side to walk
+1. Forever at his side to walk
+The smaller of the two,
+Brain of his brain,
+Blood of his blood,
+Two lives, one Being, now.
+2. Forever of his fate to taste,
+If grief the largest part,
+If joy, to put my piece away
+For that belovéd heart.
+3. All life to know each other—
+Whom we can never learn,
+And by and by a change
+Called “Heaven”—
+4. Rapt neighborhood of men
+Just finding out what
+Puzzled us
+Without the lexicon!
+
+section: 135
+label: All forgot for recollecting
+1. All forgot for recollecting
+Just a paltry One.
+All forsook for just a stranger’s
+New accompanying.
+2. Grace of rank and grace of fortune
+Less accounted than
+An unknown content, possessing,
+Estimate who can!
+3. Home effaced, her faces dwindled,
+Nature altered small—
+Sun if shone—or storm if shattered,
+Overlooked I all.
+4. Dropped my fate, a timid pebble
+In thy bolder sea,
+Ask me, Sweet, if I regret it—
+Prove myself of Thee.
+
+section: 136
+label: What would I give to see
+1. What would I give to see
+His face?
+I’d give—I’d give my life
+Of course,
+But that is not enough!
+Stop just a minute, let
+Me think—
+I’d give my biggest bobolink!
+That makes two—him and life.
+You know who June is?
+I’d give her,
+Roses a day from Zanzibar,
+And lily tubes, like wells;
+Bees by the furlong,
+Straits of blue
+Navies of butterflies sailed through,
+And dappled cowslip dells.
+Then I have “shares” in
+Primrose “banks,”
+Daffodil “dowries,” spicy “stocks,”
+Dominions broad as dew,
+Bags of doubloons, adventurous
+Bees
+Brought me from firmamental seas,
+And purple from Peru.
+Now, have I bought it,
+Shylock? Say!
+Sign me the bond!
+I vow to pay
+To him who pledges this—
+One hour of her sov’reign’s
+Face!
+Ecstatic contract!
+Niggard grace!
+My kingdom’s worth of bliss!
+
+section: 137
+label: The sunrise runs for Both
+1. The sunrise runs for Both,
+The East her purple troth
+Keeps with the hill,
+The noon unwinds her blue
+Till one breadth cover Two
+Remotest still.
+2. Nor does the night forget
+A lamp for each to set,
+Wicks wide away,
+The North her blazing sign
+Enacts in iodine,
+Till Both can see.
+3. The midnight’s dusky arms
+Clasp hemispheres and homes,
+And so
+Upon her bosom, One,
+And One upon her hem,
+Both lie.
+
+section: 138
+label: Why do I love thee, Sir?
+1. Why do I love thee, Sir?
+Because—
+The wind does not
+Require the grass
+To answer wherefore, when
+He pass,
+She cannot keep her place.
+2. The lightning never asked
+An eye
+Wherefore she shut when
+He was by—
+Because he knows
+She cannot speak,
+And reasons not contained
+Of talk
+There be—preferred by daintier folk.
+
+section: 139
+label: Where Thou art—that is Home
+1. Where Thou art—that is Home,
+Cashmere or Calvary—the same,
+Degree—or shame,
+I scarce esteem location’s name
+So I may come.
+2. What Thou do’st is delight,
+Bondage as play be sweet,
+Imprisonment content
+And sentence sacrament,
+Just we two meet!
+3. Where Thou art not is Woe—
+Though bands of spices blow,
+What Thou do’st not—Despair—
+Though Gabriel praise me, Sir!
+
+section: 140
+label: Ah, necromancy sweet!
+1. Ah, necromancy sweet!
+Ah, wizard erudite!
+:Teach me the skill
+That I instill the pain
+Surgeons assuage in vain,
+:Nor herb of all the plain
+Can heal!
+
+section: 141
+label: One and One are One
+1. One and One are One,
+Two be finished using,
+Well enough for schools
+But for inner choosing,
+Life—just, or Death—
+Or the Everlasting.
+Two would be too vast,
+For the Soul’s comprising.
+
+section: 142
+label: Some say Good Night at night
+1. Some say Good Night at night,
+I say Good Night by day,
+Good-by—the going utter me—
+Good Night I still reply.
+For parting—that is night
+And presence simply dawn,
+Itself the purple on the height
+Denominated Morn.
+
+section: 143
+label: I am ashamed, I hide
+1. I am ashamed, I hide—
+What right have I to be a
+Bride,
+So late a dowerless girl?
+Nowhere to hide my dazzled
+Face,
+No one to teach me that new
+Grace,
+Nor introduce my soul.
+2. Me to adorn, how, tell—
+Trinket to make me beautiful,
+Fabrics of cashmere—
+Never a gown of dun, more,
+Raiment instead of Pompadour
+For me, my soul, to wear.
+3. Fingers to frame my round hair
+Oval—as feudal ladies wore,
+Far fashions fair,
+Skill to hold my brow like an earl,
+Plead like a whippoorwill,
+Prove like a pearl.
+4. Then for character
+Fashion my spirit quaint, while
+Quick like a liquor,
+Gay like Light
+Bring me my best pride.
+No more ashamed,
+No more to hide,
+Meek, let it be—
+Too proud for pride,
+Baptized this day
+A Bride.
+
+section: 144
+label: Although I put away his life
+1. Although I put away his life,
+An ornament too grand
+For forehead low as mine to wear,
+This might have been the hand
+2. That sowed the flowers he preferred,
+Or smoothed a homely pain—
+Or pushed the pebble from his path,
+Or played his chosen tune
+3. On lute the least, the latest,
+But just his ear could know
+That what soe’er delighted it
+I never would let go.
+4. The foot to bear his errand
+A little boot I know
+Would leap abroad like antelope
+With just the grant to do.
+5. His weariest commandment
+A sweeter to obey
+Than “Hide and Seek”, or skip to flutes,
+Or all day chase the bee.
+6. Your servant, Sir, will weary,
+The surgeon will not come,
+The world will have its own to do,
+The dust will vex your fame.
+7. The cold will force your tightest door
+Some February day,
+But say my apron brings the sticks
+To make your cottage gay,
+8. That I may take that promise
+To Paradise with me—
+To teach the angels avarice
+Your kiss first taught to me!
+
+section: 145
+label: You see, I cannot see your lifetime
+1. You see, I cannot see your lifetime,
+I must guess
+How many times it ache
+For me to-day—
+Confess
+2. How many times for
+My far sake
+The brave eyes film.
+But I guess guessing hurts,
+Mine get so dim!
+3. Too vague the face
+My own so patient covets,
+Too far the strength
+My timidness enfolds;
+Haunting the heart
+Like her transplanted faces,
+Teasing the want
+It only can suffice.
+
+section: 146
+label: I know lives I could miss
+1. I know lives I could miss
+Without misery,
+Others—whose instant’s wanting
+Would be Eternity.
+2. The last a scanty number,
+‘T would scarcely fill a two,
+The first—a gnat’s horizon
+Could easily outgrow.
+
+section: 147
+label: Good morning, Midnight!
+1. Good morning, Midnight!
+I’m coming home,
+Day got tired of me—
+How could I of him?
+2. Sunshine was a sweet place,
+I liked to stay—
+But Morn didn’t want me—now—
+So good night, Day!
+3. I can look, can’t I?
+When the East is red?
+The hills have a way, then,
+That puts the heart abroad.
+4. You are not so fair, Midnight—
+I chose Day,
+But please take a little Girl
+He turned away!
+
+section: 148
+label: Denial is the only fact
+1. Denial is the only fact
+Received by the denied,
+Whose will, a blank intelligence
+The day the Heaven died—
+And all the Earth strove common round
+Without delight or aim.
+What comfort was it Wisdom was
+The spoiler of our home?
+
+section: 149
+label: I had not minded walls
+1. I had not minded walls
+Were Universe one rock,
+And far I heard his silver call
+The other side the block.
+2. I’d tunnel until my groove
+Pushed sudden through to his,
+Then my face take recompense—
+The looking in his eyes.
+3. But ’tis a single hair,
+A filament, a law—
+A cobweb wove in adamant,
+A battlement of straw—
+4. A limit like the veil
+Unto the lady’s face,
+But every mesh a citadel
+And dragons in the crease!
+
+section: 150
+label: Renunciation is a piercing virtue
+1. Renunciation is a piercing virtue,
+The letting go
+A presence for an expectation—
+Not now.
+2. The putting out of eyes
+Just sunrise,
+Lest Day,
+Day’s great progenitor
+Out-show.
+3. Renunciation is the choosing
+Against itself,
+Itself to justify
+Unto itself,
+When larger function
+Make that appear
+Smaller, that sated vision. Here.
+
+section: 151
+label: So well that I can live without
+1. So well that I can live without—
+I love Thee; then how well
+Is that?
+As well as Jesus?
+Prove it me
+That He loved men
+As I love Thee.
+
+section: 152
+label: The power to be true to you
+1. The power to be true to you
+Until upon my face
+The Judgment push His picture
+Presumptious of your place—
+Of this—could man deprive me,
+Himself the Heaven excel,
+Whose invitation yours reduced
+Until it shone too small.
+
+section: 153
+label: You taught me waiting with myself
+1. You taught me waiting with myself
+Appointment strictly kept,
+You taught me fortitude of fate,
+This also I have learnt.
+2. An altitude of Death that could
+No bitterer debar
+Than Life had done before it,
+Yet—there is a science more—
+The Heaven you know to understand,
+That you be not ashamed
+Of me, in Christ’s bright audience
+Upon the further hand.
+
+section: 154
+label: Longing is like the seed
+1. Longing is like the seed
+That wrestles in the ground,
+Believing if it intercede
+It shall at length be found.
+2. The hour and the zone
+Each circumstance unknown,
+What constancy must be achieved
+Before it see the sun!
+
+section: 155
+label: Only a shrine
+1. Only a shrine
+But mine;
+I made the taper shine.
+Madonna dim, to whom
+All feet may come,
+Regard a nun.
+Thou knowest every woe,
+Needless to tell Thee so,
+But canst Thou do
+The grace next to it—
+Heal?
+That looks a harder skill,
+Still—just as easy, if it be
+Thy will.
+Grant me—
+Thou knowest though,
+So why tell Thee?
+
+section: 156
+label: If he were living—dare I ask?
+1. If he were living—dare I ask?
+And how if he were dead?
+And so around the words I went
+Of meeting them afraid.
+2. I hinted changes, lapse of time,
+The surfaces of years
+I touched with caution, lest they slit
+And show me to my fears.
+3. Reverted to adjoining lives
+Adroitly turning out
+Wherever I suspected graves—
+’Twas prudenter, I thought.
+4. And He—I rushed with sudden force
+In face of the suspense—
+“Was buried”—“Buried!”
+“He!”
+My life just holds the trench.
+
+section: 157
+label: Why do they shut me
+1. Why do they shut me
+Out of Heaven?
+Did I sing too loud?
+But I can sing a little minor,
+Timid as a bird.
+2. Wouldn’t the angels try me
+Just once more?
+Just see if I troubled them—
+But don’t shut the door!
+3. Oh, if I were the gentlemen
+In the white robes,
+And they were the little hand
+That knocked—
+Could I forbid?
+
+section: 158
+label: After great pain a formal feeling comes
+1. After great pain a formal feeling comes—
+The nerves sit ceremonious like tombs;
+The stiff Heart questions—was it He that bore?
+And yesterday—or centuries before?
+2. The feet mechanical go round
+A wooden way
+Of ground or air or Ought,
+Regardless grown,
+A quartz contentment like a stone.
+3. This is the hour of lead
+Remembered if outlived
+As freezing persons recollect
+The snow—
+First chill, then stupor, then
+The letting go.
+
+section: 159
+label: There is a languor of the life
+1. There is a languor of the life
+More imminent than pain;
+’Tis pain’s successor, when the Soul
+Has suffered all it can.
+2. A drowsiness diffuses,
+A dimness like a fog
+Envelops consciousness
+As mist obliterates a crag.
+3. The surgeon does not blanch at pain,
+His habit is severe,
+But tell him that it ceased to feel—
+The creature going there,
+4. And he will tell you skill is late,
+A mightier than he
+Has ministered before him—
+There’s no vitality.
+
+section: 160
+label: There is a pain so utter
+1. There is a pain so utter
+It swallows Being up,
+Then covers the abyss with trance
+So memory can step
+Around, across, upon it,
+As One within a swoon
+Goes steady, when an open eye
+Would drop him bone by bone.
+
+section: 161
+label: Joy to have merited the pain
+1. Joy to have merited the pain
+To merit the release.
+Joy to have perished every step
+To compass thee at last.
+2. Pardon to look upon thy face
+With these old-fashioned eyes—
+Better than new could be, for that,
+Tho’ bought in Paradise—
+3. Because they looked on thee before
+And thou hadst looked on them—
+Prove me, my hazel witnesses,
+The features are the same.
+4. So fleet thou wert when present,
+So infinite when gone—
+An Orient’s apparition
+Remanded of the morn.
+5. The height I recollect
+’Twas ever with the hills,
+The depth upon my soul
+Was notched
+As floods on whites of wheels.
+6. To haunt till Time has
+Dropped
+His slow decade away,
+And haunting actualize
+To last
+At least, Eternity.
+
+section: 162
+label: Rehearsal to ourselves
+1. Rehearsal to ourselves
+Of a withdrawn delight
+Affords a bliss like murder,
+Omnipotent, acute.
+2. We will not drop the dirk
+Because we love the wound
+The dirk commemorate,
+Itself
+Remind us that we did.
+
+section: 163
+label: I tie my hat, I crease my shawl
+1. I tie my hat, I crease my shawl,
+Life’s little duties do precisely
+As the very least
+Were infinite to me.
+2. I put new blossoms in the glass,
+And throw the old away;
+I push a petal from my gown
+That anchored there—I weigh
+3. The time ’twill be till six o’clock,
+I have so much to do—
+And get existence some way back,
+Stopped, struck, my ticking through.
+4. We cannot put ourselves away
+As a completed man
+Or woman—when the errand’s done
+We came to flesh upon.
+5. There may be miles on miles of nought
+Of action,—sicker far,
+To simulate is stinging work
+To cover what we are
+6. From science and from surgery,
+Too telescopic eyes
+To bear on us unshaded,
+For their sake, not for ours.
+
+section: 164
+label: When I hoped, I recollect
+1. When I hoped, I recollect
+Just the place I stood
+In a chamber facing West—
+Roughest air was good.
+2. Not a sleet could bite me,
+Not a frost could cool,
+Hope it was that kept me warm—
+Not merino shawl.
+3. When I feared—I recollect
+Just the day it was—
+Worlds were swimming in the Sun,
+Yet how Nature froze!
+4. Icicles upon my soul
+Prickled raw and cool,
+Birds went praising everywhere,
+Mine alone was still.
+5. And the day that I despaired—
+This if I forget,
+Nature will that it be night
+When the sun is set.
+6. Dark shall overtake the hill,
+Overtake the sky,
+Nature hesitate before
+Memory—and me.
+
+section: 165
+label: From blank to blank
+1. From blank to blank
+A threadless way
+I pushed mechanic feet,
+To stop or perish
+Or advance—
+Alike indifferent
+2. If end I gained,
+If ends beyond
+Indefinite disclosed,
+I shut my eyes and
+Groped as well,
+’Twas lighter to be blind.
+
+section: 166
+label: I got so I could hear his name
+1. I got so I could hear his name
+Without—
+Tremendous gain!—
+That stop-sensation in my soul,
+And thunder in the room.
+2. I got so I could walk across
+That angle in the floor
+Where he turned—so—and I
+Turned—how—
+And all our sinew tore.
+3. I got so I could stir the box
+In which
+His letters grew,
+Without that forcing in my breath
+As staples driven through.
+4. Could dimly recollect a Grace—
+I think
+They called it “God”,
+Renowned to ease extremity
+When formula had failed—
+5. And shape my hands
+Petition’s way—
+Tho’ ignorant of word
+That Ordination utters—
+My business with the cloud.
+6. If any Power behind it be
+Not subject to despair,
+It care
+In some remoter way
+For so minute affair
+As misery—
+Itself too vast for interrupting more,
+Supremer than—
+Superior to—
+
+section: 167
+label: At leisure is the Soul
+1. At leisure is the Soul
+That gets a staggering blow;
+The width of Life
+Before it spreads
+Without a thing to do.
+2. It begs you give it work,
+But just the placing pins—
+Or humblest patchwork
+Children do—
+To help its vacant hands.
+
+section: 168
+label: “Till death” is narrow loving
+1. “Till death” is narrow loving;
+The scantiest heart extant
+Will hold you, till your
+Privilege
+Of finiteness be spent.
+2. But he whose loss procures you
+Such destitution that
+Your life, too abject for itself,
+Thenceforward imitate—
+3. Until, resemblance perfect,
+Yourself for his pursuit
+Delight of nature abdicate,
+Exhibit love somewhat.
+
+section: 169
+label: And this of all my hopes
+1. And this of all my hopes—
+This is the silent end.
+Bountiful colored my morning rose,
+Early and sere its end.
+2. Never bud from a stem
+Stepped with so gay a foot,
+Never a worm so confident
+Bored at so brave a root.
+
+section: 170
+label: Savior! I’ve no one else to tell
+1. Savior! I’ve no one else to tell
+And so I trouble Thee,
+I am the one forgot Thee so.
+Dost Thou remember me?
+2. Not for myself I came so far,
+That were the little load—
+I brought Thee the imperial heart
+I had not strength to hold.
+3. The heart I carried in my own,
+Till mine too heavy be,
+Yet strangest—heavier
+Since it went—
+Is it too large for Thee?
+
+section: 171
+label: It ceased to hurt me, though
+1. It ceased to hurt me, though
+So slow
+I could not see the trouble go—
+But only knew by looking back
+That something had obscured
+The track.
+2. Nor when it altered, I could say—
+For I had worn it every day
+As constant as the childish frock
+I hung upon the nail at night.
+3. Nor what consoled it—I
+Could trace,
+Except whereas ’twas wilderness
+It’s better, almost Peace.
+
+section: 172
+label: A wife at daybreak I shall be
+1. A wife at daybreak I shall be,
+Sunrise, hast thou a flag for me?
+At midnight I am yet a maid—
+How short it takes to make it bride!
+Then, Midnight, I have passed from thee
+Unto the East and Victory.
+2. Midnight, “Good night”
+I hear them call.
+The angels bustle in the hall,
+Softly my Future climbs the stair,
+I fumble at my childhood’s prayer—
+So soon to be a child no more!
+Eternity, I’m coming, Sir,—
+Master, I’ve seen that face before.
+
+section: 173
+label: Behind me dips Eternity
+1. Behind me dips Eternity,
+Before me Immortality,
+Myself the term between—
+Death but the drift of Eastern gray
+Dissolving into dawn away
+Before the West begins.
+2. ’Tis Kingdom—afterwards—they say,
+In perfect pauseless monarchy,
+Whose Prince is son of none—
+Himself His dateless dynasty,
+Himself, Himself diversify
+In duplicate divine.
+3. ’Tis Miracle before me, then,
+Then Miracle behind, between,
+A crescent is the sea
+With midnight to the north of her
+And midnight to the south of her,
+And maelstrom in the sky.
+
+section: 174
+label: As if the sea should part
+1. As if the sea should part
+And show a further sea—
+And that a further, and the three
+But a presumption be
+Of periods of seas
+Unvisited of shores—
+Themselves the verge of seas to be—
+Eternity is these.
+
+section: 175
+label: Not what we did shall be the test
+1. Not what we did shall be the test
+When act and will are done,
+But what our Lord infers we would—
+Had we diviner been.
+
+section: 176
+label: It will be Summer eventually
+1. It will be Summer eventually—
+Ladies with parasols,
+Sauntering gentlemen with canes,
+And little girls with dolls
+2. Will tint the pallid landscape
+As ’twere a bright bouquet,
+Though drifted deep in Parian
+The village lies to-day.
+3. The lilacs, bending many a year,
+Will sway with purple load;
+The bees will not despise the tune
+Their forefathers have hummed;
+4. The wild rose redden in the bog,
+The aster on the hill
+Her everlasting fashion set,
+And covenant gentians frill,
+5. Till Summer folds her miracle
+As women do their gown,
+Or priests adjust the symbols
+When Sacrament is done.
+6. I’m sorry for the Dead to-day,
+It’s such congenial times
+Old neighbors have at fences
+At time o’ year for hay—
+7. When broad sun-burned acquaintances
+Discourse between the toil
+And laugh, a homely species,
+That makes the meadows smile.
+8. It seems so straight to lie away
+From all the noise of fields,
+The busy carts, the fragrant cocks,
+The mower’s meter steals
+9. A trouble, lest they ‘re homesick,—
+Those farmers and their wives,
+Set separate from the farming
+And all the neighbors’ lives.
+10. I wonder if the sepulchre
+Is not a lonesome way,
+When men and boys, and larks and June
+Go down the fields to hay!
+11. To disappear enhances;
+The man who runs away
+Is tinctured for an instant
+With Immortality.
+12. But yesterday a vagrant,
+Today in memory lain
+With superstitious merit
+We tamper with again.
+13. But never far as Honour
+Removes the paltry One,
+And impotent to cherish
+We hasten to adorn.
+14. Of Death the sharpest function,
+That, just as we discern,
+The Excellence defies us;
+Securest gathered then
+15. The fruit perverse to plucking,
+But leaning to the sight
+With the ecstatic limit
+Of unobtained Delight.
+
+section: 177
+label: God is a distant, stately Lover
+1. God is a distant, stately Lover,
+Woos, so He tells us, by His Son.
+Surely a vicarious courtship!
+Miles’ and Priscilla’s such a one.
+But lest the soul, like fair Priscilla,
+Choose the envoy and spurn the Groom,
+Vouches, with hyperbolic archness,
+Miles and John Alden
+Are synonym.
+
+section: 178
+label: A feather from the whippoorwill
+1. A feather from the whippoorwill
+That everlasting sings,
+Whose galleries are sunrise,
+Whose stanzas are the spring,
+Whose emerald nest the ages spin
+With mellow murmuring thread,
+Whose beryl egg what schoolboys hunt
+In “recess” overhead!
+
+section: 179
+label: There are two ripenings
+1. There are two ripenings—
+One of sight, whose forces
+Spheric wind,
+Until the velvet product
+Drops, spicy, to the ground.
+2. A homelier maturing,
+The process in the burr—
+That teeth of frosts
+Alone disclose
+On far October air.
+
+section: 180
+label: The zeros taught us phosphorus
+1. The zeros taught us phosphorus,
+We learned to like the fire
+By handling glaciers when a boy,
+And tinder guessed by power
+Of opposite to equal ought,
+Eclipses sums imply,
+Paralysis our primer numb
+Unto vitality.
+
+section: 181
+label: Just once! Oh, least request!
+1. Just once! Oh, least request!
+Could Adamant refuse
+So small a grace
+So scanty put—
+Such agonizing terms?
+Would not a God of Flint
+Be conscious of a sigh
+As down His Heaven
+Dropt, remote,
+“Just once! Sweet Deity?”

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds db/texts/walden.txt and db/texts/dickinson.txt from Project Gutenberg.
+"""Builds db/texts/walden.txt and db/texts/dickinson-*-series.txt from Project Gutenberg.
 
 Sources (public domain; download first, not checked in):
   walden     https://www.gutenberg.org/cache/epub/205/pg205.txt    (Walden, and On the Duty of Civil Disobedience)
@@ -7,7 +7,7 @@ Sources (public domain; download first, not checked in):
 
 Unlike the Bible, these have a single source (Gutenberg's proofread edition).
 Walden: one section per chapter, one unit per paragraph ("On the Duty of Civil
-Disobedience" is left out). Dickinson: one section per poem (titled, or by its
+Disobedience" is left out). Dickinson: one work per series, one section per poem (titled, or by its
 first line), one unit per stanza, line breaks kept.
 
 Usage: build_walden_and_dickinson.py WALDEN.txt DICKINSON.txt [OUT_DIR]
@@ -61,8 +61,10 @@ def build_walden(path):
     return "\n".join(out)
 
 
-def build_dickinson(path):
-    body = gutenberg_body(path)
+SERIES = [("First Series", "1890", "first"), ("Second Series", "1891", "second"), ("Third Series", "1896", "third")]
+
+
+def parse_dickinson(body):
     body = body[body.index("\nI. LIFE.\n"):]
     poems = []
     for block in re.split(r"\n{3,}", body):
@@ -81,20 +83,37 @@ def build_dickinson(path):
         if stanzas:
             label = title_case(title) if title else stanzas[0].split("\n")[0].rstrip(",;:—- ")
             poems.append((typography(label), stanzas))
-    out = ["work: Emily Dickinson", "author: Emily Dickinson", "slug: dickinson", "collection: emily-dickinson", "position: 100", "unit: stanza", "lines: keep", ""]
+    return poems
+
+
+def poems_file(work, edition, slug, position, poems, description=None):
+    out = [f"work: {work}", f"edition: {edition}", "author: Emily Dickinson", "author_short: Dickinson", f"slug: {slug}",
+           "collection: emily-dickinson", f"position: {position}", "unit: stanza", "lines: keep", ""]
     for n, (label, stanzas) in enumerate(poems, start=1):
         out += [f"section: {n}", f"label: {label}"]
         for k, st in enumerate(stanzas, start=1):
             first, *rest = st.split("\n")
             out += [f"{k}. {first}"] + rest
         out.append("")
-    return "\n".join(out), len(poems)
+    return "\n".join(out)
+
+
+def build_dickinson(path):
+    """The Gutenberg file holds all three series; returns {filename: text} for one work per series."""
+    body = gutenberg_body(path)
+    marks = [body.index("\nI. LIFE.\n")] + [body.index(f"by EMILY DICKINSON\n\n{name}") for name in ("Second Series", "Third Series")]
+    marks.append(len(body))
+    files = {}
+    for i, (name, year, key) in enumerate(SERIES):
+        poems = parse_dickinson(body[marks[i]:marks[i + 1]])
+        files[f"dickinson-{key}-series.txt"] = poems_file(f"Poems, {name}", year, f"dickinson-{key}-series", i + 1, poems)
+    return files
 
 
 if __name__ == "__main__":
     walden, dickinson = sys.argv[1:3]
     out = Path(sys.argv[3] if len(sys.argv) > 3 else "db/texts")
     (out / "walden.txt").write_text(build_walden(walden))
-    d, n = build_dickinson(dickinson)
-    (out / "dickinson.txt").write_text(d)
-    print("Walden written;", n, "Dickinson poems written")
+    for name, text in build_dickinson(dickinson).items():
+        (out / name).write_text(text)
+    print("Walden and the three Dickinson series written")

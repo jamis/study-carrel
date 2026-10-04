@@ -161,7 +161,9 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_equal [ "Poems", "Poems Written in Youth", "Tamerlane", "Al Aaraaf" ], poe.works.map(&:title)
     raven = Section.joins(:work).find_by!(works: { slug: "poe-poems" }, label: "The Raven")
     assert_equal 18, raven.units.count
-    assert_equal "Emily Dickinson", Work.find_by!(slug: "dickinson").collection.name
+    dickinson = Collection.find_by!(slug: "emily-dickinson")
+    assert_equal [ "Poems, First Series", "Poems, Second Series", "Poems, Third Series", "The Single Hound", "Further Poems" ], dickinson.works.map(&:title)
+    assert_equal [ 112, 166, 164, 142, 181 ], dickinson.works.map { |w| w.sections.count }
 
     world = Collection.find_by!(slug: "sacred-texts")
     assert_equal %w[Dhammapada Tao\ Te\ Ching Bhagavad\ Gita\ (The\ Song\ Celestial) Quran], world.works.map(&:title)
@@ -187,8 +189,8 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_not_includes Unit.where(section: dhp).map(&:number), 59
     assert_equal 18, Work.find_by!(slug: "walden").sections.count
     assert_equal "Walden: Economy", Work.find_by!(slug: "walden").sections.first.name
-    success = Work.find_by!(slug: "dickinson").sections.find_by!(label: "Success")
-    assert_equal "Emily Dickinson: Success, stanza 1", success.units.first.reference
+    success = Work.find_by!(slug: "dickinson-first-series").sections.find_by!(label: "Success")
+    assert_equal "Poems, First Series: Success, stanza 1", success.units.first.reference
     assert_includes success.units.first.body, "\n"
   end
 end
