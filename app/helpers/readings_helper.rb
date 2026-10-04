@@ -9,12 +9,15 @@ module ReadingsHelper
     trail
   end
 
-  # The reading view's trail ends with the chapter. The work is skipped when the chapter's name already
-  # starts with its title ("Isaiah 40").
+  # The reading view's trail ends with the chapter. When the chapter's name is the work's title plus a number
+  # ("Isaiah 40") the work crumb is skipped; when it is "Work: Label" (Pensées: Of the Means of Belief) the work
+  # stays as its own crumb and the last one shows just the label, so it reads as a chapter of that work.
   def reading_crumbs(section)
     work = section.work
-    trail = library_crumbs(work.collection, work: (work unless section.name.start_with?(work.title)))
-    trail << [ section.name, work_path(work), "Chapters in #{work.title}#{" (#{work.edition})" if work.edition.present?}" ]
+    label = section.name.delete_prefix("#{work.title}: ")
+    own_crumb = label != section.name || !section.name.start_with?(work.title)
+    trail = library_crumbs(work.collection, work: (work if own_crumb))
+    trail << [ label, work_path(work), "Chapters in #{work.title}#{" (#{work.edition})" if work.edition.present?}" ]
   end
 
   def unit_ref(section, unit) = section.reference(unit.number)
