@@ -279,7 +279,7 @@
 .invite-form { max-width: none; margin: 0 0 8px; }
 
 /* ---------- foci pages ---------- */
-a:not(.chip):not(.where):not(.brand):not(.tick):not(.work-link):not(.menu-item) { color: var(--accent); }
+a:not(.chip):not(.where):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a) { color: var(--accent); }
 .inline-form { display: inline; margin: 0; }
 .page { max-width: 40em; margin: 0 auto; padding: 22px 16px 80px; }
 .page-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-family: var(--sans); margin-bottom: 18px; }
@@ -288,6 +288,10 @@ a:not(.chip):not(.where):not(.brand):not(.tick):not(.work-link):not(.menu-item) 
 .page-empty { color: var(--ink-soft); font-style: italic; }
 .list-row { padding: 12px 0; border-bottom: 1px solid var(--rule); }
 .list-row-title { font-size: 20px; font-style: italic; }
+.list-row-title.as-work { font-style: normal; }
+/* A single-work collection (the Bible) reads as a work, like the links on a collection page. */
+.list-row-title.as-work a { color: var(--ink); text-decoration: none; }
+.list-row-title.as-work a:hover { color: var(--accent); }
 .list-row-desc { color: var(--ink-soft); font-size: 16px; margin-top: 4px; }
 .list-row-meta { font-family: var(--sans); font-size: 13px; color: var(--ink-soft); margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 

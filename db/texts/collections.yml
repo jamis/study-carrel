@@ -6,21 +6,25 @@
   name: Bible
   parent: sacred-texts
   position: 1
+  single_work: true
   description: The King James Version, Old and New Testaments.
 - slug: old-testament
   name: Old Testament
   parent: bible
   position: 1
+  single_work: true
   description: The books of the Old Testament, in the King James Version.
 - slug: new-testament
   name: New Testament
   parent: bible
   position: 2
+  single_work: true
   description: The books of the New Testament, in the King James Version.
 - slug: book-of-mormon
   name: Book of Mormon
   parent: sacred-texts
   position: 2
+  single_work: true
   description: "Public-domain text (Project Gutenberg #17), with the traditional chapter and verse numbering. Not the Church's current edition, whose headings, footnotes and some wording are under copyright."
 - slug: poetry
   name: Poetry

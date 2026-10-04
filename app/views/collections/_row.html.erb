@@ -1,5 +1,5 @@
 <div class="list-row">
-  <div class="list-row-title"><%= link_to collection.name, collection_path(collection) %></div>
+  <div class="list-row-title<%= " as-work" if collection.single_work? %>"><%= link_to collection.name, collection_path(collection) %></div>
   <% if collection.description.present? %><div class="list-row-desc"><%= collection.description %></div><% end %>
-  <div class="list-row-meta"><%= pluralize(collection.all_works.count, "work") %></div>
+  <% if !collection.single_work? %><div class="list-row-meta"><%= pluralize(collection.work_count, "work") %></div><% end %>
 </div>

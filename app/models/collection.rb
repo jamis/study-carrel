@@ -55,6 +55,10 @@ class Collection < ApplicationRecord
           .lazy.filter_map(&:last_work).first || parent.work_before
   end
 
+  # How many works to show for this collection: its own works plus its child collections', where a child
+  # that is a single work (the Bible, the Book of Mormon) counts as one however many books it holds.
+  def work_count = works.size + children.sum { |c| c.single_work? ? 1 : c.work_count }
+
   # Every work in this collection or any collection nested under it.
   def all_works = Work.where(collection_id: self_and_descendant_ids)
 

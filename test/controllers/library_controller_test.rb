@@ -15,7 +15,9 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
     assert_select ".list-row-title a", text: "Sacred Texts"
     assert_select ".list-row-title a", text: "Old Testament", count: 0
     assert_select ".list-row-title a", text: "Prose"
-    assert_select ".list-row-meta", "2 works"
+    assert_select ".list-row:has(a[href=?]) .list-row-meta", collection_path("prose"), text: "1 work"
+    # The Bible and the Book of Mormon each count as one work, however many books they hold.
+    assert_select ".list-row:has(a[href=?]) .list-row-meta", collection_path("sacred-texts"), text: "2 works"
   end
 
   test "the Bible lists its testaments, and each testament its books" do

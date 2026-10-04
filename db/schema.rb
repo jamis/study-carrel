@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_04_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_04_140000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -57,6 +57,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_04_130000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "parent_id"
+    t.boolean "single_work", default: false, null: false
     t.index ["parent_id"], name: "index_collections_on_parent_id"
     t.index ["slug"], name: "index_collections_on_slug", unique: true
   end

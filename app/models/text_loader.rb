@@ -6,6 +6,8 @@
 #     name: Old Testament
 #     position: 1
 #     parent: bible           (optional; the slug of the collection this one is nested in)
+#     single_work: true       (optional; the collection is one work in its own right, e.g. the Bible: it counts as one
+#                              item in its parent and shows no count of its own)
 #     description: ...
 #
 # Each db/texts/*.txt file is one work:
@@ -46,7 +48,7 @@ class TextLoader
 
     entries = YAML.safe_load_file(path)
     entries.each do |attrs|
-      Collection.find_or_initialize_by(slug: attrs.fetch("slug")).update!(attrs.slice("name", "position", "description"))
+      Collection.find_or_initialize_by(slug: attrs.fetch("slug")).update!(attrs.slice("name", "position", "description", "single_work"))
     end
 
     # Parents are linked in a second pass so a file can list them in any order.
