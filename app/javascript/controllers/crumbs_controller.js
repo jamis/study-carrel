@@ -22,13 +22,13 @@ export default class extends Controller {
     if (!this.element.clientWidth) return
     const items = this.itemTargets
     items.forEach(i => i.hidden = false)
-    this.more.hidden = true
+    if (this.more) this.more.hidden = true
     this.list.classList.add("measuring")
     for (let n = 1; n < items.length - 1 && this.list.scrollWidth > this.list.clientWidth; n++) {
-      this.more.hidden = false
+      if (this.more) this.more.hidden = false
       items[n].hidden = true
     }
     this.list.classList.remove("measuring")
-    this.more.title = items.filter(i => i.hidden).map(i => i.textContent.trim()).join(" › ")
+    if (this.more) this.more.title = items.filter(i => i.hidden).map(i => i.textContent.trim()).join(" › ")
   }
 }

@@ -26,7 +26,22 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
       assert_equal [ "Old Testament", "New Testament" ], links.map { |l| l.text.strip }
     end
     get collection_path("old-testament")
-    assert_select "a.chip", text: "← Bible"
+    assert_select ".crumbs a.crumb[href=?]", collection_path("bible"), text: "Bible"
+    assert_select ".crumbs li:last-child a[aria-current=page]", "Old Testament"
+  end
+
+  test "library pages share the reading nav: breadcrumbs, history and the menu" do
+    [ library_path, collection_path("old-testament"), work_path("genesis-kjv") ].each do |path|
+      get path
+      assert_select "header.top .crumbs a.crumb[href=?]", library_path, text: "Library"
+      assert_select "header.top .history-btn"
+      assert_select "header.top .menu-btn"
+      assert_select "header.top .menu-item", text: "Continue reading"
+      assert_select ".page-bar", 0
+    end
+    get work_path("genesis-kjv")
+    assert_select ".crumbs li:last-child a[aria-current=page]", "Genesis"
+    assert_select ".menu-panel a[href=?]", random_work_path("genesis-kjv"), text: "Random"
   end
 
   test "a collection lists its books in order" do

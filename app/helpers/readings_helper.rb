@@ -1,13 +1,19 @@
 module ReadingsHelper
-  # Breadcrumb trail for the reading nav: [[label, path_or_nil, title], ...], Library first, the section last.
-  # The work is skipped when the section's name already starts with its title ("Isaiah 40"), and the
-  # edition and author ride along as the work crumb's tooltip.
+  # Breadcrumb trail for the top bar: [[label, path, tooltip], ...], Library first, the current page last.
+  # Collections nest, so a collection's trail runs through its ancestors; a work adds itself (the edition and
+  # author ride along as its tooltip).
+  def library_crumbs(collection = nil, work: nil)
+    trail = [ [ "Library", library_path, nil ] ]
+    (collection ? collection.ancestors + [ collection ] : []).each { |c| trail << [ c.name, collection_path(c), nil ] }
+    trail << [ work.title, work_path(work), [ work.byline, work.edition ].compact_blank.join(" · ").presence ] if work
+    trail
+  end
+
+  # The reading view's trail ends with the chapter. The work is skipped when the chapter's name already
+  # starts with its title ("Isaiah 40").
   def reading_crumbs(section)
     work = section.work
-    trail = [ [ "Library", library_path, nil ] ]
-    collections = work.collection ? work.collection.ancestors + [ work.collection ] : []
-    collections.each { |c| trail << [ c.name, collection_path(c), nil ] }
-    trail << [ work.title, work_path(work), [ work.byline, work.edition ].compact_blank.join(" · ").presence ] unless section.name.start_with?(work.title)
+    trail = library_crumbs(work.collection, work: (work unless section.name.start_with?(work.title)))
     trail << [ section.name, work_path(work), "Chapters in #{work.title}#{" (#{work.edition})" if work.edition.present?}" ]
   end
 

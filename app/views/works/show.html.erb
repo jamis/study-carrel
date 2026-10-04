@@ -1,15 +1,7 @@
 <% content_for :title, "#{@work.name} · Study Carrel" %>
 <% numbered = @sections.all?(&:numbered?) %>
+<%= render "shared/header", crumbs: library_crumbs(@work.collection, work: @work), random: random_work_path(@work.slug), focus: Current.user.foci.current_one %>
 <main class="page">
-  <div class="page-bar">
-    <% if @work.collection %>
-      <%= link_to "← #{@work.collection.name}", collection_path(@work.collection), class: "chip" %>
-    <% else %>
-      <%= link_to "← Library", library_path, class: "chip" %>
-    <% end %>
-    <%= link_to "Continue reading", root_path, class: "chip" %>
-    <%= link_to "Random", random_work_path(@work.slug), class: "chip" %>
-  </div>
   <h2 class="page-title"><%= @work.title %></h2>
   <p class="page-lede"><%= [ @work.byline, @work.edition, pluralize(@sections.size, "section") ].compact_blank.join(" · ") %></p>
 

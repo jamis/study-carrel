@@ -1,12 +1,6 @@
 <% content_for :title, "Library · Study Carrel" %>
+<%= render "shared/header", crumbs: library_crumbs, focus: Current.user.foci.current_one %>
 <main class="page">
-  <div class="page-bar">
-    <%= link_to "← Continue reading", root_path, class: "chip" %>
-    <span class="page-bar-actions">
-      <%= link_to "Kept", kept_path, class: "chip" %>
-      <%= link_to "Random", random_path, class: "chip" %>
-    </span>
-  </div>
   <h2 class="page-title">Library</h2>
 
   <% if @collections.empty? && @loose_works.empty? %>
