@@ -299,7 +299,7 @@ lexxy-editor, .lexxy-content {
 .autosave-status {
   flex: none; margin: 0; line-height: 18px; min-height: 18px; padding: 4px 12px;
   font-family: var(--sans); font-size: 12px; color: var(--ink-soft);
-  background: color-mix(in srgb, var(--paper) 95%, var(--ink)); border: 1px solid var(--lexxy-color-ink-lighter); border-top: 0; border-radius: 0 0 10px 10px;
+  background: color-mix(in srgb, var(--paper) 95%, var(--ink)); border: 1px solid var(--rule); border-top: 0; border-radius: 0 0 10px 10px;
 }
 
 /* ---------- all-notes page ---------- */
