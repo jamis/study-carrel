@@ -127,8 +127,8 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_equal 23_145, Unit.where(section: ot_sections).count
     assert_equal 176, ot_sections.find_by!(works: { slug: "psalms-kjv" }, number: 119).units.count
 
-    assert_equal %w[Bible Old\ Testament New\ Testament LDS\ Scripture Book\ of\ Mormon World\ Scripture Poetry Emily\ Dickinson Robert\ Frost Edgar\ Allan\ Poe Prose], Collection.reorder(:id).map(&:name)
-    assert_equal %w[Bible LDS\ Scripture World\ Scripture Poetry Prose], Collection.top_level.ordered.map(&:name)
+    assert_equal %w[Sacred\ Texts Bible Old\ Testament New\ Testament Book\ of\ Mormon Poetry Emily\ Dickinson Robert\ Frost Edgar\ Allan\ Poe Prose], Collection.reorder(:id).map(&:name)
+    assert_equal %w[Poetry Prose Sacred\ Texts], Collection.top_level.ordered.map(&:name)
 
     nt = Collection.find_by!(slug: "new-testament")
     nt_sections = Section.joins(:work).where(works: { collection_id: nt.id })
@@ -138,11 +138,11 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_equal 260, nt_sections.count
     assert_equal 7_957, Unit.where(section: nt_sections).count
     assert_equal "Malachi", nt.works.first.previous_work.title
-    assert_nil nt.works.last.next_work
+    assert_equal "1 Nephi", nt.works.last.next_work.title
 
     bom = Collection.find_by!(slug: "book-of-mormon")
     bom_sections = Section.joins(:work).where(works: { collection_id: bom.id })
-    assert_equal "LDS Scripture", bom.parent.name
+    assert_equal "Sacred Texts", bom.parent.name
     assert_equal 15, bom.works.count
     assert_equal %w[1\ Nephi 2\ Nephi], bom.works.first(2).map(&:title)
     assert_equal 239, bom_sections.count
@@ -163,7 +163,7 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_equal 18, raven.units.count
     assert_equal "Emily Dickinson", Work.find_by!(slug: "dickinson").collection.name
 
-    world = Collection.find_by!(slug: "world-scripture")
+    world = Collection.find_by!(slug: "sacred-texts")
     assert_equal %w[Dhammapada Tao\ Te\ Ching Bhagavad\ Gita\ (The\ Song\ Celestial) Quran], world.works.map(&:title)
     counts = ->(slug) { Section.joins(:work).where(works: { slug: slug }).then { |s| [ s.count, Unit.where(section: s).count ] } }
     assert_equal [ 26, 414 ], counts.("dhammapada")

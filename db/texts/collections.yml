@@ -1,5 +1,10 @@
+- slug: sacred-texts
+  name: Sacred Texts
+  position: 3
+  description: Scripture from several traditions, in public-domain translations. Older translations read differently from modern ones.
 - slug: bible
   name: Bible
+  parent: sacred-texts
   position: 1
   description: The King James Version, Old and New Testaments.
 - slug: old-testament
@@ -12,22 +17,14 @@
   parent: bible
   position: 2
   description: The books of the New Testament, in the King James Version.
-- slug: lds-scripture
-  name: LDS Scripture
-  position: 2
-  description: The standard works of The Church of Jesus Christ of Latter-day Saints, in older public-domain editions rather than the Church's current copyrighted text.
 - slug: book-of-mormon
   name: Book of Mormon
-  parent: lds-scripture
-  position: 1
-  description: Public-domain text (Project Gutenberg #17), with the traditional chapter and verse numbering. Not the Church's current edition, whose headings, footnotes and some wording are under copyright.
-- slug: world-scripture
-  name: World Scripture
-  position: 3
-  description: Sacred texts of other traditions, in public-domain translations from the 19th century. Older translations read differently from modern ones.
+  parent: sacred-texts
+  position: 2
+  description: "Public-domain text (Project Gutenberg #17), with the traditional chapter and verse numbering. Not the Church's current edition, whose headings, footnotes and some wording are under copyright."
 - slug: poetry
   name: Poetry
-  position: 4
+  position: 1
   description: Poems, read a stanza at a time.
 - slug: emily-dickinson
   name: Emily Dickinson
@@ -46,5 +43,5 @@
   description: The poems, from the 1900 Bell edition (public domain). Without the prose, the notes, or Politian.
 - slug: prose
   name: Prose
-  position: 5
+  position: 2
   description: Essays and books, read a paragraph at a time.

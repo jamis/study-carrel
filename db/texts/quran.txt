@@ -1,7 +1,7 @@
 work: Quran
 edition: Rodwell translation (1861)
 slug: quran
-collection: world-scripture
+collection: sacred-texts
 position: 4
 unit: verse
 

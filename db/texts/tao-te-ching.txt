@@ -1,7 +1,7 @@
 work: Tao Te Ching
 edition: Legge translation (1891)
 slug: tao-te-ching
-collection: world-scripture
+collection: sacred-texts
 position: 2
 unit: paragraph
 lines: keep

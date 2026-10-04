@@ -1,7 +1,7 @@
 work: Bhagavad Gita (The Song Celestial)
 edition: Arnold translation (1885)
 slug: bhagavad-gita
-collection: world-scripture
+collection: sacred-texts
 position: 3
 unit: stanza
 lines: keep

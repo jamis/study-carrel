@@ -12,7 +12,7 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
 
   test "library lists collections in order" do
     get library_path
-    assert_select ".list-row-title a", text: "Bible"
+    assert_select ".list-row-title a", text: "Sacred Texts"
     assert_select ".list-row-title a", text: "Old Testament", count: 0
     assert_select ".list-row-title a", text: "Prose"
     assert_select ".list-row-meta", "2 works"

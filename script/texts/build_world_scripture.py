@@ -8,7 +8,7 @@ Sources (all public domain; download first, none are checked in):
   quran       https://www.gutenberg.org/cache/epub/2800/pg2800.txt   J. M. Rodwell (1861)
   meditations https://www.gutenberg.org/cache/epub/2680/pg2680.txt   Meric Casaubon (1634)
 
-Each has a single source (Gutenberg's proofreading). Works go in "world-scripture"
+Each has a single source (Gutenberg's proofreading). Works go in "sacred-texts"
 (Meditations in "prose"), a section per chapter, a unit per verse or paragraph.
 The Quran is Rodwell's, with the suras put back in the traditional order (his
 edition arranges them chronologically) and numbered traditionally.
@@ -85,7 +85,7 @@ def build_dhammapada(src, out):
         sections.append((n, title, verses))
     assert [s[0] for s in sections] == list(range(1, 27)) and last == 423, last
     write(out, "dhammapada", ["work: Dhammapada", "edition: Müller translation (1881)", "slug: dhammapada",
-                              "collection: world-scripture", "position: 1", "unit: verse"], sections)
+                              "collection: sacred-texts", "position: 1", "unit: verse"], sections)
 
 
 def build_tao(src, out):
@@ -120,7 +120,7 @@ def build_tao(src, out):
     assert len(chapters) == 81, len(chapters)
     sections = [(i, None, units) for i, units in enumerate(chapters, start=1)]
     write(out, "tao-te-ching", ["work: Tao Te Ching", "edition: Legge translation (1891)", "slug: tao-te-ching",
-                                "collection: world-scripture", "position: 2", "unit: paragraph"], sections, keep_lines=True)
+                                "collection: sacred-texts", "position: 2", "unit: paragraph"], sections, keep_lines=True)
 
 
 def build_gita(src, out):
@@ -145,7 +145,7 @@ def build_gita(src, out):
         sections.append((n, f"{n}. {pretty(titles[n])}", units))
     assert [s[0] for s in sections] == list(range(1, 19))
     write(out, "bhagavad-gita", ["work: Bhagavad Gita (The Song Celestial)", "edition: Arnold translation (1885)", "slug: bhagavad-gita",
-                                 "collection: world-scripture", "position: 3", "unit: stanza"], sections, keep_lines=True)
+                                 "collection: sacred-texts", "position: 3", "unit: stanza"], sections, keep_lines=True)
 
 
 def build_meditations(src, out):
@@ -229,7 +229,7 @@ def build_quran(src, out):
         print("  verse count differs from the header:", mm)
     left = [(n, u[:60]) for n, _, us in sections for u in us if re.search(r"\d", u)]
     print("  units still containing digits:", len(left), left[:5])
-    write(out, "quran", ["work: Quran", "edition: Rodwell translation (1861)", "slug: quran", "collection: world-scripture",
+    write(out, "quran", ["work: Quran", "edition: Rodwell translation (1861)", "slug: quran", "collection: sacred-texts",
                           "position: 4", "unit: verse"], sections)
 
 

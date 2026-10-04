@@ -1,7 +1,7 @@
 work: Dhammapada
 edition: Müller translation (1881)
 slug: dhammapada
-collection: world-scripture
+collection: sacred-texts
 position: 1
 unit: verse
 
