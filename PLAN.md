@@ -54,7 +54,7 @@ Each step is small, can be checked on its own, and leaves the app working.
 
 - **History.** Built (see DECISIONS.md). Show where you've been recently (random hops make this matter) and jump straight back to any of those places. Global per user, not per focus, so a trail survives starting a new focus.
 - **Bookmarks/Favorites** (built as "Keep"; see DECISIONS.md). Sometimes I'll stumble across something profound that's unrelated to my current focus, but which I want to remember to come back to.
-- **Random, extended.** An "Another" button inside the reader to roll again in the same scope; configurable weighting (uniform today).
+- **Random, extended.** An "Another" button inside the reader to roll again in the same scope; configurable weighting (uniform today). Further, the "Random" button at the top of the reader page should probably have a different default than "everything." Perhaps a dropdown to select a specific scope, and defaulting to the current (innermost) collection (or work, if there is no containing collection).
 - **Library Search**. Search the entire library, or within a collection or work.
 
 ## Later (wanted, not scheduled)
