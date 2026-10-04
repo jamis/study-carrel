@@ -12,6 +12,8 @@
 #
 #   work: Isaiah
 #   edition: KJV
+#   author: Robert Frost    (optional; shown with the title in the library)
+#   author_short: Frost     (optional; used in the reading view, defaults to author)
 #   slug: isaiah-kjv        (optional; defaults to the parameterized name)
 #   collection: old-testament   (optional; a slug from collections.yml)
 #   position: 23            (optional; order within the whole library)
@@ -69,7 +71,8 @@ class TextLoader
 
     Work.transaction do
       work = Work.find_or_initialize_by(slug: slug)
-      work.update!(title: title, edition: meta["edition"], collection: collection, position: meta["position"].to_i,
+      work.update!(title: title, edition: meta["edition"], author: meta["author"].presence,
+                   author_short: meta["author_short"].presence, collection: collection, position: meta["position"].to_i,
                    unit_name: meta["unit"].presence || "verse")
       sections.each { |s| load_section(work, s) }
       work

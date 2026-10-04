@@ -1,5 +1,7 @@
 work: North of Boston
 edition: Collected Poems (1930)
+author: Robert Frost
+author_short: Frost
 slug: frost-north-of-boston
 collection: robert-frost
 position: 2

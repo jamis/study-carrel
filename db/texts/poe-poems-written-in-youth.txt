@@ -1,5 +1,7 @@
 work: Poems Written in Youth
 edition: 1900 edition
+author: Edgar Allan Poe
+author_short: Poe
 slug: poe-poems-written-in-youth
 collection: edgar-allan-poe
 position: 2

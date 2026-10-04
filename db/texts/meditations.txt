@@ -1,5 +1,6 @@
 work: Meditations
 edition: Casaubon translation (1634)
+author: Marcus Aurelius
 slug: meditations
 collection: prose
 position: 201

@@ -102,7 +102,7 @@ def main(src, out="db/texts"):
     order = ["Poems", "Poems Written in Youth", "Tamerlane", "Al Aaraaf"]
     for pos, g in enumerate(order, start=1):
         slug = "poe-" + g.lower().replace(" ", "-")
-        lines = [f"work: {g}", "edition: 1900 edition", f"slug: {slug}", "collection: edgar-allan-poe", f"position: {pos}",
+        lines = [f"work: {g}", "edition: 1900 edition", "author: Edgar Allan Poe", "author_short: Poe", f"slug: {slug}", "collection: edgar-allan-poe", f"position: {pos}",
                  "unit: stanza", "lines: keep", ""]
         for n, (label, st) in enumerate(works[g], start=1):
             lines += [f"section: {n}", f"label: {label}"]

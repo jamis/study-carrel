@@ -1,4 +1,6 @@
 work: Emily Dickinson
+author: Emily Dickinson
+author_short: Dickinson
 slug: dickinson
 collection: emily-dickinson
 position: 100

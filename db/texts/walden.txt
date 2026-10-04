@@ -1,4 +1,6 @@
 work: Walden
+author: Henry David Thoreau
+author_short: Thoreau
 slug: walden
 collection: prose
 position: 200

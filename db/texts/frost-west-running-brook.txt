@@ -1,5 +1,7 @@
 work: West-Running Brook
 edition: Collected Poems (1930)
+author: Robert Frost
+author_short: Frost
 slug: frost-west-running-brook
 collection: robert-frost
 position: 5

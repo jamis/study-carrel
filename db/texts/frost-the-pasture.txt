@@ -1,5 +1,7 @@
 work: The Pasture
 edition: Collected Poems (1930)
+author: Robert Frost
+author_short: Frost
 slug: frost-the-pasture
 collection: robert-frost
 position: 0

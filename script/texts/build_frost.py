@@ -87,7 +87,7 @@ def main(src, out="db/texts"):
     books = parse(src)
     total = 0
     for pos, ((title, slug), poems) in enumerate(zip(BOOKS, books)):
-        lines = [f"work: {title}", "edition: Collected Poems (1930)", f"slug: frost-{slug}", "collection: robert-frost",
+        lines = [f"work: {title}", "edition: Collected Poems (1930)", "author: Robert Frost", "author_short: Frost", f"slug: frost-{slug}", "collection: robert-frost",
                  f"position: {pos}", "unit: stanza", "lines: keep", ""]
         for n, (ptitle, blocks) in enumerate(poems, start=1):
             units = stanzas(blocks)

@@ -11,7 +11,7 @@
     <%= link_to "Random", random_work_path(@work.slug), class: "chip" %>
   </div>
   <h2 class="page-title"><%= @work.title %></h2>
-  <% if @work.edition.present? %><p class="page-lede"><%= @work.edition %> · <%= pluralize(@sections.size, "section") %></p><% end %>
+  <p class="page-lede"><%= [ @work.byline, @work.edition, pluralize(@sections.size, "section") ].compact_blank.join(" · ") %></p>
 
   <% if numbered %>
     <nav class="strip chapters" aria-label="Chapters">

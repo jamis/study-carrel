@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_03_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_04_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -145,6 +145,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_03_130000) do
     t.integer "collection_id"
     t.integer "position", default: 0, null: false
     t.string "unit_name", default: "verse", null: false
+    t.string "author"
+    t.string "author_short"
     t.index ["collection_id"], name: "index_works_on_collection_id"
     t.index ["slug"], name: "index_works_on_slug", unique: true
   end

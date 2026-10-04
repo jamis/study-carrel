@@ -171,7 +171,7 @@ def build_meditations(src, out):
                  for k, (v, _, end) in enumerate(marks)}
         sections.append((n, None, units))
     assert len(sections) == 12
-    write(out, "meditations", ["work: Meditations", "edition: Casaubon translation (1634)", "slug: meditations",
+    write(out, "meditations", ["work: Meditations", "edition: Casaubon translation (1634)", "author: Marcus Aurelius", "slug: meditations",
                                "collection: prose", "position: 201", "unit: section"], sections)
 
 

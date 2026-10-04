@@ -1,5 +1,7 @@
 work: Poems
 edition: 1900 edition
+author: Edgar Allan Poe
+author_short: Poe
 slug: poe-poems
 collection: edgar-allan-poe
 position: 1

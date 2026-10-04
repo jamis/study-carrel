@@ -18,7 +18,7 @@
     <% @works.each do |work| %>
       <%= link_to work_path(work), class: "work-link" do %>
         <span class="work-link-title"><%= work.title %></span>
-        <span class="work-link-meta"><%= work.edition.presence || pluralize(work.sections.size, "section") %></span>
+        <span class="work-link-meta"><%= [ work.byline, work.edition ].compact_blank.join(" · ").presence || pluralize(work.sections.size, "section") %></span>
       <% end %>
     <% end %>
   </div>

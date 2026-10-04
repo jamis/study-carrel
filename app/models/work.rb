@@ -20,6 +20,17 @@ class Work < ApplicationRecord
 
   def to_param = slug
 
+  def short_author = author_short.presence || author
+
+  # The author to show beside the title, unless the title already is the author (Emily Dickinson).
+  def byline
+    author if author.present? && !title.include?(author)
+  end
+
+  def short_byline
+    short_author if byline
+  end
+
   def name = [ title, edition ].compact_blank.join(" ")
 
   private

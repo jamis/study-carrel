@@ -52,7 +52,7 @@ def build_walden(path):
             i += 1
         heads.append(i)
         i += 1
-    out = ["work: Walden", "slug: walden", "collection: prose", "position: 200", "unit: paragraph", ""]
+    out = ["work: Walden", "author: Henry David Thoreau", "author_short: Thoreau", "slug: walden", "collection: prose", "position: 200", "unit: paragraph", ""]
     for n, (title, start) in enumerate(zip(CHAPTERS, heads), start=1):
         end = heads[n] if n < len(heads) else len(lines)
         paras = [" ".join(l.strip() for l in p.strip().split("\n")) for p in re.split(r"\n\s*\n", "\n".join(lines[start + 1:end])) if p.strip()]
@@ -81,7 +81,7 @@ def build_dickinson(path):
         if stanzas:
             label = title_case(title) if title else stanzas[0].split("\n")[0].rstrip(",;:—- ")
             poems.append((typography(label), stanzas))
-    out = ["work: Emily Dickinson", "slug: dickinson", "collection: emily-dickinson", "position: 100", "unit: stanza", "lines: keep", ""]
+    out = ["work: Emily Dickinson", "author: Emily Dickinson", "slug: dickinson", "collection: emily-dickinson", "position: 100", "unit: stanza", "lines: keep", ""]
     for n, (label, stanzas) in enumerate(poems, start=1):
         out += [f"section: {n}", f"label: {label}"]
         for k, st in enumerate(stanzas, start=1):
