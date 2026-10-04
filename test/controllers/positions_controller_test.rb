@@ -14,6 +14,18 @@ class PositionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal unit, @focus.reload.last_unit
   end
 
+  test "records the place in the user's history" do
+    patch position_path, params: { unit_id: verse(25).id }, as: :json
+    assert_equal [ verse(25) ], users(:one).visits.map(&:unit)
+  end
+
+  test "history is kept when there is no current focus" do
+    @focus.archive!
+    patch position_path, params: { unit_id: verse(25).id }, as: :json
+    assert_response :no_content
+    assert_equal 1, users(:one).visits.count
+  end
+
   test "the app reopens at the saved verse" do
     @focus.update!(last_unit: verse(25))
     get root_path

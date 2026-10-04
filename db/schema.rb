@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_04_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_04_150000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -137,6 +137,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_04_140000) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  create_table "visits", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "unit_id", null: false
+    t.datetime "visited_at", null: false
+    t.index ["unit_id"], name: "index_visits_on_unit_id"
+    t.index ["user_id", "unit_id"], name: "index_visits_on_user_id_and_unit_id", unique: true
+    t.index ["user_id", "visited_at"], name: "index_visits_on_user_id_and_visited_at"
+    t.index ["user_id"], name: "index_visits_on_user_id"
+  end
+
   create_table "works", force: :cascade do |t|
     t.string "title", null: false
     t.string "edition"
@@ -164,5 +174,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_04_140000) do
   add_foreign_key "sections", "works"
   add_foreign_key "sessions", "users"
   add_foreign_key "units", "sections"
+  add_foreign_key "visits", "units"
+  add_foreign_key "visits", "users"
   add_foreign_key "works", "collections"
 end

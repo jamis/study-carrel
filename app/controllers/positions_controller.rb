@@ -1,8 +1,9 @@
-# Remembers where the reader is in the current focus, so the app reopens there.
+# Remembers where the reader is, so the app reopens there: the place in the current focus, and the user's history.
 class PositionsController < ApplicationController
   def update
-    focus = Current.user.foci.current_one or return head(:no_content)
-    focus.update!(last_unit: Unit.find(params.expect(:unit_id)))
+    unit = Unit.find(params.expect(:unit_id))
+    Visit.record(Current.user, unit)
+    Current.user.foci.current_one&.update!(last_unit: unit)
     head :no_content
   end
 end

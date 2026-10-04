@@ -4,7 +4,6 @@ Last updated: 2026-10-02
 See `DECISIONS.md` for decisions and `prototype/index.html` for the reference design.
 
 ## Stack
-
 **Rails + Hotwire + SQLite.** (Rails confirmed by the user.)
 
 - Small, single-user, server-rendered app. Rails 8's built-in auth and PWA support cover most needs.
@@ -49,19 +48,24 @@ Each step is small, can be checked on its own, and leaves the app working.
 19b. ✅ **Random.** "Random" on the library, each collection and each work (and in the reader's menu) drops you into a random unit in lectio mode: uniform within a work or collection; the library picks a collection first. It moves your position like normal reading.
 20. ✅ **Polish.** An accessibility pass (lang, focus rings, live verse, aria state), feedback when a note fails to save, diagonal swipes ignored, a phone pass (two-row nav with a ⋯ menu, no zoomed-out page on long chapters, strip drags no longer turn the page), empty states (no texts loaded, empty library, "Add one" link on a focus with no description), edit-note (inline Lexxy form in a Turbo Frame; no "edited" marker), and a keyboard pass (Esc closes the focus dropdown and notes sheet, the verse strip is a single tab stop, a closed phone sheet is out of the tab order). Checked on a real iPhone: installs to the home screen and looks right.
 
-**v1 is complete.**
+**proof-of-concept is complete.**
+
+## Needed for v1
+
+- **History.** Built (see DECISIONS.md). Show where you've been recently (random hops make this matter) and jump straight back to any of those places. Global per user, not per focus, so a trail survives starting a new focus.
+- **Bookmarks/Favorites**. Sometimes I'll stumble across something profound that's unrelated to my current focus, but which I want to remmember to come back to.
+- **Random, extended.** An "Another" button inside the reader to roll again in the same scope; configurable weighting (uniform today).
+- **Library Search**. Search the entire library, or within a collection or work.
 
 ## Later (wanted, not scheduled)
 
-- **History.** Show where you've been recently (random hops make this matter) and jump straight back to any of those places. Likely a per-focus list of recently visited units, written when the position is saved.
 - **New user signups.** Done (invitation links). Not yet: password reset, removing users or revoking access, emailing invitations, encrypting notes.
 - **More works**. Religious texts, as well as more classics and poetry. Done: KJV New Testament, Book of Mormon, Poe, Frost, Dhammapada, Tao Te Ching, Bhagavad Gita, Quran (Rodwell, traditional sura order restored), Marcus Aurelius. Candidates: Upanishads, Analects, Zhuangzi, Apocrypha, Augustine, Thomas à Kempis, Whitman, Blake, Shakespeare's sonnets, Emerson.
 - **Doctrine and Covenants and Pearl of Great Price.** Deferred: no clean public-domain text exists online. The Wikisource D&C is the modern copyrighted text. Options are OCR of the 1908 Deseret News D&C (archive.org `thedoctrineandco00smituoft`) cross-checked against two other pre-1923 scans, and the 1913 Pearl of Great Price on Wikisource. Label both as older public-domain editions; D&C 138 and the Official Declarations would be missing.
 - **User-uploaded works**. Allow users to (somehow?) upload works that exist only in their library. Perhaps allow user's to share these works with other users?
-- **Random, extended.** An "Another" button inside the reader to roll again in the same scope; configurable weighting (uniform today).
 - **Backups, extended.** A scheduled restore check, and a resize to 1 GB if the 512 MB droplet feels tight.
 
 ## Notes
 
 - Suggested first batch: steps 1-3 together, then check in after step 6.
-- Deferred from v1 (see `DECISIONS.md`): full-chapter reading view, verse ranges, word-level highlights, cross-reference links, "current answer" history, Margin Map / Synthesis, offline support, search.
+- Deferred from v1 (see `DECISIONS.md`): full-chapter reading view, verse ranges, word-level highlights, cross-reference links, Margin Map / Synthesis, offline support.

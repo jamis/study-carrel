@@ -29,6 +29,7 @@ Rails.application.routes.draw do
   resources :notes, only: :index do
     get :export, on: :collection
   end
+  get "history", to: "history#index"
   get "library", to: "library#index"
   get "random", to: "random_readings#show", as: :random
   get "collections/:collection/random", to: "random_readings#show", as: :random_collection
