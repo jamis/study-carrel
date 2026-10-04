@@ -33,7 +33,7 @@ class PositionsControllerTest < ActionDispatch::IntegrationTest
     @focus.update!(last_unit: verse(25))
     users(:one).foci.start!(title: "Next")
     get root_path
-    assert_redirected_to reading_path("isaiah-kjv", 1)
+    assert_redirected_to library_path
   end
 
   test "the page tells the controller where to report" do

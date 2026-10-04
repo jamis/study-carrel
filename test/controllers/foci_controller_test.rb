@@ -19,7 +19,8 @@ class FociControllerTest < ActionDispatch::IntegrationTest
     post foci_path, params: { focus: { title: "What does it mean to be holy?", description: "Set apart or good?" } }
     assert_redirected_to root_path
     follow_redirect!
-    follow_redirect!
+    assert_redirected_to library_path
+    get reading_path("isaiah-kjv", 1)
     assert_select ".focus-title", "What does it mean to be holy?"
     assert_select ".focus-body", /Set apart or good/
     assert_select ".pfocus", "What does it mean to be holy?"

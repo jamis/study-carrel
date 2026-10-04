@@ -10,9 +10,7 @@ class HomeController < ApplicationController
       return redirect_to reading_path(unit.section.work.slug, unit.section.number, unit.number)
     end
 
-    section = Section.joins(:work).order("works.position", "works.id", :number).first
-    return render :no_texts unless section
-
-    redirect_to reading_path(section.work.slug, section.number)
+    # Nothing read yet under this focus: let them choose where to begin.
+    redirect_to library_path
   end
 end
