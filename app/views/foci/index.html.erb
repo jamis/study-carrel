@@ -1,10 +1,10 @@
-<% content_for :title, "Foci · Study Carrel" %>
+<% content_for :title, "Focuses · Study Carrel" %>
 <main class="page">
   <div class="page-bar">
     <%= link_to "← Back to reading", root_path, class: "chip" %>
     <%= link_to "New focus", new_focus_path, class: "chip" %>
   </div>
-  <h2 class="page-title">Foci</h2>
+  <h2 class="page-title">Focuses</h2>
 
   <% if @current %>
     <h3 class="page-sub">Current</h3>
@@ -16,7 +16,7 @@
 
   <h3 class="page-sub">Past</h3>
   <% if @past.empty? %>
-    <p class="page-empty">Nothing here yet. Foci you set aside will be kept here.</p>
+    <p class="page-empty">Nothing here yet. Focuses you set aside will be kept here.</p>
   <% end %>
   <% @past.each do |focus| %>
     <div class="list-row">

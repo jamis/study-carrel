@@ -33,6 +33,7 @@
                 data-menu-target="button" data-action="menu#toggle">⋯</button>
         <div class="menu-panel" id="nav-menu" data-menu-target="panel">
           <%= render "notes/all_link", focus: focus if focus %>
+          <%= link_to "All focuses", foci_path, class: "menu-item" %>
           <button class="menu-item menu-history" type="button" data-history-open data-action="menu#close">Recent places<kbd>h</kbd></button>
           <% unless reading %><%= link_to "Continue reading", root_path, class: "menu-item" %><% end %>
           <%= link_to "Random", random, class: "menu-item" %>
