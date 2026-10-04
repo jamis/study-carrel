@@ -7,6 +7,7 @@ export default class extends Controller {
   // On phones the on-screen keyboard covers the bottom of the page without resizing it. Track the
   // visible area so the sheet can sit above the keyboard and shrink to fit (--kb, --vvh in the CSS).
   connect() {
+    this.#trackHeader()
     this.viewport = window.visualViewport
     if (!this.viewport) return
     this.fit = () => this.#fit()
@@ -16,6 +17,7 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.headerObserver?.disconnect()
     this.viewport?.removeEventListener("resize", this.fit)
     this.viewport?.removeEventListener("scroll", this.fit)
   }
@@ -34,6 +36,17 @@ export default class extends Controller {
     this.element.classList.toggle("open", open)
     this.labelTarget.textContent = open ? "Close ▾" : "Notes ▴"
     this.handleTarget.setAttribute("aria-expanded", open)
+  }
+
+  // The side panel sticks just below the sticky header, whose height varies (the focus band can wrap
+  // or open its description), so publish it as --top-h on the document.
+  #trackHeader() {
+    const header = document.querySelector("header.top")
+    if (!header) return
+    const set = () => document.documentElement.style.setProperty("--top-h", `${header.offsetHeight}px`)
+    this.headerObserver = new ResizeObserver(set)
+    this.headerObserver.observe(header)
+    set()
   }
 
   #fit() {
