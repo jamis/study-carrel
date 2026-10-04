@@ -3,7 +3,7 @@
   <div class="nav">
     <div class="nav-in">
       <%= link_to "Study Carrel", library_path, class: "brand", title: "Library" %>
-      <%= link_to work_path(@section.work), class: "where", title: "Chapters in #{@section.work.title}" do %><%= @section.name %><small><%= [ @section.work.short_byline, @section.work.edition ].compact_blank.join(" · ") %></small><% end %>
+      <%= link_to work_path(@section.work), class: "where", title: "#{@section.name}: chapters in #{@section.work.title}", data: { controller: "fit" } do %><%= @section.name %><small><%= [ @section.work.short_byline, @section.work.edition ].compact_blank.join(" · ") %></small><% end %>
       <%= render "notes/all_link", focus: @focus %>
       <div class="menu" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
         <button class="icon-btn menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-menu"
@@ -28,6 +28,7 @@
       data-action="note:saved@window->lectio#noteSaved"
       data-lectio-base-value="<%= reading_path(@section.work.slug, @section.number) %>"
       data-lectio-ref-template-value="<%= @section.reference_template %>"
+      data-lectio-ref-unit-template-value="<%= @section.reference_unit_template %>"
       data-lectio-unit-name-value="<%= unit_noun(@section) %>"
       data-lectio-prev-url-value="<%= edge_url(@previous_section, :previous) %>"
       data-lectio-prev-label-value="<%= @previous_section&.name %>"
@@ -44,7 +45,7 @@
   <% next_unit = @units[at + 1] %>
   <article class="lectio" data-action="touchstart->lectio#touchStart touchend->lectio#touchEnd keydown@document->lectio#key">
     <div class="near<%= " edge" if !prev_unit && @previous_section %>" aria-hidden="true" data-lectio-target="prev" data-action="click->lectio#previous"><% if prev_unit %><b><%= prev_unit.number %></b><%= prev_unit.body %><% elsif @previous_section %><b>←</b><%= @previous_section.name %><% end %></div>
-    <div class="now <%= unit_size_class(@current.body) %>" aria-live="polite" data-lectio-target="now"><span class="ref" data-lectio-target="ref"><%= unit_ref(@section, @current) %></span><span data-lectio-target="body"><%= @current.body %></span></div>
+    <div class="now <%= unit_size_class(@current.body) %>" aria-live="polite" data-lectio-target="now"><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span><span data-lectio-target="body"><%= @current.body %></span></div>
     <div class="near<%= " edge" if !next_unit && @next_section %>" aria-hidden="true" data-lectio-target="next" data-action="click->lectio#next"><% if next_unit %><b><%= next_unit.number %></b><%= next_unit.body %><% elsif @next_section %><b>→</b><%= @next_section.name %><% end %></div>
     <div class="steps">
       <button class="chip" type="button" data-action="lectio#previous">← Previous</button>
@@ -60,12 +61,12 @@
 
   <aside class="panel" data-controller="sheet" data-action="keydown.esc@window->sheet#escape">
     <button class="panel-handle" type="button" aria-expanded="false" data-sheet-target="handle" data-action="sheet#toggle">
-      <span class="ref" data-lectio-target="ref"><%= unit_ref(@section, @current) %></span>
+      <span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span>
       <span class="count" data-lectio-target="count">Notes</span>
       <span class="go" data-sheet-target="label">Notes ▴</span>
     </button>
     <div class="panel-head">
-      <div class="ref" data-lectio-target="ref"><%= unit_ref(@section, @current) %></div>
+      <div class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></div>
       <div class="pfocus"><%= @focus.title %></div>
     </div>
     <div class="composer">

@@ -3,8 +3,8 @@ import { Turbo } from "@hotwired/turbo-rails"
 
 // Switches verses client-side; the whole section is already on the page.
 export default class extends Controller {
-  static targets = ["unit", "prev", "now", "body", "next", "ref", "tick", "count", "strip", "editor"]
-  static values = { current: Number, base: String, refTemplate: String, positionUrl: String, unitName: String,
+  static targets = ["unit", "prev", "now", "body", "next", "ref", "refUnit", "tick", "count", "strip", "editor"]
+  static values = { current: Number, base: String, refTemplate: String, refUnitTemplate: String, positionUrl: String, unitName: String,
     noteUrlTemplate: String, prevUrl: String, prevLabel: String, nextUrl: String, nextLabel: String }
 
   connect() {
@@ -14,13 +14,25 @@ export default class extends Controller {
     this.unitIds = new Map(this.unitTargets.map(u => [Number(u.dataset.number), Number(u.dataset.unitId)]))
     // Which verses have a note; the editor reports changes as it autosaves.
     this.noted = new Set(this.tickTargets.filter(t => t.classList.contains("has")).map(t => Number(t.dataset.number)))
+    this.fitRefs = () => this.refTargets.forEach(r => this.fitRef(r))
+    this.refObserver = new ResizeObserver(this.fitRefs)
+    this.refTargets.filter(r => r.closest(".panel")).forEach(r => this.refObserver.observe(r))
     this.updateCount()
     this.scrollStripToCurrent()
     this.savePosition()
   }
 
   disconnect() {
+    this.refObserver?.disconnect()
     clearTimeout(this.saveTimer)
+  }
+
+  // In the notes panel, drop the work title when the full reference won't fit (the section name then ellipsizes).
+  fitRef(ref) {
+    if (!ref.closest(".panel") || !ref.clientWidth) return
+    ref.classList.remove("tight")
+    const needed = [...ref.children].reduce((sum, c) => sum + (c.classList.contains("ref-section") ? c.scrollWidth : c.offsetWidth), 0)
+    ref.classList.toggle("tight", needed > ref.clientWidth)
   }
 
   next() { this.step(1) }
@@ -68,7 +80,9 @@ export default class extends Controller {
     const body = this.bodies.get(n)
     this.nowTarget.className = "now" + (body.length > 450 ? " long" : body.length > 180 ? " mid" : "")
     this.bodyTarget.textContent = body
-    this.refTargets.forEach(r => r.textContent = this.refTemplateValue.replace("{n}", n))
+    this.refUnitTargets.forEach(r => r.textContent = this.refUnitTemplateValue.replace("{n}", n))
+    this.refTargets.forEach(r => r.title = this.refTemplateValue.replace("{n}", n))
+    this.fitRefs()
     this.tickTargets.forEach(t => {
       const current = Number(t.dataset.number) === n
       t.classList.toggle("current", current)
