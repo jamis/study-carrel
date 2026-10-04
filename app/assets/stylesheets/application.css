@@ -238,7 +238,7 @@
     .panel.open .panel-handle { height: 48px; }
     .panel-head { padding-top: 0; }
     .panel-head .pfocus { margin-top: 0; }
-    .panel .composer lexxy-editor { --lexxy-editor-rows: 3lh; }
+    .panel .composer lexxy-editor { --lexxy-editor-rows: 6lh; }
     .panel-head .ref { display: none; }
   }
 
@@ -301,7 +301,7 @@ lexxy-editor, .lexxy-content {
   font-family: var(--serif);
 }
 .composer lexxy-editor { --lexxy-color-canvas: var(--paper); --lexxy-editor-rows: 10lh; font-size: 16.5px; border-radius: 10px 10px 0 0; flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.composer .lexxy-editor__content { flex: 1; min-height: 0; overflow-y: auto; }
+.composer .lexxy-editor__content { flex: 1; min-height: max(3lh, min(var(--lexxy-editor-rows), calc(var(--vvh, 100vh) - 380px))); overflow-y: auto; }
 .composer form { border-radius: 10px; }
 .composer form:has(.lexxy-editor__content:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
 .composer .lexxy-editor__content:focus-visible { outline: none; }
