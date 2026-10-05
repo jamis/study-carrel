@@ -89,6 +89,7 @@ class TextLoader
 
     rows = data[:units].map { |number, body| { section_id: section.id, number: number, body: body } }
     Unit.upsert_all(rows, unique_by: %i[section_id number]) if rows.any?
+    Unit.reindex_search([ section.id ])
   end
 
   def find_collection(slug)

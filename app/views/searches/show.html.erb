@@ -1,0 +1,55 @@
+<% content_for :title, "#{"#{@search.query} · " if @search.searching?}Search · Study Carrel" %>
+<%= render "shared/header", crumbs: [ [ "Library", library_path, nil ], [ "Search", search_path, nil ] ],
+      random: (RandomScope.chain_for(@place) if @place), focus: Current.focus %>
+<main class="page">
+  <h2 class="page-title">Search</h2>
+  <%= render "shared/search_form", place: @place, query: @search.query, autofocus: !@search.searching? %>
+
+  <% if @place %>
+    <nav class="search-scopes" aria-label="Search in">
+      <% RandomScope.chain_for(@place).each do |scope| %>
+        <%= link_to scope.label, search_in_path(@search.query, scope.place), class: "chip#{" current" if scope.place == @place}",
+              aria: { current: (true if scope.place == @place) } %>
+      <% end %>
+    </nav>
+  <% end %>
+
+  <% if !@search.searching? %>
+    <p class="search-hint">Every word must appear. Put a phrase in "quotes", and end a word with * to match its beginning, as in <i>sanctif*</i>.</p>
+  <% elsif @search.total.zero? %>
+    <p class="page-empty">Nothing matches <%= @search.query %><%= " in #{RandomScope.new(@place).label}" if @place %>.</p>
+  <% else %>
+    <% first = (@page - 1) * LibrarySearch::PER_PAGE + 1 %>
+    <p class="page-lede search-summary">
+      <%= pluralize(@search.total, "passage") %><%= ", #{first}–#{first + @units.size - 1} shown" if @search.pages > 1 && @units.any? %>
+    </p>
+
+    <% if @search.counts.size > 1 %>
+      <%# A long list (a common word across the library) folds away so the passages stay near the top. %>
+      <%= tag.details class: "search-works", open: @search.counts.size <= 12 do %>
+        <summary>In <%= pluralize(@search.counts.size, "work") %></summary>
+        <ul class="search-counts" aria-label="Passages per work">
+          <% @search.counts.each do |work, count| %>
+            <li><%= link_to search_in_path(@search.query, work), title: [ work.byline, work.edition ].compact_blank.join(" · ").presence do %><%= work.title %> <span><%= count %></span><% end %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    <% end %>
+
+    <% @units.each do |unit|
+      section = unit.section %>
+      <section class="fv-item">
+        <%= link_to reading_path(section.work.slug, section.number, unit.number), class: "fv-ref" do %><%= unit.reference %><% if section.work.short_byline %><span class="search-by"> · <%= section.work.short_byline %></span><% end %><% end %>
+        <p class="fv-quote search-excerpt"><%= search_excerpt(unit.excerpt) %></p>
+      </section>
+    <% end %>
+
+    <% if @search.pages > 1 %>
+      <nav class="search-pages" aria-label="Pages">
+        <% if @page > 1 %><%= link_to "← Previous", search_in_path(@search.query, @place, page: @page - 1), class: "chip" %><% end %>
+        <span>Page <%= @page %> of <%= @search.pages %></span>
+        <% if @page < @search.pages %><%= link_to "Next →", search_in_path(@search.query, @place, page: @page + 1), class: "chip" %><% end %>
+      </nav>
+    <% end %>
+  <% end %>
+</main>

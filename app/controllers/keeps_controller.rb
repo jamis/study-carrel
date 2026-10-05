@@ -6,7 +6,7 @@ class KeepsController < ApplicationController
   def index
     keeps = Current.user.keeps.preload(unit: { section: :work })
     @keeps = if params[:order] == "reading"
-      keeps.joins(unit: { section: :work }).order("works.position", "works.id", "sections.number", "units.number")
+      keeps.joins(unit: :section).in_order_of(:"sections.work_id", Work.ids_in_library_order).order("sections.number", "units.number")
     else
       keeps.order(created_at: :desc, id: :desc)
     end

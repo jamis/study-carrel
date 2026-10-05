@@ -15,6 +15,12 @@ namespace :study_carrel do
   task load_texts: :environment do
     TextLoader.load_all.each { |w| puts "Loaded #{w.name}: #{w.sections.count} section(s)" }
   end
+
+  desc "Rebuild the full-text search index from the loaded texts"
+  task reindex: :environment do
+    Unit.reindex_search
+    puts "Indexed #{Unit.count} units."
+  end
 end
 
 namespace :study_carrel do

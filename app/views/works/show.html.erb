@@ -4,6 +4,7 @@
 <main class="page">
   <h2 class="page-title"><%= @work.title %></h2>
   <p class="page-lede"><%= [ @work.byline, @work.edition, pluralize(@sections.size, "section") ].compact_blank.join(" · ") %></p>
+  <%= render "shared/search_form", place: @work %>
 
   <% if numbered %>
     <nav class="strip chapters" aria-label="Chapters">

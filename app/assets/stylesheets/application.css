@@ -439,3 +439,27 @@ a.tick { display: inline-flex; align-items: center; justify-content: center; tex
 .page-bar-actions .chip.current { border-color: var(--accent); color: var(--accent); }
 .kept-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; font-family: var(--sans); }
 .start-from { margin-bottom: 18px; }
+
+/* ---------- search ---------- */
+.search-form { display: flex; gap: 8px; align-items: center; margin: 0 0 24px; font-family: var(--sans); }
+.search-form input[type="search"] {
+  flex: 1; min-width: 0; font: inherit; font-size: 16px; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--rule); border-radius: 10px; padding: 9px 12px;
+}
+.search-form input[type="search"]:focus { border-color: var(--accent); outline: none; }
+.search-form .chip { padding: 9px 14px; }
+.search-scopes { display: flex; flex-wrap: wrap; gap: 8px; margin: -12px 0 22px; }
+.search-scopes .chip.current { border-color: var(--accent); color: var(--accent); }
+.search-hint { color: var(--ink-soft); font-family: var(--sans); font-size: 13px; }
+.search-summary { margin-bottom: 10px; }
+.search-works { margin: 0 0 28px; font-family: var(--sans); font-size: 13px; }
+.search-works summary { cursor: pointer; color: var(--ink-soft); width: max-content; margin-bottom: 8px; }
+.search-works summary:hover { color: var(--accent); }
+.search-counts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-family: var(--sans); font-size: 13px; }
+.search-counts a { text-decoration: none; }
+.search-counts a:hover { text-decoration: underline; }
+.search-counts span { color: var(--ink-soft); }
+.search-by { text-transform: none; letter-spacing: 0; color: var(--ink-soft); }
+.search-excerpt { font-style: normal; color: var(--ink); }
+.search-excerpt mark { background: var(--hl); color: inherit; border-radius: 2px; padding: 0 1px; }
+.search-pages { display: flex; align-items: center; justify-content: center; gap: 14px; font-family: var(--sans); font-size: 13px; color: var(--ink-soft); margin-top: 8px; }

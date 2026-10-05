@@ -1,0 +1,10 @@
+<%# A search box. place: the work or collection to search in (nil for the whole library); query: what to prefill. %>
+<% place = local_assigns[:place]
+   label = place.is_a?(Work) ? place.title : place&.name %>
+<%= form_with url: search_path, method: :get, class: "search-form", role: "search" do |f| %>
+  <% search_place_params(place).each do |name, slug| %><%= hidden_field_tag name, slug, id: nil %><% end %>
+  <%= f.search_field :q, value: local_assigns[:query], placeholder: label ? "Search #{label}" : "Search the library",
+        aria: { label: label ? "Search #{label}" : "Search the library" }, autocomplete: "off", enterkeyhint: "search",
+        autofocus: local_assigns[:autofocus], data: { search_input: true } %>
+  <button class="chip" type="submit">Search</button>
+<% end %>

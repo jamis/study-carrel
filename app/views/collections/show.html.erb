@@ -3,6 +3,7 @@
 <main class="page">
   <h2 class="page-title"><%= @collection.name %></h2>
   <% if @collection.description.present? %><p class="page-lede"><%= @collection.description %></p><% end %>
+  <%= render "shared/search_form", place: @collection %>
 
   <%= render partial: "collections/row", collection: @children, as: :collection, locals: { work_counts: @work_counts } %>
 

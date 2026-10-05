@@ -38,6 +38,7 @@
           <%= link_to "All focuses", foci_path, class: "menu-item" %>
           <button class="menu-item menu-history" type="button" data-history-open data-action="menu#close">Recent places<kbd>h</kbd></button>
           <% unless reading %><%= link_to "Continue reading", root_path, class: "menu-item" %><% end %>
+          <%= link_to search_path, class: "menu-item", data: { controller: "search-key", action: "keydown@window->search-key#key" } do %>Search<kbd>/</kbd><% end %>
           <%= render "shared/random_menu", scopes: random, default: random_default %>
           <%= link_to "Kept", kept_path, class: "menu-item" %>
           <button class="menu-item" type="button" data-action="theme#toggle">Light / dark</button>

@@ -33,6 +33,7 @@ Rails.application.routes.draw do
   get "history", to: "history#index"
   get "kept", to: "keeps#index"
   get "library", to: "library#index"
+  get "search", to: "searches#show"
   get "random", to: "random_readings#show", as: :random
   get "collections/:collection/random", to: "random_readings#show", as: :random_collection
   get "works/:work/random", to: "random_readings#show", as: :random_work

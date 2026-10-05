@@ -18,6 +18,15 @@ class Work < ApplicationRecord
       collection&.work_before
   end
 
+  # Every work's id in library order: the top-level collections in turn, each collection's own works before its child
+  # collections' (as Collection#first_work reads), then the works in no collection. Positions only order siblings.
+  def self.ids_in_library_order
+    works = ordered.pluck(:id, :collection_id).group_by(&:last)
+    collections = Collection.ordered.pluck(:id, :parent_id).group_by(&:last)
+    inside = ->(id) { works.fetch(id, []).map(&:first) + collections.fetch(id, []).flat_map { inside.(it.first) } }
+    collections.fetch(nil, []).flat_map { inside.(it.first) } + works.fetch(nil, []).map(&:first)
+  end
+
   def to_param = slug
 
   def short_author = author_short.presence || author
