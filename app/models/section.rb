@@ -17,7 +17,7 @@ class Section < ApplicationRecord
 
   # The reference's leading part split in two: the work title (which the panel may drop when space is short) and the
   # section name. Numbered chapters have no separable title ("Isaiah 40").
-  def reference_name_parts = numbered? ? ["", name] : ["#{work.title}: ", display_label]
+  def reference_name_parts = numbered? ? [ "", name ] : [ "#{work.title}: ", display_label ]
 
   # The same reference in parts, so a long name can truncate while the unit number stays visible.
   def reference_unit_template = numbered? ? ":{n}" : ", #{work.unit_name} {n}"
