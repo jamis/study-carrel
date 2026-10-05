@@ -18,6 +18,11 @@ class UnitNotesControllerTest < ActionDispatch::IntegrationTest
     assert_match "All notes (1)", response.body
   end
 
+  test "note text is kept out of the logs" do
+    put unit_note_path(@unit), params: { note: { content: "Private thought." } }, as: :turbo_stream
+    assert_equal "[FILTERED]", request.filtered_parameters.dig("note", "content")
+  end
+
   test "later saves update the same note" do
     put unit_note_path(@unit), params: { note: { content: "one" } }, as: :turbo_stream
     assert_no_difference "Note.count" do
