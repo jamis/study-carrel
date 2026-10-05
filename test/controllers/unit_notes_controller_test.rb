@@ -26,6 +26,14 @@ class UnitNotesControllerTest < ActionDispatch::IntegrationTest
     assert_response :conflict
   end
 
+  test "a save with no current focus is refused, not redirected" do
+    @focus.archive!
+    assert_no_difference "Note.count" do
+      put unit_note_path(@unit), params: { focus_id: @focus.id, note: { content: "Too late." } }, as: :turbo_stream
+    end
+    assert_response :conflict
+  end
+
   test "a save that names the current focus goes through" do
     put unit_note_path(@unit), params: { focus_id: @focus.id, note: { content: "Incomparable." } }, as: :turbo_stream
     assert_response :success

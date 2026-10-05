@@ -26,6 +26,21 @@ class AutosaveTest < ApplicationSystemTestCase
     assert_equal "To whom then will ye liken me?", @focus.notes.find_by!(unit: verse(25)).content.to_plain_text.strip
   end
 
+  test "a save bounced to sign-in isn't reported as saved, and goes through once signed in again" do
+    visit reading_path("isaiah-kjv", 40, 25)
+    Session.update_all(created_at: 31.days.ago)
+
+    find("lexxy-editor [contenteditable]").send_keys "Have ye not known?"
+    assert_text "Not saved: you've been signed out"
+    assert_no_text "Saved"
+    assert_not @focus.notes.exists?(unit: verse(25))
+
+    Session.update_all(created_at: Time.current)
+    execute_script "window.dispatchEvent(new Event('online'))"
+    assert_text "Saved"
+    assert_equal "Have ye not known?", @focus.notes.find_by!(unit: verse(25)).content.to_plain_text.strip
+  end
+
   private
 
   # Swap in a fetch that fails note saves (as a dropped connection would) and counts them.

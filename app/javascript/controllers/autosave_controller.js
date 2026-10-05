@@ -89,7 +89,7 @@ export default class extends Controller {
       if (!response.ok) {
         // Server trouble may pass; any other refusal will only repeat.
         retry = response.status >= 500 || response.status === 408 || response.status === 429
-        if (response.status === 409) failure = "Not saved: a different focus is current now."
+        if (response.status === 409) failure = "Not saved: this focus is no longer current."
         else if (!retry) failure = "Couldn't save this note."
         throw new Error(response.status)
       }
