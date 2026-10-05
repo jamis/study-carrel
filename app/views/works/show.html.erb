@@ -8,7 +8,7 @@
   <% if numbered %>
     <nav class="strip chapters" aria-label="Chapters">
       <% @sections.each do |section| %>
-        <%= link_to section.number, reading_path(@work.slug, section.number, section.units.first.number),
+        <%= link_to section.number, reading_path(@work.slug, section.number, @first_unit_numbers[section.id]),
               class: "tick#{" has" if @noted_section_ids.include?(section.id)}",
               aria: { label: "#{section.name}#{", has notes" if @noted_section_ids.include?(section.id)}" } %>
       <% end %>
@@ -17,7 +17,7 @@
     <ol class="section-list">
       <% @sections.each do |section| %>
         <li>
-          <%= link_to section.label.presence || section.number, reading_path(@work.slug, section.number, section.units.first.number) %>
+          <%= link_to section.label.presence || section.number, reading_path(@work.slug, section.number, @first_unit_numbers[section.id]) %>
           <% if @noted_section_ids.include?(section.id) %><span class="noted-dot" title="Has notes"></span><% end %>
         </li>
       <% end %>
