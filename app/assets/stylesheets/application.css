@@ -3,6 +3,7 @@
     --paper: #fbf8f1;
     --ink: #2b2620;
     --ink-soft: #6b6256;
+    --ink-faint: #a39a8c;
     --rule: #e2d9c8;
     --accent: #8a4b2a;
     --accent-soft: #f0dcc9;
@@ -12,13 +13,13 @@
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
   :root[data-theme="dark"] {
-    --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685;
+    --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685; --ink-faint: #6e665a;
     --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d; --hl: #5a4a1e;
     --shadow: 0 8px 30px rgba(0, 0, 0, .5);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685;
+      --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685; --ink-faint: #6e665a;
       --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d; --hl: #5a4a1e;
       --shadow: 0 8px 30px rgba(0, 0, 0, .5);
     }
@@ -68,16 +69,11 @@
   .icon-btn { border: 0; background: transparent; padding: 6px 8px; border-radius: 8px; font-size: 16px; }
   .icon-btn:hover { background: var(--accent-soft); }
 
-  /* ---------- focus: compact, always visible ---------- */
-  .focus {
-    position: relative;
-    background: var(--paper);
-    border-bottom: 1px solid var(--rule);
-  }
+  /* ---------- focus: tops the reading column (sticky), quiet: a small label and an italic title; the description drops down ---------- */
+  .focus { position: relative; }
   .focus-head {
-    max-width: 1180px; margin: 0 auto; padding: 10px 16px;
     display: flex; align-items: baseline; justify-content: flex-start; gap: 12px;
-    width: 100%; border: 0; background: none; text-align: left; cursor: pointer;
+    width: 100%; padding: 0; border: 0; background: none; text-align: left; cursor: pointer;
   }
   .focus-label {
     flex: none; font-family: var(--sans); font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
@@ -88,20 +84,21 @@
     font-size: clamp(16px, 2.4vw, 20px); line-height: 1.3; text-wrap: balance;
   }
   .focus-head:hover .focus-title { color: var(--accent); }
-  .focus-caret { flex: none; color: var(--ink-soft); font-family: var(--sans); font-size: 13px; transition: transform .2s; }
+  .focus-caret { flex: none; color: var(--ink-faint); font-family: var(--sans); font-size: 12px; transition: transform .2s; }
   .focus.open .focus-caret { transform: rotate(180deg); }
   .focus-body {
-    display: none; position: absolute; left: 0; right: 0; top: 100%;
-    background: var(--paper); border-bottom: 1px solid var(--rule); box-shadow: var(--shadow);
+    display: none; position: absolute; left: -16px; top: calc(100% + 8px); z-index: 25; width: min(560px, calc(100vw - 16px));
     max-height: 60vh; overflow-y: auto;
+    background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--shadow);
   }
   .focus.open .focus-body { display: block; }
-  .focus-body-in { max-width: 1180px; margin: 0 auto; padding: 14px 16px 18px; color: var(--ink-soft); font-size: 17px; }
+  .focus-body-in { padding: 14px 16px 18px; color: var(--ink-soft); font-size: 17px; }
   .focus-body-in > p { max-width: 60ch; }
   .focus-body p { margin: 0 0 10px; }
   .focus-actions { display: flex; gap: 8px; align-items: center; font-family: var(--sans); }
   @media (max-width: 599px) {
-    .focus-head { gap: 8px; padding: 7px 12px; }
+    .focus-head { gap: 8px; }
+    .focus-body { left: -8px; }
   }
 
   /* Recent places: opened from the menu (or with h); a short list under the nav (full width on phones). */
@@ -136,9 +133,9 @@
     .history-panel { left: 12px; right: 12px; width: auto; }
   }
 
-  /* Keep: a bookmark ribbon beside the passage's reference. The whole row sticks below the header while a long passage scrolls. */
+  /* Keep: a bookmark ribbon beside the passage's reference. The whole row sticks below the focus while a long passage scrolls. */
   .now-head {
-    position: sticky; top: var(--top-h, 96px); z-index: 2; display: flex; align-items: center;
+    position: sticky; top: var(--top-h, 60px); z-index: 2; display: flex; align-items: center;
     margin-bottom: 4px; padding: 4px 0 10px;
     background: linear-gradient(var(--band) calc(100% - 10px), transparent); /* text scrolling under it fades out instead of being cut */
   }
@@ -198,56 +195,90 @@
     .menu-panel .menu-item, .menu-panel .signout button { min-height: 44px; }
   }
 
-  /* ---------- layout ---------- */
-  .layout {
-    max-width: 1180px; margin: 0 auto;
-    display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 40px;
-    padding: 0 16px 120px;
-  }
-  @media (max-width: 899px) { .layout { grid-template-columns: minmax(0, 1fr); padding-bottom: 150px; } }
-  /* The sticky side panel can't leave the grid area; padding outside it would push the panel up near the end of the page. */
-  @media (min-width: 900px) { .layout { padding-bottom: 0; } .layout > .panel { margin-top: 28px; } }
+  /* ---------- reader: a rail of tools | the passage | the note, docked ---------- */
+  .reader { display: grid; grid-template-columns: 52px minmax(0, 1fr) 380px; min-height: 100vh; }
+  @media (max-width: 1099px) { .reader { grid-template-columns: 52px minmax(0, 1fr) 340px; } }
 
-  /* ---------- lectio ---------- */
-  .lectio {
-    max-width: 34em; margin: 0; width: 100%; text-align: left;
-    display: flex; flex-direction: column; gap: 14px; padding: 0 0 20px;
-    touch-action: pan-y;
+  /* The rail: quiet icons down the left edge; their popovers open to the right. */
+  .rail {
+    position: sticky; top: 0; z-index: 20; height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 0;
   }
-  @media (min-width: 900px) { .lectio { max-width: none; } }
-  .near {
-    font-size: 15px; color: var(--ink-soft); opacity: .38; cursor: pointer; line-height: 1.45;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-    text-wrap: pretty;
+  .rail-item, .rail .history { position: relative; display: flex; }
+  .rail-spacer { flex: 1; }
+  .rail-btn {
+    display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; min-width: 0; min-height: 0; padding: 0;
+    color: var(--ink-faint); text-decoration: none;
   }
-  .near:hover { opacity: .85; }
-  .now, .near { white-space: pre-line; }
-  .near:empty { display: none; }
-  /* No gap under the focus band when the verse starts the screen; a faded neighbor up there brings its own. */
-  .near:first-child { padding-top: 14px; }
-  .strip.scrolling { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; padding-bottom: 6px; }
-  .strip.scrolling .tick { flex: none; }
-  .near b { font-family: var(--sans); font-size: 11px; color: var(--accent); font-weight: 600; margin-right: 4px; }
-  .now { color: var(--ink); font-weight: 500; --band: color-mix(in srgb, var(--accent-soft) 30%, var(--bg)); position: relative; isolation: isolate; padding: 16px 0 18px; font-size: clamp(24px, 3.9vw, 35px); line-height: 1.5; text-wrap: pretty; hyphens: auto; }
-  /* The band runs the full width of the screen and is bevelled so the verse looks recessed: a shadow along the top edge, a darker line along the bottom. Never wider than the viewport: on phones, overflow past it widens the layout and pushes the fixed notes sheet off-screen. */
-  .now::before {
-    content: ""; position: absolute; top: 0; bottom: 0; z-index: -1;
-    /* Exactly the viewport wide: from the column's left edge back to the screen edge (the layout is centered, max 1180px, with 16px of padding). */
-    width: 100vw; left: calc(-16px - max(0px, (100vw - 1180px) / 2)); pointer-events: none;
-    background: var(--band);
-    box-shadow: inset 0 5px 7px -3px rgba(40, 25, 10, .28), inset 0 -1px 0 rgba(40, 25, 10, .2), inset 0 1px 0 rgba(40, 25, 10, .18);
+  .rail .rail-btn:hover, .rail .rail-btn[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
+  .rail-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .rail .menu-btn { font-size: 19px; }
+  .rail .history-btn { width: 36px; height: 36px; padding: 0; justify-content: center; color: var(--ink-faint); }
+  .rail .menu-panel, .rail .history-panel { font-family: var(--sans); font-size: 14px; }
+  .rail .menu-panel, .rail .history-panel { left: calc(100% + 8px); right: auto; top: 0; }
+  .rail .menu .menu-panel { top: auto; bottom: 0; }
+  /* The rail has its own icons for these; the menu repeats them only on phones. */
+  .rail .menu-search, .rail .menu-kept, .rail .menu-trail { display: none; }
+
+  /* Where you are: the library trail, indented a step per level, and the chapters either side. */
+  .trail { list-style: none; margin: 0; padding: 2px 0; }
+  .trail a {
+    display: block; max-width: 320px; padding: 6px 12px 6px calc(12px + var(--depth, 0) * 12px); border-radius: 8px;
+    font-family: var(--sans); font-size: 14px; color: var(--ink-soft); text-decoration: none;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .now::before { box-shadow: inset 0 5px 7px -3px rgba(0, 0, 0, .55), inset 0 -1px 0 rgba(0, 0, 0, .35), inset 0 1px 0 rgba(0, 0, 0, .4); } }
-  :root[data-theme="dark"] .now::before { box-shadow: inset 0 5px 7px -3px rgba(0, 0, 0, .55), inset 0 -1px 0 rgba(0, 0, 0, .35), inset 0 1px 0 rgba(0, 0, 0, .4); }
+  .trail a:hover { background: var(--accent-soft); color: var(--ink); }
+  .trail a.here { color: var(--ink); font-weight: 600; }
+  .trail-sides {
+    display: flex; gap: 16px; margin-top: 4px; padding: 8px 12px 4px; border-top: 1px solid var(--rule);
+    font-family: var(--sans); font-size: 13px; white-space: nowrap;
+  }
+  .trail-sides a { color: var(--ink-soft); text-decoration: none; }
+  .trail-sides a:hover { color: var(--accent); }
+  .trail-sides .trail-next { margin-left: auto; }
+  .menu-trail { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--rule); }
+
+  /* The reading column: the focus stays at the top; the reference row sticks under it while a long passage scrolls. */
+  .reader-col { min-width: 0; padding: 0 56px 80px 44px; }
+  .reader-top { position: sticky; top: 0; z-index: 10; padding: 22px 0 12px; background: var(--bg); }
+
+  /* ---------- lectio: one passage, large ---------- */
+  .lectio { max-width: 34em; margin-top: 11vh; touch-action: pan-y; }
+  .now { white-space: pre-line; color: var(--ink); font-weight: 500; --band: var(--bg); font-size: clamp(24px, 3.9vw, 35px); line-height: 1.5; text-wrap: pretty; hyphens: auto; }
   .now.mid { font-size: clamp(21px, 3.2vw, 29px); line-height: 1.55; }
   .now.long { font-size: clamp(18px, 2.6vw, 23px); line-height: 1.7; }
   .now .ref {
     display: block; font-family: var(--sans); font-size: 12px; letter-spacing: .14em;
     text-transform: uppercase; color: var(--accent);
   }
-  .steps { display: flex; justify-content: flex-start; gap: 12px; }
 
-  .strip { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 18px; }
+  /* ‹ 25 of 31 ›, and the grid of every verse behind the number. */
+  .steps { position: relative; display: flex; align-items: center; gap: 4px; margin: 40px 0 0 -10px; font-family: var(--sans); }
+  .step { border: 0; border-radius: 8px; background: none; padding: 6px 10px; font-size: 16px; line-height: 1.2; color: var(--ink-faint); }
+  .step-of { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .step:hover, .step[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
+  .unit-grid {
+    display: none; position: absolute; left: 0; top: calc(100% + 6px); z-index: 15;
+    grid-template-columns: repeat(8, minmax(0, 38px)); gap: 2px; padding: 6px; max-width: calc(100vw - 32px); max-height: min(50vh, 360px); overflow-y: auto;
+    background: var(--bg); border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+  }
+  .unit-grid.open { display: grid; }
+  .cell {
+    position: relative; height: 34px; padding: 0; border: 0; border-radius: 6px; background: none;
+    font-family: var(--sans); font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums;
+  }
+  .cell:hover { background: var(--accent-soft); color: var(--ink); }
+  .cell.current { color: var(--accent); font-weight: 700; }
+  .cell.has::after {
+    content: ""; position: absolute; left: 50%; bottom: 4px; width: 3px; height: 3px; margin-left: -1.5px;
+    border-radius: 50%; background: var(--accent);
+  }
+  .cell.kept::before {
+    content: ""; position: absolute; top: 0; right: 5px; width: 5px; height: 7px; background: var(--accent);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
+  }
+
+  /* The work page's chapter numbers. */
   .tick {
     position: relative; width: 30px; height: 30px; border-radius: 50%;
     border: 1px solid var(--rule); background: transparent;
@@ -258,80 +289,74 @@
     content: ""; position: absolute; left: 50%; bottom: 3px; width: 4px; height: 4px; margin-left: -2px;
     border-radius: 50%; background: var(--accent);
   }
-  .tick.current { background: var(--accent); border-color: var(--accent); color: var(--paper); }
-  .tick.current.has::after { background: var(--paper); }
-  .tick.kept::before {
-    content: ""; position: absolute; top: -3px; right: 5px; width: 7px; height: 10px; background: var(--accent);
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
-  }
-  .tick.current.kept::before { background: var(--paper); }
 
-  /* ---------- notes panel ---------- */
+  /* ---------- the note: a page docked down the right ---------- */
   .panel {
-    align-self: start; position: sticky; top: calc(var(--top-h, 96px) + 28px);
-    background: var(--paper); border: 1px solid var(--rule); border-radius: 14px;
-    box-shadow: var(--shadow);
-    display: flex; flex-direction: column; max-height: calc(100vh - var(--top-h, 96px) - 48px);
+    position: sticky; top: 0; align-self: start; height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column; padding: 26px 28px 18px;
+    background: var(--paper); border-left: 1px solid var(--rule);
   }
   .panel-handle { display: none; }
-  .panel-head { padding: 14px 16px 10px; border-bottom: 1px solid var(--rule); font-family: var(--sans); }
-  .panel-head .ref { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
-  .panel-head .ref, .panel-handle .ref { display: flex; min-width: 0; }
+  .panel-label { flex: none; font-family: var(--sans); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+  .panel-head { display: flex; align-items: baseline; gap: .5em; margin-bottom: 14px; }
+  .panel-head .panel-label::after { content: "·"; margin-left: .5em; }
+  .panel .ref { display: flex; min-width: 0; font-family: var(--sans); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
   /* Too narrow for the whole reference: the work title goes first (lectio_controller adds .tight), then the section name ellipsizes. */
   .panel .ref-work { flex: none; white-space: pre; }
   .panel .ref.tight .ref-work { display: none; }
   .panel .ref-section { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .panel .ref-unit { flex: none; white-space: pre; }
-  .panel-head .pfocus { font-family: var(--serif); font-style: italic; color: var(--accent); font-size: 15px; margin-top: 4px; }
-  .notes { overflow-y: auto; padding: 6px 16px; flex: 1; min-height: 40px; }
 
-  /* The editor takes whatever height the panel has left; long notes scroll inside it,
-     so the status line stays in view. */
-  .composer { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 12px; overflow: hidden; font-family: var(--sans); }
+  /* The editor takes whatever height the panel has left; long notes scroll inside it. */
+  .composer { flex: 1; min-height: 0; display: flex; flex-direction: column; font-family: var(--sans); }
   .composer turbo-frame, .composer form { flex: 1; min-height: 0; display: flex; flex-direction: column; }
   .primary { background: var(--accent); color: var(--paper); border: 0; border-radius: 999px; padding: 7px 16px; font-family: var(--sans); font-size: 14px; }
   .primary:hover { filter: brightness(1.08); }
 
-  /* Too short for a sticky card to leave room for the editor: let it scroll with the page at a usable height. */
-  @media (min-width: 900px) and (max-height: 640px) {
-    .panel { position: static; max-height: none; }
-    .panel .composer lexxy-editor { --lexxy-editor-rows: 8lh; }
-    .panel .composer .lexxy-editor__content { min-height: 8lh; }
-  }
-
-  /* mobile bottom sheet */
+  /* Phones: the reading column alone; the ⋯ floats top right and the note is a bottom sheet. */
   @media (max-width: 899px) {
+    .reader { display: block; }
+    .rail { position: fixed; top: 8px; right: 6px; height: auto; padding: 0; flex-direction: row; }
+    .rail .rail-only, .rail .history-btn, .rail-spacer { display: none; }
+    /* It drops from 48px down and must end above the note sheet's 52px handle; a long menu scrolls inside. */
+    .rail .menu .menu-panel {
+      left: auto; right: 0; top: calc(100% + 4px); bottom: auto; overflow-y: auto; overscroll-behavior: contain;
+      max-height: calc(100dvh - 48px - 52px - 8px - env(safe-area-inset-bottom));
+    }
+    .rail .menu-trail { display: block; }
+    .rail .menu-panel .menu-search, .rail .menu-panel .menu-kept, .rail .menu-panel .menu-item.menu-history { display: flex; }
+    .rail .history-panel { position: fixed; left: 12px; right: 12px; top: 52px; width: auto; }
+    .reader-col { padding: 0 16px 140px; }
+    .reader-top { padding: 14px 44px 10px 0; }
+    .lectio { margin-top: 5vh; }
+
     .panel {
       position: fixed; left: 0; right: 0; bottom: var(--kb, 0px); top: auto; z-index: 30;
-      border-radius: 16px 16px 0 0; border-bottom: 0;
-      height: calc(var(--vvh, 100vh) - 16px - env(safe-area-inset-top)); max-height: none;
-      transform: translateY(calc(100% - 66px - env(safe-area-inset-bottom)));
+      height: calc(var(--vvh, 100vh) - 16px - env(safe-area-inset-top));
+      padding: 0 16px env(safe-area-inset-bottom); border: 0; border-top: 1px solid var(--rule); border-radius: 14px 14px 0 0;
+      box-shadow: var(--shadow);
+      transform: translateY(calc(100% - 52px - env(safe-area-inset-bottom)));
       transition: transform .28s cubic-bezier(.2,.8,.2,1);
-      padding-bottom: env(safe-area-inset-bottom);
     }
     .panel.open { transform: none; }
     /* Offscreen controls must not take keyboard focus; hide them once the slide-down finishes. */
     .panel > :not(.panel-handle) { transition: visibility 0s .28s; }
     .panel:not(.open) > :not(.panel-handle) { visibility: hidden; }
     .panel.open > :not(.panel-handle) { transition-delay: 0s; }
+    /* Closed, the handle shows the note's first line; open, the passage it belongs to. */
     .panel-handle {
-      display: flex; align-items: center; gap: 10px; position: relative;
-      height: 66px; padding: 0 16px; flex: none; cursor: pointer;
-      font-family: var(--sans); font-size: 14px; border: 0; background: none; width: 100%; text-align: left;
+      display: flex; align-items: center; gap: 10px; position: relative; flex: none;
+      width: 100%; height: 52px; padding: 0; border: 0; background: none; text-align: left; cursor: pointer;
+      font-family: var(--sans);
     }
-    .panel-handle::before { content: ""; position: absolute; top: 8px; left: 50%; width: 38px; height: 4px; margin-left: -19px; border-radius: 2px; background: var(--rule); }
-    .panel-handle .ref {
-      font-weight: 600; flex: 1; min-width: 0;
-      overflow: hidden;
-    }
-    .panel-handle .count { color: var(--ink-soft); flex: none; white-space: nowrap; }
-    .panel-handle .go { color: var(--accent); flex: none; white-space: nowrap; }
-    /* Open, the handle is just a header: trim its tall tap area so the focus sits close beneath the reference. */
-    .panel.open .panel-handle { height: 48px; }
-    .panel-head { padding-top: 0; }
-    .panel-head .pfocus { margin-top: 0; }
-    .panel .composer lexxy-editor { --lexxy-editor-rows: 6lh; }
-    .panel-head .ref { display: none; }
+    .panel-handle::before { content: ""; position: absolute; top: 6px; left: 50%; width: 38px; height: 4px; margin-left: -19px; border-radius: 2px; background: var(--rule); }
+    .panel-handle .ref { display: none; flex: 1; }
+    .panel.open .panel-handle .ref { display: flex; }
+    .panel.open .panel-handle .preview { display: none; }
+    .preview { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--serif); font-size: 15px; color: var(--ink-soft); }
+    .preview.empty { font-style: italic; color: var(--ink-faint); }
+    .panel-handle .go { flex: none; color: var(--ink-faint); }
+    .panel-head { display: none; }
   }
 
   /* ---------- all-notes view ---------- */
@@ -362,7 +387,7 @@
 .invite-form { max-width: none; margin: 0 0 8px; }
 
 /* ---------- foci pages ---------- */
-a:not(.chip):not(.crumb):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a) { color: var(--accent); }
+a:not(.chip):not(.crumb):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a):not(.rail a) { color: var(--accent); }
 .inline-form { display: inline; margin: 0; }
 .page { max-width: 40em; margin: 0 auto; padding: 22px 16px 80px; }
 .page-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-family: var(--sans); margin-bottom: 18px; }
@@ -396,16 +421,28 @@ lexxy-editor, .lexxy-content {
   --lexxy-color-code-bg: var(--accent-soft);
   font-family: var(--serif);
 }
-.composer lexxy-editor { --lexxy-color-canvas: var(--paper); --lexxy-editor-rows: 10lh; font-size: 16.5px; border-radius: 10px 10px 0 0; flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.composer .lexxy-editor__content { flex: 1; min-height: max(3lh, min(var(--lexxy-editor-rows), calc(var(--vvh, 100vh) - 380px))); overflow-y: auto; }
-.composer form { border-radius: 10px; }
-.composer form:has(.lexxy-editor__content:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* In the note panel the editor is borderless on the paper; its toolbar sits below the text, behind a rule, and only
+   shows while you're writing (always, on a phone's opened sheet). */
+.composer lexxy-editor {
+  --lexxy-color-canvas: var(--paper); --lexxy-editor-padding: 0;
+  font-size: 17px; border: 0; border-radius: 0; background: transparent;
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+}
+.composer .lexxy-editor__content { flex: 1; min-height: 3lh; overflow-y: auto; }
 .composer .lexxy-editor__content:focus-visible { outline: none; }
-.composer lexxy-toolbar { --lexxy-toolbar-icon-size: .73em; --lexxy-toolbar-button-size: 1.4lh; }
-.autosave-status {
-  flex: none; margin: 0; line-height: 18px; min-height: 18px; padding: 4px 12px;
-  font-family: var(--sans); font-size: 12px; color: var(--ink-soft);
-  background: color-mix(in srgb, var(--paper) 95%, var(--ink)); border: 1px solid var(--rule); border-top: 0; border-radius: 0 0 10px 10px;
+/* The placeholder reads like the prototype's: italic, in faint ink. */
+.composer .lexxy-editor--empty .lexxy-editor__content::before { color: var(--ink-faint); opacity: 1; font-style: italic; }
+.composer lexxy-toolbar {
+  order: 2; --lexxy-toolbar-icon-size: .73em; --lexxy-toolbar-button-size: 1.4lh;
+  margin-top: 10px; padding-top: 8px; border-block-end: 0; border-block-start: 1px solid var(--rule);
+  opacity: 0; visibility: hidden; transition: opacity .2s, visibility 0s .2s;
+}
+.composer:focus-within lexxy-toolbar { opacity: 1; visibility: visible; transition-delay: 0s; }
+/* With the toolbar at the bottom, its dropdowns open upward. */
+.composer lexxy-toolbar [data-dropdown-panel] { inset-block-end: 100%; }
+.autosave-status { flex: none; margin: 6px 0 0; min-height: 18px; line-height: 18px; font-family: var(--sans); font-size: 12px; color: var(--ink-faint); }
+@media (max-width: 899px) {
+  .composer lexxy-toolbar { opacity: 1; visibility: visible; }
 }
 
 /* ---------- all-notes page ---------- */

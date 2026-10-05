@@ -1,0 +1,22 @@
+<%# The reader's tools, in a thin rail down the left: where you are, recent places, search, kept, and the ⋯ menu.
+    On phones only the ⋯ stays, top right, and the menu takes in the rest. %>
+<% trail = render("readings/trail", section: section, previous_section: previous_section, next_section: next_section) %>
+<nav class="rail" aria-label="Tools" data-controller="theme">
+  <div class="rail-item rail-only" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
+    <button class="icon-btn rail-btn" type="button" title="Where you are" aria-label="Where you are" aria-expanded="false" aria-controls="rail-library"
+            data-menu-target="button" data-action="menu#toggle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg></button>
+    <div class="menu-panel rail-pop" id="rail-library" data-menu-target="panel"><%= trail %></div>
+  </div>
+  <%= render "shared/history" %>
+  <%= link_to search_path, class: "icon-btn rail-btn rail-only", title: "Search (/)", aria: { label: "Search" } do %><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg><% end %>
+  <%= link_to kept_path, class: "icon-btn rail-btn rail-only", title: "Kept", aria: { label: "Kept" } do %><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z"/></svg><% end %>
+  <span class="rail-spacer"></span>
+  <div class="menu rail-item" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
+    <button class="icon-btn menu-btn rail-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-menu"
+            data-menu-target="button" data-action="menu#toggle">⋯</button>
+    <div class="menu-panel rail-pop" id="nav-menu" data-menu-target="panel">
+      <div class="menu-trail"><%= trail %></div>
+      <%= render "shared/menu_items", focus: focus, reading: true, random: random, random_default: random_default %>
+    </div>
+  </div>
+</nav>

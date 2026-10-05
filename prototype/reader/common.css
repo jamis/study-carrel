@@ -1,0 +1,133 @@
+/* Shared by the four reader prototypes: tokens, base type, the focus band, menus, the note editor. */
+:root {
+  --bg: #f6f1e7;
+  --paper: #fbf8f1;
+  --ink: #2b2620;
+  --ink-soft: #6b6256;
+  --ink-faint: #a39a8c;
+  --rule: #e2d9c8;
+  --accent: #8a4b2a;
+  --accent-soft: #f0dcc9;
+  --shadow: 0 8px 30px rgba(60, 40, 20, .12);
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+:root[data-theme="dark"] {
+  --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685; --ink-faint: #6e665a;
+  --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d; --shadow: 0 8px 30px rgba(0, 0, 0, .5);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685; --ink-faint: #6e665a;
+    --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d; --shadow: 0 8px 30px rgba(0, 0, 0, .5);
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink); overflow-x: clip;
+  font-family: var(--serif); line-height: 1.5; -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- the passage: large, length-adaptive ---------- */
+.verse { font-size: clamp(24px, 3.9vw, 35px); line-height: 1.5; font-weight: 500; text-wrap: pretty; hyphens: auto; margin: 0; }
+.verse.mid { font-size: clamp(21px, 3.2vw, 29px); line-height: 1.55; }
+.verse.long { font-size: clamp(18px, 2.6vw, 23px); line-height: 1.7; }
+.verse.turn { animation: turn .22s ease-out; }
+@keyframes turn { from { opacity: 0; transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) { .verse.turn { animation: none; } }
+
+.ref-label { font-family: var(--sans); font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+
+/* ---------- focus: small muted label, ~20px italic title, caret; description drops down ---------- */
+.focus { position: relative; }
+.focus-head {
+  display: flex; align-items: baseline; gap: 12px; width: 100%;
+  padding: 0; border: 0; background: none; text-align: left; cursor: pointer;
+}
+.focus-label { flex: none; font-family: var(--sans); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); }
+.focus-title { margin: 0; font-weight: 400; font-style: italic; color: var(--ink-soft); font-size: clamp(16px, 2.4vw, 20px); line-height: 1.3; text-wrap: balance; }
+.focus-head:hover .focus-title { color: var(--accent); }
+.focus-caret { flex: none; font-family: var(--sans); font-size: 12px; color: var(--ink-faint); transition: transform .2s; }
+.focus.open .focus-caret { transform: rotate(180deg); }
+.focus-body {
+  display: none; position: absolute; left: -16px; top: calc(100% + 8px); z-index: 40; width: min(560px, calc(100vw - 16px));
+  padding: 14px 16px 16px; color: var(--ink-soft); font-size: 17px;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--shadow);
+}
+.focus.open .focus-body { display: block; }
+.focus-body p { margin: 0 0 12px; }
+.focus-actions { display: flex; gap: 8px; flex-wrap: wrap; font-family: var(--sans); font-size: 13px; }
+.focus-actions a { color: var(--accent); }
+
+/* ---------- small controls ---------- */
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 36px; min-height: 32px; padding: 4px 8px;
+  border: 0; border-radius: 8px; background: transparent; color: var(--ink-faint);
+}
+.icon-btn:hover, .icon-btn[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
+.icon-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+.keep-btn { display: inline-flex; padding: 6px; margin: -6px; border: 0; background: none; color: var(--ink-faint); }
+.keep-btn svg { width: 12px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
+.keep-btn:hover { color: var(--accent); }
+.keep-btn.kept { color: var(--accent); }
+.keep-btn.kept svg { fill: currentColor; }
+
+/* ---------- popovers (menu, verse picker) ---------- */
+.pop {
+  display: none; position: absolute; z-index: 40; padding: 6px; font-family: var(--sans);
+  background: var(--bg); border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+}
+.pop.open { display: block; }
+.menu-item {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px; width: 100%; min-height: 38px; padding: 7px 12px;
+  border: 0; border-radius: 8px; background: none; font-size: 14.5px; color: var(--ink); text-align: left; text-decoration: none; white-space: nowrap;
+}
+.menu-item:hover { background: var(--accent-soft); }
+.menu-item kbd { font: inherit; font-size: 12px; color: var(--ink-soft); }
+.menu-item small { font-size: 12.5px; color: var(--ink-soft); }
+.menu-sep { height: 1px; margin: 5px 8px; background: var(--rule); }
+.menu-head { padding: 6px 12px 4px; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-soft); }
+.tree a { display: block; padding: 5px 12px; border-radius: 8px; font-size: 14px; color: var(--ink-soft); text-decoration: none; }
+.tree a:hover { background: var(--accent-soft); color: var(--ink); }
+.tree a.here { color: var(--ink); font-weight: 600; }
+
+/* Verse picker, plain numbers: no circles. A dot under a number = a note; the accent number is where you are. */
+.vgrid { display: grid; grid-template-columns: repeat(8, 34px); gap: 2px; padding: 4px; }
+.vgrid button {
+  position: relative; height: 32px; border: 0; border-radius: 6px; background: none;
+  font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums;
+}
+.vgrid button:hover { background: var(--accent-soft); color: var(--ink); }
+.vgrid button.here { color: var(--accent); font-weight: 700; }
+.vgrid button.noted::after { content: ""; position: absolute; left: 50%; bottom: 4px; width: 3px; height: 3px; margin-left: -1.5px; border-radius: 50%; background: var(--accent); }
+
+/* ---------- note editor (stand-in for Lexxy) ---------- */
+.note-editor { outline: none; font-family: var(--serif); font-size: 17px; line-height: 1.55; color: var(--ink); }
+.note-editor:empty::before { content: attr(data-placeholder); color: var(--ink-faint); font-style: italic; pointer-events: none; }
+.note-editor p { margin: 0 0 .6em; }
+.note-editor p:last-child { margin: 0; }
+.note-tools { display: flex; gap: 2px; font-family: var(--sans); }
+.note-tools button {
+  min-width: 26px; height: 24px; padding: 0 6px; border: 0; border-radius: 5px; background: none;
+  font-size: 12.5px; color: var(--ink-faint);
+}
+.note-tools button:hover { background: var(--accent-soft); color: var(--ink); }
+.note-status { font-family: var(--sans); font-size: 11.5px; color: var(--ink-faint); }
+
+/* ---------- prototype-only switcher ---------- */
+.proto-switch {
+  position: fixed; left: 0; top: 50%; z-index: 100; transform: translateY(-50%);
+  display: flex; flex-direction: column; font-family: var(--sans); font-size: 11px;
+  opacity: .28; transition: opacity .15s;
+}
+.proto-switch:hover { opacity: 1; }
+.proto-switch a { padding: 5px 7px; color: var(--ink-soft); text-decoration: none; background: var(--paper); border: 1px solid var(--rule); border-left: 0; }
+.proto-switch a + a { border-top: 0; }
+.proto-switch a.on { color: var(--paper); background: var(--accent); border-color: var(--accent); }
+@media (max-width: 899px) { .proto-switch { font-size: 9px; } .proto-switch a { padding: 4px 3px; } }

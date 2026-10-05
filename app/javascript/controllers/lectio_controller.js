@@ -4,7 +4,7 @@ import { csrfToken, fillId } from "lib/request"
 
 // Switches verses client-side; the whole section is already on the page.
 export default class extends Controller {
-  static targets = ["unit", "prev", "now", "body", "next", "prevButton", "nextButton", "ref", "refUnit", "tick", "count", "strip", "editor"]
+  static targets = ["unit", "now", "body", "prevButton", "nextButton", "position", "ref", "refUnit", "grid", "tick", "editor"]
   static values = { current: Number, base: String, refTemplate: String, refUnitTemplate: String, positionUrl: String, unitName: String,
     noteUrlTemplate: String, prevUrl: String, prevLabel: String, nextUrl: String, nextLabel: String }
 
@@ -22,8 +22,7 @@ export default class extends Controller {
     this.fitRefs = () => this.refTargets.forEach(r => this.fitRef(r))
     this.refObserver = new ResizeObserver(this.fitRefs)
     this.refTargets.filter(r => r.closest(".panel")).forEach(r => this.refObserver.observe(r))
-    this.updateCount()
-    this.scrollStripToCurrent()
+    this.updateMarkers()
     this.announce()
     this.savePosition()
   }
@@ -80,10 +79,9 @@ export default class extends Controller {
   render() {
     const n = this.currentValue
     const i = this.numbers.indexOf(n)
-    this.fillNear(this.prevTarget, this.numbers[i - 1])
-    this.fillNear(this.nextTarget, this.numbers[i + 1])
-    this.fillStep(this.prevButtonTarget, this.numbers[i - 1], this.prevLabelValue, "← ", "")
-    this.fillStep(this.nextButtonTarget, this.numbers[i + 1], this.nextLabelValue, "", " →")
+    this.fillStep(this.prevButtonTarget, this.numbers[i - 1], this.prevLabelValue)
+    this.fillStep(this.nextButtonTarget, this.numbers[i + 1], this.nextLabelValue)
+    this.positionTarget.textContent = n
 
     const body = this.bodies.get(n)
     this.nowTarget.className = ["now", this.sizes.get(n)].filter(Boolean).join(" ")
@@ -95,14 +93,12 @@ export default class extends Controller {
       const current = Number(t.dataset.number) === n
       t.classList.toggle("current", current)
       t.setAttribute("aria-current", current)
-      t.tabIndex = current ? 0 : -1 // the strip is one tab stop; arrow keys move within it
+      t.tabIndex = current ? 0 : -1 // the grid is one tab stop; arrow keys step through it
       if (current && this.tickTargets.includes(document.activeElement)) t.focus({ preventScroll: true })
     })
-    this.scrollStripToCurrent()
 
     // Swapping the frame replaces the editor; the old one saves itself as it goes.
     this.editorTarget.src = fillId(this.noteUrlTemplateValue, this.unitIds.get(n))
-    this.updateCount()
     this.announce()
   }
 
@@ -118,27 +114,24 @@ export default class extends Controller {
     this.updateMarkers()
   }
 
-  // A long chapter's strip is a single scrolling row; keep the current number in view.
-  scrollStripToCurrent() {
-    if (!this.hasStripTarget || !this.stripTarget.classList.contains("scrolling")) return
+  // The grid of every verse just opened (the menu controller runs first): start on the current one,
+  // scrolled into view in a long chapter.
+  gridOpened() {
+    if (!this.gridTarget.classList.contains("open")) return
     const tick = this.tickTargets.find(t => Number(t.dataset.number) === this.currentValue)
-    const strip = this.stripTarget
-    if (tick) strip.scrollLeft = tick.offsetLeft - (strip.clientWidth - tick.offsetWidth) / 2
+    if (!tick) return
+    this.gridTarget.scrollTop = tick.offsetTop - (this.gridTarget.clientHeight - tick.offsetHeight) / 2
+    tick.focus({ preventScroll: true })
   }
 
   noteSaved({ detail: { unitId, noted } }) {
     const number = [...this.unitIds].find(([, id]) => id === unitId)?.[0]
     if (number === undefined) return
     if (noted) this.noted.add(number); else this.noted.delete(number)
-    this.updateCount()
-  }
-
-  updateCount() {
-    this.countTarget.textContent = this.noted.has(this.currentValue) ? "Has a note" : "No note yet"
     this.updateMarkers()
   }
 
-  // The strip marks every verse that has a note, and every one that's kept.
+  // The grid marks every verse that has a note, and every one that's kept.
   updateMarkers() {
     this.tickTargets.forEach(tick => {
       const n = Number(tick.dataset.number)
@@ -150,25 +143,18 @@ export default class extends Controller {
     })
   }
 
-  // The faded neighbor above or below; empty at a chapter's edge.
-  fillNear(el, number) {
-    el.replaceChildren()
-    if (number === undefined) return
-    const b = document.createElement("b")
-    b.textContent = number
-    el.append(b, this.bodies.get(number))
-  }
-
-  // A step button names where it goes: the neighboring verse, or at a chapter's edge the neighboring chapter. Hidden at either end of the text.
-  fillStep(button, number, edgeLabel, before, after) {
+  // A step arrow names where it goes (as its tooltip and label): the neighboring verse, or at a chapter's edge
+  // the neighboring chapter. Hidden at either end of the text.
+  fillStep(button, number, edgeLabel) {
     const label = number !== undefined ? `${this.unitNameValue} ${number}` : edgeLabel
     button.hidden = !label
-    button.textContent = `${before}${label}${after}`
+    button.title = label
+    button.setAttribute("aria-label", label)
   }
 
   touchStart(event) {
-    // Dragging the verse strip scrolls it; it must not also turn the page.
-    if (this.hasStripTarget && this.stripTarget.contains(event.target)) { this.touchStartPoint = undefined; return }
+    // Scrolling the verse grid must not also turn the page.
+    if (this.gridTarget.contains(event.target)) { this.touchStartPoint = undefined; return }
     const { clientX, clientY } = event.touches[0]
     this.touchStartPoint = { x: clientX, y: clientY }
   }

@@ -1,0 +1,13 @@
+<%# The ⋯ menu's items, shared by the top bar and the reader's rail.
+    focus: the current focus (nil if none); reading: on the reading view (no "Continue reading");
+    random / random_default: as for shared/_header %>
+<%= render "notes/all_link", focus: focus if focus %>
+<%= link_to "All focuses", foci_path, class: "menu-item" %>
+<button class="menu-item menu-history" type="button" data-history-open data-action="menu#close">Recent places<kbd>h</kbd></button>
+<% unless reading %><%= link_to "Continue reading", root_path, class: "menu-item" %><% end %>
+<%= link_to search_path, class: "menu-item menu-search", data: { controller: "search-key", action: "keydown@window->search-key#key" } do %>Search<kbd>/</kbd><% end %>
+<%= render "shared/random_menu", scopes: random, default: random_default %>
+<%= link_to "Kept", kept_path, class: "menu-item menu-kept" %>
+<button class="menu-item" type="button" data-action="theme#toggle">Light / dark</button>
+<% if Current.user.admin? %><%= link_to "Invitations", admin_invitations_path, class: "menu-item" %><% end %>
+<%= button_to "Sign out", session_path, method: :delete, class: "menu-item", form_class: "signout" %>

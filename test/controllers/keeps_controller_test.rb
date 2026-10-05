@@ -108,12 +108,12 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
     assert_equal one, six
   end
 
-  test "the reading page carries what's kept, and the strip marks it" do
+  test "the reading page carries what's kept, and the verse grid marks it" do
     @user.keeps.create!(unit: verse(3), remark: "hm")
     get reading_path("isaiah-kjv", 40, 1)
     assert_select ".keep[data-keep-kept-value=?]", { verse(3).id.to_s => "hm" }.to_json
-    assert_select ".tick.kept", "3"
-    assert_select ".tick.kept", 1
+    assert_select ".cell.kept", "3"
+    assert_select ".cell.kept", 1
   end
 
   test "history marks kept places" do

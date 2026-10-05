@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reader A · Desk</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  /* A · Desk: one quiet line on top (focus left, place right), the passage and an unboxed note column side by side. */
+  .bar {
+    position: sticky; top: 0; z-index: 30; background: var(--bg);
+    max-width: 1180px; margin: 0 auto; padding: 14px 24px 12px;
+    display: flex; align-items: baseline; gap: 16px;
+  }
+  .bar .focus { flex: 1; min-width: 0; }
+  .bar-right { flex: none; display: flex; align-items: center; gap: 2px; align-self: center; position: relative; font-family: var(--sans); }
+  .place { border: 0; background: none; padding: 4px 8px; border-radius: 8px; font-size: 13px; color: var(--ink-faint); }
+  .place:hover, .place[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
+  #tree { right: 76px; top: calc(100% + 6px); width: 240px; }
+  #menu { right: 0; top: calc(100% + 6px); min-width: 220px; }
+
+  .desk {
+    max-width: 1180px; margin: 0 auto; padding: 7vh 24px 80px;
+    display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 72px;
+  }
+  .passage { max-width: 34em; }
+  .ref-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .steps { display: flex; align-items: center; gap: 4px; margin-top: 44px; font-family: var(--sans); font-size: 13px; position: relative; }
+  .steps button { border: 0; background: none; padding: 6px 10px; border-radius: 8px; color: var(--ink-faint); }
+  .steps button:hover:not(:disabled), .steps button[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
+  .steps button:disabled { visibility: hidden; }
+  .steps .of { font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+  #picker { left: 0; bottom: calc(100% + 6px); }
+
+  /* The note column: no card, no shadow, just a hairline to its left. */
+  .notes {
+    position: sticky; top: 90px; align-self: start;
+    border-left: 1px solid var(--rule); padding: 4px 0 0 28px; min-height: 50vh;
+    display: flex; flex-direction: column;
+  }
+  .notes-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; font-family: var(--sans); }
+  .notes-head .lbl { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+  .notes .note-editor { flex: 1; min-height: 40vh; }
+  .notes .note-tools { margin-top: 10px; opacity: 0; transition: opacity .2s; }
+  .notes:focus-within .note-tools { opacity: 1; }
+  .handle { display: none; }
+
+  @media (max-width: 899px) {
+    .bar { padding: 12px 16px 10px; }
+    .place, .bar-right .icon-btn[title^="Recent"] { display: none; }
+    .desk { grid-template-columns: minmax(0, 1fr); padding: 5vh 16px 120px; }
+    /* Notes become a slim bottom sheet that shows the first line of the note. */
+    .notes {
+      position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 35; min-height: 0; height: 75vh;
+      padding: 0 16px calc(16px + env(safe-area-inset-bottom)); border: 0; border-top: 1px solid var(--rule);
+      background: var(--paper); border-radius: 14px 14px 0 0; box-shadow: var(--shadow);
+      transform: translateY(calc(100% - 52px - env(safe-area-inset-bottom))); transition: transform .28s cubic-bezier(.2,.8,.2,1);
+    }
+    .notes.open { transform: none; }
+    .handle {
+      display: flex; align-items: center; gap: 10px; height: 52px; flex: none; width: 100%; padding: 0;
+      border: 0; background: none; text-align: left; font-family: var(--sans); font-size: 14px;
+    }
+    .handle .lbl { flex: none; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+    .handle [data-note-preview] { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--serif); font-size: 15px; color: var(--ink-soft); }
+    .handle [data-note-preview].empty { font-style: italic; color: var(--ink-faint); }
+    .notes-head { display: none; }
+    .notes .note-tools { opacity: 1; }
+  }
+</style>
+<script src="isaiah40.js"></script>
+<script src="common.js"></script>
+</head>
+<body data-proto="a">
+  <header class="bar">
+    <div data-focus></div>
+    <div class="bar-right">
+      <button class="place" type="button" data-pop-toggle="tree" aria-expanded="false" title="Where you are">Isaiah 40</button>
+      <button class="icon-btn" type="button" title="Recent places (h)" aria-label="Recent places"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+      <button class="icon-btn" type="button" data-pop-toggle="menu" aria-expanded="false" aria-label="Menu" style="font-size:19px">⋯</button>
+      <div class="pop" id="tree"><div class="menu-head">Library</div><div class="tree">
+        <a href="#">Sacred Texts</a><a href="#" style="padding-left:24px">Old Testament</a>
+        <a href="#" style="padding-left:36px">Isaiah</a><a href="#" class="here" style="padding-left:48px">Chapter 40</a></div></div>
+      <div class="pop" id="menu" data-menu></div>
+    </div>
+  </header>
+
+  <main class="desk">
+    <article class="passage" data-swipe>
+      <div class="ref-row">
+        <button class="keep-btn" type="button" data-keep aria-label="Keep"><svg viewBox="0 0 12 16"><path d="M1 1h10v14l-5-4-5 4z"/></svg></button>
+        <span class="ref-label" data-ref></span>
+      </div>
+      <p class="verse" data-body></p>
+      <nav class="steps" aria-label="Verses">
+        <button type="button" data-prev aria-label="Previous verse">‹</button>
+        <button type="button" class="of" data-pop-toggle="picker" aria-expanded="false"><span data-n></span> of <span data-count></span></button>
+        <button type="button" data-next aria-label="Next verse">›</button>
+        <div class="pop" id="picker"><div data-vgrid></div></div>
+      </nav>
+    </article>
+
+    <aside class="notes" id="notes">
+      <button class="handle" type="button" onclick="this.parentElement.classList.toggle('open')">
+        <span class="lbl">Note</span><span data-note-preview></span><span style="color:var(--ink-faint)">▴</span>
+      </button>
+      <div class="notes-head"><span class="lbl">Note</span><span class="note-status" data-note-status></span></div>
+      <div class="note-editor" contenteditable="true" data-note data-placeholder="What comes to mind?"></div>
+      <div class="note-tools">
+        <button type="button" data-tool="bold"><b>B</b></button><button type="button" data-tool="italic"><i>I</i></button>
+        <button type="button" data-tool="formatBlock" data-arg="blockquote">❝</button><button type="button" data-tool="insertUnorderedList">•</button>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reader B · Open Book</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  /* B · Open book: no app bar. A running head and a folio, like a printed page; the passage on the left, your notebook on the right. */
+  body { background: color-mix(in srgb, var(--bg) 88%, #6b5a40); min-height: 100vh; }
+  .book {
+    position: relative; max-width: 1120px; min-height: calc(100vh - 48px); margin: 24px auto;
+    background: var(--paper); border-radius: 3px; box-shadow: 0 1px 2px rgba(40, 25, 10, .12), 0 12px 40px rgba(40, 25, 10, .16);
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr;
+  }
+  /* The gutter: a soft shadow down the middle where the pages meet. */
+  .book::after {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 48px; margin-left: -24px; pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(40, 25, 10, .07) 46%, rgba(40, 25, 10, .12) 50%, rgba(40, 25, 10, .07) 54%, transparent);
+  }
+  .head { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; }
+  .runhead {
+    display: flex; align-items: center; justify-content: space-between; position: relative;
+    padding: 18px 56px 0; font-family: var(--sans); font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-faint);
+  }
+  .runhead button { border: 0; background: none; padding: 4px 6px; margin: -4px -6px; border-radius: 6px; letter-spacing: inherit; text-transform: inherit; font-size: inherit; color: inherit; }
+  .runhead button:hover, .runhead button[aria-expanded="true"] { color: var(--accent); }
+  .runhead .icons { display: flex; gap: 2px; margin-right: -10px; }
+  .runhead .icons .icon-btn { margin: 0; padding: 4px 8px; min-height: 28px; }
+  #tree { left: 50px; top: calc(100% + 6px); width: 240px; text-transform: none; letter-spacing: 0; }
+  #menu { right: 40px; top: calc(100% + 6px); min-width: 220px; text-transform: none; letter-spacing: 0; }
+  .focus-wrap { grid-column: 1 / -1; padding: 22px 56px 0; }
+  .focus-wrap .focus-body { left: 40px; }
+
+  .page { position: relative; padding: 9vh 56px 96px; display: flex; flex-direction: column; }
+  .ref-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .folio {
+    position: absolute; left: 0; right: 0; bottom: 28px; display: flex; justify-content: center; align-items: center; gap: 18px;
+    font-family: var(--serif); font-size: 15px; color: var(--ink-soft);
+  }
+  .folio button { border: 0; background: none; padding: 4px 10px; border-radius: 8px; color: var(--ink-faint); font-size: 18px; }
+  .folio button:hover:not(:disabled), .folio button[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
+  .folio button:disabled { visibility: hidden; }
+  .folio .num { font-size: 15px; font-style: italic; color: var(--ink-soft); font-variant-numeric: oldstyle-nums; }
+  #picker { bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); }
+
+  /* The notebook page: faint ruled lines the note sits on. */
+  .page.notebook { padding-top: calc(9vh + 2px); }
+  .nb-head { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--sans); margin-bottom: 12px; }
+  .nb-head .lbl { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+  .notebook .note-editor {
+    flex: 1; min-height: 40vh; font-size: 17px; line-height: 30px;
+    background-image: repeating-linear-gradient(transparent 0 29px, color-mix(in srgb, var(--rule) 70%, transparent) 29px 30px);
+    background-position: 0 1px;
+  }
+  .notebook .note-editor p { margin: 0; }
+  .notebook .note-tools { position: absolute; left: 50px; bottom: 28px; opacity: 0; transition: opacity .2s; }
+  .notebook:focus-within .note-tools { opacity: 1; }
+
+  @media (max-width: 899px) {
+    body { background: var(--paper); }
+    .book { margin: 0; border-radius: 0; box-shadow: none; grid-template-columns: 1fr; min-height: 100vh; }
+    .book::after { display: none; }
+    .head { grid-template-columns: 1fr; }
+    .runhead { padding: 14px 20px 0; }
+    .runhead.right { position: absolute; right: 0; top: 0; padding: 10px 20px 0; }
+    .runhead.right .keep-label { display: none; }
+    #menu { right: 10px; }
+    .focus-wrap { padding: 14px 20px 0; }
+    .focus-wrap .focus-body { left: 0; }
+    .page { padding: 6vh 20px 24px; }
+    .folio { position: fixed; z-index: 10; bottom: 0; padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, var(--paper) 35%); }
+    /* One page on a phone: the notebook follows the passage. */
+    .page.notebook { padding-top: 8px; border-top: 1px solid var(--rule); margin: 0 20px; padding-left: 0; padding-right: 0; padding-bottom: 90px; }
+    .notebook .note-editor { min-height: 30vh; }
+    .notebook .note-tools { position: static; opacity: 1; margin-top: 8px; }
+  }
+</style>
+<script src="isaiah40.js"></script>
+<script src="common.js"></script>
+</head>
+<body data-proto="b">
+  <div class="book">
+    <div class="head">
+      <div class="runhead">
+        <button type="button" data-pop-toggle="tree" aria-expanded="false" title="Where you are">Isaiah · Chapter 40</button>
+        <div class="pop" id="tree"><div class="menu-head">Library</div><div class="tree">
+          <a href="#">Sacred Texts</a><a href="#" style="padding-left:24px">Old Testament</a>
+          <a href="#" style="padding-left:36px">Isaiah</a><a href="#" class="here" style="padding-left:48px">Chapter 40</a></div></div>
+      </div>
+      <div class="runhead right">
+        <span class="keep-label">Notebook</span>
+        <span class="icons">
+          <button class="icon-btn" type="button" title="Recent places (h)" aria-label="Recent places"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+          <button class="icon-btn" type="button" data-pop-toggle="menu" aria-expanded="false" aria-label="Menu" style="font-size:18px; letter-spacing:0">⋯</button>
+        </span>
+        <div class="pop" id="menu" data-menu></div>
+      </div>
+      <div class="focus-wrap"><div data-focus></div></div>
+    </div>
+
+    <section class="page passage-page" data-swipe>
+      <div class="ref-row">
+        <button class="keep-btn" type="button" data-keep aria-label="Keep"><svg viewBox="0 0 12 16"><path d="M1 1h10v14l-5-4-5 4z"/></svg></button>
+        <span class="ref-label" data-ref></span>
+      </div>
+      <p class="verse" data-body></p>
+      <nav class="folio" aria-label="Verses">
+        <button type="button" data-prev aria-label="Previous verse">‹</button>
+        <button type="button" class="num" data-pop-toggle="picker" aria-expanded="false" title="Go to verse">— <span data-n></span> —</button>
+        <button type="button" data-next aria-label="Next verse">›</button>
+        <div class="pop" id="picker"><div data-vgrid></div></div>
+      </nav>
+    </section>
+
+    <section class="page notebook">
+      <div class="nb-head"><span class="lbl">On <span data-ref></span></span><span class="note-status" data-note-status></span></div>
+      <div class="note-editor" contenteditable="true" data-note data-placeholder="What comes to mind?"></div>
+      <div class="note-tools">
+        <button type="button" data-tool="bold"><b>B</b></button><button type="button" data-tool="italic"><i>I</i></button>
+        <button type="button" data-tool="formatBlock" data-arg="blockquote">❝</button><button type="button" data-tool="insertUnorderedList">•</button>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

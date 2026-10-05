@@ -1,8 +1,6 @@
 <% content_for :title, "#{@section.name} · Study Carrel" %>
-<%= render "shared/header", crumbs: reading_crumbs(@section), focus: @focus, band: true,
-                            random: RandomScope.chain_for(@section.work), random_default: RandomScope.default_for(@section.work) %>
-
-<main class="layout" data-controller="lectio"
+<% note_text = @notes_by_unit[@current.id]&.content&.to_plain_text.to_s.squish.truncate(200) %>
+<main class="reader" data-controller="lectio"
       data-lectio-current-value="<%= @current.number %>"
       data-lectio-position-url-value="<%= position_path %>"
       data-lectio-note-url-template-value="<%= unit_note_path("{id}") %>"
@@ -15,6 +13,9 @@
       data-lectio-prev-label-value="<%= @previous_section&.name %>"
       data-lectio-next-url-value="<%= edge_url(@next_section, :next) %>"
       data-lectio-next-label-value="<%= @next_section&.name %>">
+  <%= render "readings/rail", section: @section, previous_section: @previous_section, next_section: @next_section, focus: @focus,
+             random: RandomScope.chain_for(@section.work), random_default: RandomScope.default_for(@section.work) %>
+
   <div hidden>
     <% @units.each do |u| %>
       <span data-lectio-target="unit" data-number="<%= u.number %>" data-unit-id="<%= u.id %>" data-size="<%= unit_size_class(u.body) %>"><%= u.body %></span>
@@ -24,32 +25,41 @@
   <% at = @units.index(@current) %>
   <% prev_unit = (@units[at - 1] if at.positive?) %>
   <% next_unit = @units[at + 1] %>
-  <article class="lectio" data-action="touchstart->lectio#touchStart touchend->lectio#touchEnd keydown@document->lectio#key">
-    <div class="near" aria-hidden="true" data-lectio-target="prev" data-action="click->lectio#previous"><% if prev_unit %><b><%= prev_unit.number %></b><%= prev_unit.body %><% end %></div>
-    <div class="now <%= unit_size_class(@current.body) %>" aria-live="polite" data-lectio-target="now"><div class="now-head"><%= render "keeps/ribbon", unit: @current, kept: @kept %><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span></div><span data-lectio-target="body"><%= @current.body %></span></div>
-    <div class="near" aria-hidden="true" data-lectio-target="next" data-action="click->lectio#next"><% if next_unit %><b><%= next_unit.number %></b><%= next_unit.body %><% end %></div>
-    <div class="steps">
-      <button class="chip" type="button" data-lectio-target="prevButton" data-action="lectio#previous" <%= "hidden" unless prev_unit || @previous_section %>>← <%= prev_unit ? "#{unit_noun(@section)} #{prev_unit.number}" : @previous_section&.name %></button>
-      <button class="chip" type="button" data-lectio-target="nextButton" data-action="lectio#next" <%= "hidden" unless next_unit || @next_section %>><%= next_unit ? "#{unit_noun(@section)} #{next_unit.number}" : @next_section&.name %> →</button>
-    </div>
-    <nav class="strip<%= " scrolling" if @units.size > 40 %>" aria-label="<%= unit_noun(@section).pluralize %>" data-lectio-target="strip">
-      <% @units.each do |u| %>
-        <% noted = @notes_by_unit.key?(u.id) %>
-        <% kept = @kept.key?(u.id) %>
-        <button type="button" class="tick<%= " current" if u == @current %><%= " has" if noted %><%= " kept" if kept %>" aria-current="<%= u == @current %>" tabindex="<%= u == @current ? 0 : -1 %>" data-lectio-target="tick" data-number="<%= u.number %>" data-action="lectio#go" aria-label="<%= unit_noun(@section) %> <%= u.number %><%= ", has a note" if noted %><%= ", kept" if kept %>"><%= u.number %></button>
-      <% end %>
-    </nav>
-  </article>
+  <div class="reader-col">
+    <div class="reader-top" data-reader-top><%= render "foci/band", focus: @focus %></div>
+    <article class="lectio" data-action="touchstart->lectio#touchStart touchend->lectio#touchEnd keydown@document->lectio#key">
+      <div class="now <%= unit_size_class(@current.body) %>" aria-live="polite" data-lectio-target="now"><div class="now-head"><%= render "keeps/ribbon", unit: @current, kept: @kept %><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span></div><span data-lectio-target="body"><%= @current.body %></span></div>
 
-  <aside class="panel" data-controller="sheet" data-action="keydown.esc@window->sheet#escape">
+      <%# ‹ 25 of 31 ›: the number opens a grid of every verse (a dot = has a note, a ribbon = kept). Past either end, the arrows carry on into the next chapter. %>
+      <nav class="steps" aria-label="<%= unit_noun(@section).pluralize %>" data-controller="menu"
+           data-action="keydown.esc@window->menu#escape click@window->menu#away">
+        <% prev_label = prev_unit ? "#{unit_noun(@section)} #{prev_unit.number}" : @previous_section&.name %>
+        <% next_label = next_unit ? "#{unit_noun(@section)} #{next_unit.number}" : @next_section&.name %>
+        <button class="step" type="button" title="<%= prev_label %>" aria-label="<%= prev_label %>" data-lectio-target="prevButton" data-action="lectio#previous" <%= "hidden" unless prev_label %>>‹</button>
+        <button class="step step-of" type="button" title="Go to a <%= unit_noun(@section).downcase %>" aria-expanded="false" aria-controls="unit-grid"
+                data-menu-target="button" data-action="menu#toggle lectio#gridOpened"><span data-lectio-target="position"><%= @current.number %></span> of <%= @units.last.number %></button>
+        <div class="unit-grid" id="unit-grid" data-menu-target="panel" data-lectio-target="grid">
+          <% @units.each do |u| %>
+            <% noted = @notes_by_unit.key?(u.id) %>
+            <% kept = @kept.key?(u.id) %>
+            <button type="button" class="cell<%= " current" if u == @current %><%= " has" if noted %><%= " kept" if kept %>" aria-current="<%= u == @current %>" tabindex="<%= u == @current ? 0 : -1 %>" data-lectio-target="tick" data-number="<%= u.number %>" data-action="lectio#go menu#close" aria-label="<%= unit_noun(@section) %> <%= u.number %><%= ", has a note" if noted %><%= ", kept" if kept %>"><%= u.number %></button>
+          <% end %>
+        </div>
+        <button class="step" type="button" title="<%= next_label %>" aria-label="<%= next_label %>" data-lectio-target="nextButton" data-action="lectio#next" <%= "hidden" unless next_label %>>›</button>
+      </nav>
+    </article>
+  </div>
+
+  <aside class="panel" data-controller="sheet" data-action="keydown.esc@window->sheet#escape note:text@window->sheet#preview">
     <button class="panel-handle" type="button" aria-expanded="false" data-sheet-target="handle" data-action="sheet#toggle">
+      <span class="panel-label">Note</span>
       <span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span>
-      <span class="count" data-lectio-target="count">Notes</span>
-      <span class="go" data-sheet-target="label">Notes ▴</span>
+      <span class="preview<%= " empty" if note_text.blank? %>" data-sheet-target="preview"><%= note_text.presence || "Write a note" %></span>
+      <span class="go" data-sheet-target="label" aria-hidden="true">▴</span>
     </button>
     <div class="panel-head">
-      <div class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></div>
-      <div class="pfocus"><%= @focus.title %></div>
+      <span class="panel-label">Note</span>
+      <span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span>
     </div>
     <div class="composer">
       <%= render "unit_notes/editor", unit: @current, note: @notes_by_unit[@current.id], focus: @focus %>

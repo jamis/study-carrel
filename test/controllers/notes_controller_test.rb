@@ -23,16 +23,16 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
   end
 end
 
-class VerseStripMarkersTest < ActionDispatch::IntegrationTest
-  test "verses with notes are marked on the strip" do
+class VerseGridMarkersTest < ActionDispatch::IntegrationTest
+  test "verses with notes are marked in the verse grid" do
     load_isaiah
     focus = users(:one).foci.start!(title: "Holy")
     focus.notes.create!(unit: verse(11), content: "a")
     sign_in_as users(:one)
 
     get reading_path("isaiah-kjv", 40, 25)
-    assert_select ".tick.has", 1
-    assert_select ".tick.has[aria-label=?]", "Verse 11, has a note"
+    assert_select ".cell.has", 1
+    assert_select ".cell.has[aria-label=?]", "Verse 11, has a note"
   end
 end
 

@@ -122,21 +122,22 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-lectio-next-url-value=?]", reading_path("exodus-kjv", 1, 1)
     assert_select "[data-lectio-prev-url-value=?]", reading_path("genesis-kjv", 1, 2)
     assert_select "[data-lectio-prev-label-value=?]", "Genesis 1"
-    assert_select "[data-lectio-target=prevButton]", text: "← Genesis 1"
-    assert_select "[data-lectio-target=nextButton]", text: "Exodus 1 →"
-    assert_select ".crumbs a.crumb[href=?]", work_path("genesis-kjv"), text: "Genesis 2"
-    assert_select ".crumbs a.crumb[href=?]", library_path, text: "Library"
+    assert_select "[data-lectio-target=prevButton][title=?]", "Genesis 1"
+    assert_select "[data-lectio-target=nextButton][title=?]", "Exodus 1"
+    assert_select "#rail-library .trail a[href=?]", work_path("genesis-kjv"), text: "Genesis 2"
+    assert_select "#rail-library .trail a[href=?]", library_path, text: "Library"
+    assert_select "#rail-library .trail-sides a[href=?]", reading_path("exodus-kjv", 1), text: /Exodus 1/
   end
 
   test "a text whose verse numbers skip ahead renders neighbors by position" do
     TextLoader.new("work: Skippy\ncollection: prose\n\nsection: 1\nlabel: One\n58. a\n60. b\n61. c\n").load
     get reading_path("skippy", 1, 58)
-    assert_select "[data-lectio-target=next] b", "60"
+    assert_match(/ 60\z/, css_select("[data-lectio-target=nextButton]").first["title"])
   end
 
   test "units are named for the text in labels" do
     get reading_path("walden", 1, 1)
-    assert_select ".tick[aria-label=?]", "Paragraph 1"
+    assert_select ".cell[aria-label=?]", "Paragraph 1"
   end
 
   private

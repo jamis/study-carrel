@@ -1,12 +1,9 @@
-<%# The top bar shared by the reading view and the library pages.
+<%# The top bar of the library pages (the reading view has its own rail, readings/_rail).
     crumbs: [[label, path, tooltip], ...], last one is the current page
     focus: the current focus (for the All notes link; nil if none)
-    band: show the focus band under the nav
     random: the RandomScope places Random can roll in, innermost first (just the library if omitted)
     random_default: the one the Random item rolls in (the first if omitted) %>
 <% focus = local_assigns[:focus]
-   band = local_assigns[:band] && focus
-   reading = local_assigns[:band]
    random = local_assigns[:random] || [ RandomScope.library ]
    random_default = local_assigns[:random_default] || random.first %>
 <header class="top" data-controller="theme">
@@ -21,32 +18,14 @@
           <% end %>
         </ol>
       </nav>
-      <div class="history" data-controller="menu history" data-history-url-value="<%= history_path %>"
-           data-action="keydown.esc@window->menu#escape click@window->menu#away keydown@window->history#key click@window->history#fromMenu">
-        <button class="icon-btn history-btn" type="button" title="Recent places (h)" aria-label="Recent places" aria-expanded="false" aria-controls="history-panel"
-                data-menu-target="button" data-history-target="button" data-action="menu#toggle history#refresh"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
-        <div class="history-panel" id="history-panel" data-menu-target="panel" data-history-target="panel" data-action="keydown->history#arrow">
-          <div class="hist-head">Recent places</div>
-          <div data-history-target="list"></div>
-        </div>
-      </div>
+      <%= render "shared/history" %>
       <div class="menu" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
         <button class="icon-btn menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-menu"
                 data-menu-target="button" data-action="menu#toggle">⋯</button>
         <div class="menu-panel" id="nav-menu" data-menu-target="panel">
-          <%= render "notes/all_link", focus: focus if focus %>
-          <%= link_to "All focuses", foci_path, class: "menu-item" %>
-          <button class="menu-item menu-history" type="button" data-history-open data-action="menu#close">Recent places<kbd>h</kbd></button>
-          <% unless reading %><%= link_to "Continue reading", root_path, class: "menu-item" %><% end %>
-          <%= link_to search_path, class: "menu-item", data: { controller: "search-key", action: "keydown@window->search-key#key" } do %>Search<kbd>/</kbd><% end %>
-          <%= render "shared/random_menu", scopes: random, default: random_default %>
-          <%= link_to "Kept", kept_path, class: "menu-item" %>
-          <button class="menu-item" type="button" data-action="theme#toggle">Light / dark</button>
-          <% if Current.user.admin? %><%= link_to "Invitations", admin_invitations_path, class: "menu-item" %><% end %>
-          <%= button_to "Sign out", session_path, method: :delete, class: "menu-item", form_class: "signout" %>
+          <%= render "shared/menu_items", focus: focus, reading: false, random: random, random_default: random_default %>
         </div>
       </div>
     </div>
   </div>
-  <%= render "foci/band", focus: focus if band %>
 </header>

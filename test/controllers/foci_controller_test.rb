@@ -23,7 +23,6 @@ class FociControllerTest < ActionDispatch::IntegrationTest
     get reading_path("isaiah-kjv", 1)
     assert_select ".focus-title", "What does it mean to be holy?"
     assert_select ".focus-body", /Set apart or good/
-    assert_select ".pfocus", "What does it mean to be holy?"
   end
 
   test "title is required" do

@@ -34,6 +34,7 @@ export default class extends Controller {
   // Lexxy may normalize the stored HTML on load; remember that as "already saved".
   ready() {
     this.saved = this.editorTarget.value
+    this.#announceText()
 
     const unsaved = this.#unsaved
     if (unsaved == null) return
@@ -42,11 +43,13 @@ export default class extends Controller {
       this.#unsaved = null
     } else {
       this.restored = true
+      this.#announceText()
       this.save()
     }
   }
 
   changed() {
+    this.#announceText()
     clearTimeout(this.timer)
     this.timer = setTimeout(() => this.save(), this.delayValue)
   }
@@ -129,6 +132,12 @@ export default class extends Controller {
       if (value == null) sessionStorage.removeItem(this.#storageKey)
       else sessionStorage.setItem(this.#storageKey, value)
     } catch {}
+  }
+
+  // The note's plain text, for the phone sheet's handle (sheet_controller.js).
+  #announceText() {
+    const text = new DOMParser().parseFromString(this.editorTarget.value, "text/html").body.textContent.replace(/\s+/g, " ").trim()
+    window.dispatchEvent(new CustomEvent("note:text", { detail: { text } }))
   }
 
   #status(text) {

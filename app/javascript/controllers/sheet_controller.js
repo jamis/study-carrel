@@ -1,8 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
-// The notes panel: a side card on desktop, a bottom sheet on phones.
+// The note panel: docked down the right on desktop, a bottom sheet on phones whose handle shows the note's first line.
 export default class extends Controller {
-  static targets = ["label", "handle"]
+  static targets = ["label", "handle", "preview"]
 
   // On phones the on-screen keyboard covers the bottom of the page without resizing it. Track the
   // visible area so the sheet can sit above the keyboard and shrink to fit (--kb, --vvh in the CSS).
@@ -34,14 +34,20 @@ export default class extends Controller {
 
   #set(open) {
     this.element.classList.toggle("open", open)
-    this.labelTarget.textContent = open ? "Close ▾" : "Notes ▴"
+    this.labelTarget.textContent = open ? "▾" : "▴"
     this.handleTarget.setAttribute("aria-expanded", open)
   }
 
-  // The side panel sticks just below the sticky header, whose height varies (the focus band can wrap
-  // or open its description), so publish it as --top-h on the document.
+  // The editor reports its text as it loads and changes (note:text).
+  preview({ detail: { text } }) {
+    this.previewTarget.textContent = text || "Write a note"
+    this.previewTarget.classList.toggle("empty", !text)
+  }
+
+  // The passage's reference row sticks just below the sticky focus band, whose height varies (the focus can
+  // wrap), so publish it as --top-h on the document.
   #trackHeader() {
-    const header = document.querySelector("header.top")
+    const header = document.querySelector("[data-reader-top]")
     if (!header) return
     const set = () => document.documentElement.style.setProperty("--top-h", `${header.offsetHeight}px`)
     this.headerObserver = new ResizeObserver(set)

@@ -1,7 +1,7 @@
 <%= turbo_frame_tag "note_editor", data: { lectio_target: "editor" } do %>
   <%= form_with model: (note || Note.new), url: unit_note_path(unit), method: :put,
         data: { controller: "autosave", autosave_unit_id_value: unit.id, autosave_focus_id_value: focus.id, action: "submit->autosave#prevent" } do |form| %>
-    <%= form.rich_textarea :content, preset: "notes", rows: 8, placeholder: "How does this passage speak to your question?",
+    <%= form.rich_textarea :content, preset: "notes", rows: 8, placeholder: "What comes to mind?",
           aria: { label: "Note" },
           data: { autosave_target: "editor", action: "lexxy:initialize->autosave#ready lexxy:change->autosave#changed lexxy:blur->autosave#save" } %>
     <p class="autosave-status" aria-live="polite" data-autosave-target="status">&nbsp;</p>

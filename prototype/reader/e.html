@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reader E · Rail and Steps</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  /* E · Rail and steps: D's layout (tool rail on the left, note docked on the right, no top bar)
+     with A's verse navigation: ‹ 3 of 31 ›, the number opening a plain number grid. */
+  body { display: grid; grid-template-columns: 52px minmax(0, 1fr) 380px; min-height: 100vh; }
+  .rail {
+    position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 0;
+  }
+  .rail .icon-btn { width: 36px; height: 36px; padding: 0; }
+  .rail .spacer { flex: 1; }
+  .rail .pop { left: 48px; }
+  #tree { top: 10px; width: 240px; }
+  #menu { bottom: 10px; min-width: 220px; }
+  .rail-wrap { position: relative; }
+
+  .main { padding: 22px 56px 80px 44px; display: flex; flex-direction: column; min-width: 0; }
+  .passage { margin: 12vh 0 0; max-width: 34em; }
+  .ref-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .ref-row .work { font-family: var(--sans); font-size: 12px; color: var(--ink-faint); margin-left: 6px; }
+
+  .steps { display: flex; align-items: center; gap: 4px; margin-top: 44px; font-family: var(--sans); font-size: 13px; position: relative; }
+  .steps button { border: 0; background: none; padding: 6px 10px; border-radius: 8px; color: var(--ink-faint); }
+  .steps button:first-child { margin-left: -10px; }
+  .steps button:hover:not(:disabled), .steps button[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
+  .steps button:disabled { visibility: hidden; }
+  .steps .of { font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+  #picker { left: 0; bottom: calc(100% + 6px); }
+
+  /* Docked note: a full-height page, not a floating card. */
+  .dock {
+    position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column;
+    background: var(--paper); border-left: 1px solid var(--rule); padding: 26px 28px 18px;
+  }
+  .dock-head { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--sans); margin-bottom: 16px; }
+  .dock-head .lbl { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+  .dock .note-editor { flex: 1; overflow-y: auto; }
+  /* The toolbar and its rule only appear while you're writing. */
+  .dock .note-tools { padding-top: 10px; border-top: 1px solid var(--rule); opacity: 0; transition: opacity .2s; }
+  .dock:focus-within .note-tools { opacity: 1; }
+  .handle, .phone-top { display: none; }
+
+  @media (max-width: 899px) {
+    body { display: block; }
+    .rail { display: none; }
+    .phone-top { display: flex; justify-content: flex-end; position: absolute; top: 10px; right: 8px; z-index: 20; }
+    .phone-top .pop { right: 0; top: calc(100% + 4px); min-width: 230px; }
+    .main { padding: 14px 52px 140px 16px; }
+    .passage { margin-top: 6vh; }
+    .dock {
+      position: fixed; left: 0; right: 0; bottom: 0; top: auto; height: 75vh; z-index: 35; border: 0; border-top: 1px solid var(--rule);
+      border-radius: 14px 14px 0 0; box-shadow: var(--shadow); padding: 0 16px calc(14px + env(safe-area-inset-bottom));
+      transform: translateY(calc(100% - 52px - env(safe-area-inset-bottom))); transition: transform .28s cubic-bezier(.2,.8,.2,1);
+    }
+    .dock.open { transform: none; }
+    .dock-head { display: none; }
+    .dock .note-tools { opacity: 1; }
+    .handle {
+      display: flex; align-items: center; gap: 10px; height: 52px; flex: none; width: 100%; padding: 0;
+      border: 0; background: none; text-align: left; font-family: var(--sans);
+    }
+    .handle .lbl { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+    .handle [data-note-preview] { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--serif); font-size: 15px; color: var(--ink-soft); }
+    .handle [data-note-preview].empty { font-style: italic; color: var(--ink-faint); }
+  }
+</style>
+<script src="isaiah40.js"></script>
+<script src="common.js"></script>
+</head>
+<body data-proto="e">
+  <nav class="rail" aria-label="Tools">
+    <div class="rail-wrap">
+      <button class="icon-btn" type="button" data-pop-toggle="tree" aria-expanded="false" title="Library" aria-label="Library"><svg viewBox="0 0 24 24"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg></button>
+      <div class="pop" id="tree"><div class="menu-head">Library</div><div class="tree">
+        <a href="#">Sacred Texts</a><a href="#" style="padding-left:24px">Old Testament</a>
+        <a href="#" style="padding-left:36px">Isaiah</a><a href="#" class="here" style="padding-left:48px">Chapter 40</a>
+        <a href="#" style="padding-left:48px">Chapter 41</a></div></div>
+    </div>
+    <button class="icon-btn" type="button" title="Recent places (h)" aria-label="Recent places"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+    <button class="icon-btn" type="button" title="Search (/)" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
+    <button class="icon-btn" type="button" title="Kept" aria-label="Kept"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-4-5 4z"/></svg></button>
+    <span class="spacer"></span>
+    <div class="rail-wrap">
+      <button class="icon-btn" type="button" data-pop-toggle="menu" aria-expanded="false" aria-label="Menu" style="font-size:19px">⋯</button>
+      <div class="pop" id="menu" data-menu></div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="phone-top">
+      <button class="icon-btn" type="button" data-pop-toggle="pmenu" aria-expanded="false" aria-label="Menu" style="font-size:19px">⋯</button>
+      <div class="pop" id="pmenu" data-menu="tree"></div>
+    </div>
+    <div data-focus></div>
+    <article class="passage" data-swipe>
+      <div class="ref-row">
+        <button class="keep-btn" type="button" data-keep aria-label="Keep"><svg viewBox="0 0 12 16"><path d="M1 1h10v14l-5-4-5 4z"/></svg></button>
+        <span class="ref-label" data-ref></span>
+      </div>
+      <p class="verse" data-body></p>
+      <nav class="steps" aria-label="Verses">
+        <button type="button" data-prev aria-label="Previous verse">‹</button>
+        <button type="button" class="of" data-pop-toggle="picker" aria-expanded="false" title="Go to verse"><span data-n></span> of <span data-count></span></button>
+        <button type="button" data-next aria-label="Next verse">›</button>
+        <div class="pop" id="picker"><div data-vgrid></div></div>
+      </nav>
+    </article>
+  </main>
+
+  <aside class="dock">
+    <button class="handle" type="button" onclick="this.parentElement.classList.toggle('open')">
+      <span class="lbl">Note</span><span data-note-preview></span><span style="color:var(--ink-faint)">▴</span>
+    </button>
+    <div class="dock-head"><span class="lbl">Note · <span data-ref></span></span><span class="note-status" data-note-status></span></div>
+    <div class="note-editor" contenteditable="true" data-note data-placeholder="What comes to mind?"></div>
+    <div class="note-tools">
+      <button type="button" data-tool="bold"><b>B</b></button><button type="button" data-tool="italic"><i>I</i></button>
+      <button type="button" data-tool="formatBlock" data-arg="blockquote">❝</button><button type="button" data-tool="insertUnorderedList">•</button>
+    </div>
+  </aside>
+</body>
+</html>

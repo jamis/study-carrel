@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reader Layouts</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  main { max-width: 40em; margin: 0 auto; padding: 48px 20px 80px; }
+  h1 { font-weight: 400; font-style: italic; font-size: 26px; margin: 0 0 6px; }
+  .sub { color: var(--ink-soft); margin: 0 0 36px; }
+  a.card { display: block; padding: 18px 0; border-top: 1px solid var(--rule); text-decoration: none; }
+  a.card:hover h2 { color: var(--accent); }
+  h2 { margin: 0 0 4px; font-size: 20px; font-weight: 500; }
+  h2 small { font-family: var(--sans); font-size: 11px; letter-spacing: .18em; color: var(--ink-faint); margin-right: 10px; }
+  a.card p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+  .keys { margin-top: 28px; font-family: var(--sans); font-size: 13px; color: var(--ink-soft); }
+  kbd { font: inherit; padding: 1px 6px; border: 1px solid var(--rule); border-radius: 4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Reader layouts</h1>
+  <p class="sub">Four takes on a calmer reading view. All keep the large passage, the focus as it is, and an always-open note; none preview neighboring verses or show the circle strip.</p>
+  <a class="card" href="a.html"><h2><small>A</small>Desk</h2>
+    <p>One short line on top: the focus on the left, “Isaiah 40”, recent places and ⋯ on the right. Passage and an unboxed note column side by side, divided by a hairline. Verses step with ‹ 3 of 31 ›; the number opens a plain number grid.</p></a>
+  <a class="card" href="b.html"><h2><small>B</small>Open book</h2>
+    <p>No app bar. A two-page spread on the desk: running head and folio like a printed book, the passage on the left page, a faintly ruled notebook page on the right. On a phone the notebook follows the passage on one page.</p></a>
+  <a class="card" href="c.html"><h2><small>C</small>Single column</h2>
+    <p>The focus, the passage, and your note directly under it, nothing more. The reference opens a contents list (each verse by its opening words). The page margins turn the page; the menu and arrows fade out while you read or write.</p></a>
+  <a class="card" href="d.html"><h2><small>D</small>Rail and ruler</h2>
+    <p>Tools in a thin icon rail on the left, the note as a full-height docked page on the right. Position in the chapter is a hairline ruler (taller tick = has a note) in place of the numbered circles.</p></a>
+  <a class="card" href="e.html"><h2><small>E</small>Rail and steps</h2>
+    <p>D’s layout (tool rail, docked note, no top bar) with A’s navigation: ‹ 3 of 31 › under the passage, the number opening a plain number grid.</p></a>
+  <p class="keys"><kbd>j</kbd>/<kbd>k</kbd> or <kbd>←</kbd>/<kbd>→</kbd> step · <kbd>n</kbd> write · <kbd>b</kbd> keep · <kbd>Esc</kbd> leave the note. The tab on the left edge switches layouts and keeps your verse.</p>
+</main>
+</body>
+</html>

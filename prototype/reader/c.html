@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reader C · Single Column</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  /* C · Single column: the focus, the passage, your note under it. Nothing else until you reach for it;
+     the menu and page-turn arrows fade out while you read or write. */
+  .column { max-width: 38em; margin: 0 auto; padding: 0 24px 140px; }
+  .top { display: flex; align-items: baseline; gap: 12px; padding: 22px 0 0; position: relative; }
+  .top .focus { flex: 1; min-width: 0; }
+  .top .icon-btn { align-self: center; font-size: 19px; }
+  #menu { right: 0; top: calc(100% + 4px); min-width: 220px; }
+
+  .passage { margin-top: 13vh; }
+  .ref-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; position: relative; }
+  .where { border: 0; background: none; padding: 4px 6px; margin: -4px -6px; border-radius: 6px; }
+  .where:hover, .where[aria-expanded="true"] { background: var(--accent-soft); }
+  .where .ref-label::after { content: " ▾"; color: var(--ink-faint); letter-spacing: 0; }
+  /* "Contents": the library path, then every verse by its opening words. */
+  #contents { left: 16px; top: calc(100% + 6px); width: min(440px, calc(100vw - 32px)); max-height: 70vh; overflow-y: auto; }
+  .vlist button {
+    display: grid; grid-template-columns: 30px 1fr; gap: 6px; width: 100%; padding: 6px 12px; border: 0; border-radius: 8px;
+    background: none; text-align: left; font-size: 14px;
+  }
+  .vlist button:hover { background: var(--accent-soft); }
+  .vlist b { font-weight: 400; font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; padding-top: 2px; }
+  .vlist span { font-family: var(--serif); color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .vlist button.here b, .vlist button.here span { color: var(--accent); }
+  .vlist button.noted b::after { content: " ·"; color: var(--accent); font-weight: 700; }
+
+  /* The note continues the page: a quiet margin rule, no box. */
+  .note { margin-top: 48px; padding-left: 20px; border-left: 2px solid var(--accent-soft); }
+  .note .note-editor { min-height: 3.1em; }
+  .note-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; min-height: 24px; opacity: 0; transition: opacity .2s; }
+  .note:focus-within .note-foot { opacity: 1; }
+
+  /* Page turns: the empty margins either side are the buttons. */
+  .turn-zone {
+    position: fixed; top: 0; bottom: 0; width: calc((100vw - 38em) / 2 - 24px); min-width: 56px; z-index: 5;
+    display: flex; align-items: center; border: 0; background: none; padding: 0 3vw; color: var(--ink-faint);
+    font-size: 28px; font-family: var(--sans);
+  }
+  .turn-zone.prev { left: 0; justify-content: flex-start; }
+  .turn-zone.next { right: 0; justify-content: flex-end; }
+  .turn-zone span { opacity: 0; transition: opacity .2s; }
+  .turn-zone:hover span { opacity: .8; color: var(--accent); }
+  .turn-zone:disabled { display: none; }
+  .phone-steps { display: none; }
+
+  /* Chrome fades while you're still. */
+  .fade { transition: opacity .6s; }
+  body.idle .fade:not(:hover):not(:focus-within):not([aria-expanded="true"]) { opacity: 0; }
+
+  @media (max-width: 899px) {
+    .column { padding: 0 16px 120px; }
+    .top { padding-top: 14px; }
+    .passage { margin-top: 7vh; }
+    .turn-zone { display: none; }
+    #contents { left: 0; }
+    .note-foot { opacity: 1; }
+    .phone-steps {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: flex; justify-content: center; align-items: center; gap: 4px;
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); font-family: var(--sans); font-size: 13px; color: var(--ink-soft);
+      background: linear-gradient(transparent, var(--bg) 40%);
+    }
+    .phone-steps button { border: 0; background: none; padding: 8px 16px; font-size: 18px; color: var(--ink-faint); }
+    .phone-steps button:disabled { visibility: hidden; }
+    .phone-steps span { font-variant-numeric: tabular-nums; }
+  }
+</style>
+<script src="isaiah40.js"></script>
+<script src="common.js"></script>
+</head>
+<body data-proto="c">
+  <button class="turn-zone prev fade" type="button" data-prev aria-label="Previous verse"><span>‹</span></button>
+  <button class="turn-zone next fade" type="button" data-next aria-label="Next verse"><span>›</span></button>
+
+  <div class="column">
+    <header class="top">
+      <div data-focus></div>
+      <button class="icon-btn fade" type="button" data-pop-toggle="menu" aria-expanded="false" aria-label="Menu">⋯</button>
+      <div class="pop" id="menu" data-menu></div>
+    </header>
+
+    <article class="passage" data-swipe>
+      <div class="ref-row">
+        <button class="keep-btn" type="button" data-keep aria-label="Keep"><svg viewBox="0 0 12 16"><path d="M1 1h10v14l-5-4-5 4z"/></svg></button>
+        <button class="where" type="button" data-pop-toggle="contents" aria-expanded="false" title="Contents"><span class="ref-label" data-ref></span></button>
+        <div class="pop" id="contents">
+          <div class="menu-head">Sacred Texts › Old Testament › Isaiah</div>
+          <div class="tree"><a href="#">‹ Chapter 39</a></div>
+          <div class="vlist" data-vlist></div>
+          <div class="tree"><a href="#">Chapter 41 ›</a></div>
+        </div>
+      </div>
+      <p class="verse" data-body></p>
+
+      <div class="note">
+        <div class="note-editor" contenteditable="true" data-note data-placeholder="What comes to mind?"></div>
+        <div class="note-foot">
+          <div class="note-tools">
+            <button type="button" data-tool="bold"><b>B</b></button><button type="button" data-tool="italic"><i>I</i></button>
+            <button type="button" data-tool="formatBlock" data-arg="blockquote">❝</button><button type="button" data-tool="insertUnorderedList">•</button>
+          </div>
+          <span class="note-status" data-note-status></span>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <nav class="phone-steps" aria-label="Verses">
+    <button type="button" data-prev aria-label="Previous verse">‹</button>
+    <span><span data-n></span> / <span data-count></span></span>
+    <button type="button" data-next aria-label="Next verse">›</button>
+  </nav>
+
+  <script>
+    // Idle after 2.5s without the mouse moving (or right away while typing in the note).
+    let t;
+    const wake = () => { document.body.classList.remove("idle"); clearTimeout(t); t = setTimeout(() => document.body.classList.add("idle"), 2500); };
+    addEventListener("mousemove", wake);
+    addEventListener("keydown", (e) => e.target.closest?.("[contenteditable]") ? document.body.classList.add("idle") : wake());
+    wake();
+  </script>
+</body>
+</html>

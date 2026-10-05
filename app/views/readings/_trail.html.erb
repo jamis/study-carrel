@@ -1,0 +1,15 @@
+<%# Where this chapter sits in the library, Library first, indented a step per level, then the chapters either side.
+    In the rail's Library popover, and on phones at the top of the ⋯ menu. %>
+<% crumbs = reading_crumbs(section) %>
+<ol class="trail">
+  <% crumbs.each_with_index do |(label, path, title), i| %>
+    <% last = i == crumbs.size - 1 %>
+    <li style="--depth: <%= i %>"><%= link_to label, path, title: title, class: ("here" if last), aria: { current: ("page" if last) } %></li>
+  <% end %>
+</ol>
+<% if previous_section || next_section %>
+  <div class="trail-sides">
+    <% if previous_section %><%= link_to "‹ #{previous_section.name}", reading_path(previous_section.work.slug, previous_section.number) %><% end %>
+    <% if next_section %><%= link_to "#{next_section.name} ›", reading_path(next_section.work.slug, next_section.number), class: "trail-next" %><% end %>
+  </div>
+<% end %>

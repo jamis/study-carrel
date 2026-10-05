@@ -32,13 +32,13 @@ class PositionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to reading_path("isaiah-kjv", 40, 25)
 
     get reading_path("isaiah-kjv", 40)
-    assert_select ".tick.current", "25"
+    assert_select ".cell.current", "25"
   end
 
   test "an explicit verse in the URL wins over the saved one" do
     @focus.update!(last_unit: verse(25))
     get reading_path("isaiah-kjv", 40, 3)
-    assert_select ".tick.current", "3"
+    assert_select ".cell.current", "3"
   end
 
   test "each focus remembers its own place" do
