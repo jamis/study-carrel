@@ -15,7 +15,7 @@
   <% end %>
 
   <% if !@search.searching? %>
-    <p class="search-hint">Every word must appear. Put a phrase in "quotes", and end a word with * to match its beginning, as in <i>sanctif*</i>.</p>
+    <p class="search-hint">This searches the words of the texts, not titles; to find a work by name, browse the <%= link_to "library", library_path %>. Every word must appear. Put a phrase in "quotes", and end a word with * to match its beginning, as in <i>sanctif*</i>.</p>
   <% elsif @search.total.zero? %>
     <p class="page-empty">Nothing matches <%= @search.query %><%= " in #{RandomScope.new(@place).label}" if @place %>.</p>
   <% else %>

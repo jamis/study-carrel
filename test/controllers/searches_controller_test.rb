@@ -66,6 +66,17 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
     assert_select "form.search-form input[type=hidden][name=work][value=walden]"
   end
 
+  test "the boxes say they find words in the texts, not titles" do
+    get library_path
+    assert_select "input[type=search][placeholder=?][aria-label=?]", "Find words in the library", "Find words in the library"
+    get collection_path("prose")
+    assert_select "input[type=search][placeholder=?]", "Find words in Prose"
+    get work_path("walden")
+    assert_select "input[type=search][placeholder=?]", "Find words in Walden"
+    get search_path
+    assert_select ".search-hint", /not titles/
+  end
+
   test "signed out, search is closed" do
     sign_out
     get search_path(q: "light")

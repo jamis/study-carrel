@@ -1,10 +1,11 @@
-<%# A search box. place: the work or collection to search in (nil for the whole library); query: what to prefill. %>
+<%# A search box. place: the work or collection to search in (nil for the whole library); query: what to prefill.
+    It searches the words of the texts, not titles, so it says "Find words in", not "Search". %>
 <% place = local_assigns[:place]
-   label = place.is_a?(Work) ? place.title : place&.name %>
+   label = "Find words in #{place.is_a?(Work) ? place.title : place&.name || "the library"}" %>
 <%= form_with url: search_path, method: :get, class: "search-form", role: "search" do |f| %>
   <% search_place_params(place).each do |name, slug| %><%= hidden_field_tag name, slug, id: nil %><% end %>
-  <%= f.search_field :q, value: local_assigns[:query], placeholder: label ? "Search #{label}" : "Search the library",
-        aria: { label: label ? "Search #{label}" : "Search the library" }, autocomplete: "off", enterkeyhint: "search",
+  <%= f.search_field :q, value: local_assigns[:query], placeholder: label,
+        aria: { label: label }, autocomplete: "off", enterkeyhint: "search",
         autofocus: local_assigns[:autofocus], data: { search_input: true } %>
   <button class="chip" type="submit">Search</button>
 <% end %>
