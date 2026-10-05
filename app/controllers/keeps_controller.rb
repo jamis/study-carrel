@@ -10,6 +10,7 @@ class KeepsController < ApplicationController
     else
       keeps.order(created_at: :desc, id: :desc)
     end
+    @has_focus = Current.user.foci.current.exists?
   end
 
   def create

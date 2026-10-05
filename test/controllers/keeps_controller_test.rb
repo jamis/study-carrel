@@ -83,6 +83,24 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".fv-item", 0
   end
 
+  test "the Kept page asks before starting a focus only when one is current" do
+    @user.keeps.create!(unit: verse(3))
+    get kept_path
+    assert_select "a[href=?][data-turbo-confirm]", new_focus_path(unit_id: verse(3).id)
+
+    @user.foci.current_one.archive!
+    get kept_path
+    assert_select "a[href=?]:not([data-turbo-confirm])", new_focus_path(unit_id: verse(3).id)
+  end
+
+  test "the Kept page's query count doesn't grow with the number of keeps" do
+    @user.keeps.create!(unit: verse(1))
+    one = count_queries { get kept_path }
+    (2..6).each { |n| @user.keeps.create!(unit: verse(n)) }
+    six = count_queries { get kept_path }
+    assert_equal one, six
+  end
+
   test "the reading page carries what's kept, and the strip marks it" do
     @user.keeps.create!(unit: verse(3), remark: "hm")
     get reading_path("isaiah-kjv", 40, 1)
@@ -114,5 +132,15 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
     users(:two).keeps.create!(unit: verse(25))
     post foci_path, params: { unit_id: verse(25).id, focus: { title: "Strength" } }
     assert_nil @user.foci.current_one.last_unit
+  end
+
+  private
+
+  # Counts cached queries too: the query cache hides a repeated lookup from the database, but not its cost.
+  def count_queries(&block)
+    count = 0
+    counter = ->(*, payload) { count += 1 unless payload[:name].in?(%w[SCHEMA TRANSACTION]) }
+    ActiveSupport::Notifications.subscribed(counter, "sql.active_record", &block)
+    count
   end
 end
