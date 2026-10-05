@@ -26,6 +26,7 @@
 
   * { box-sizing: border-box; }
   html, body { margin: 0; }
+  body { overflow-x: clip; }
   body {
     background: var(--bg); color: var(--ink);
     font-family: var(--serif); line-height: 1.5;
@@ -139,7 +140,7 @@
   .now-head {
     position: sticky; top: var(--top-h, 96px); z-index: 2; display: flex; align-items: center;
     margin-bottom: 4px; padding: 4px 0 10px;
-    background: linear-gradient(var(--bg) calc(100% - 10px), transparent); /* text scrolling under it fades out instead of being cut */
+    background: linear-gradient(var(--band) calc(100% - 10px), transparent); /* text scrolling under it fades out instead of being cut */
   }
   .now-head .ref { margin: 0; }
   .keep { position: relative; flex: none; display: flex; white-space: normal; } /* .now keeps line breaks; the popover mustn't */
@@ -192,33 +193,45 @@
   .layout {
     max-width: 1180px; margin: 0 auto;
     display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 40px;
-    padding: 28px 16px 120px;
+    padding: 0 16px 120px;
   }
   @media (max-width: 899px) { .layout { grid-template-columns: minmax(0, 1fr); padding-bottom: 150px; } }
   /* The sticky side panel can't leave the grid area; padding outside it would push the panel up near the end of the page. */
-  @media (min-width: 900px) { .layout { padding-bottom: 0; } }
+  @media (min-width: 900px) { .layout { padding-bottom: 0; } .layout > .panel { margin-top: 28px; } }
 
   /* ---------- lectio ---------- */
   .lectio {
     max-width: 34em; margin: 0; width: 100%; text-align: left;
-    display: flex; flex-direction: column; gap: 26px; padding: 8px 0 20px;
+    display: flex; flex-direction: column; gap: 14px; padding: 0 0 20px;
     touch-action: pan-y;
   }
   @media (min-width: 900px) { .lectio { max-width: none; } }
   .near {
-    font-size: 17px; color: var(--ink-soft); opacity: .5; cursor: pointer; line-height: 1.6;
+    font-size: 15px; color: var(--ink-soft); opacity: .38; cursor: pointer; line-height: 1.45;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     text-wrap: pretty;
   }
-  .near:hover { opacity: .9; }
+  .near:hover { opacity: .85; }
   .now, .near { white-space: pre-line; }
-  .near.edge { font-style: italic; opacity: .55; }
+  .near:empty { display: none; }
+  /* No gap under the focus band when the verse starts the screen; a faded neighbor up there brings its own. */
+  .near:first-child { padding-top: 14px; }
   .strip.scrolling { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; padding-bottom: 6px; }
   .strip.scrolling .tick { flex: none; }
   .near b { font-family: var(--sans); font-size: 11px; color: var(--accent); font-weight: 600; margin-right: 4px; }
-  .now { font-size: clamp(22px, 3.6vw, 32px); line-height: 1.5; text-wrap: pretty; hyphens: auto; }
-  .now.mid { font-size: clamp(20px, 3vw, 27px); line-height: 1.55; }
-  .now.long { font-size: clamp(18px, 2.5vw, 22px); line-height: 1.7; }
+  .now { color: var(--ink); font-weight: 500; --band: color-mix(in srgb, var(--accent-soft) 30%, var(--bg)); position: relative; isolation: isolate; padding: 16px 0 18px; font-size: clamp(24px, 3.9vw, 35px); line-height: 1.5; text-wrap: pretty; hyphens: auto; }
+  /* The band runs the full width of the screen and is bevelled so the verse looks recessed: a shadow along the top edge, a darker line along the bottom. Never wider than the viewport: on phones, overflow past it widens the layout and pushes the fixed notes sheet off-screen. */
+  .now::before {
+    content: ""; position: absolute; top: 0; bottom: 0; z-index: -1;
+    /* Exactly the viewport wide: from the column's left edge back to the screen edge (the layout is centered, max 1180px, with 16px of padding). */
+    width: 100vw; left: calc(-16px - max(0px, (100vw - 1180px) / 2)); pointer-events: none;
+    background: var(--band);
+    box-shadow: inset 0 5px 7px -3px rgba(40, 25, 10, .28), inset 0 -1px 0 rgba(40, 25, 10, .2), inset 0 1px 0 rgba(40, 25, 10, .18);
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .now::before { box-shadow: inset 0 5px 7px -3px rgba(0, 0, 0, .55), inset 0 -1px 0 rgba(0, 0, 0, .35), inset 0 1px 0 rgba(0, 0, 0, .4); } }
+  :root[data-theme="dark"] .now::before { box-shadow: inset 0 5px 7px -3px rgba(0, 0, 0, .55), inset 0 -1px 0 rgba(0, 0, 0, .35), inset 0 1px 0 rgba(0, 0, 0, .4); }
+  .now.mid { font-size: clamp(21px, 3.2vw, 29px); line-height: 1.55; }
+  .now.long { font-size: clamp(18px, 2.6vw, 23px); line-height: 1.7; }
   .now .ref {
     display: block; font-family: var(--sans); font-size: 12px; letter-spacing: .14em;
     text-transform: uppercase; color: var(--accent);

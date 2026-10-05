@@ -24,12 +24,12 @@
   <% prev_unit = (@units[at - 1] if at.positive?) %>
   <% next_unit = @units[at + 1] %>
   <article class="lectio" data-action="touchstart->lectio#touchStart touchend->lectio#touchEnd keydown@document->lectio#key">
-    <div class="near<%= " edge" if !prev_unit && @previous_section %>" aria-hidden="true" data-lectio-target="prev" data-action="click->lectio#previous"><% if prev_unit %><b><%= prev_unit.number %></b><%= prev_unit.body %><% elsif @previous_section %><b>←</b><%= @previous_section.name %><% end %></div>
+    <div class="near" aria-hidden="true" data-lectio-target="prev" data-action="click->lectio#previous"><% if prev_unit %><b><%= prev_unit.number %></b><%= prev_unit.body %><% end %></div>
     <div class="now <%= unit_size_class(@current.body) %>" aria-live="polite" data-lectio-target="now"><div class="now-head"><%= render "keeps/ribbon", unit: @current, kept: @kept %><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span></div><span data-lectio-target="body"><%= @current.body %></span></div>
-    <div class="near<%= " edge" if !next_unit && @next_section %>" aria-hidden="true" data-lectio-target="next" data-action="click->lectio#next"><% if next_unit %><b><%= next_unit.number %></b><%= next_unit.body %><% elsif @next_section %><b>→</b><%= @next_section.name %><% end %></div>
+    <div class="near" aria-hidden="true" data-lectio-target="next" data-action="click->lectio#next"><% if next_unit %><b><%= next_unit.number %></b><%= next_unit.body %><% end %></div>
     <div class="steps">
-      <button class="chip" type="button" data-action="lectio#previous">← Previous</button>
-      <button class="chip" type="button" data-action="lectio#next">Next →</button>
+      <button class="chip" type="button" data-lectio-target="prevButton" data-action="lectio#previous" <%= "hidden" unless prev_unit || @previous_section %>>← <%= prev_unit ? "#{unit_noun(@section)} #{prev_unit.number}" : @previous_section&.name %></button>
+      <button class="chip" type="button" data-lectio-target="nextButton" data-action="lectio#next" <%= "hidden" unless next_unit || @next_section %>><%= next_unit ? "#{unit_noun(@section)} #{next_unit.number}" : @next_section&.name %> →</button>
     </div>
     <nav class="strip<%= " scrolling" if @units.size > 40 %>" aria-label="<%= unit_noun(@section).pluralize %>" data-lectio-target="strip">
       <% @units.each do |u| %>

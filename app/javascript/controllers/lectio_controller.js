@@ -3,7 +3,7 @@ import { Turbo } from "@hotwired/turbo-rails"
 
 // Switches verses client-side; the whole section is already on the page.
 export default class extends Controller {
-  static targets = ["unit", "prev", "now", "body", "next", "ref", "refUnit", "tick", "count", "strip", "editor"]
+  static targets = ["unit", "prev", "now", "body", "next", "prevButton", "nextButton", "ref", "refUnit", "tick", "count", "strip", "editor"]
   static values = { current: Number, base: String, refTemplate: String, refUnitTemplate: String, positionUrl: String, unitName: String,
     noteUrlTemplate: String, prevUrl: String, prevLabel: String, nextUrl: String, nextLabel: String }
 
@@ -77,8 +77,10 @@ export default class extends Controller {
   render() {
     const n = this.currentValue
     const i = this.numbers.indexOf(n)
-    this.fillNear(this.prevTarget, this.numbers[i - 1], "←", this.prevLabelValue)
-    this.fillNear(this.nextTarget, this.numbers[i + 1], "→", this.nextLabelValue)
+    this.fillNear(this.prevTarget, this.numbers[i - 1])
+    this.fillNear(this.nextTarget, this.numbers[i + 1])
+    this.fillStep(this.prevButtonTarget, this.numbers[i - 1], this.prevLabelValue, "← ", "")
+    this.fillStep(this.nextButtonTarget, this.numbers[i + 1], this.nextLabelValue, "", " →")
 
     const body = this.bodies.get(n)
     this.nowTarget.className = "now" + (body.length > 450 ? " long" : body.length > 180 ? " mid" : "")
@@ -145,19 +147,20 @@ export default class extends Controller {
     })
   }
 
-  // The faded neighbor above or below; at a chapter's edge it names the adjacent chapter instead.
-  fillNear(el, number, arrow, edgeLabel) {
+  // The faded neighbor above or below; empty at a chapter's edge.
+  fillNear(el, number) {
     el.replaceChildren()
-    el.classList.remove("edge")
+    if (number === undefined) return
     const b = document.createElement("b")
-    if (number !== undefined) {
-      b.textContent = number
-      el.append(b, this.bodies.get(number))
-    } else if (edgeLabel) {
-      b.textContent = arrow
-      el.classList.add("edge")
-      el.append(b, edgeLabel)
-    }
+    b.textContent = number
+    el.append(b, this.bodies.get(number))
+  }
+
+  // A step button names where it goes: the neighboring verse, or at a chapter's edge the neighboring chapter. Hidden at either end of the text.
+  fillStep(button, number, edgeLabel, before, after) {
+    const label = number !== undefined ? `${this.unitNameValue} ${number}` : edgeLabel
+    button.hidden = !label
+    button.textContent = `${before}${label}${after}`
   }
 
   touchStart(event) {
