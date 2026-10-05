@@ -15,6 +15,22 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert cookies[:session_id]
   end
 
+  test "signing in returns to the page that asked for it" do
+    get kept_path
+    assert_redirected_to new_session_path
+
+    post session_path, params: { email_address: @user.email_address, password: "password" }
+    assert_redirected_to kept_url
+  end
+
+  test "an autosave or a frame that asked for sign-in isn't returned to" do
+    put unit_note_path(1), params: { note: { content: "x" } }, as: :turbo_stream
+    get unit_note_path(1), headers: { "Turbo-Frame" => "note_editor" }
+
+    post session_path, params: { email_address: @user.email_address, password: "password" }
+    assert_redirected_to root_url
+  end
+
   test "create with invalid credentials" do
     post session_path, params: { email_address: @user.email_address, password: "wrong" }
 

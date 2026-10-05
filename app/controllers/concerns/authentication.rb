@@ -29,8 +29,9 @@ module Authentication
       Session.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
     end
 
+    # Only a page is worth coming back to: not an autosave or position update, and not the note editor's frame.
     def request_authentication
-      session[:return_to_after_authenticating] = request.url
+      session[:return_to_after_authenticating] = request.url if request.get? && !turbo_frame_request?
       redirect_to new_session_path
     end
 

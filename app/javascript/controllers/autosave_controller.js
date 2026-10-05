@@ -36,6 +36,7 @@ export default class extends Controller {
 
     this.inflight = true
     this.#status("Saving…")
+    let failure = "Couldn't save; retrying…"
     try {
       const response = await fetch(this.element.action, {
         method: "PUT",
@@ -47,6 +48,12 @@ export default class extends Controller {
         body: JSON.stringify({ note: { content: value } }),
         keepalive: true
       })
+      // fetch follows redirects, so a save bounced to the sign-in page still looks ok; it saved nothing.
+      // The session cookie is shared, so signing in from another tab lets the next retry through.
+      if (response.redirected) {
+        failure = "Not saved: you've been signed out. Sign in from another tab and it will save."
+        throw new Error("redirected")
+      }
       if (!response.ok) throw new Error(response.status)
 
       this.saved = value
@@ -55,7 +62,7 @@ export default class extends Controller {
       Turbo.renderStreamMessage(await response.text())
       this.#status("Saved")
     } catch {
-      this.#status("Couldn't save; retrying…")
+      this.#status(failure)
       this.timer = setTimeout(() => this.save(), 5000)
     } finally {
       this.inflight = false

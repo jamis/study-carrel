@@ -113,7 +113,8 @@ export default class extends Controller {
         body: body && JSON.stringify(body),
         keepalive: true
       })
-      if (!response.ok) throw new Error(response.statusText)
+      // A redirect (to sign in) means nothing was saved, though fetch reports it ok.
+      if (!response.ok || response.redirected) throw new Error(response.statusText)
     } catch {
       if (method === "PATCH") return
       const kept = method === "DELETE"
