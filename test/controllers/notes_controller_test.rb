@@ -101,7 +101,8 @@ class ExportTest < ActionDispatch::IntegrationTest
 
   test "all-notes page offers copy and download" do
     get notes_path
-    assert_select "[data-controller=clipboard][data-clipboard-text-value*=?]", "# Holy"
+    assert_select "[data-controller=clipboard][data-clipboard-url-value=?]", export_notes_path
+    assert_select "[data-clipboard-text-value]", count: 0
     assert_select "a[href=?]", export_notes_path
   end
 end
