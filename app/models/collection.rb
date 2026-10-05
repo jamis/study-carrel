@@ -57,7 +57,16 @@ class Collection < ApplicationRecord
 
   # How many works to show for this collection: its own works plus its child collections', where a child
   # that is a single work (the Bible, the Book of Mormon) counts as one however many books it holds.
-  def work_count = works.size + children.sum { |c| c.single_work? ? 1 : c.work_count }
+  def work_count = Collection.work_counts.fetch(id)
+
+  # Every collection's #work_count, keyed by id, from two queries, for pages that list several collections.
+  def self.work_counts
+    rows = pluck(:id, :parent_id, :single_work)
+    own = Work.group(:collection_id).count
+    children = rows.group_by { |_, parent_id, _| parent_id }
+    count = ->(id) { own.fetch(id, 0) + children.fetch(id, []).sum { |child, _, single| single ? 1 : count.(child) } }
+    rows.to_h { |id, *| [ id, count.(id) ] }
+  end
 
   # Every work in this collection or any collection nested under it.
   def all_works = Work.where(collection_id: self_and_descendant_ids)

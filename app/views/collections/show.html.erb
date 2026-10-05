@@ -1,10 +1,10 @@
 <% content_for :title, "#{@collection.name} · Study Carrel" %>
-<%= render "shared/header", crumbs: library_crumbs(@collection), random: random_collection_path(@collection.slug), focus: Current.user.foci.current_one %>
+<%= render "shared/header", crumbs: library_crumbs(@collection), random: random_collection_path(@collection.slug), focus: Current.focus %>
 <main class="page">
   <h2 class="page-title"><%= @collection.name %></h2>
   <% if @collection.description.present? %><p class="page-lede"><%= @collection.description %></p><% end %>
 
-  <%= render partial: "collections/row", collection: @children, as: :collection %>
+  <%= render partial: "collections/row", collection: @children, as: :collection, locals: { work_counts: @work_counts } %>
 
   <div class="works">
     <% @works.each do |work| %>

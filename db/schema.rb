@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_04_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_05_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -71,7 +71,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_04_160000) do
     t.integer "last_unit_id"
     t.integer "user_id", null: false
     t.index ["last_unit_id"], name: "index_foci_on_last_unit_id"
-    t.index ["user_id"], name: "index_foci_on_user_id"
+    t.index ["user_id", "archived_at", "created_at"], name: "index_foci_on_user_id_and_archived_at_and_created_at"
   end
 
   create_table "invitations", force: :cascade do |t|

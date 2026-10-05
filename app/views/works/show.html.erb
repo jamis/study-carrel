@@ -1,6 +1,6 @@
 <% content_for :title, "#{@work.name} · Study Carrel" %>
 <% numbered = @sections.all?(&:numbered?) %>
-<%= render "shared/header", crumbs: library_crumbs(@work.collection, work: @work), random: random_work_path(@work.slug), focus: Current.user.foci.current_one %>
+<%= render "shared/header", crumbs: library_crumbs(@work.collection, work: @work), random: random_work_path(@work.slug), focus: Current.focus %>
 <main class="page">
   <h2 class="page-title"><%= @work.title %></h2>
   <p class="page-lede"><%= [ @work.byline, @work.edition, pluralize(@sections.size, "section") ].compact_blank.join(" · ") %></p>

@@ -1,5 +1,5 @@
 <% content_for :title, "Library · Study Carrel" %>
-<%= render "shared/header", crumbs: library_crumbs, focus: Current.user.foci.current_one %>
+<%= render "shared/header", crumbs: library_crumbs, focus: Current.focus %>
 <main class="page">
   <h2 class="page-title">Library</h2>
 
@@ -7,7 +7,7 @@
     <p class="page-empty">No texts are loaded yet. Run <code>bin/rails db:seed</code> on the server.</p>
   <% end %>
 
-  <%= render partial: "collections/row", collection: @collections, as: :collection %>
+  <%= render partial: "collections/row", collection: @collections, as: :collection, locals: { work_counts: @work_counts } %>
 
   <% @loose_works.each do |work| %>
     <div class="list-row">

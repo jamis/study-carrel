@@ -20,6 +20,19 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
     assert_select ".list-row:has(a[href=?]) .list-row-meta", collection_path("sacred-texts"), text: "2 works"
   end
 
+  test "the library page's queries don't grow with the collection tree" do
+    get library_path
+    before = count_queries { get library_path }
+
+    parent = Collection.find_by!(slug: "prose")
+    3.times do |i|
+      parent = Collection.create!(slug: "nested-#{i}", name: "Nested #{i}", parent:)
+      Work.create!(title: "Work #{i}", slug: "work-#{i}", collection: parent)
+    end
+    assert_equal before, count_queries { get library_path }
+    assert_select ".list-row:has(a[href=?]) .list-row-meta", collection_path("prose"), text: "4 works"
+  end
+
   test "the Bible lists its testaments, and each testament its books" do
     get collection_path("bible")
     assert_select ".list-row-title a" do |links|
@@ -121,5 +134,14 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
   test "units are named for the text in labels" do
     get reading_path("walden", 1, 1)
     assert_select ".tick[aria-label=?]", "Paragraph 1"
+  end
+
+  private
+
+  def count_queries(&block)
+    count = 0
+    counter = ->(*, payload) { count += 1 unless payload[:name].in?([ "SCHEMA", "TRANSACTION" ]) }
+    ActiveSupport::Notifications.subscribed(counter, "sql.active_record", &block)
+    count
   end
 end

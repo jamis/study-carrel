@@ -1,14 +1,14 @@
 <% content_for :title, "New focus · Study Carrel" %>
 <main class="signin">
   <h1 class="brand">Study Carrel</h1>
-  <p class="signin-notice"><%= Current.user.foci.current_one ? "What will you ponder next?" : "What do you want to ponder as you read?" %></p>
+  <p class="signin-notice"><%= Current.focus ? "What will you ponder next?" : "What do you want to ponder as you read?" %></p>
   <% if @start_keep %>
     <p class="signin-notice start-from">Beginning at <%= link_to @start_keep.unit.reference, reading_path(@start_keep.unit.section.work.slug, @start_keep.unit.section.number, @start_keep.unit.number) %><% if @start_keep.remark %>: <em><%= @start_keep.remark %></em><% end %></p>
   <% end %>
   <%= render "form", focus: @focus, submit: "Begin", start_keep: @start_keep %>
   <% if Current.user.foci.exists? %>
     <p class="signin-notice">
-      <% if Current.user.foci.current_one %><%= link_to "Cancel", root_path %> · <% end %><%= link_to "Past focuses", foci_path %>
+      <% if Current.focus %><%= link_to "Cancel", root_path %> · <% end %><%= link_to "Past focuses", foci_path %>
     </p>
   <% end %>
 </main>

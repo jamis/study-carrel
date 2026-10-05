@@ -60,4 +60,20 @@ class CollectionTest < ActiveSupport::TestCase
     a.destroy!
     assert_nil b.reload.parent
   end
+
+  test "work counts include nested collections, a single-work collection counting as one" do
+    scripture = Collection.create!(slug: "scripture", name: "Scripture")
+    bible = Collection.create!(slug: "bible", name: "Bible", parent: scripture, single_work: true)
+    ot = Collection.create!(slug: "ot", name: "Old Testament", parent: bible)
+    world = Collection.create!(slug: "world", name: "World", parent: scripture)
+    Work.create!(title: "Genesis", slug: "genesis", collection: ot)
+    Work.create!(title: "Exodus", slug: "exodus", collection: ot)
+    Work.create!(title: "Dhammapada", slug: "dhammapada", collection: world)
+    Work.create!(title: "Gita", slug: "gita", collection: world)
+    Work.create!(title: "Psalms of Solomon", slug: "pss", collection: scripture)
+
+    counts = Collection.work_counts
+    assert_equal({ scripture.id => 4, bible.id => 2, ot.id => 2, world.id => 2 }, counts)
+    assert_equal 4, scripture.work_count
+  end
 end
