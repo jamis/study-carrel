@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { csrfToken, fillId } from "lib/request"
 
 // The Keep ribbon. Tapping the empty ribbon keeps the verse on screen (and offers Undo / Add a remark for a few
 // seconds); tapping a kept ribbon opens a small popover for the remark, or to release it. The reader announces
@@ -108,9 +109,9 @@ export default class extends Controller {
   async send(method, body, previousRemark) {
     const unitId = this.unitIdValue
     try {
-      const response = await fetch(this.urlTemplateValue.replace("%7Bid%7D", unitId).replace("{id}", unitId), {
+      const response = await fetch(fillId(this.urlTemplateValue, unitId), {
         method,
-        headers: { "Content-Type": "application/json", Accept: "application/json", "X-CSRF-Token": document.querySelector("meta[name=csrf-token]")?.content },
+        headers: { "Content-Type": "application/json", Accept: "application/json", "X-CSRF-Token": csrfToken() },
         body: body && JSON.stringify(body),
         keepalive: true
       })

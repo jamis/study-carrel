@@ -16,7 +16,7 @@
       data-lectio-next-label-value="<%= @next_section&.name %>">
   <div hidden>
     <% @units.each do |u| %>
-      <span data-lectio-target="unit" data-number="<%= u.number %>" data-unit-id="<%= u.id %>"><%= u.body %></span>
+      <span data-lectio-target="unit" data-number="<%= u.number %>" data-unit-id="<%= u.id %>" data-size="<%= unit_size_class(u.body) %>"><%= u.body %></span>
     <% end %>
   </div>
 

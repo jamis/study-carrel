@@ -15,7 +15,7 @@
           <% crumbs.each_with_index do |(label, path, title), i| %>
             <% last = i == crumbs.size - 1 %>
             <% if i == 1 %><li class="crumb-more" hidden aria-hidden="true">…</li><% end %>
-            <li data-crumbs-target="item"<%= " class=crumb-last".html_safe if last %>><%= link_to label, path, class: "crumb", title: title, aria: { current: ("page" if last) } %></li>
+            <%= tag.li class: ("crumb-last" if last), data: { crumbs_target: "item" } do %><%= link_to label, path, class: "crumb", title: title, aria: { current: ("page" if last) } %><% end %>
           <% end %>
         </ol>
       </nav>

@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
+import { csrfToken } from "lib/request"
 
 // The always-open note editor: saves a moment after typing stops, when focus leaves the
 // editor, and when the verse changes (this controller disconnecting). Failed saves retry.
@@ -43,7 +44,7 @@ export default class extends Controller {
         headers: {
           "Content-Type": "application/json",
           "Accept": "text/vnd.turbo-stream.html",
-          "X-CSRF-Token": document.querySelector("meta[name=csrf-token]")?.content
+          "X-CSRF-Token": csrfToken()
         },
         body: JSON.stringify({ note: { content: value } }),
         keepalive: true

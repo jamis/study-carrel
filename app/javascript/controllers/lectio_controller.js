@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
+import { csrfToken, fillId } from "lib/request"
 
 // Switches verses client-side; the whole section is already on the page.
 export default class extends Controller {
@@ -10,6 +11,8 @@ export default class extends Controller {
   connect() {
     this.bodies = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.textContent.trim()]))
     this.numbers = [...this.bodies.keys()].sort((a, b) => a - b)
+    // Longer units step down in size; the server decides which (ReadingsHelper#unit_size_class).
+    this.sizes = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.dataset.size]))
 
     this.unitIds = new Map(this.unitTargets.map(u => [Number(u.dataset.number), Number(u.dataset.unitId)]))
     // Which verses have a note; the editor reports changes as it autosaves.
@@ -67,7 +70,7 @@ export default class extends Controller {
       if (!unitId) return
       fetch(this.positionUrlValue, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", "X-CSRF-Token": document.querySelector("meta[name=csrf-token]")?.content },
+        headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken() },
         body: JSON.stringify({ unit_id: unitId }),
         keepalive: true
       })
@@ -83,7 +86,7 @@ export default class extends Controller {
     this.fillStep(this.nextButtonTarget, this.numbers[i + 1], this.nextLabelValue, "", " →")
 
     const body = this.bodies.get(n)
-    this.nowTarget.className = "now" + (body.length > 450 ? " long" : body.length > 180 ? " mid" : "")
+    this.nowTarget.className = ["now", this.sizes.get(n)].filter(Boolean).join(" ")
     this.bodyTarget.textContent = body
     this.refUnitTargets.forEach(r => r.textContent = this.refUnitTemplateValue.replace("{n}", n))
     this.refTargets.forEach(r => r.title = this.refTemplateValue.replace("{n}", n))
@@ -98,7 +101,7 @@ export default class extends Controller {
     this.scrollStripToCurrent()
 
     // Swapping the frame replaces the editor; the old one saves itself as it goes.
-    this.editorTarget.src = this.noteUrlTemplateValue.replace("%7Bid%7D", this.unitIds.get(n)).replace("{id}", this.unitIds.get(n))
+    this.editorTarget.src = fillId(this.noteUrlTemplateValue, this.unitIds.get(n))
     this.updateCount()
     this.announce()
   }
