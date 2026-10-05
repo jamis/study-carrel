@@ -46,4 +46,32 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
     assert_empty cookies[:session_id]
   end
+
+  test "signing out ends the user's sessions on every device, and nobody else's" do
+    other_device = @user.sessions.create!
+    other_user = User.where.not(id: @user.id).take.sessions.create!
+    sign_in_as(@user)
+
+    delete session_path
+
+    assert_empty @user.sessions.reload
+    assert_not Session.exists?(other_device.id)
+    assert Session.exists?(other_user.id)
+  end
+
+  test "a session older than 30 days no longer signs you in" do
+    sign_in_as(@user)
+    Current.session.update!(created_at: 31.days.ago)
+
+    get kept_path
+    assert_redirected_to new_session_path
+  end
+
+  test "a session just under 30 days old still works" do
+    sign_in_as(@user)
+    Current.session.update!(created_at: 29.days.ago)
+
+    get kept_path
+    assert_response :success
+  end
 end

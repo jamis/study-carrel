@@ -26,7 +26,7 @@ module Authentication
     end
 
     def find_session_by_cookie
-      Session.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
+      Session.active.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
     end
 
     # Only a page is worth coming back to: not an autosave or position update, and not the note editor's frame.
@@ -42,12 +42,13 @@ module Authentication
     def start_new_session_for(user)
       user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
         Current.session = session
-        cookies.signed.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }
+        cookies.signed[:session_id] = { value: session.id, expires: Session::MAX_AGE, httponly: true, same_site: :lax }
       end
     end
 
+    # Signing out on one device signs out of all of them.
     def terminate_session
-      Current.session.destroy
+      Current.session.user.sessions.delete_all
       cookies.delete(:session_id)
     end
 end
