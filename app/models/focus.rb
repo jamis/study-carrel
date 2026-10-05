@@ -5,10 +5,8 @@ class Focus < ApplicationRecord
 
   validates :title, presence: true
 
+  # user.foci.current_one and user.foci.start! are defined on the association in User.
   scope :current, -> { where(archived_at: nil) }
-
-  # Called on a user's foci (user.foci.current_one), so each reader has their own current focus.
-  def self.current_one = current.order(:created_at).last
 
   scope :past, -> { where.not(archived_at: nil).order(archived_at: :desc) }
 
@@ -26,14 +24,6 @@ class Focus < ApplicationRecord
     self.class.transaction do
       user.foci.current.where.not(id: id).update_all(archived_at: Time.current)
       update!(archived_at: nil)
-    end
-  end
-
-  # Only one focus is current at a time per user: user.foci.start! archives the old one.
-  def self.start!(attrs)
-    transaction do
-      current.update_all(archived_at: Time.current)
-      create!(attrs)
     end
   end
 end
