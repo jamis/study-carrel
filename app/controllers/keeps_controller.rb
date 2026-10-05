@@ -21,8 +21,12 @@ class KeepsController < ApplicationController
   end
 
   def update
-    Current.user.keeps.find_by(unit: @unit)&.update!(params.expect(keep: [ :remark ]))
-    head :no_content
+    keep = Current.user.keeps.find_by(unit: @unit)
+    if keep.nil? || keep.update(params.expect(keep: [ :remark ]))
+      head :no_content
+    else
+      render json: { errors: keep.errors.full_messages }, status: :unprocessable_content
+    end
   end
 
   def destroy

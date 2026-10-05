@@ -49,8 +49,9 @@ export default class extends Controller {
 
   saveRemark() {
     const remark = this.remarkTarget.value.trim()
+    const previous = this.kept.get(this.unitIdValue) ?? ""
     this.kept.set(this.unitIdValue, remark)
-    this.send("PATCH", { keep: { remark } })
+    this.send("PATCH", { keep: { remark } }, previous)
   }
 
   openRemark() {
@@ -103,8 +104,8 @@ export default class extends Controller {
     this.dispatch("changed", { detail: { unitId: this.unitIdValue, kept } })
   }
 
-  // Send the change for the verse shown now; if it doesn't take, put the ribbon back as it was.
-  async send(method, body) {
+  // Send the change for the verse shown now; if it doesn't take, put the ribbon (or the remark) back as it was.
+  async send(method, body, previousRemark) {
     const unitId = this.unitIdValue
     try {
       const response = await fetch(this.urlTemplateValue.replace("%7Bid%7D", unitId).replace("{id}", unitId), {
@@ -116,7 +117,12 @@ export default class extends Controller {
       // A redirect (to sign in) means nothing was saved, though fetch reports it ok.
       if (!response.ok || response.redirected) throw new Error(response.statusText)
     } catch {
-      if (method === "PATCH") return
+      if (method === "PATCH") {
+        // Unless it was released meanwhile, in which case there's no remark to restore.
+        if (this.kept.has(unitId)) this.kept.set(unitId, previousRemark)
+        alert("Couldn't save your remark. Check your connection and try again.")
+        return
+      }
       const kept = method === "DELETE"
       if (kept) this.kept.set(unitId, ""); else this.kept.delete(unitId)
       if (unitId === this.unitIdValue) this.render()

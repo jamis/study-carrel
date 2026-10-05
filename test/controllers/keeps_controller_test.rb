@@ -27,6 +27,13 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Come back to this", @user.keeps.first.remark
   end
 
+  test "a remark that's too long is refused and the old one kept" do
+    @user.keeps.create!(unit: verse(3), remark: "first")
+    patch unit_keep_path(verse(3)), params: { keep: { remark: "x" * 201 } }, as: :json
+    assert_response :unprocessable_content
+    assert_equal "first", @user.keeps.first.remark
+  end
+
   test "a remark for something no longer kept is ignored" do
     patch unit_keep_path(verse(3)), params: { keep: { remark: "late" } }, as: :json
     assert_response :no_content
