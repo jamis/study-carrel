@@ -14,6 +14,10 @@ export default class extends Controller {
     }
   }
 
+  select(event) {
+    event.target.select()
+  }
+
   #flash(message) {
     const original = (this.buttonTarget.dataset.original ??= this.buttonTarget.innerHTML)
     this.buttonTarget.textContent = message

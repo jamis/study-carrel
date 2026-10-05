@@ -9,6 +9,7 @@ class InvitationsFlowTest < ActionDispatch::IntegrationTest
   end
 
   def join_params(**over) = { user: { email_address: "sam@example.com", password: "long enough", password_confirmation: "long enough" }.merge(over) }
+  def without_nonces(html) = html.gsub(/(nonce|name="csp-nonce" content)="[^"]*"/, '\1=""') # the CSP nonce changes with every request
 
   test "the join page is open to anyone holding a valid link" do
     get join_path(token: @token)
@@ -49,12 +50,12 @@ class InvitationsFlowTest < ActionDispatch::IntegrationTest
   test "unknown, expired and revoked links all look the same" do
     get join_path(token: "bogus")
     assert_response :not_found
-    expected = response.body
+    expected = without_nonces(response.body)
 
     @invitation.update!(expires_at: 1.hour.ago)
     get join_path(token: @token)
     assert_response :not_found
-    assert_equal expected, response.body
+    assert_equal expected, without_nonces(response.body)
 
     other = @admin.invitations.create!
     other.revoke!

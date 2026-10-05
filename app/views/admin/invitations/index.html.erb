@@ -9,7 +9,7 @@
   <% if flash[:invitation_link] %>
     <div class="invite-new" data-controller="clipboard" data-clipboard-text-value="<%= flash[:invitation_link] %>">
       <p class="page-sub">New invitation<%= " for #{flash[:invitation_label]}" if flash[:invitation_label] %></p>
-      <input class="invite-link" type="text" readonly value="<%= flash[:invitation_link] %>" aria-label="Invitation link" onfocus="this.select()">
+      <input class="invite-link" type="text" readonly value="<%= flash[:invitation_link] %>" aria-label="Invitation link" data-action="focus->clipboard#select">
       <p class="signin-notice">Copy it now: it won't be shown again.</p>
       <button class="chip" type="button" data-action="clipboard#copy" data-clipboard-target="button">Copy link</button>
     </div>
