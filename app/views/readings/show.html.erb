@@ -51,7 +51,7 @@
       <div class="pfocus"><%= @focus.title %></div>
     </div>
     <div class="composer">
-      <%= render "unit_notes/editor", unit: @current, note: @notes_by_unit[@current.id] %>
+      <%= render "unit_notes/editor", unit: @current, note: @notes_by_unit[@current.id], focus: @focus %>
     </div>
   </aside>
 </main>

@@ -10,6 +10,9 @@ class UnitNotesController < ApplicationController
   end
 
   def update
+    # The editor was opened under another focus (one started since, maybe in another tab).
+    return head :conflict if params[:focus_id].present? && params[:focus_id].to_i != @focus.id
+
     @note ||= @focus.notes.build(unit: @unit)
     @note.content = params.expect(note: [ :content ])[:content]
 

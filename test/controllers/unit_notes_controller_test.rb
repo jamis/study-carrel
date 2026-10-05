@@ -18,6 +18,20 @@ class UnitNotesControllerTest < ActionDispatch::IntegrationTest
     assert_match "All notes (1)", response.body
   end
 
+  test "a save from an editor opened under another focus is refused" do
+    users(:one).foci.start!(title: "Newer")
+    assert_no_difference "Note.count" do
+      put unit_note_path(@unit), params: { focus_id: @focus.id, note: { content: "Meant for Holy." } }, as: :turbo_stream
+    end
+    assert_response :conflict
+  end
+
+  test "a save that names the current focus goes through" do
+    put unit_note_path(@unit), params: { focus_id: @focus.id, note: { content: "Incomparable." } }, as: :turbo_stream
+    assert_response :success
+    assert_equal @focus, Note.last.focus
+  end
+
   test "note text is kept out of the logs" do
     put unit_note_path(@unit), params: { note: { content: "Private thought." } }, as: :turbo_stream
     assert_equal "[FILTERED]", request.filtered_parameters.dig("note", "content")
