@@ -64,6 +64,7 @@ Each step is small, can be checked on its own, and leaves the app working.
 - **Doctrine and Covenants and Pearl of Great Price.** Deferred: no clean public-domain text exists online. The Wikisource D&C is the modern copyrighted text. Options are OCR of the 1908 Deseret News D&C (archive.org `thedoctrineandco00smituoft`) cross-checked against two other pre-1923 scans, and the 1913 Pearl of Great Price on Wikisource. Label both as older public-domain editions; D&C 138 and the Official Declarations would be missing.
 - **User-uploaded works**. Allow users to (somehow?) upload works that exist only in their library. Perhaps allow user's to share these works with other users?
 - **Backups, extended.** A scheduled restore check, and a resize to 1 GB if the 512 MB droplet feels tight.
+- **Encrypted notes, foci.** Keep personal information private.
 
 ## Notes
 
