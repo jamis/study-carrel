@@ -1,5 +1,6 @@
 <% content_for :title, "#{@section.name} · Study Carrel" %>
-<%= render "shared/header", crumbs: reading_crumbs(@section), focus: @focus, band: true %>
+<%= render "shared/header", crumbs: reading_crumbs(@section), focus: @focus, band: true,
+                            random: RandomScope.chain_for(@section.work), random_default: RandomScope.default_for(@section.work) %>
 
 <main class="layout" data-controller="lectio"
       data-lectio-current-value="<%= @current.number %>"

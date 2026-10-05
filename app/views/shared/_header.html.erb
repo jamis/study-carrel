@@ -2,11 +2,13 @@
     crumbs: [[label, path, tooltip], ...], last one is the current page
     focus: the current focus (for the All notes link; nil if none)
     band: show the focus band under the nav
-    random: where the Random item goes (scoped on collection and work pages) %>
+    random: the RandomScope places Random can roll in, innermost first (just the library if omitted)
+    random_default: the one the Random item rolls in (the first if omitted) %>
 <% focus = local_assigns[:focus]
    band = local_assigns[:band] && focus
    reading = local_assigns[:band]
-   random = local_assigns[:random] || random_path %>
+   random = local_assigns[:random] || [ RandomScope.library ]
+   random_default = local_assigns[:random_default] || random.first %>
 <header class="top" data-controller="theme">
   <div class="nav">
     <div class="nav-in">
@@ -36,7 +38,7 @@
           <%= link_to "All focuses", foci_path, class: "menu-item" %>
           <button class="menu-item menu-history" type="button" data-history-open data-action="menu#close">Recent places<kbd>h</kbd></button>
           <% unless reading %><%= link_to "Continue reading", root_path, class: "menu-item" %><% end %>
-          <%= link_to "Random", random, class: "menu-item" %>
+          <%= render "shared/random_menu", scopes: random, default: random_default %>
           <%= link_to "Kept", kept_path, class: "menu-item" %>
           <button class="menu-item" type="button" data-action="theme#toggle">Light / dark</button>
           <% if Current.user.admin? %><%= link_to "Invitations", admin_invitations_path, class: "menu-item" %><% end %>

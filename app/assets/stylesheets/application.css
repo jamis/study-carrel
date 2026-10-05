@@ -185,6 +185,15 @@
   .menu-panel .menu-item:hover, .menu-panel .signout button:hover { background: var(--accent-soft); color: var(--ink); }
   .menu-panel .signout { width: 100%; }
   .menu-item kbd { font: inherit; font-size: 12px; color: var(--ink-soft); }
+  /* Random: the item rolls in the default scope; the ▾ reveals the wider scopes. */
+  .menu-row { display: flex; align-items: stretch; gap: 2px; }
+  .menu-row .menu-item { flex: 1; min-width: 0; }
+  .menu-note { min-width: 0; max-width: 11em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--ink-soft); }
+  .menu-more { border: 0; border-radius: 8px; background: transparent; padding: 0 12px; font-size: 13px; color: var(--ink-soft); cursor: pointer; }
+  .menu-more:hover { background: var(--accent-soft); }
+  .menu-more[aria-expanded="true"] { transform: rotate(180deg); }
+  .menu-sub { margin: 0 0 4px 12px; padding-left: 6px; border-left: 1px solid var(--rule); }
+  .menu-sub .menu-item { font-size: 14px; }
   @media (max-width: 719px) {
     .menu-panel .menu-item, .menu-panel .signout button { min-height: 44px; }
   }

@@ -54,7 +54,10 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
     end
     get work_path("genesis-kjv")
     assert_select ".crumbs li:last-child a[aria-current=page]", "Genesis"
-    assert_select ".menu-panel a[href=?]", random_work_path("genesis-kjv"), text: "Random"
+    assert_select ".menu-row a[href=?]", random_work_path("genesis-kjv"), text: /Random\s*Genesis/
+    get library_path
+    assert_select ".menu-row a[href=?]", random_path
+    assert_select ".menu-more", 0
   end
 
   test "a collection lists its books in order" do

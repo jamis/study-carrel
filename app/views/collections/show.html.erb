@@ -1,5 +1,5 @@
 <% content_for :title, "#{@collection.name} · Study Carrel" %>
-<%= render "shared/header", crumbs: library_crumbs(@collection), random: random_collection_path(@collection.slug), focus: Current.focus %>
+<%= render "shared/header", crumbs: library_crumbs(@collection), random: RandomScope.chain_for(@collection), focus: Current.focus %>
 <main class="page">
   <h2 class="page-title"><%= @collection.name %></h2>
   <% if @collection.description.present? %><p class="page-lede"><%= @collection.description %></p><% end %>

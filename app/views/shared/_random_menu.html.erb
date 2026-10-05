@@ -1,0 +1,19 @@
+<%# The ⋯ menu's Random item, rolling in the default scope, with a disclosure for the wider scopes.
+    scopes: RandomScope places, innermost first; default: the one the item rolls in %>
+<% others = scopes - [ default ] %>
+<div class="menu-random" data-controller="disclosure">
+  <div class="menu-row">
+    <%= link_to random_scope_path(default), class: "menu-item" do %>Random<span class="menu-note"><%= default.label %></span><% end %>
+    <% if others.any? %>
+      <button class="menu-more" type="button" aria-label="Other places to roll" aria-expanded="false" aria-controls="random-more"
+              data-disclosure-target="button" data-action="disclosure#toggle">▾</button>
+    <% end %>
+  </div>
+  <% if others.any? %>
+    <div class="menu-sub" id="random-more" hidden data-disclosure-target="panel">
+      <% others.each do |scope| %>
+        <%= link_to "Random #{scope.in_words}", random_scope_path(scope), class: "menu-item" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

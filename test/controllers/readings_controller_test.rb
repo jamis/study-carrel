@@ -23,6 +23,13 @@ class ReadingsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".tick.current", "25"
   end
 
+  test "Random rolls in the innermost collection, with the wider scopes behind a disclosure" do
+    get reading_path("isaiah-kjv", 40)
+    assert_select ".menu-row a.menu-item[href=?]", random_collection_path("old-testament"), text: /Old Testament/
+    assert_select ".menu-sub a.menu-item[href=?]", random_work_path("isaiah-kjv")
+    assert_select ".menu-sub a.menu-item[href=?]", random_path
+  end
+
   test "unknown verse is a 404" do
     get reading_path("isaiah-kjv", 40, 99)
     assert_response :not_found
