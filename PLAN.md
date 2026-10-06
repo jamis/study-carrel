@@ -55,6 +55,7 @@ Each step is small, can be checked on its own, and leaves the app working.
 - **History.** Built (see DECISIONS.md). Show where you've been recently (random hops make this matter) and jump straight back to any of those places. Global per user, not per focus, so a trail survives starting a new focus.
 - **Bookmarks/Favorites** (built as "Keep"; see DECISIONS.md). Sometimes I'll stumble across something profound that's unrelated to my current focus, but which I want to remember to come back to.
 - ✅ **Random, extended** (2026-10-05; see DECISIONS.md). The reader's Random defaults to the innermost collection (or the work, if it has none), with the wider scopes behind a ▾ in the menu, and rolls are balanced across the library's branches. Tried and dropped: an "Another" button in the reader and configurable weighting.
+- ✅ **Prose by sentence** (2026-10-06; see DECISIONS.md). Every work in the Prose collection is read a sentence at a time, with ¶ opening each paragraph and the whole paragraph one tap (or `p`) away; search and Random work on sentences. Deploy: run `study_carrel:load_texts` after deploying, which moves existing prose notes, keeps and history to their paragraph's first sentence.
 - ✅ **Library Search** (2026-10-05; see DECISIONS.md). Search the entire library, or within a collection or work. SQLite FTS5 over unit text; results in reading order with a count per work. Not yet: matching work/section titles or references ("Psalm 23"), searching your own notes.
 
 ## Later (wanted, not scheduled)
