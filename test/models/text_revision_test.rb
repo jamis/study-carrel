@@ -100,6 +100,73 @@ class TextRevisionTest < ActiveSupport::TestCase
     assert_equal "Journal: 10 March 3:2", kept.sole.citation
   end
 
+  SONG = <<~TEXT
+    [Verse 1]
+    The river’s down to stones again,
+    the dock leans like a tired man.
+
+    [Chorus]
+    So I’ll wait by the low water,
+    keep it burning on.
+
+    [Verse 2]
+    The barges sit like sleeping cows,
+    the ferry hasn’t run since June.
+
+    [Chorus]
+    So I’ll wait by the low water,
+    keep it burning on.
+
+    [Bridge]
+    And if it never rises,
+    I’ll call that a kind of faith.
+  TEXT
+
+  REVISED_SONG = <<~TEXT
+    [Verse 1]
+    The river’s down to stones again,
+    the dock leans like a tired man.
+
+    [Chorus]
+    So I’ll wait by the low water,
+    keep it burning on.
+
+    [Verse 2]
+    The barges sleep like heavy cows,
+    the ferry hasn’t run since June.
+
+    [Verse 3]
+    Tonight the sky went green and low,
+    the swallows flew in close to ground.
+
+    [Chorus]
+    So I’ll wait by the low water,
+    keep it burning on.
+  TEXT
+
+  test "poetry is matched a stanza at a time: a chorus sung twice by its place, a reworded stanza by its words" do
+    work = UserText.new(title: "Low Water", source: SONG, form: "poetry").publish!(@user)
+    first, verse, second, bridge = work.sections.sole.units.to_a.values_at(1, 2, 3, 4)
+    @wait.notes.create!(unit: first, content: "Keeping something lit.")
+    @wait.notes.create!(unit: second, content: "After the barges, waiting with company.")
+    @wait.notes.create!(unit: verse, content: "Counting rings.")
+    @user.keeps.create!(unit: bridge, remark: "Faith as naming what's left.")
+
+    r = TextRevision.new(work, UserText.new(title: "Low Water", source: REVISED_SONG, form: "poetry"))
+    assert_equal({ same: 3, reworded: 1, new: 1, gone: 1 }, r.counts.slice(:same, :reworded, :new, :gone))
+    assert_equal [ :stays, :stays, :reworded, :detached ], [ first, second, verse, bridge ].map { |u| r.fates.find { it.record.unit_id == u.id }.fate }
+    assert_equal "Low Water, stanza 5", r.fates.find { it.record.unit_id == second.id }.new_citation
+
+    r.apply!
+
+    assert_equal [ 2, 5, 3 ], [ first, second, verse ].map { it.reload.number }
+    assert_equal [ nil, nil ], [ verse.paragraph, verse.sentence ]
+    assert_equal "[Verse 2]\nThe barges sleep like heavy cows,\nthe ferry hasn’t run since June.", verse.body
+    assert_not Unit.exists?(bridge.id)
+    assert_equal "Low Water, stanza 5", @user.detached_notes.sole.citation
+    assert_equal "stanza", work.reload.unit_name
+  end
+
   test "a text revised without changes keeps everything as it was" do
     ids = Unit.joins(:section).where(sections: { work_id: @work.id }).order(:id).pluck(:id, :body)
     r = revision(BEFORE)

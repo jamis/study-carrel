@@ -1,11 +1,21 @@
 import { Controller } from "@hotwired/stimulus"
 
 // The Add a text form: a chosen or dropped .txt / .md file is read in the browser into the text box (only text is
-// sent), and the box shows how much it holds against the limit.
+// sent), and the box shows how much it holds against the limit. Text that looks like verse, added as prose, gets a
+// hint offering to read it as poetry.
 const LIMIT = 5 * 1024 * 1024
 
+// As UserText#looks_like_verse?: mostly short lines, many without a closing stop.
+function looksLikeVerse(text) {
+  const lines = text.split("\n").map(l => l.trim()).filter(l => l && !/^# /.test(l))
+  if (lines.length < 6) return false
+  const short = lines.filter(l => l.length <= 60).length
+  const open = lines.filter(l => !/[.?!][”’")\]]*$/.test(l)).length
+  return short > lines.length * 0.8 && open > lines.length * 0.4
+}
+
 export default class extends Controller {
-  static targets = ["title", "source", "file", "stats", "error"]
+  static targets = ["title", "source", "file", "stats", "error", "prose", "poetry", "hint"]
 
   connect() { this.count() }
 
@@ -32,8 +42,14 @@ export default class extends Controller {
     })
   }
 
+  poetry() {
+    this.poetryTarget.checked = true
+    this.count()
+  }
+
   count() {
     const text = this.sourceTarget.value
+    if (this.hasHintTarget) this.hintTarget.hidden = !this.proseTarget.checked || this.proseTarget.disabled || !looksLikeVerse(text)
     if (!text.trim()) { this.statsTarget.textContent = ""; return }
     const words = (text.match(/\S+/g) || []).length
     const kb = new Blob([text]).size / 1024

@@ -16,7 +16,7 @@
         <% @texts.sort_by(&:created_at).reverse.first(5).each do |work| %><li><%= link_to work.title, work_path(work) %></li><% end %>
       </ul>
     <% else %>
-      <div class="list-row-desc">A journal, a talk, anything in prose, read a sentence at a time. Only you can see them.</div>
+      <div class="list-row-desc">Journals, talks, poems, songs: read a sentence or a stanza at a time. Only you can see them.</div>
     <% end %>
     <div class="list-row-meta"><%= pluralize(@texts.size, "text") if @texts.any? %><%= link_to "Add a text", new_text_path %></div>
   </div>

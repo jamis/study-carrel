@@ -7,7 +7,7 @@ class UserTextsController < ApplicationController
   def index
     @texts = Current.user.texts.to_a
     units = Unit.joins(:section).where(sections: { work_id: @texts })
-    @sentence_counts = units.group("sections.work_id").count
+    @unit_counts = units.group("sections.work_id").count
     @annotation_counts = Note.joins(unit: :section).merge(units).group("sections.work_id").count
                              .merge(Keep.joins(unit: :section).merge(units).group("sections.work_id").count) { |_, a, b| a + b }
   end
@@ -17,7 +17,7 @@ class UserTextsController < ApplicationController
   end
 
   def edit
-    @text = UserText.new(title: @work.title, author: @work.author, source: @work.source)
+    @text = UserText.new(title: @work.title, author: @work.author, source: @work.source, form: UserText.form_of(@work))
     render :new
   end
 
@@ -63,7 +63,11 @@ class UserTextsController < ApplicationController
 
   def set_work = @work = Current.user.texts.find_by!(slug: params[:slug])
 
-  def text_params = params.expect(user_text: %i[title author source])
+  # A revision keeps the text's form, whatever is posted: changing it would change every unit's shape.
+  def text_params
+    attrs = params.expect(user_text: %i[title author source form])
+    @work ? attrs.merge(form: UserText.form_of(@work)) : attrs
+  end
 
   def set_aside_count
     before = Current.user.detached_notes.count

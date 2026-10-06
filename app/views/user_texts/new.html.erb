@@ -4,10 +4,11 @@
 <main class="texts-page">
   <% if revising %>
     <h2 class="page-title">Revise “<%= @work.title %>”</h2>
-    <p class="texts-lede">Edit it freely. Notes and kept passages on unchanged sentences stay put; anything on a sentence that’s gone is set aside with its passage, never lost. The review shows exactly what moves before you save.</p>
+    <% unit = @text.poetry? ? "stanza" : "sentence" %>
+    <p class="texts-lede">Edit it freely. Notes and kept passages on unchanged <%= unit.pluralize %> stay put; anything on a <%= unit %> that’s gone is set aside with its passage, never lost. The review shows exactly what moves before you save.</p>
   <% else %>
     <h2 class="page-title">Add a text</h2>
-    <p class="texts-lede">A journal, the transcript of a talk, anything in prose. Only you can see texts you add.</p>
+    <p class="texts-lede">A journal, the transcript of a talk, poems, song lyrics. Only you can see texts you add.</p>
   <% end %>
 
   <div class="texts-source">
@@ -18,6 +19,12 @@
       <% end %>
       <label class="texts-field"><span>Title</span><%= f.text_field :title, autocomplete: "off", required: true, autofocus: @text.title.blank?, data: { text_source_target: "title" } %></label>
       <label class="texts-field"><span>Author <small>optional</small></span><%= f.text_field :author, autocomplete: "off" %></label>
+      <fieldset class="texts-form-choice">
+        <legend>Read it as<% if revising %> <small>(a revision keeps its form)</small><% end %></legend>
+        <label><%= f.radio_button :form, "prose", disabled: revising, data: { text_source_target: "prose", action: "text-source#count" } %><span><b>Prose</b><span>A sentence at a time, like Walden</span></span></label>
+        <label><%= f.radio_button :form, "poetry", disabled: revising, data: { text_source_target: "poetry", action: "text-source#count" } %><span><b>Poetry or lyrics</b><span>A stanza at a time, line breaks kept</span></span></label>
+      </fieldset>
+      <p class="texts-verse-hint" data-text-source-target="hint" hidden>This looks like verse. <button type="button" class="texts-linkish" data-action="text-source#poetry">Read it as poetry</button></p>
       <div class="texts-field">
         <div class="texts-src-head">
           <label for="user_text_source">Text</label>
@@ -36,6 +43,7 @@
 
     <aside class="texts-howto" aria-labelledby="howto-head">
       <h3 id="howto-head">How the text is read</h3>
+      <div class="texts-howto-prose">
       <ol>
         <li><b>Paragraphs.</b> Blank lines between paragraphs, and line breaks inside one are joined. With no blank lines at all, every line is a paragraph.</li>
         <li><b>Sections.</b> A line starting <code>#&nbsp;</code> starts a section, named by the rest of the line. No headings: one section.</li>
@@ -49,6 +57,23 @@ Woke before six. The house
 was quiet.
 
 Read Isaiah 40 again.</pre>
+      </div>
+      <div class="texts-howto-poetry">
+      <ol>
+        <li><b>Stanzas.</b> Blank lines separate stanzas, and every line break is kept. With no blank lines, a poem is one stanza.</li>
+        <li><b>Sections.</b> A line starting <code>#&nbsp;</code> starts a section (a poem, or a song), named by the rest of the line. No headings: one section.</li>
+        <li><b>A stanza at a time,</b> like Frost.</li>
+        <li><b>Labels</b> like <code>[Chorus]</code> are read as typed; the review points them out. Indents are lost.</li>
+        <li><b>Everything else</b> shows exactly as typed. Asterisks stay asterisks.</li>
+      </ol>
+      <pre># Low Water
+
+The river’s down to stones again,
+the dock leans like a tired man.
+
+So I’ll wait by the low water,
+wait till the low water’s gone.</pre>
+      </div>
     </aside>
   </div>
 </main>

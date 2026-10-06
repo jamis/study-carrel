@@ -30,6 +30,24 @@
 .texts-actions .primary { padding: 11px 22px; font-size: 15px; }
 .texts-actions .chip { padding: 10px 18px; font-size: 14px; }
 
+/* prose or poetry; the how-to follows the choice */
+.texts-form-choice { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; margin: 0 0 18px; padding: 0; border: 0; }
+.texts-form-choice legend { padding: 0; margin-bottom: 6px; font: 600 13px var(--sans); color: var(--ink-soft); }
+.texts-form-choice legend small { font-weight: 400; color: var(--ink-faint); }
+.texts-form-choice label {
+  flex: 1 1 15em; display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; cursor: pointer;
+  border: 1px solid var(--rule); border-radius: 12px; background: var(--paper);
+}
+.texts-form-choice label:has(input:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.texts-form-choice label:has(input:disabled) { cursor: default; }
+.texts-form-choice label:has(input:disabled:not(:checked)) { opacity: .45; }
+.texts-form-choice input { margin: 5px 0 0; accent-color: var(--accent); }
+.texts-form-choice b { display: block; font-weight: 600; font-size: 16px; }
+.texts-form-choice span span { display: block; font: 13px var(--sans); color: var(--ink-soft); }
+.texts-verse-hint { margin: -8px 0 18px; font: 13px var(--sans); color: var(--ink-soft); }
+.texts-source:has(input[value="poetry"]:checked) .texts-howto-prose,
+.texts-source:not(:has(input[value="poetry"]:checked)) .texts-howto-poetry { display: none; }
+
 .texts-howto { position: sticky; top: 72px; padding: 18px 20px; border: 1px solid var(--rule); border-radius: 14px; background: var(--paper); font-size: 16px; }
 .texts-howto h3 { margin: 0 0 10px; font: 600 11px var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft); }
 .texts-howto ol { margin: 0; padding: 0; list-style: none; }
@@ -45,6 +63,8 @@
 .texts-summary { margin: 0 0 4px; font: 14px var(--sans); color: var(--ink-soft); }
 .texts-summary b { color: var(--ink); font-weight: 600; }
 .texts-rule { margin: 0 0 22px; font-size: 15px; color: var(--ink-soft); }
+.texts-rule .inline-form { display: inline; }
+.texts-rule .texts-linkish { font: inherit; }
 
 .texts-panel { margin-bottom: 14px; border: 1px solid var(--rule); border-radius: 14px; background: var(--paper); max-width: 46em; }
 .texts-panel > summary { list-style: none; display: flex; align-items: baseline; gap: 6px; padding: 12px 16px; cursor: pointer; font: 600 13px var(--sans); }
@@ -81,7 +101,7 @@
 .texts-tag { padding: 1px 8px; border-radius: 999px; font-size: 11.5px; background: var(--accent-soft); color: var(--accent); }
 .texts-tag.quiet { background: transparent; color: var(--ink-faint); border: 1px solid var(--rule); }
 .texts-fate .said { margin: 6px 0 0; padding-left: 10px; border-left: 2px solid var(--rule); font-size: 15px; font-style: italic; color: var(--ink-soft); }
-.texts-fate .was, .texts-fate .now { margin: 6px 0 0; font-size: 15px; }
+.texts-fate .was, .texts-fate .now { margin: 6px 0 0; font-size: 15px; white-space: pre-line; }
 .texts-fate .was { color: var(--ink-faint); text-decoration: line-through; }
 .texts-fate .lbl { display: inline-block; margin-right: 6px; font: 11px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
 
@@ -102,11 +122,21 @@
 .texts-para .s.here { outline: 2px solid var(--accent); outline-offset: 1px; background: var(--accent-soft); }
 .texts-para .s sup { margin-right: 2px; font: 10px var(--sans); color: var(--accent); opacity: .75; }
 
+/* a stanza of poetry, shaded in turn like sentences */
+.texts-stanza { position: relative; margin: 0 0 14px -12px; padding: 6px 12px; border-radius: 6px; font-size: 17px; line-height: 1.6; white-space: pre-line; cursor: pointer; }
+.texts-stanza .pn { position: absolute; right: calc(100% + 4px); top: 10px; font: 400 11.5px var(--sans); color: var(--ink-faint); }
+.texts-stanza:nth-of-type(odd) { background: color-mix(in srgb, var(--accent-soft) 55%, transparent); }
+.texts-stanza:hover { background: var(--accent-soft); }
+.texts-stanza.flag { background: var(--hl); }
+.texts-stanza.reworded { box-shadow: inset 3px 0 0 var(--accent); }
+.texts-stanza.new { box-shadow: inset 3px 0 0 #5a8a3a; }
+.texts-stanza.here { outline: 2px solid var(--accent); outline-offset: 1px; background: var(--accent-soft); }
+
 .texts-preview { position: sticky; top: 72px; padding: 18px 22px 16px; border: 1px solid var(--rule); border-radius: 14px; background: var(--paper); }
 .texts-preview-label { display: flex; align-items: center; min-height: 28px; font: 600 11px var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft); }
 .texts-preview-label .icon-btn { display: none; margin-left: auto; }
 .texts-preview-ref { margin: 10px 0 10px; font: 13px var(--sans); color: var(--ink-soft); }
-.texts-preview-text { position: relative; margin: 0; padding-left: 14px; line-height: 1.45; max-height: 52vh; overflow-y: auto; }
+.texts-preview-text { position: relative; margin: 0; padding-left: 14px; line-height: 1.45; white-space: pre-line; max-height: 52vh; overflow-y: auto; }
 .texts-preview-text .pilcrow { position: absolute; left: -4px; color: var(--accent); opacity: .7; }
 .texts-preview-steps { display: flex; align-items: center; gap: 4px; margin-top: 18px; font: 13px var(--sans); color: var(--ink-soft); }
 .texts-preview-steps button { border: 0; background: none; padding: 6px 10px; border-radius: 8px; color: var(--ink-faint); }
@@ -128,7 +158,7 @@
   .texts-source, .texts-review-grid { grid-template-columns: 1fr; }
   .texts-howto { position: static; order: -1; }
   .texts-text { padding-left: 0; }
-  .texts-para .pn { display: none; }
+  .texts-para .pn, .texts-stanza .pn { display: none; }
   .texts-preview {
     position: fixed; left: 8px; right: 8px; bottom: 74px; top: auto; z-index: 40; box-shadow: var(--shadow);
     transform: translateY(calc(100% + 90px)); transition: transform .25s;

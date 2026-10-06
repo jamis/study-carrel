@@ -164,6 +164,52 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     assert_not DetachedNote.exists?(detached.id)
   end
 
+  POEM = "# Lamp\n\nBefore the house wakes\nI turn the lamp down low,\nand the window gives me back\na face I almost know.\n\nThe kettle ticks. The dark\nleans in to hear\n"
+
+  test "poetry: the review shows stanzas with their line breaks, and adding it reads a stanza at a time" do
+    post review_texts_path, params: params(source: POEM, form: "poetry")
+    assert_response :success
+    assert_select ".texts-summary", /1\s+section · 2\s+stanzas · 6\s+lines/
+    assert_select ".texts-stanza", 2
+    assert_equal "2The kettle ticks. The dark\nleans in to hear", css_select(".texts-stanza[data-ref='Journal: Lamp, stanza 2']").sole.text
+    assert_select ".texts-legend", /Each stanza is shaded in turn/
+    assert_select "form.texts-bar input[name='user_text[form]'][value=poetry]"
+
+    post texts_path, params: params(source: POEM, form: "poetry")
+    work = @user.texts.last
+    assert_equal "stanza", work.unit_name
+    follow_redirect!
+    assert_select ".now .ref-unit", ", stanza 1"
+    get texts_path
+    assert_select ".list-row-meta", /2 stanzas/
+  end
+
+  test "verse added as prose: the form and the review offer to read it as poetry" do
+    get new_text_path
+    assert_select "input[type=radio][name='user_text[form]'][value=prose][checked]"
+    assert_select ".texts-verse-hint[hidden]"
+
+    post review_texts_path, params: params(source: POEM)
+    assert_select ".texts-rule form input[name='user_text[form]'][value=poetry]"
+    assert_select ".texts-rule button", "This looks like verse: read it as poetry instead"
+    post review_texts_path, params: params(source: SOURCE)
+    assert_select ".texts-rule form", 0
+  end
+
+  test "a revision keeps the text's form, whatever is posted" do
+    work = UserText.new(title: "Journal", source: POEM, form: "poetry").publish!(@user)
+    get edit_text_path(work)
+    assert_select "input[type=radio][value=poetry][checked][disabled]"
+    assert_select "legend", /a revision keeps its form/
+
+    patch review_text_path(work), params: params(source: POEM, form: "prose")
+    assert_select ".texts-stanza", 2
+    assert_select ".texts-changes .texts-tally", /2 stanzas unchanged/
+    patch text_path(work), params: params(source: POEM.sub("dark", "night"), form: "prose")
+    assert_equal "stanza", work.reload.unit_name
+    assert_equal [ nil ], work.sections.sole.units.pluck(:sentence).uniq
+  end
+
   test "another user can't revise someone's text" do
     work = noted_text
     sign_in_as users(:two)

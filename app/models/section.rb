@@ -25,12 +25,15 @@ class Section < ApplicationRecord
   # section name. Numbered chapters have no separable title ("Isaiah 40").
   def reference_name_parts = numbered? ? [ "", name ] : [ "#{work.title}: ", display_label ]
 
-  # The same reference in parts, so a long name can truncate while the unit number stays visible.
-  def reference_unit_template = work.sentences? ? " {n}" : numbered? ? ":{n}" : ", #{work.unit_name} {n}"
+  # The same reference in parts, so a long name can truncate while the unit number stays visible. A user's poem with no
+  # headings is cited by the work alone, so its stanzas are named ("Low Water, stanza 2"), not numbered.
+  def reference_unit_template = work.sentences? ? " {n}" : numbered? && !unnamed? ? ":{n}" : ", #{work.unit_name} {n}"
 
   def numbered? = display_label.match?(/\A\d+\z/)
 
   private
 
   def display_label = label.presence || number.to_s
+
+  def unnamed? = label.blank? && work.own_text?
 end

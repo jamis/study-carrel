@@ -11,6 +11,10 @@
 #      sentence merely in the same place is not a match: a note on it is set aside with its passage rather than quietly
 #      hung on words it wasn't written about.
 #
+# Poetry is matched the same way a stanza at a time, except that stanzas have no paragraph to pair: in step 2 the
+# nearest place sorts out a chorus sung twice, and in step 3 a leftover stanza takes the most alike leftover in its
+# section, the most alike pairs first.
+#
 # A sentence left over is gone: its notes and remarked keeps are set aside as detached notes (see DetachedNote).
 # #changes describes all this before anything is saved, for the review.
 class TextRevision
@@ -69,7 +73,7 @@ class TextRevision
       numbers = Hash.new(0)
       rows = news.each_with_index.map do |new, j|
         section_id = sections.fetch(new.section).id
-        { section_id:, number: numbers[section_id] += 1, paragraph: new.paragraph + 1, sentence: new.sentence + 1, body: new.text,
+        { section_id:, number: numbers[section_id] += 1, **text.unit_place(new.paragraph + 1, new.sentence + 1), body: new.text,
           updated_at: now, id: by_new[j] }
       end
       kept, added = rows.partition { it[:id] }
@@ -114,7 +118,7 @@ class TextRevision
       @matches, @matched_news, @reworded = {}, Set.new, Set.new
       match_by_text_in_section
       match_by_text_anywhere
-      match_leftovers_in_paired_paragraphs
+      text.poetry? ? match_leftover_stanzas : match_leftovers_in_paired_paragraphs
       true
     end
   end
@@ -179,6 +183,23 @@ class TextRevision
       end
       best = free.max_by { [ likeness(old.text, news[it].text), -(news[it].paragraph - old.paragraph).abs ] }
       claim(old, best, reworded: true) if best && likeness(old.text, news[best].text) >= LIKENESS
+    end
+  end
+
+  def match_leftover_stanzas
+    pairs = olds.flat_map do |old|
+      section = section_map[old.section]
+      next [] if @matches.key?(old.unit.id) || section.nil?
+
+      news.each_index.filter_map do |j|
+        next if @matched_news.include?(j) || news[j].section != section
+
+        likeness = likeness(old.text, news[j].text)
+        [ old, j, likeness, (news[j].paragraph - old.paragraph).abs ] if likeness >= LIKENESS
+      end
+    end
+    pairs.sort_by { |_, _, likeness, distance| [ -likeness, distance ] }.each do |old, j|
+      claim(old, j, reworded: true) unless @matches.key?(old.unit.id) || @matched_news.include?(j)
     end
   end
 

@@ -5,17 +5,33 @@
     <h2 class="page-title"><%= @text.title %></h2>
     <% if @text.author %><span class="texts-by"><%= @text.author %></span><% end %>
   </div>
-  <% sections = @text.kept_sections %>
+  <% sections = @text.kept_sections; unit = @text.poetry? ? "stanza" : "sentence" %>
   <p class="texts-summary">
     <b><%= sections.size %></b> <%= "section".pluralize(sections.size) %> ·
-    <b><%= @text.paragraph_count.to_fs(:delimited) %></b> <%= "paragraph".pluralize(@text.paragraph_count) %> ·
-    <b><%= @text.sentence_count.to_fs(:delimited) %></b> <%= "sentence".pluralize(@text.sentence_count) %>
+    <% if @text.poetry? %>
+      <b><%= @text.paragraph_count.to_fs(:delimited) %></b> <%= "stanza".pluralize(@text.paragraph_count) %> ·
+      <b><%= @text.line_count.to_fs(:delimited) %></b> <%= "line".pluralize(@text.line_count) %>
+    <% else %>
+      <b><%= @text.paragraph_count.to_fs(:delimited) %></b> <%= "paragraph".pluralize(@text.paragraph_count) %> ·
+      <b><%= @text.sentence_count.to_fs(:delimited) %></b> <%= "sentence".pluralize(@text.sentence_count) %>
+    <% end %>
   </p>
-  <p class="texts-rule">
-    <%= @text.blank_lines_separate? ? "Blank lines separate the paragraphs; line breaks inside a paragraph were joined." :
-          "There are no blank lines between paragraphs, so every line is a paragraph." %>
+  <div class="texts-rule">
+    <% if @text.poetry? %>
+      <%= @text.paragraph_count > sections.size ? "Blank lines separate the stanzas, and every line break is kept." :
+            "There are no blank lines inside a section, so each is one stanza, every line break kept." %>
+    <% else %>
+      <%= @text.blank_lines_separate? ? "Blank lines separate the paragraphs; line breaks inside a paragraph were joined." :
+            "There are no blank lines between paragraphs, so every line is a paragraph." %>
+    <% end %>
     <%= @text.headed? ? "Sections come from the # headings." : "No # headings, so it’s one section." %>
-  </p>
+    <% if !@work && !@text.poetry? && @text.looks_like_verse? %>
+      <%= form_with model: @text, url: review_texts_path, class: "inline-form", data: { turbo: false } do |f| %>
+        <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :form, value: "poetry" %>
+        <button type="submit" class="texts-linkish">This looks like verse: read it as poetry instead</button>
+      <% end %>
+    <% end %>
+  </div>
 
   <% if @revision %>
     <% counts = @revision.counts; fates = @revision.fates; moving = fates.count { it.fate != :stays } %>
@@ -23,7 +39,7 @@
       <summary>What changes <span>· <%= fates.empty? ? "no notes or keeps on this text" : "#{moving} of #{pluralize(fates.size, "note and keep", plural: "notes and keeps")} affected" %></span></summary>
       <div class="texts-panel-body">
         <p class="texts-tally">
-          <span><%= pluralize(counts.fetch(:same, 0), "sentence") %> unchanged</span>
+          <span><%= pluralize(counts.fetch(:same, 0), unit) %> unchanged</span>
           <span><i class="reworded"></i><%= counts.fetch(:reworded, 0) %> reworded</span>
           <span><i class="new"></i><%= counts.fetch(:new, 0) %> new</span>
           <span><%= counts.fetch(:gone, 0) %> gone</span>
@@ -64,14 +80,14 @@
             <span class="snip"><%= check_excerpt(check) %></span>
           </button>
         <% end %>
-        <p class="texts-hint">To fix one, edit the text: a heading, a blank line, or a backslash beside the period.</p>
+        <p class="texts-hint">To fix one, edit the text: <%= @text.poetry? ? "a heading, a blank line, or a line taken out" : "a heading, a blank line, or a backslash beside the period" %>.</p>
       </div>
     </details>
   <% end %>
 
-  <p class="texts-legend"><span><i class="shade"></i>Each sentence is shaded in turn</span><% if checks.any? %><span><i class="flag"></i>Worth a look</span><% end %><% if @revision %><span><i class="reworded"></i>Reworded</span><span><i class="new"></i>New</span><% end %></p>
+  <p class="texts-legend"><span><i class="shade"></i>Each <%= unit %> is shaded in turn</span><% if checks.any? %><span><i class="flag"></i>Worth a look</span><% end %><% if @revision %><span><i class="reworded"></i>Reworded</span><span><i class="new"></i>New</span><% end %></p>
 
-  <% flagged = checks.select(&:sentence).map { [ it.section, it.paragraph, it.sentence ].join(".") }.to_set
+  <% flagged = checks.select { it.sentence && !it.quiet }.map { [ it.section, it.paragraph, it.sentence ].join(".") }.to_set
      statuses = @revision&.statuses || []
      j = -1 %>
   <div class="texts-review-grid">
@@ -80,13 +96,21 @@
         <% next if section.paragraphs.empty? %>
         <% count = section.paragraphs.sum { it.sentences.size }; position = 0 %>
         <section class="texts-sec">
-          <h3><%= @text.label_for(section) || tag.span(@text.title, class: "untitled") %><span class="mark"><%= pluralize(count, "sentence") %></span></h3>
-          <% section.paragraphs.each.with_index(1) do |paragraph, p| %>
-            <p class="texts-para"><b class="pn"><%= p %></b><% paragraph.sentences.each.with_index(1) do |sentence, s| %><% position += 1; j += 1 %>
-              <%= tag.span class: [ "s", ("flag" if flagged.include?("#{si}.#{p - 1}.#{s - 1}")), (statuses[j] if statuses[j] != :same) ], tabindex: 0,
-                    data: { key: "#{si}.#{p - 1}.#{s - 1}", ref: @text.reference(section, p, s), of: "#{position} of #{count}", first: (s == 1),
-                            action: "click->text-review#pick keydown.enter->text-review#pick" } do %><sup><%= s %></sup><%= sentence %><% end %>
-            <% end %></p>
+          <h3><%= @text.label_for(section) || tag.span(@text.title, class: "untitled") %><span class="mark"><%= pluralize(count, unit) %></span></h3>
+          <% if @text.poetry? %>
+            <% section.paragraphs.each.with_index(1) do |stanza, p| %><% position += 1; j += 1 %>
+              <%= tag.div class: [ "s", "texts-stanza", ("flag" if flagged.include?("#{si}.#{p - 1}.0")), (statuses[j] if statuses[j] != :same) ], tabindex: 0,
+                    data: { key: "#{si}.#{p - 1}.0", ref: @text.reference(section, p, 1), of: "#{position} of #{count}",
+                            action: "click->text-review#pick keydown.enter->text-review#pick" } do %><b class="pn"><%= p %></b><%= stanza.sentences.first %><% end %>
+            <% end %>
+          <% else %>
+            <% section.paragraphs.each.with_index(1) do |paragraph, p| %>
+              <p class="texts-para"><b class="pn"><%= p %></b><% paragraph.sentences.each.with_index(1) do |sentence, s| %><% position += 1; j += 1 %>
+                <%= tag.span class: [ "s", ("flag" if flagged.include?("#{si}.#{p - 1}.#{s - 1}")), (statuses[j] if statuses[j] != :same) ], tabindex: 0,
+                      data: { key: "#{si}.#{p - 1}.#{s - 1}", ref: @text.reference(section, p, s), of: "#{position} of #{count}", first: (s == 1),
+                              action: "click->text-review#pick keydown.enter->text-review#pick" } do %><sup><%= s %></sup><%= sentence %><% end %>
+              <% end %></p>
+            <% end %>
           <% end %>
         </section>
       <% end %>
@@ -97,20 +121,20 @@
       <div class="texts-preview-ref" data-text-review-target="ref"></div>
       <p class="texts-preview-text" data-text-review-target="text"></p>
       <div class="texts-preview-steps">
-        <button type="button" aria-label="Previous sentence" data-action="text-review#previous" data-text-review-target="prev">‹</button>
+        <button type="button" aria-label="Previous <%= unit %>" data-action="text-review#previous" data-text-review-target="prev">‹</button>
         <span data-text-review-target="of"></span>
-        <button type="button" aria-label="Next sentence" data-action="text-review#next" data-text-review-target="next">›</button>
+        <button type="button" aria-label="Next <%= unit %>" data-action="text-review#next" data-text-review-target="next">›</button>
       </div>
-      <p class="texts-preview-help">Pick any sentence to see it here. ← → step through.</p>
+      <p class="texts-preview-help">Pick any <%= unit %> to see it here. ← → step through.</p>
     </aside>
   </div>
 
   <%# A plain form post: the review and the form answer with a page, not a redirect, which Turbo won't take. %>
   <%= form_with model: @text, url: (@work ? text_path(@work) : texts_path), method: (@work ? :patch : :post), multipart: true,
         class: "texts-bar", data: { turbo: false } do |f| %>
-    <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %>
+    <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :form %>
     <div class="texts-bar-in">
-      <span class="info"><%= @work ? "Saving replaces the text. Nothing on an unchanged sentence moves." : "You can revise it later; notes on unchanged sentences stay put." %></span>
+      <span class="info"><%= @work ? "Saving replaces the text. Nothing on an unchanged #{unit} moves." : "You can revise it later; notes on unchanged #{unit.pluralize} stay put." %></span>
       <%= f.button "Edit the text", type: "submit", name: "edit", value: "1", class: "chip", formaction: (@work ? review_text_path(@work) : review_texts_path),
             formnovalidate: true %>
       <%= f.button(@work ? "Save the revision" : "Add to your texts", type: "submit", class: "primary") %>

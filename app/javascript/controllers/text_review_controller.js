@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
-// The review of a text being added: pick a sentence (or a "Worth a look" item) to see it as the reader will show it,
-// and step through with ← →. On phones the preview slides up from the bottom when a sentence is picked.
+// The review of a text being added: pick a sentence or stanza (or a "Worth a look" item) to see it as the reader will
+// show it, and step through with ← →. On phones the preview slides up from the bottom when a sentence is picked.
 export default class extends Controller {
   static targets = ["preview", "ref", "text", "of", "prev", "next"]
 
@@ -36,10 +36,12 @@ export default class extends Controller {
     el.classList.add("here")
     if (scroll) el.scrollIntoView({ block: "center", behavior: "smooth" })
 
-    const text = [...el.childNodes].filter(n => n.nodeName !== "SUP").map(n => n.textContent).join("")
+    const text = [...el.childNodes].filter(n => n.nodeName !== "SUP" && !n.classList?.contains("pn")).map(n => n.textContent).join("")
     const length = text.length
     this.refTarget.textContent = el.dataset.ref
-    this.textTarget.style.fontSize = length < 120 ? "28px" : length < 300 ? "24px" : length < 600 ? "21px" : "18px"
+    this.textTarget.style.fontSize = el.classList.contains("texts-stanza")
+      ? (length < 160 ? "23px" : length < 320 ? "20px" : "17px")
+      : (length < 120 ? "28px" : length < 300 ? "24px" : length < 600 ? "21px" : "18px")
     this.textTarget.replaceChildren()
     if (el.dataset.first === "true") {
       const mark = document.createElement("span")
