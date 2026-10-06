@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prose by Sentence</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  /* Reader E's layout (rail, passage, docked note), reading prose one sentence at a time.
+     A paragraph's first sentence opens with a pilcrow, hung in the left margin so the text stays flush. */
+  body { display: grid; grid-template-columns: 52px minmax(0, 1fr) 380px; min-height: 100vh; }
+  .rail {
+    position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 0;
+  }
+  .rail .icon-btn { width: 36px; height: 36px; padding: 0; }
+  .rail .spacer { flex: 1; }
+  .rail .pop { left: 48px; }
+  #tree { top: 10px; width: 260px; }
+  #menu { bottom: 10px; min-width: 220px; }
+  .rail-wrap { position: relative; }
+
+  .main { padding: 22px 56px 80px 44px; display: flex; flex-direction: column; min-width: 0; }
+  .passage { margin: 12vh 0 0; max-width: 34em; }
+  .ref-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .ref-row .work { font-family: var(--sans); font-size: 12px; color: var(--ink-faint); margin-left: 6px; }
+
+  .verse { position: relative; }
+  .pilcrow { position: absolute; right: 100%; padding-right: .3em; font-weight: 400; color: var(--accent); opacity: .7; }
+
+  .steps { display: flex; align-items: center; gap: 4px; margin-top: 44px; font-family: var(--sans); font-size: 13px; position: relative; }
+  .steps button { border: 0; background: none; padding: 6px 10px; border-radius: 8px; color: var(--ink-faint); }
+  .steps button:first-child { margin-left: -10px; }
+  .steps button:hover:not(:disabled), .steps button[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
+  .steps button:disabled { visibility: hidden; }
+  .steps .of { font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+  .steps .whole { margin-left: 10px; font-family: var(--serif); font-size: 16px; line-height: 1; }
+  #picker { left: 0; top: calc(100% + 6px); }
+  #whole { left: -16px; top: calc(100% + 6px); width: min(36em, calc(100vw - 32px)); }
+
+  /* Sentence picker: a row per paragraph, numbered by sentence within it. */
+  .plist { position: relative; max-height: min(60vh, 520px); overflow-y: auto; padding: 4px; width: 300px; }
+  .prow { display: flex; align-items: flex-start; gap: 4px; padding: 2px 0; }
+  .prow .pn { flex: none; width: 40px; padding-top: 7px; font-size: 11.5px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .prow .pn.here { color: var(--accent); }
+  .prow .ss { display: flex; flex-wrap: wrap; gap: 2px; }
+  .plist button {
+    position: relative; width: 30px; height: 30px; border: 0; border-radius: 6px; background: none;
+    font-size: 12.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums;
+  }
+  .plist button:hover { background: var(--accent-soft); color: var(--ink); }
+  .plist button.here { color: var(--accent); font-weight: 700; }
+  .plist button.noted::after { content: ""; position: absolute; left: 50%; bottom: 3px; width: 3px; height: 3px; margin-left: -1.5px; border-radius: 50%; background: var(--accent); }
+  .plist.paras .prow { display: block; }
+  .plist.paras button { display: block; width: 100%; height: auto; padding: 6px 8px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .plist.paras button { position: relative; padding-left: 14px; }
+  .plist.paras button.noted::after { left: 6px; top: 50%; bottom: auto; margin: -1.5px 0 0; }
+  .plist.paras button b { display: inline-block; width: 28px; font-weight: 400; color: var(--ink-faint); }
+  .plist.paras button.here b { color: var(--accent); }
+
+  /* The whole paragraph, on request: the current sentence marked, any sentence a link. */
+  .whole-text { position: relative; max-height: 50vh; overflow-y: auto; padding: 10px 12px; font-family: var(--serif); font-size: 17px; line-height: 1.6; color: var(--ink-soft); }
+  .whole-text span { cursor: pointer; border-radius: 3px; }
+  .whole-text span:hover { color: var(--ink); }
+  .whole-text span.here { color: var(--ink); background: var(--accent-soft); box-shadow: 0 0 0 2px var(--accent-soft); }
+  .whole-text span.noted { text-decoration: underline dotted color-mix(in srgb, var(--accent) 55%, transparent); text-underline-offset: 4px; }
+
+  /* Docked note: a full-height page, not a floating card. */
+  .dock {
+    position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column;
+    background: var(--paper); border-left: 1px solid var(--rule); padding: 26px 28px 18px;
+  }
+  .dock-head { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--sans); margin-bottom: 16px; }
+  .dock-head .lbl { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+  .dock .note-editor { flex: 1; overflow-y: auto; }
+  .dock .note-tools { padding-top: 10px; border-top: 1px solid var(--rule); opacity: 0; transition: opacity .2s; }
+  .dock:focus-within .note-tools { opacity: 1; }
+  .handle, .phone-top { display: none; }
+
+  /* Prototype-only: text and granularity switches. */
+  .proto-opts {
+    position: fixed; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px;
+    font-family: var(--sans); font-size: 11px; opacity: .35; z-index: 30; transition: opacity .15s;
+  }
+  .proto-opts:hover { opacity: 1; }
+  .proto-opts div { display: flex; flex-direction: column; }
+  .proto-opts a { padding: 5px 7px; color: var(--ink-soft); text-decoration: none; background: var(--paper); border: 1px solid var(--rule); border-left: 0; }
+  .proto-opts a + a { border-top: 0; }
+  .proto-opts a.on { color: var(--paper); background: var(--accent); border-color: var(--accent); }
+
+  @media (max-width: 899px) {
+    body { display: block; }
+    .rail { display: none; }
+    .phone-top { display: flex; justify-content: flex-end; position: absolute; top: 10px; right: 8px; z-index: 20; }
+    .phone-top .pop { right: 0; top: calc(100% + 4px); min-width: 230px; }
+    .main { padding: 14px 52px 140px 16px; }
+    .passage { margin-top: 6vh; }
+    .pilcrow { position: static; padding-right: .2em; }
+    #whole { left: 0; width: calc(100vw - 32px); }
+    .dock {
+      position: fixed; left: 0; right: 0; bottom: 0; top: auto; height: 75vh; z-index: 35; border: 0; border-top: 1px solid var(--rule);
+      border-radius: 14px 14px 0 0; box-shadow: var(--shadow); padding: 0 16px calc(14px + env(safe-area-inset-bottom));
+      transform: translateY(calc(100% - 52px - env(safe-area-inset-bottom))); transition: transform .28s cubic-bezier(.2,.8,.2,1);
+    }
+    .dock.open { transform: none; }
+    .dock-head { display: none; }
+    .dock .note-tools { opacity: 1; }
+    .handle {
+      display: flex; align-items: center; gap: 10px; height: 52px; flex: none; width: 100%; padding: 0;
+      border: 0; background: none; text-align: left; font-family: var(--sans);
+    }
+    .handle .lbl { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+    .handle [data-note-preview] { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--serif); font-size: 15px; color: var(--ink-soft); }
+    .handle [data-note-preview].empty { font-style: italic; color: var(--ink-faint); }
+    .ref-row .work { display: none; }
+    .proto-opts { top: auto; bottom: 64px; transform: none; flex-direction: row; font-size: 10px; }
+    .proto-opts div { flex-direction: row; }
+    .proto-opts a + a { border-top: 1px solid var(--rule); border-left: 0; }
+  }
+</style>
+<script src="prose.js"></script>
+</head>
+<body>
+  <nav class="rail" aria-label="Tools">
+    <div class="rail-wrap">
+      <button class="icon-btn" type="button" data-pop-toggle="tree" aria-expanded="false" title="Where you are" aria-label="Where you are"><svg viewBox="0 0 24 24"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg></button>
+      <div class="pop" id="tree" data-tree></div>
+    </div>
+    <button class="icon-btn" type="button" title="Recent places (h)" aria-label="Recent places"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+    <button class="icon-btn" type="button" title="Search (/)" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
+    <button class="icon-btn" type="button" title="Kept" aria-label="Kept"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-4-5 4z"/></svg></button>
+    <span class="spacer"></span>
+    <div class="rail-wrap">
+      <button class="icon-btn" type="button" data-pop-toggle="menu" aria-expanded="false" aria-label="Menu" style="font-size:19px">⋯</button>
+      <div class="pop" id="menu" data-menu></div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="phone-top">
+      <button class="icon-btn" type="button" data-pop-toggle="pmenu" aria-expanded="false" aria-label="Menu" style="font-size:19px">⋯</button>
+      <div class="pop" id="pmenu" data-menu="tree"></div>
+    </div>
+    <section class="focus">
+      <button class="focus-head" type="button" aria-expanded="false" title="About this focus">
+        <span class="focus-label">Focus</span>
+        <h1 class="focus-title">What would it mean to live deliberately?</h1>
+        <span class="focus-caret">▾</span>
+      </button>
+      <div class="focus-body">
+        <p>Thoreau's phrase, but the question is mine: what in an ordinary day is chosen, and what is only inherited or drifted into? Reading the two of them side by side.</p>
+        <div class="focus-actions"><a href="#">Edit focus</a> · <a href="#">New focus</a> · <a href="#">All focuses</a></div>
+      </div>
+    </section>
+    <article class="passage" data-swipe>
+      <div class="ref-row">
+        <button class="keep-btn" type="button" data-keep aria-label="Keep"><svg viewBox="0 0 12 16"><path d="M1 1h10v14l-5-4-5 4z"/></svg></button>
+        <span class="ref-label" data-ref></span>
+        <span class="work" data-work></span>
+      </div>
+      <p class="verse" data-body aria-live="polite"></p>
+      <nav class="steps" aria-label="Sentences">
+        <button type="button" data-prev>‹</button>
+        <button type="button" class="of" data-pop-toggle="picker" aria-expanded="false" data-of-title><span data-n></span> of <span data-count></span></button>
+        <button type="button" data-next>›</button>
+        <button type="button" class="whole" data-pop-toggle="whole" aria-expanded="false" title="The whole paragraph (p)" aria-label="The whole paragraph" data-sentence-only>¶</button>
+        <div class="pop" id="picker"><div class="plist" data-plist></div></div>
+        <div class="pop" id="whole"><div class="whole-text" data-whole></div></div>
+      </nav>
+    </article>
+  </main>
+
+  <aside class="dock">
+    <button class="handle" type="button" onclick="this.parentElement.classList.toggle('open')">
+      <span class="lbl">Note</span><span data-note-preview></span><span style="color:var(--ink-faint)">▴</span>
+    </button>
+    <div class="dock-head"><span class="lbl">Note · <span data-ref></span></span><span class="note-status" data-note-status></span></div>
+    <div class="note-editor" contenteditable="true" data-note data-placeholder="What comes to mind?"></div>
+    <div class="note-tools">
+      <button type="button" data-tool="bold"><b>B</b></button><button type="button" data-tool="italic"><i>I</i></button>
+      <button type="button" data-tool="formatBlock" data-arg="blockquote">❝</button><button type="button" data-tool="insertUnorderedList">•</button>
+    </div>
+  </aside>
+
+  <nav class="proto-opts" aria-label="Prototype options" data-opts></nav>
+
+<script>
+(() => {
+  const params = new URLSearchParams(location.search);
+  const textKey = params.get("text") === "emerson" ? "emerson" : "walden";
+  const by = params.get("by") === "paragraph" ? "paragraph" : "sentence";
+  const T = window.PROSE[textKey];
+
+  // Units in reading order. A sentence knows its paragraph (p) and place in it (s); a paragraph unit has s = 0.
+  const units = by === "sentence"
+    ? T.paragraphs.flatMap((ss, pi) => ss.map((text, si) => ({ p: pi + 1, s: si + 1, text })))
+    : T.paragraphs.map((ss, pi) => ({ p: pi + 1, s: 0, text: ss.join(" ") }));
+  const refOf = (u) => u.s ? `${T.chapter} ${u.p}:${u.s}` : `${T.chapter} ${u.p}`;
+  const keyOf = (u) => `${u.p}:${u.s}`;
+
+  // A few sample notes and keeps, attached to whichever unit holds these words.
+  const SAMPLES = {
+    walden: [["I went to the woods", "<p>“Deliberately”: weighed, as on scales (<em>libra</em>). Not slowly; on purpose.</p>"],
+             ["Simplify, simplify", "<p>He says it twice. The repetition undercuts the advice, and I think he knows.</p>"],
+             ["Our life is frittered away", "<p>Frittered: broken into fragments. The opposite of deliberate is not fast but scattered.</p>"]],
+    emerson: [["Trust thyself", "<p>The iron string: something already tuned, not something built.</p>"],
+              ["A foolish consistency", "<p>Deliberate is not the same as consistent. A chosen life can change its mind.</p>"],
+              ["Nothing can bring you peace but yourself", "<p>Is this true, or just bracing?</p>"]],
+  };
+  const notes = {}, kept = new Set();
+  SAMPLES[textKey].forEach(([words, html], i) => {
+    const u = units.find((u) => u.text.includes(words));
+    if (u) { notes[keyOf(u)] = html; if (i === 0) kept.add(keyOf(u)); }
+  });
+
+  const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+  const sizeOf = (t) => (t.length > 450 ? "long" : t.length > 180 ? "mid" : "");
+  const plain = (html) => { const d = document.createElement("div"); d.innerHTML = html; return d.textContent.trim(); };
+  const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  let n = 1;
+
+  const TREE = `<div class="menu-head">Where you are</div><div class="tree">
+      <a href="#">Library</a><a href="#" style="padding-left:24px">Prose</a>
+      <a href="#" style="padding-left:36px">${T.work}</a>
+      <a href="#" class="here" style="padding-left:48px">${T.chapter}</a></div>`;
+  const MENU = (tree) => `${tree ? TREE + '<div class="menu-sep"></div>' : ""}
+    <a class="menu-item" href="#">All notes <small>${Object.keys(notes).length}</small></a>
+    <a class="menu-item" href="#">All focuses</a>
+    <a class="menu-item" href="#">Random · Prose</a>
+    <div class="menu-sep"></div>
+    <button class="menu-item" type="button" data-theme-toggle>Light / dark</button>
+    <a class="menu-item" href="#">Sign out</a>`;
+
+  function go(to) {
+    to = Math.max(1, Math.min(units.length, to));
+    if (to === n) return;
+    n = to;
+    history.replaceState(null, "", `${location.search}#u${n}`);
+    render(true);
+  }
+
+  function render(moved) {
+    const u = units[n - 1], key = keyOf(u), note = notes[key] || "";
+    $$("[data-ref]").forEach((el) => (el.textContent = refOf(u)));
+    $$("[data-work]").forEach((el) => (el.textContent = `${T.author} · ${T.work}`));
+    $$("[data-n]").forEach((el) => (el.textContent = n));
+    $$("[data-count]").forEach((el) => (el.textContent = units.length));
+    $$("[data-body]").forEach((el) => {
+      el.innerHTML = (u.s === 1 ? '<span class="pilcrow" aria-label="New paragraph">¶</span>' : "") + esc(u.text);
+      el.classList.remove("mid", "long", "turn");
+      if (sizeOf(u.text)) el.classList.add(sizeOf(u.text));
+      if (moved) { void el.offsetWidth; el.classList.add("turn"); }
+    });
+    $$("[data-note]").forEach((el) => { if (el !== document.activeElement || moved) el.innerHTML = note; });
+    $$("[data-note-preview]").forEach((el) => { el.textContent = note ? plain(note) : "Write a note"; el.classList.toggle("empty", !note); });
+    $$("[data-note-status]").forEach((el) => (el.textContent = ""));
+    const word = by === "sentence" ? "sentence" : "paragraph";
+    $$("[data-prev]").forEach((el) => { el.disabled = n === 1; if (n > 1) el.title = `Previous ${word}: ${refOf(units[n - 2])}`; });
+    $$("[data-next]").forEach((el) => { el.disabled = n === units.length; if (n < units.length) el.title = `Next ${word}: ${refOf(units[n])}`; });
+    $$("[data-of-title]").forEach((el) => (el.title = `Go to a ${word}`));
+    $$("[data-keep]").forEach((el) => { el.classList.toggle("kept", kept.has(key)); el.title = kept.has(key) ? "Kept (b)" : "Keep this passage (b)"; });
+    $$("[data-v]").forEach((b) => {
+      const v = units[+b.dataset.v - 1];
+      b.classList.toggle("here", +b.dataset.v === n);
+      b.classList.toggle("noted", !!notes[keyOf(v)]);
+      b.setAttribute("aria-current", +b.dataset.v === n);
+    });
+    $$("[data-pn]").forEach((el) => el.classList.toggle("here", +el.dataset.pn === u.p));
+    $$("[data-whole]").forEach((el) => {
+      el.innerHTML = units.map((v, i) => v.p === u.p
+        ? `<span data-v="${i + 1}" class="${i + 1 === n ? "here" : ""} ${notes[keyOf(v)] ? "noted" : ""}">${esc(v.text)}</span>` : "")
+        .filter(Boolean).join(" ");
+    });
+  }
+
+  function build() {
+    $$("[data-tree]").forEach((el) => (el.innerHTML = TREE));
+    $$("[data-menu]").forEach((el) => (el.innerHTML = MENU(el.dataset.menu === "tree")));
+    $$("[data-plist]").forEach((el) => {
+      if (by === "paragraph") {
+        el.classList.add("paras");
+        el.innerHTML = units.map((u, i) => `<div class="prow"><button type="button" data-v="${i + 1}" title="${esc(u.text.slice(0, 120))}…"><b>${u.p}</b>${esc(u.text.slice(0, 60))}</button></div>`).join("");
+        return;
+      }
+      el.innerHTML = T.paragraphs.map((ss, pi) => {
+        const first = units.findIndex((u) => u.p === pi + 1) + 1;
+        return `<div class="prow"><span class="pn" data-pn="${pi + 1}">¶ ${pi + 1}</span><span class="ss">` +
+          ss.map((t, si) => `<button type="button" data-v="${first + si}" title="${esc(t.slice(0, 90))}${t.length > 90 ? "…" : ""}">${si + 1}</button>`).join("") +
+          "</span></div>";
+      }).join("");
+    });
+    $$("[data-sentence-only]").forEach((el) => (el.hidden = by !== "sentence"));
+
+    // Switching granularity keeps your place: a sentence maps to its paragraph, a paragraph to its first sentence.
+    const link = (t, b, label) => {
+      const u = units[n - 1];
+      const target = t !== textKey ? 1 : b === by ? n
+        : b === "paragraph" ? u.p
+        : T.paragraphs.slice(0, u.p - 1).reduce((a, ss) => a + ss.length, 0) + 1;
+      return `<a href="?text=${t}&by=${b}#u${target}" class="${t === textKey && b === by ? "on" : ""}">${label}</a>`;
+    };
+    const opts = () => `<div>${link("walden", by, "Thoreau")}${link("emerson", by, "Emerson")}</div>` +
+      `<div>${link(textKey, "sentence", "Sentence")}${link(textKey, "paragraph", "Paragraph")}</div>`;
+    const el = document.querySelector("[data-opts]");
+    el.innerHTML = opts();
+    el.addEventListener("mouseenter", () => (el.innerHTML = opts()));
+    el.addEventListener("touchstart", () => (el.innerHTML = opts()), { passive: true });
+  }
+
+  const closePops = (except) => {
+    $$(".pop.open").forEach((p) => { if (p !== except) p.classList.remove("open"); });
+    $$("[data-pop-toggle]").forEach((b) => { if (!except || b.dataset.popToggle !== except.id) b.setAttribute("aria-expanded", "false"); });
+    $$(".focus.open").forEach((f) => { f.classList.remove("open"); f.querySelector(".focus-head").setAttribute("aria-expanded", "false"); });
+  };
+  const togglePop = (id) => {
+    const pop = document.getElementById(id), open = !pop.classList.contains("open");
+    closePops(pop);
+    pop.classList.toggle("open", open);
+    document.querySelector(`[data-pop-toggle="${id}"]`)?.setAttribute("aria-expanded", open);
+    const box = pop.querySelector(".plist, .whole-text"), here = box?.querySelector(".here");
+    // Fit the list to the room below the steps, so it never runs off the window.
+    if (open && box) box.style.maxHeight = `${Math.max(200, innerHeight - box.getBoundingClientRect().top - 24)}px`;
+    if (open && here) box.scrollTop = here.offsetTop - box.clientHeight / 2 + here.offsetHeight / 2;
+  };
+  const toggleKeep = () => { const k = keyOf(units[n - 1]); kept.has(k) ? kept.delete(k) : kept.add(k); render(); };
+
+  let saveTimer;
+  function wire() {
+    document.addEventListener("click", (e) => {
+      const t = e.target;
+      const v = t.closest("[data-v]");
+      if (v) { go(+v.dataset.v); if (!v.closest("[data-whole]")) closePops(); return; }
+      if (t.closest("[data-prev]")) return go(n - 1);
+      if (t.closest("[data-next]")) return go(n + 1);
+      if (t.closest("[data-keep]")) return toggleKeep();
+      if (t.closest("[data-theme-toggle]")) {
+        const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+        const cur = document.documentElement.dataset.theme || (dark ? "dark" : "light");
+        document.documentElement.dataset.theme = cur === "dark" ? "light" : "dark";
+        return closePops();
+      }
+      const tool = t.closest("[data-tool]");
+      if (tool) { e.preventDefault(); document.execCommand(tool.dataset.tool, false, tool.dataset.arg); return; }
+      const toggle = t.closest("[data-pop-toggle]");
+      if (toggle) return togglePop(toggle.dataset.popToggle);
+      const head = t.closest(".focus-head");
+      if (head) {
+        const f = head.closest(".focus"), open = !f.classList.contains("open");
+        closePops();
+        f.classList.toggle("open", open);
+        head.setAttribute("aria-expanded", open);
+        return;
+      }
+      if (!t.closest(".pop, .focus-body")) closePops();
+    });
+
+    document.addEventListener("input", (e) => {
+      const ed = e.target.closest("[data-note]");
+      if (!ed) return;
+      const key = keyOf(units[n - 1]), html = ed.innerHTML.trim(), empty = !ed.textContent.trim();
+      if (empty) delete notes[key]; else notes[key] = html;
+      $$("[data-note-status]").forEach((el) => (el.textContent = "Saving…"));
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => $$("[data-note-status]").forEach((el) => (el.textContent = empty ? "Note removed" : "Saved")), 600);
+      $$("[data-note-preview]").forEach((el) => { el.textContent = empty ? "Write a note" : plain(html); el.classList.toggle("empty", empty); });
+      $$("[data-v]").forEach((b) => +b.dataset.v === n && b.classList.toggle("noted", !empty));
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") { closePops(); document.activeElement?.blur(); return; }
+      if (e.target.closest("[contenteditable], input, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "j" || e.key === "ArrowRight") { e.preventDefault(); go(n + 1); }
+      else if (e.key === "k" || e.key === "ArrowLeft") { e.preventDefault(); go(n - 1); }
+      else if (e.key === "b") toggleKeep();
+      else if (e.key === "p" && by === "sentence") togglePop("whole");
+      else if (e.key === "n") { const ed = $$("[data-note]").find((el) => el.offsetParent); if (ed) { e.preventDefault(); ed.focus(); } }
+    });
+
+    $$("[data-swipe]").forEach((el) => {
+      let x0, y0;
+      el.addEventListener("touchstart", (e) => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+      el.addEventListener("touchend", (e) => {
+        const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) go(n + (dx < 0 ? 1 : -1));
+      });
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const m = location.hash.match(/^#u(\d+)$/);
+    const start = units.findIndex((u) => u.text.includes(textKey === "walden" ? "I went to the woods" : "Trust thyself")) + 1;
+    n = m ? Math.max(1, Math.min(units.length, +m[1])) : Math.max(1, start);
+    build();
+    wire();
+    render(false);
+  });
+})();
+</script>
+</body>
+</html>
