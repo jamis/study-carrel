@@ -254,7 +254,7 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_equal [ 81, 253 ], counts.("tao-te-ching")
     assert_equal [ 18, 240 ], counts.("bhagavad-gita")
     assert_equal [ 114, 6_245 ], counts.("quran")
-    assert_equal [ 12, 418 ], counts.("meditations")
+    assert_equal [ 12, 1_880 ], counts.("meditations")
     assert_equal "Prose", Work.find_by!(slug: "meditations").collection.name
 
     # The Quran is in the traditional order, not Rodwell's chronological one.
@@ -271,6 +271,13 @@ class BundledTextsTest < ActiveSupport::TestCase
     assert_not_includes Unit.where(section: dhp).map(&:number), 59
     assert_equal 18, Work.find_by!(slug: "walden").sections.count
     assert_equal "Walden: Economy", Work.find_by!(slug: "walden").sections.first.name
+
+    # Prose is read a sentence at a time.
+    prose = Work.where(collection: Collection.find_by!(slug: "prose"))
+    assert prose.all?(&:sentences?)
+    woods = Unit.find_by!(body: "I went to the woods because I wished to live deliberately, to front only the essential facts of life, and see if I could not learn what it had to teach, and not, when I came to die, discover that I had not lived.")
+    assert_equal "Walden: Where I Lived, and What I Lived For 19:1", woods.reference
+    assert_equal "Meditations: Book 2 1:1", Work.find_by!(slug: "meditations").sections.second.units.first.reference
     success = Work.find_by!(slug: "dickinson-first-series").sections.find_by!(label: "Success")
     assert_equal "Poems, First Series: Success, stanza 1", success.units.first.reference
     assert_includes success.units.first.body, "\n"

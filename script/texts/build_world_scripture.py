@@ -9,7 +9,8 @@ Sources (all public domain; download first, none are checked in):
   meditations https://www.gutenberg.org/cache/epub/2680/pg2680.txt   Meric Casaubon (1634)
 
 Each has a single source (Gutenberg's proofreading). Works go in "sacred-texts"
-(Meditations in "prose"), a section per chapter, a unit per verse or paragraph.
+(Meditations in "prose"), a section per chapter, a unit per verse or paragraph. Meditations is read a sentence
+at a time (see sentences.py): a section per book, labelled "Book 3", its numbered sections grouping the sentences.
 The Quran is Rodwell's, with the suras put back in the traditional order (his
 edition arranges them chronologically) and numbered traditionally.
 
@@ -17,6 +18,8 @@ Usage: build_world_scripture.py DIR_WITH_pgNNNN.txt_FILES [OUT_DIR]
 """
 import re, sys
 from pathlib import Path
+
+import sentences
 
 DEBUG = False
 ROMAN = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100}
@@ -53,16 +56,21 @@ def typography(s):
     return s.replace("'", "’")
 
 
-def write(out, slug, header, sections, keep_lines=False):
-    """sections: list of (number, label or None, [unit text, ...])"""
+def write(out, slug, header, sections, keep_lines=False, by_sentence=False):
+    """sections: list of (number, label or None, [unit text, ...] or {number: text}); by_sentence splits each unit into
+    sentences"""
     lines = header + (["lines: keep"] if keep_lines else []) + [""]
     for number, label, units in sections:
         lines.append(f"section: {number}")
         if label:
             lines.append(f"label: {label}")
-        for k, u in enumerate(units, start=1) if not isinstance(units, dict) else units.items():
-            first, *rest = u.split("\n")
-            lines += [f"{k}. {first}"] + rest
+        numbered = enumerate(units, start=1) if not isinstance(units, dict) else units.items()
+        if by_sentence:
+            lines += sentences.lines(numbered)
+        else:
+            for k, u in numbered:
+                first, *rest = u.split("\n")
+                lines += [f"{k}. {first}"] + rest
         lines.append("")
     (Path(out) / f"{slug}.txt").write_text("\n".join(lines))
     print(f"{slug}: {len(sections)} sections, {sum(len(u) for _, _, u in sections)} units")
@@ -169,10 +177,10 @@ def build_meditations(src, out):
         assert marks and marks[0][1] == 0, n
         units = {v: typography(flat(book[end:(marks[k + 1][1] if k + 1 < len(marks) else len(book))]))
                  for k, (v, _, end) in enumerate(marks)}
-        sections.append((n, None, units))
+        sections.append((n, f"Book {n}", units))
     assert len(sections) == 12
     write(out, "meditations", ["work: Meditations", "edition: Casaubon translation (1634)", "author: Marcus Aurelius", "slug: meditations",
-                               "collection: prose", "position: 201", "unit: section"], sections)
+                               "collection: prose", "position: 201", "unit: sentence", "group: section"], sections, by_sentence=True)
 
 
 def build_quran(src, out):

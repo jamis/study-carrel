@@ -15,6 +15,8 @@ Usage: build_walden_and_dickinson.py WALDEN.txt DICKINSON.txt [OUT_DIR]
 import re, sys
 from pathlib import Path
 
+import sentences
+
 CHAPTERS = ["Economy", "Where I Lived, and What I Lived For", "Reading", "Sounds", "Solitude", "Visitors", "The Bean-Field",
             "The Village", "The Ponds", "Baker Farm", "Higher Laws", "Brute Neighbors", "House-Warming",
             "Former Inhabitants and Winter Visitors", "Winter Animals", "The Pond in Winter", "Spring", "Conclusion"]
@@ -52,12 +54,12 @@ def build_walden(path):
             i += 1
         heads.append(i)
         i += 1
-    out = ["work: Walden", "author: Henry David Thoreau", "author_short: Thoreau", "slug: walden", "collection: prose", "position: 200", "unit: paragraph", ""]
+    out = ["work: Walden", "author: Henry David Thoreau", "author_short: Thoreau", "slug: walden", "collection: prose", "position: 200", "unit: sentence", "group: paragraph", ""]
     for n, (title, start) in enumerate(zip(CHAPTERS, heads), start=1):
         end = heads[n] if n < len(heads) else len(lines)
         paras = [" ".join(l.strip() for l in p.strip().split("\n")) for p in re.split(r"\n\s*\n", "\n".join(lines[start + 1:end])) if p.strip()]
         paras = [typography(p) for p in paras if not re.fullmatch(r"[\s*]+", p)]
-        out += [f"section: {n}", f"label: {title}"] + [f"{k}. {p}" for k, p in enumerate(paras, start=1)] + [""]
+        out += [f"section: {n}", f"label: {title}"] + sentences.lines(enumerate(paras, start=1)) + [""]
     return "\n".join(out)
 
 

@@ -7,13 +7,15 @@ Sources (all public domain; download first, none are checked in):
   montaigne https://www.gutenberg.org/cache/epub/3600/pg3600.txt    Montaigne, Essays (Charles Cotton's translation, ed. W. C. Hazlitt, 1877)
   pensees   https://www.gutenberg.org/cache/epub/18269/pg18269.txt   Pascal, Pensées (W. F. Trotter's translation; the file doesn't name the translator)
 
-Works go in "prose". A section is a part of the work and a unit is one numbered
-fragment (Pensées), essay paragraph (Emerson) or paragraph (Montaigne).
+Works go in "prose". A section is a part of the work, and a unit is one sentence
+(see sentences.py) of a numbered thought (Pensées) or a paragraph (Emerson, Montaigne).
 
 Usage: build_prose.py DIR_WITH_pgNNNN.txt_FILES [OUT_DIR]
 """
 import re, sys
 from pathlib import Path
+
+import sentences
 
 ROMAN = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100}
 
@@ -59,17 +61,16 @@ def title_case(s):
 
 
 def write(out, slug, header, sections):
-    """sections: list of (number, label or None, [unit text, ...] or {number: text})"""
+    """sections: list of (number, label or None, [paragraph text, ...] or {number: text}); written a sentence per line"""
     lines = header + [""]
     for number, label, units in sections:
         lines.append(f"section: {number}")
         if label:
             lines.append(f"label: {label}")
-        for k, u in enumerate(units, start=1) if not isinstance(units, dict) else units.items():
-            lines.append(f"{k}. {u}")
+        lines += sentences.lines(enumerate(units, start=1) if not isinstance(units, dict) else units.items())
         lines.append("")
     (Path(out) / f"{slug}.txt").write_text("\n".join(lines))
-    print(f"{slug}: {len(sections)} sections, {sum(len(u) for _, _, u in sections)} units")
+    print(f"{slug}: {len(sections)} sections, {sum(len(u) for _, _, u in sections)} paragraphs")
 
 
 def build_pensees(src, out):
@@ -92,7 +93,7 @@ def build_pensees(src, out):
     assert nums == list(range(1, 924)), (nums[:3], nums[-3:], len(nums))
     assert [s[0] for s in sections] == list(range(1, 15))
     write(out, "pensees", ["work: Pensées", "edition: Trotter translation", "author: Blaise Pascal", "author_short: Pascal",
-                            "slug: pensees", "collection: prose", "position: 202", "unit: thought"], sections)
+                            "slug: pensees", "collection: prose", "position: 202", "unit: sentence", "group: thought"], sections)
 
 
 SECOND_SERIES = ["THE POET", "EXPERIENCE", "CHARACTER", "MANNERS", "GIFTS", "NATURE", "POLITICS",
@@ -162,7 +163,7 @@ def build_montaigne(src, out):
     assert len(sections) == 107, len(sections)
     write(out, "montaigne-essays", ["work: Essays", "edition: Cotton translation (1877)", "author: Michel de Montaigne",
                                     "author_short: Montaigne", "slug: montaigne-essays", "collection: prose", "position: 205",
-                                    "unit: paragraph"], sections)
+                                    "unit: sentence", "group: paragraph"], sections)
 
 
 def unshout(s):
@@ -189,7 +190,7 @@ def build_emerson(src, out, slug, name, year, first_series, position):
         units = [unshout(typography(flat(p))) for p in ps]
         sections.append((n, title, units))
     write(out, slug, [f"work: {name}", f"edition: {year}", "author: Ralph Waldo Emerson", "author_short: Emerson",
-                      f"slug: {slug}", "collection: prose", f"position: {position}", "unit: paragraph"], sections)
+                      f"slug: {slug}", "collection: prose", f"position: {position}", "unit: sentence", "group: paragraph"], sections)
 
 
 if __name__ == "__main__":
