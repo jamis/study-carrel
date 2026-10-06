@@ -129,9 +129,11 @@
     </aside>
   </div>
 
-  <%# A plain form post: the review and the form answer with a page, not a redirect, which Turbo won't take. %>
+  <%# A plain form post: the review and the form answer with a page, not a redirect, which Turbo won't take. "Edit the
+      text" sends this form to the review instead, so it carries the session's token, which suits any action; a
+      per-form token is only good for the form's own action. %>
   <%= form_with model: @text, url: (@work ? text_path(@work) : texts_path), method: (@work ? :patch : :post), multipart: true,
-        class: "texts-bar", data: { turbo: false } do |f| %>
+        class: "texts-bar", authenticity_token: form_authenticity_token, data: { turbo: false } do |f| %>
     <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :form %>
     <div class="texts-bar-in">
       <span class="info"><%= @work ? "Saving replaces the text. Nothing on an unchanged #{unit} moves." : "You can revise it later; notes on unchanged #{unit.pluralize} stay put." %></span>

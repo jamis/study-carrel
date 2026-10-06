@@ -28,6 +28,29 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     assert_select "textarea[name='user_text[source]']", text: SOURCE.sub(/\A\n/, "")
   end
 
+  test "both of the review's buttons pass the forgery check, adding a text or revising one" do
+    ActionController::Base.allow_forgery_protection = true
+    token = -> { css_select("form.texts-bar input[name=authenticity_token]").sole["value"] }
+
+    get new_text_path
+    post review_texts_path, params: params.merge(authenticity_token: css_select("form.texts-form input[name=authenticity_token]").sole["value"])
+    bar = token.()
+    post review_texts_path, params: params.merge(authenticity_token: bar, edit: "1")
+    assert_response :success, "Edit the text"
+    post texts_path, params: params.merge(authenticity_token: bar)
+    assert_response :redirect, "Add to your texts"
+
+    work = @user.texts.last
+    patch review_text_path(work), params: params(source: SOURCE + "More.\n").merge(authenticity_token: bar)
+    bar = token.()
+    patch review_text_path(work), params: params.merge(authenticity_token: bar, edit: "1")
+    assert_response :success, "Edit the text, revising"
+    patch text_path(work), params: params.merge(authenticity_token: bar)
+    assert_response :redirect, "Save the revision"
+  ensure
+    ActionController::Base.allow_forgery_protection = false
+  end
+
   test "editing from the review goes back to the form with the text" do
     post review_texts_path, params: params.merge(edit: "1")
     assert_response :success
