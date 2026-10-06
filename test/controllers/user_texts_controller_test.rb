@@ -91,4 +91,12 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".texts-latest", text: /Text 0/, count: 0
     assert_select ".list-row-meta", /6 texts/
   end
+
+  test "the reader's trail runs through Your Texts, with headings or without" do
+    [ "Talk", "Journal" ].zip([ "Thank you. It is good to be here.", SOURCE ]).each do |title, source|
+      work = UserText.new(title:, source:).publish!(@user)
+      get reading_path(work.slug, 1, 1)
+      assert_select ".trail li", text: "Your Texts", count: 2 # the rail's popover and the phone menu
+    end
+  end
 end
