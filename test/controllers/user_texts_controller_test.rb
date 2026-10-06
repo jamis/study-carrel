@@ -65,4 +65,21 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     assert_not Unit.exists?(unit.id)
     assert_empty LibrarySearch.new("quiet", user: @user).page(1)
   end
+
+  test "Your texts has its own search and Random, which stay inside the user's texts" do
+    work = UserText.new(title: "Journal", source: SOURCE).publish!(@user)
+    load_isaiah
+    get texts_path
+    assert_select "input[type=hidden][name=texts][value=yours]"
+    assert_select ".menu-random a[href=?]", random_texts_path
+
+    get search_path(q: "quiet", texts: "yours")
+    assert_select ".fv-ref", text: "Journal: Monday 1:2"
+    assert_select ".search-scopes a", text: "Your texts"
+    get search_path(q: "comfort", texts: "yours")
+    assert_select ".fv-ref", 0
+
+    get random_texts_path
+    assert_match %r{/read/#{work.slug}/}, response.location
+  end
 end

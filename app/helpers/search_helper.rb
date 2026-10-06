@@ -4,6 +4,7 @@ module SearchHelper
     case place
     when nil then {}
     when Work then { work: place.slug }
+    when OwnTexts then { texts: "yours" }
     else { collection: place.slug }
     end
   end

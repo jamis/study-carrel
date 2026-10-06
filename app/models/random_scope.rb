@@ -2,7 +2,7 @@
 # library (place nil). Rolls are balanced: each branch of the library gets an even chance at every level (Sacred
 # Texts > Bible, Book of Mormon, Quran, ... alike), then the roll picks evenly among the units of the work it reaches;
 # a single-work collection (the Bible) counts as one branch and is even by unit inside, so Obadiah is no likelier than
-# Psalm 119's verses. A user's own texts are one more branch of the library, all of them together.
+# Psalm 119's verses. A user's own texts (OwnTexts) are one more branch of the library, all of them together.
 class RandomScope
   attr_reader :place
 
@@ -12,14 +12,18 @@ class RandomScope
 
   # The places enclosing a work or collection, innermost first: itself, its collections out to the top, the library.
   def self.chain_for(place)
+    return [ new(place), library ] if place.is_a?(OwnTexts)
+    return [ new(place), new(OwnTexts.new(place.user)), library ] if place.is_a?(Work) && place.own_text?
+
     collection = place.is_a?(Work) ? place.collection : place
     collections = collection ? [ *collection.ancestors, collection ].reverse : []
     places = place.is_a?(Work) ? [ place, *collections ] : collections
     [ *places, nil ].map { new(it) }
   end
 
-  # The reader's default: the innermost collection, or the work itself when it sits in none.
-  def self.default_for(work) = new(work.collection || work)
+  # The reader's default: the innermost collection (Your texts, for one of the user's own), or the work itself when it
+  # sits in none.
+  def self.default_for(work) = new(work.collection || (OwnTexts.new(work.user) if work.own_text?) || work)
 
   def label
     case place
@@ -67,11 +71,11 @@ class RandomScope
   end
 
   def branches(node)
-    return works.select(&:user_id) if node == :own_texts
+    return works.select(&:user_id) if node.is_a?(OwnTexts)
 
     id = node&.id
     found = collections.select { it.parent_id == id } + works.select { it.collection_id == id && !it.user_id }
-    node.nil? && works.any?(&:user_id) ? found << :own_texts : found
+    node.nil? && works.any?(&:user_id) ? found << OwnTexts.new(@user) : found
   end
 
   # Ids of the works with any units under a node; nil is the whole library.

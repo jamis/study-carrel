@@ -38,6 +38,7 @@ Rails.application.routes.draw do
   get "collections/:collection/random", to: "random_readings#show", as: :random_collection
   get "works/:work/random", to: "random_readings#show", as: :random_work
   # A user's own texts. Adding one is new > review (which can go back to new with the text) > create.
+  get "texts/random", to: "random_readings#show", defaults: { texts: "yours" }, as: :random_texts
   resources :texts, only: %i[index new create destroy], param: :slug, controller: "user_texts" do
     post :review, on: :collection
   end
