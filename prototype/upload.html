@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Add a Text</title>
+<style>
+  /* Add a text: paste or choose a plain-text file, review how it will be read, then add it to your texts.
+     Also the revision of a text you already have, where notes and keeps on passages that are gone are detached. */
+  :root {
+    --bg: #f6f1e7; --paper: #fbf8f1; --ink: #2b2620; --ink-soft: #6b6256; --ink-faint: #a39a8c;
+    --rule: #e2d9c8; --accent: #8a4b2a; --accent-soft: #f0dcc9; --hl: #f7e3a4; --new: #dfe9d3;
+    --shadow: 0 8px 30px rgba(60, 40, 20, .12);
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  :root[data-theme="dark"] {
+    --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685; --ink-faint: #6e665a;
+    --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d; --hl: #5a4a1e; --new: #26321f;
+    --shadow: 0 8px 30px rgba(0, 0, 0, .5);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685; --ink-faint: #6e665a;
+      --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d; --hl: #5a4a1e; --new: #26321f;
+      --shadow: 0 8px 30px rgba(0, 0, 0, .5);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--serif); line-height: 1.5; overflow-x: clip; -webkit-font-smoothing: antialiased; }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* prototype switcher, not part of the design */
+  .proto { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; padding: 6px 16px; font: 12px var(--sans); color: var(--ink-faint); border-bottom: 1px dashed var(--rule); }
+  .proto button { border: 0; background: none; padding: 2px 0; color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; }
+  .proto button[aria-pressed="true"] { color: var(--accent); text-decoration: none; font-weight: 600; }
+
+  /* top bar, as on the library pages */
+  .nav { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 1px solid var(--rule); }
+  .nav-in { max-width: 1180px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; font: 14px var(--sans); }
+  .crumbs { flex: 1; min-width: 0; }
+  .crumbs ol { display: flex; margin: 0; padding: 0; list-style: none; white-space: nowrap; overflow: hidden; }
+  .crumbs li { color: var(--ink-soft); }
+  .crumbs li + li::before { content: "›"; margin: 0 8px; opacity: .55; }
+  .crumbs li:last-child { color: var(--ink); font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+  .icon-btn { border: 0; background: transparent; padding: 6px 8px; border-radius: 8px; font-size: 16px; }
+  .icon-btn:hover { background: var(--accent-soft); }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 28px 16px 120px; }
+  h1 { margin: 0 0 6px; font-weight: 400; font-size: clamp(26px, 4vw, 34px); line-height: 1.2; }
+  .lede { margin: 0 0 28px; color: var(--ink-soft); font-size: 17px; max-width: 40em; }
+  .lede .lock { font-family: var(--sans); font-size: 13px; }
+
+  /* ---------- step 1: source ---------- */
+  .source { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 40px; align-items: start; }
+  .field { display: block; margin-bottom: 18px; }
+  .field > span { display: block; margin-bottom: 6px; font: 600 13px var(--sans); color: var(--ink-soft); }
+  .field > span small { font-weight: 400; color: var(--ink-faint); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  input[type=text], textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper);
+  }
+  input[type=text] { font-size: 18px; }
+  input[type=text]:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  textarea { display: block; min-height: 46vh; resize: vertical; font: 14px/1.55 var(--mono); tab-size: 4; }
+  .src-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; font: 13px var(--sans); }
+  .src-head b { color: var(--ink-soft); }
+  .src-head .grow { flex: 1; }
+  .linkish { border: 0; background: none; padding: 0; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; font: inherit; }
+  .src-foot { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font: 12px var(--sans); color: var(--ink-faint); }
+  .drop.over textarea { border-color: var(--accent); border-style: dashed; background: var(--accent-soft); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; border-radius: 999px;
+    border: 1px solid var(--rule); background: transparent; font: 15px var(--sans); text-decoration: none; color: inherit;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+  .btn.primary:hover { filter: brightness(1.08); color: var(--paper); }
+  .btn:disabled { opacity: .45; cursor: default; filter: none; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 22px; }
+  .actions .msg { font: 13px var(--sans); color: var(--accent); }
+
+  .howto { position: sticky; top: 72px; padding: 18px 20px; border: 1px solid var(--rule); border-radius: 14px; background: var(--paper); font-size: 16px; }
+  .howto h2 { margin: 0 0 10px; font: 600 11px var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft); }
+  .howto ol { margin: 0; padding: 0; list-style: none; }
+  .howto li { margin-bottom: 12px; color: var(--ink-soft); }
+  .howto li b { color: var(--ink); font-weight: 600; }
+  .howto code { font: 13px var(--mono); padding: 1px 4px; border-radius: 4px; background: var(--accent-soft); color: var(--ink); }
+  .howto pre { margin: 6px 0 0; padding: 10px 12px; border-radius: 8px; background: var(--bg); font: 12.5px/1.5 var(--mono); white-space: pre-wrap; color: var(--ink-soft); }
+
+  .revising { margin: -8px 0 24px; padding: 12px 16px; border-left: 3px solid var(--accent); background: var(--paper); border-radius: 0 10px 10px 0; font-size: 16px; color: var(--ink-soft); max-width: 46em; }
+  .revising b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- step 2: review ---------- */
+  .review-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; }
+  .review-head .by { color: var(--ink-soft); font-style: italic; }
+  .summary { margin: 4px 0 4px; font: 14px var(--sans); color: var(--ink-soft); }
+  .summary b { color: var(--ink); font-weight: 600; }
+  .rule-note { margin: 0 0 22px; font-size: 15px; color: var(--ink-soft); }
+
+  .panel { margin-bottom: 18px; border: 1px solid var(--rule); border-radius: 14px; background: var(--paper); max-width: 46em; }
+  .panel > summary, .panel > .ph { list-style: none; display: flex; align-items: baseline; gap: 10px; padding: 12px 16px; cursor: pointer; font: 600 13px var(--sans); }
+  .panel > summary::-webkit-details-marker { display: none; }
+  .panel > summary::after { content: "▾"; margin-left: auto; color: var(--ink-faint); font-weight: 400; transition: transform .2s; }
+  .panel[open] > summary::after { transform: rotate(180deg); }
+  .panel > summary .count { font-weight: 400; color: var(--ink-soft); }
+  .panel .pbody { padding: 0 8px 10px; }
+  .check {
+    display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; width: 100%; padding: 8px 10px; border: 0; border-radius: 8px;
+    background: none; text-align: left;
+  }
+  .check:hover { background: var(--accent-soft); }
+  .check .what { font: 13.5px var(--sans); color: var(--ink); }
+  .check .where { font: 12px var(--sans); color: var(--ink-faint); white-space: nowrap; }
+  .check .snip { grid-column: 1 / -1; font-size: 15px; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .check .snip mark { background: var(--hl); color: inherit; border-radius: 2px; }
+  .pbody .hint { margin: 4px 10px 6px; font: 12.5px var(--sans); color: var(--ink-faint); }
+
+  .tally { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 0 10px 8px; font: 13px var(--sans); color: var(--ink-soft); }
+  .tally .k { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 2px; vertical-align: 0; }
+  .fate { padding: 10px 10px 12px; border-top: 1px solid var(--rule); }
+  .fate:first-of-type { border-top: 0; }
+  .fate .head { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; font: 13px var(--sans); }
+  .fate .head b { font-weight: 600; }
+  .fate .head .tag { padding: 1px 8px; border-radius: 999px; font-size: 11.5px; background: var(--accent-soft); color: var(--accent); }
+  .fate .head .tag.ok { background: transparent; color: var(--ink-faint); border: 1px solid var(--rule); }
+  .fate .head .ref { color: var(--ink-faint); }
+  .fate .note { margin: 6px 0 0; padding-left: 10px; border-left: 2px solid var(--rule); font-size: 15px; font-style: italic; color: var(--ink-soft); }
+  .fate .was, .fate .now { margin: 6px 0 0; font-size: 15px; }
+  .fate .was { color: var(--ink-faint); text-decoration: line-through; text-decoration-color: var(--ink-faint); }
+  .fate .lbl { font: 11px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); margin-right: 6px; text-decoration: none; display: inline-block; }
+
+  .review { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 40px; align-items: start; }
+  .text { max-width: 40em; }
+  .sec { margin-bottom: 30px; }
+  .sec h2 { position: sticky; top: 49px; z-index: 2; margin: 0 0 10px; padding: 8px 0; background: var(--bg); font-weight: 400; font-size: 21px; }
+  .sec h2 .n { margin-right: 10px; font: 12px var(--sans); color: var(--ink-faint); vertical-align: 3px; }
+  .sec h2 .untitled { font-style: italic; color: var(--ink-soft); }
+  .sec h2 .mark { margin-left: 8px; font: 11.5px var(--sans); color: var(--ink-faint); vertical-align: 3px; }
+  .para { position: relative; margin: 0 0 14px; font-size: 17px; line-height: 1.7; }
+  .para .pn { position: absolute; right: calc(100% + 12px); top: 4px; font: 400 11.5px var(--sans); color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .s { border-radius: 3px; cursor: pointer; padding: 1px 0; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  .s + .s { margin-left: .15em; }
+  .s sup { margin-right: 2px; font: 10px var(--sans); color: var(--accent); opacity: .75; vertical-align: 5px; }
+  .s:nth-of-type(even) { background: color-mix(in srgb, var(--accent-soft) 45%, transparent); }
+  .s:hover { background: var(--accent-soft); }
+  .s.flag { background: var(--hl); }
+  .s.new { box-shadow: inset 0 -2px 0 color-mix(in srgb, #5a8a3a 60%, transparent); }
+  .s.reworded { box-shadow: inset 0 -2px 0 var(--accent); }
+  .s.noted::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 4px; border-radius: 50%; background: var(--accent); vertical-align: 2px; }
+  .s.here { outline: 2px solid var(--accent); outline-offset: 1px; background: var(--accent-soft); }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: -12px 0 20px; font: 12px var(--sans); color: var(--ink-faint); }
+  .legend i { display: inline-block; width: 18px; height: 10px; margin-right: 6px; border-radius: 2px; vertical-align: -1px; }
+
+  /* How it reads: the chosen sentence as the reader shows it */
+  .preview { position: sticky; top: 72px; padding: 18px 22px 16px; border: 1px solid var(--rule); border-radius: 14px; background: var(--paper); }
+  .pv-label { display: flex; align-items: baseline; font: 600 11px var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft); }
+  .pv-label .x { display: none; margin-left: auto; }
+  .pv-ref { margin: 14px 0 10px; font: 13px var(--sans); color: var(--ink-soft); }
+  .pv-text { position: relative; margin: 0; padding-left: 14px; line-height: 1.45; max-height: 52vh; overflow-y: auto; }
+  .pv-text .pilcrow { position: absolute; left: -4px; color: var(--accent); opacity: .7; }
+  .pv-steps { display: flex; align-items: center; gap: 4px; margin-top: 18px; font: 13px var(--sans); }
+  .pv-steps button { border: 0; background: none; padding: 6px 10px; border-radius: 8px; color: var(--ink-faint); }
+  .pv-steps button:first-child { margin-left: -10px; }
+  .pv-steps button:hover:not(:disabled) { color: var(--accent); background: var(--accent-soft); }
+  .pv-steps button:disabled { visibility: hidden; }
+  .pv-steps .of { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .pv-help { margin: 14px 0 0; font: 12px var(--sans); color: var(--ink-faint); }
+
+  .bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; border-top: 1px solid var(--rule); background: var(--bg);
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  }
+  .bar-in { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .bar-in .info { flex: 1; min-width: 12em; font: 13px var(--sans); color: var(--ink-soft); }
+
+  /* ---------- step 3: done ---------- */
+  .done { max-width: 34em; margin: 10vh 0 0; }
+  .done p { color: var(--ink-soft); font-size: 17px; }
+
+  @media (max-width: 899px) {
+    .source, .review { grid-template-columns: 1fr; }
+    .howto { position: static; order: -1; }
+    .preview {
+      position: fixed; left: 8px; right: 8px; bottom: 74px; top: auto; z-index: 40; box-shadow: var(--shadow);
+      transform: translateY(calc(100% + 90px)); transition: transform .25s;
+    }
+    .preview.open { transform: none; }
+    .pv-label .x { display: inline-block; }
+    .pv-help { display: none; }
+    .para .pn { display: none; }
+  }
+  @media (max-width: 599px) {
+    .row { grid-template-columns: 1fr; gap: 0; }
+    textarea { min-height: 40vh; }
+    .bar-in .info { display: none; }
+    .bar-in .btn { flex: 1; justify-content: center; padding: 0 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="proto">
+  <span>Prototype:</span>
+  <button type="button" data-mode="new" aria-pressed="true">Adding a new text</button>
+  <button type="button" data-mode="revise" aria-pressed="false">Revising a text with notes</button>
+</div>
+
+<header class="nav">
+  <div class="nav-in">
+    <nav class="crumbs" aria-label="Where you are"><ol><li>Library</li><li>Your texts</li><li id="crumbLast">Add a text</li></ol></nav>
+    <button class="icon-btn" type="button" aria-label="Menu">⋯</button>
+  </div>
+</header>
+
+<main>
+  <!-- step 1 -->
+  <section id="stepSource">
+    <h1 id="srcTitle">Add a text</h1>
+    <p class="lede" id="srcLede">A journal, the transcript of a talk, anything in prose. <span class="lock">🔒</span> Only you can see texts you add.</p>
+    <div class="revising" id="revisingNote" hidden></div>
+
+    <div class="source">
+      <form id="form" novalidate>
+        <label class="field"><span>Title</span><input type="text" id="title" autocomplete="off" placeholder="Journal, spring 2024"></label>
+        <div class="row">
+          <label class="field"><span>Author <small>optional</small></span><input type="text" id="author" autocomplete="off"></label>
+          <label class="field"><span>Short form <small>optional, shown in the reader</small></span><input type="text" id="authorShort" autocomplete="off"></label>
+        </div>
+        <div class="field drop" id="drop">
+          <div class="src-head">
+            <b>Text</b><span class="grow"></span>
+            <button type="button" class="linkish" id="choose">Choose a file…</button>
+            <input type="file" id="file" accept=".txt,.md,.markdown,text/plain,text/markdown" hidden>
+          </div>
+          <textarea id="src" spellcheck="false" aria-label="Text" placeholder="Paste the text here, or drop a .txt or .md file on this box."></textarea>
+          <div class="src-foot">
+            <span id="srcStats">Empty</span>
+            <span id="samples">Try a sample: <button type="button" class="linkish" data-sample="journal">journal</button> · <button type="button" class="linkish" data-sample="talk">talk</button></span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn primary" type="submit" id="toReview">Review</button>
+          <a class="btn" href="#" id="cancel">Cancel</a>
+          <span class="msg" id="formMsg" role="status"></span>
+        </div>
+      </form>
+
+      <aside class="howto" aria-labelledby="howtoHead">
+        <h2 id="howtoHead">How the text is read</h2>
+        <ol>
+          <li><b>Paragraphs.</b> Blank lines between paragraphs, and line breaks inside one are joined. With no blank lines at all, every line is a paragraph.</li>
+          <li><b>Sections.</b> A line starting <code>#&nbsp;</code> starts a section, named by the rest of the line. No headings: one section.</li>
+          <li><b>Sentences.</b> Each paragraph is read a sentence at a time, like Walden.</li>
+          <li><b>A backslash</b> beside <code>.</code> <code>?</code> <code>!</code> decides a split: <code>Sgt\. Pepper</code> isn’t an ending, <code>with M.\ We</code> is. <code>\\</code> is a backslash.</li>
+          <li><b>Everything else</b> shows exactly as typed. Asterisks stay asterisks.</li>
+        </ol>
+        <pre># 3 March 2024
+
+Woke before six. The house
+was quiet.
+
+Read Isaiah 40 again.</pre>
+      </aside>
+    </div>
+  </section>
+
+  <!-- step 2 -->
+  <section id="stepReview" hidden>
+    <div class="review-head"><h1 id="rvTitle"></h1><span class="by" id="rvBy"></span></div>
+    <p class="summary" id="rvSummary"></p>
+    <p class="rule-note" id="rvRule"></p>
+
+    <details class="panel" id="revPanel" open hidden>
+      <summary>What changes <span class="count" id="revCount"></span></summary>
+      <div class="pbody" id="revBody"></div>
+    </details>
+
+    <details class="panel" id="checksPanel" open>
+      <summary>Worth a look <span class="count" id="checksCount"></span></summary>
+      <div class="pbody" id="checksBody"></div>
+    </details>
+
+    <div class="legend" id="legend"></div>
+
+    <div class="review">
+      <div class="text" id="rvText"></div>
+      <aside class="preview" id="preview" aria-live="polite">
+        <div class="pv-label">How it reads <button class="icon-btn x" type="button" id="pvClose" aria-label="Close">✕</button></div>
+        <div class="pv-ref" id="pvRef"></div>
+        <p class="pv-text" id="pvText"></p>
+        <div class="pv-steps"><button type="button" id="pvPrev" aria-label="Previous sentence">‹</button><span class="of" id="pvOf"></span><button type="button" id="pvNext" aria-label="Next sentence">›</button></div>
+        <p class="pv-help">Pick any sentence to see it here. ← → step through.</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- step 3 -->
+  <section id="stepDone" hidden>
+    <div class="done">
+      <h1 id="doneTitle"></h1>
+      <p id="doneText"></p>
+      <div class="actions"><a class="btn primary" href="reader/sentences.html">Start reading</a><button class="btn" type="button" id="again">Back to the prototype</button></div>
+    </div>
+  </section>
+</main>
+
+<div class="bar" id="bar" hidden>
+  <div class="bar-in">
+    <span class="info" id="barInfo"></span>
+    <button class="btn" type="button" id="toSource">Edit the text</button>
+    <button class="btn primary" type="button" id="publish">Add to your texts</button>
+  </div>
+</div>
+
+<script>
+/* ---------- samples ---------- */
+const SAMPLES = {
+  journal: { title: "Journal, spring 2024", author: "", authorShort: "", text:
+`# 3 March 2024
+
+Woke before six and sat with the lamp for a while before anyone else was up. The house has a particular quiet at that hour. I read Isaiah 40 again and stopped at verse 31, which I have read a hundred times without really hearing it.
+"They shall mount up with wings as eagles." I keep wondering what it costs to wait like that. Not idle waiting... the kind that is full of attention.
+Dr. Alvarez called at 9 a.m. to move the appointment. Fine. One less thing on Thursday.
+
+# 10 March 2024
+
+Long walk by the reservoir with M. We talked about her father, and about how grief doesn't arrive on schedule. She said it comes "sideways, like weather." I think that is exactly right.
+Hm. I want to remember that.
+March 14
+Couldn't sleep. Wrote three pages and threw away two. The one I kept says only that I am tired of pretending to be certain.
+
+# 17 March 2024
+
+Rain all day. Played Sgt\\. Pepper on the drive home, loud. Finished the Emerson essay on self-reliance and felt *scolded* in a good way. He says trust thyself, every heart vibrates to that iron string. Maybe. But some days the string is slack.
+` },
+  talk: { title: "On Attention", author: "Ruth Ellery", authorShort: "Ellery", text:
+`Thank you. It's a little strange to stand up here after Dr. Okafor,
+who has known most of you far longer than I have.
+
+I want to talk this morning about attention. Simone Weil wrote that
+attention is the rarest and purest form of generosity. I've carried
+that line around for years... and I'm still not sure I practice it.
+
+When I was nineteen I spent a summer in St. Louis working nights at a
+bakery on Grand Ave. We started at 2 a.m. and finished around 9. The
+owner, Mr. Haddad, had a rule: no radio until the first loaves were
+out. He said the bread needed us to listen. I thought he was joking.
+He was not joking.
+
+Um. So. Where was I going with that?
+
+Abiding, I think. "Abide in me, and I in you" (John 15:5). The word
+means to stay, to remain, to not leave the room when it gets
+uncomfortable. It is *really* hard. Most of us, e.g. most of the
+people I love, are very good at leaving the room without ever
+standing up.
+
+# Questions afterward
+
+Q. How do you practice attention when you have small children?
+
+A. Badly! Mostly badly. But I've learned to count the interruptions
+as part of the practice rather than a failure of it. That helped.
+` }
+};
+
+/* Revising: the journal as it was loaded, with notes and keeps on some of its sentences, and an edited copy. */
+const REVISE = {
+  oldText: SAMPLES.journal.text,
+  annotations: [
+    { kind: "note", focus: "What does it mean to wait?", on: "\"They shall mount up with wings as eagles.\"", body: "Waiting as a kind of strength, not its absence." },
+    { kind: "note", focus: "What does it mean to wait?", on: "Not idle waiting... the kind that is full of attention.", body: "Compare Weil on attention. Waiting with the door open." },
+    { kind: "note", focus: "What is grief for?", on: "Long walk by the reservoir with M. We talked about her father, and about how grief doesn't arrive on schedule.", body: "Grief has its own calendar. Mine didn't start for a year." },
+    { kind: "note", focus: "What does it mean to wait?", on: "Dr. Alvarez called at 9 a.m. to move the appointment.", body: "Even this: being made to wait, and how badly I do it." },
+    { kind: "keep", remark: "Say this out loud sometime.", on: "The one I kept says only that I am tired of pretending to be certain." },
+    { kind: "keep", remark: "", on: "Fine. One less thing on Thursday." },
+  ],
+  newText:
+`# 3 March 2024
+
+Woke before six and sat with the lamp for a while before anyone else was up. The house has a particular quiet at that hour. I read Isaiah 40 again and stopped at verse 31, which I have read a hundred times without really hearing it.
+"They shall mount up with wings as eagles." I keep wondering what it costs to wait like that. Not idle waiting, but the kind that is full of attention.
+
+# 10 March 2024
+
+Long walk by the reservoir with Maria. We talked about her father, and about how grief doesn't arrive on schedule. She said it comes "sideways, like weather." I think that is exactly right.
+Hm. I want to remember that.
+
+# 14 March 2024
+
+Couldn't sleep. Wrote three pages and kept one.
+
+# 17 March 2024
+
+Rain all day. Played Sgt\\. Pepper on the drive home, loud. Finished the Emerson essay on self-reliance and felt *scolded* in a good way. He says trust thyself, every heart vibrates to that iron string. Maybe. But some days the string is slack.
+`
+};
+
+/* ---------- sentences: a port of script/texts/sentences.py ---------- */
+const ABBREVIATIONS = new Set(`Mr Mrs Messrs Dr St Mt Esq Rev Capt Col Gen Lieut Hon Prof Sen Jr Sr Mme Mlle Co No
+  viz vs etc cf ch chap vol pp ibid Ib Id Lib Ep`.split(/\s+/));
+const FRAGMENT = /^(?:[“‘(\[]?[A-Za-zÀ-ÿ’]+\.[”’)\]]*|[^A-Za-zÀ-ÿ]+)$/;
+
+function splitSentences(text) {
+  if (/\.{6,}\s*\$?\s*\d/.test(text)) return [text];
+  const END = /([.?!][”’")\]]*)\s+(?=[“‘"(\[]?[A-Z])/g;
+  const out = []; let start = 0, m;
+  while ((m = END.exec(text))) {
+    const before = text.slice(start, m.index);
+    const word = before.match(/([A-Za-z]+)$/);
+    if (m[1] === ".") {
+      if (word && (ABBREVIATIONS.has(word[1]) || (word[1].length === 1 && /[A-Z]/.test(word[1])))) continue;
+      if (/^\s*\d+$/.test(before)) continue;
+    }
+    if (bracketDepth(text.slice(start, m.index + m[1].length).replace(/^[\[(]+/, "")) > 0) continue;
+    out.push(text.slice(start, m.index + m[1].length).trim());
+    start = m.index + m[0].length;
+  }
+  out.push(text.slice(start).trim());
+  return joinFragments(out.filter(Boolean));
+}
+function joinFragments(sentences) {
+  const out = []; let carry = [];
+  for (const s of sentences) {
+    if (FRAGMENT.test(s)) carry.push(s);
+    else { out.push([...carry, s].join(" ")); carry = []; }
+  }
+  if (carry.length) out.length ? (out[out.length - 1] = [out[out.length - 1], ...carry].join(" ")) : out.push(carry.join(" "));
+  return out;
+}
+function bracketDepth(t) {
+  const c = ch => t.split(ch).length - 1;
+  return Math.max(0, c("(") - c(")")) + Math.max(0, c("[") - c("]"));
+}
+
+/* ---------- the backslash: beside . ? ! it overrides the splitter's guess ---------- */
+// "\." (or ? !) is not an ending; ".\" before a space is one; "\\" is a literal backslash. Anywhere else a backslash
+// shows as typed. The markers are swapped for private-use characters while splitting, then removed.
+const LIT = "\uE000", KEEP = "\uE001", BREAK = "\uE002";
+function mark(t) {
+  return t.replace(/\\\\/g, LIT).replace(/\\([.?!])/g, "$1" + KEEP).replace(/([.?!][”’")\]]*)\\(?=\s|$)/g, "$1" + BREAK);
+}
+const unmark = t => t.replace(/[\uE001\uE002]/g, "").replace(/\uE000/g, "\\");
+function splitMarked(t) {
+  return t.split(new RegExp(BREAK + "\\s*")).flatMap(piece => piece.trim() ? splitSentences(piece) : []);
+}
+// Where sentences end, counted in characters other than spaces, so splits with and without markers compare.
+function ends(sentences) {
+  const out = new Set(); let n = 0;
+  sentences.slice(0, -1).forEach(s => { n += unmark(s).replace(/\s/g, "").length; out.add(n); });
+  return out;
+}
+// Each marker in a paragraph: which sentence it falls in or ends, and whether the splitter would have done the same.
+function markers(raw, sentences) {
+  const prepared = mark(raw), out = [];
+  const auto = ends(splitSentences(unmark(prepared.replace(/[\uE001\uE002]/g, "")))), real = ends(sentences);
+  let n = 0;
+  for (const ch of prepared) {
+    if (ch === KEEP || ch === BREAK) {
+      const k = [...real].filter(e => e < n).length;
+      out.push({ kind: ch === KEEP ? "keep" : "break", k, needless: ch === KEEP ? !auto.has(n) : auto.has(n) });
+    } else if (ch === "\\") out.push({ kind: "stray", k: [...real].filter(e => e <= n).length });
+    if (!/\s|[\uE001\uE002]/.test(ch)) n++;
+  }
+  return out;
+}
+
+/* ---------- parsing: paragraphs, # sections, sentences ---------- */
+const HEADING = /^# (.*)$/;
+function parse(src) {
+  const lines = src.replace(/\r\n?/g, "\n").split("\n");
+  // Blank lines separate paragraphs only if one falls between two lines of text; blank lines around headings don't count.
+  let blankRule = false;
+  for (let i = 1; i < lines.length - 1 && !blankRule; i++) {
+    if (lines[i].trim()) continue;
+    let a = i - 1; while (a >= 0 && !lines[a].trim()) a--;
+    let b = i + 1; while (b < lines.length && !lines[b].trim()) b++;
+    blankRule = a >= 0 && b < lines.length && !HEADING.test(lines[a]) && !HEADING.test(lines[b]);
+  }
+  const sections = []; let cur = null, buf = [], bufLine = 0;
+  const flush = () => {
+    const text = buf.join(" ").replace(/\s+/g, " ").trim(); buf = [];
+    if (!text) return;
+    if (!cur) { cur = { label: null, line: bufLine, paras: [] }; sections.push(cur); }
+    const marked = splitMarked(mark(text));
+    cur.paras.push({ text: unmark(mark(text)), line: bufLine, sentences: marked.map(unmark), markers: markers(text, marked) });
+  };
+  lines.forEach((line, i) => {
+    const h = line.match(HEADING);
+    if (h) { flush(); cur = { label: h[1].trim(), line: i + 1, paras: [] }; sections.push(cur); return; }
+    if (!line.trim()) { flush(); return; }
+    if (!buf.length) bufLine = i + 1;
+    buf.push(line.trim());
+    if (!blankRule) flush();
+  });
+  flush();
+  const headed = sections.some(s => s.label !== null);
+  return { sections, blankRule, headed };
+}
+
+/* ---------- checks: places a reader of the review should look ---------- */
+function checks(doc) {
+  const out = [], md = [];
+  doc.sections.forEach((sec, si) => {
+    if (!sec.paras.length) out.push({ what: "Empty section; it will be left out.", si, line: sec.line, snip: "# " + sec.label });
+    if (sec.label === null && doc.headed) out.push({ what: "Text before the first heading becomes an untitled opening section.", si, pi: 0, line: sec.line, snip: sec.paras[0]?.text || "" });
+    sec.paras.forEach((p, pi) => {
+      if (/^#{2,}\s|^#\S/.test(p.text)) out.push({ what: "Starts with # but isn't a heading (a heading is # and a space).", si, pi, si2: 0, line: p.line, snip: p.text });
+      else if (p.sentences.length === 1 && p.text.length < 40 && !/[.?!:;,”"’)]$/.test(p.text) && sec.paras.length > 1)
+        out.push({ what: "Looks like a heading. Start the line with “# ” to make it one.", si, pi, s: 0, line: p.line, snip: p.text });
+      p.sentences.forEach((s, k) => {
+        const mid = s.match(/\s([A-Z])\.\s+(?=[“"‘]?[A-Z])/);
+        if (mid) out.push({ what: `Not split after “${mid[1]}.” If it ends a sentence, type ${mid[1]}.\\ there.`, si, pi, s: k, line: p.line, snip: s, mark: mid[1] + "." });
+        const end = s.match(/(?:^|\s)((?:[A-Z][A-Za-z]{0,3})|(?:[A-Za-z]+\.[A-Za-z.]*))\.[”’")\]]*$/);
+        const byHand = p.markers.some(m => m.k === k && m.kind === "break");
+        if (end && !byHand && k < p.sentences.length - 1 && !/^(I|A)$/.test(end[1]))
+          out.push({ what: `Split after “${end[1]}.” If it doesn’t end a sentence, type ${end[1]}\\. there.`, si, pi, s: k, line: p.line, snip: s, mark: end[1] + "." });
+        if (s.length > 700) out.push({ what: `A long sentence (${s.length.toLocaleString()} characters).`, si, pi, s: k, line: p.line, snip: s });
+        const here = p.markers.filter(m => m.k === k);
+        for (const m of here.filter((m, i) => m.kind !== "stray" || here.findIndex(x => x.kind === "stray") === i)) {
+          if (m.kind === "stray") out.push({ what: "A backslash shows as typed. Type \\\\ if you meant one.", si, pi, s: k, line: p.line, snip: s, mark: "\\" });
+          else out.push({ what: (m.kind === "break" ? "You ended this sentence by hand." : "You kept this sentence together by hand.") + (m.needless ? " The marker isn’t needed; it would have been read this way anyway." : ""), si, pi, s: k, line: p.line, snip: s });
+        }
+        if (/\*[^*\s][^*]*\*|_[^_\s][^_]*_|\[[^\]]+\]\([^)]+\)/.test(s)) md.push({ si, pi, s: k, line: p.line, snip: s });
+      });
+    });
+  });
+  if (md.length) out.push({ ...md[0], what: md.length === 1 ? "Markdown formatting shows as typed (asterisks and all)." : `Markdown formatting shows as typed, in ${md.length} sentences.`, mark: (md[0].snip.match(/\*[^*\s][^*]*\*|_[^_\s][^_]*_|\[[^\]]+\]\([^)]+\)/) || [])[0] });
+  return out;
+}
+
+/* ---------- revision: match the new text against the old, as the loader would ---------- */
+// Sections by label, then place. Within a section, sentences by exact text (nearest paragraph first), then anywhere in
+// the work; then each old paragraph is paired with the new one most of its sentences went to, and a leftover in a pair
+// matches the most alike sentence there (a rewording), or failing that the one in its place.
+function flatten(doc) {
+  const units = [];
+  doc.sections.forEach((sec, si) => sec.paras.forEach((p, pi) => p.sentences.forEach((text, k) => units.push({ si, pi, k, text }))));
+  return units;
+}
+function likeness(a, b) {
+  const words = t => new Set(t.toLowerCase().match(/[a-z’']+/g) || []);
+  const A = words(a), B = words(b), shared = [...A].filter(w => B.has(w)).length;
+  return shared / Math.max(1, Math.min(A.size, B.size) + Math.abs(A.size - B.size) / 2);
+}
+function matchRevision(oldDoc, newDoc) {
+  const secMap = new Map(), usedNew = new Set();
+  oldDoc.sections.forEach((s, i) => {
+    const j = newDoc.sections.findIndex((n, j) => !usedNew.has(j) && n.label !== null && n.label === s.label);
+    if (j >= 0) { secMap.set(i, j); usedNew.add(j); }
+  });
+  oldDoc.sections.forEach((s, i) => { if (!secMap.has(i) && newDoc.sections[i] && !usedNew.has(i) && newDoc.sections[i].label === null && s.label === null) { secMap.set(i, i); usedNew.add(i); } });
+
+  const olds = flatten(oldDoc).map((u, id) => ({ ...u, id })), news = flatten(newDoc);
+  const match = new Map(); // old id -> new index
+  const taken = new Set();
+  for (const o of olds) {
+    if (!secMap.has(o.si)) continue;
+    const cands = news.map((n, j) => ({ n, j })).filter(({ n, j }) => !taken.has(j) && n.si === secMap.get(o.si) && n.text === o.text);
+    cands.sort((a, b) => Math.abs(a.n.pi - o.pi) - Math.abs(b.n.pi - o.pi));
+    if (cands[0]) { match.set(o.id, cands[0].j); taken.add(cands[0].j); }
+  }
+  // A sentence that moved to another section (a heading added above it) still matches by its text, if only once.
+  for (const o of olds) {
+    if (match.has(o.id)) continue;
+    const cands = news.map((n, j) => j).filter(j => !taken.has(j) && news[j].text === o.text);
+    if (cands.length === 1 && olds.filter(x => x.text === o.text).length === 1) { match.set(o.id, cands[0]); taken.add(cands[0]); }
+  }
+  const paraPair = new Map(); // "si.pi" -> "si.pi"
+  const votes = new Map();
+  for (const [oid, j] of match) {
+    const o = olds[oid], n = news[j], key = o.si + "." + o.pi, to = n.si + "." + n.pi;
+    const v = votes.get(key) || new Map(); v.set(to, (v.get(to) || 0) + 1); votes.set(key, v);
+  }
+  for (const [key, v] of votes) paraPair.set(key, [...v].sort((a, b) => b[1] - a[1])[0][0]);
+  const reworded = new Set();
+  for (const o of olds) {
+    if (match.has(o.id)) continue;
+    const to = paraPair.get(o.si + "." + o.pi);
+    if (!to) continue;
+    // The most alike leftover sentence in the paired paragraph (shared words), else the one in the same place.
+    const free = news.map((n, j) => j).filter(j => !taken.has(j) && news[j].si + "." + news[j].pi === to);
+    const scored = free.map(j => ({ j, sim: likeness(o.text, news[j].text) })).sort((a, b) => b.sim - a.sim);
+    const j = scored[0] && scored[0].sim >= 0.3 ? scored[0].j : free.find(j => news[j].k === o.k);
+    if (j !== undefined) { match.set(o.id, j); taken.add(j); reworded.add(j); }
+  }
+  const newStatus = news.map((n, j) => taken.has(j) ? (reworded.has(j) ? "reworded" : "same") : "new");
+  const removed = olds.filter(o => !match.has(o.id));
+  return { olds, news, match, newStatus, removed };
+}
+
+/* ---------- state and rendering ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let mode = "new", doc = null, units = [], current = 0, rev = null;
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === m));
+  show("source");
+  const r = m === "revise";
+  $("srcTitle").textContent = r ? "Revise “Journal, spring 2024”" : "Add a text";
+  $("srcLede").hidden = r;
+  $("samples").hidden = r;
+  $("crumbLast").textContent = r ? "Journal, spring 2024 › Revise" : "Add a text";
+  const notes = REVISE.annotations.filter(a => a.kind === "note").length, keeps = REVISE.annotations.length - notes;
+  $("revisingNote").hidden = !r;
+  $("revisingNote").innerHTML = `This text has <b>${notes} notes</b> and <b>${keeps} kept passages</b>. Edit it freely: anything on a sentence that’s gone is set aside, never lost, and the review shows exactly what moves. <br><small>(Prototype: the box holds an edited copy: two entries changed, one paragraph deleted, a heading added.)</small>`;
+  if (r) fill({ ...SAMPLES.journal, text: REVISE.newText }); else fill({ title: "", author: "", authorShort: "", text: "" });
+}
+function fill(s) { $("title").value = s.title; $("author").value = s.author; $("authorShort").value = s.authorShort; $("src").value = s.text; srcStats(); }
+function srcStats() {
+  const t = $("src").value;
+  if (!t.trim()) { $("srcStats").textContent = "Empty"; return; }
+  const words = (t.match(/\S+/g) || []).length;
+  $("srcStats").textContent = `${words.toLocaleString()} words · ${(new Blob([t]).size / 1024).toFixed(1)} KB of 5 MB`;
+}
+function show(step) {
+  $("stepSource").hidden = step !== "source";
+  $("stepReview").hidden = step !== "review";
+  $("stepDone").hidden = step !== "done";
+  $("bar").hidden = step !== "review";
+  window.scrollTo(0, 0);
+}
+
+function citation(u) {
+  const title = $("title").value.trim() || "Untitled";
+  const sec = doc.sections[u.si];
+  const many = doc.sections.length > 1;
+  const label = sec.label ?? (many ? "Opening" : null);
+  return label ? `${title}: ${label} ${u.pi + 1}:${u.k + 1}` : `${title} ${u.pi + 1}:${u.k + 1}`;
+}
+
+function review() {
+  const src = $("src").value;
+  if (!$("title").value.trim()) { $("formMsg").textContent = "Give it a title."; $("title").focus(); return; }
+  if (!src.trim()) { $("formMsg").textContent = "Paste some text, or choose a file."; $("src").focus(); return; }
+  $("formMsg").textContent = "";
+  doc = parse(src);
+  units = flatten(doc);
+  rev = mode === "revise" ? matchRevision(parse(REVISE.oldText), doc) : null;
+
+  const author = $("author").value.trim();
+  $("rvTitle").textContent = $("title").value.trim();
+  $("rvBy").textContent = author ? author : "";
+  const nsec = doc.sections.filter(s => s.paras.length).length;
+  const npara = doc.sections.reduce((n, s) => n + s.paras.length, 0);
+  $("rvSummary").innerHTML = `<b>${nsec}</b> ${nsec === 1 ? "section" : "sections"} · <b>${npara}</b> ${npara === 1 ? "paragraph" : "paragraphs"} · <b>${units.length.toLocaleString()}</b> ${units.length === 1 ? "sentence" : "sentences"}`;
+  $("rvRule").textContent = (doc.blankRule
+    ? "Blank lines separate the paragraphs; line breaks inside a paragraph were joined."
+    : "There are no blank lines between paragraphs, so every line is a paragraph.")
+    + (doc.headed ? " Sections come from the # headings." : " No # headings, so it’s one section.");
+
+  renderRevision();
+  renderChecks();
+  renderText();
+  $("legend").innerHTML = `<span><i style="background:color-mix(in srgb, var(--accent-soft) 45%, transparent)"></i>Each sentence is shaded in turn</span><span><i style="background:var(--hl)"></i>Worth a look</span>`
+    + (rev ? `<span><i style="box-shadow:inset 0 -2px 0 var(--accent)"></i>Reworded</span><span><i style="box-shadow:inset 0 -2px 0 color-mix(in srgb, #5a8a3a 60%, transparent)"></i>New</span><span><i style="background:none;width:auto">●</i> Has a note</span>` : "");
+  $("barInfo").textContent = rev ? "Saving replaces the text. Nothing on an unchanged sentence moves." : "You can revise the text later; notes on unchanged sentences stay put.";
+  $("publish").textContent = rev ? "Save the revision" : "Add to your texts";
+  show("review");
+  select(0, false);
+}
+
+function renderChecks() {
+  const list = checks(doc);
+  $("checksPanel").hidden = !list.length;
+  $("checksCount").textContent = list.length ? `· ${list.length}` : "";
+  $("checksBody").innerHTML = list.map((c, i) => {
+    let snip = esc(c.snip.length > 160 ? c.snip.slice(0, 160) + "…" : c.snip);
+    if (c.mark) snip = snip.replace(esc(c.mark), `<mark>${esc(c.mark)}</mark>`);
+    return `<button type="button" class="check" data-i="${i}"><span class="what">${esc(c.what)}</span><span class="where">line ${c.line}</span><span class="snip">${snip}</span></button>`;
+  }).join("") + `<p class="hint">To fix one, edit the text: a heading, a blank line, or a backslash beside the period.</p>`;
+  $("checksBody").querySelectorAll(".check").forEach(b => b.onclick = () => {
+    const c = list[+b.dataset.i];
+    const idx = units.findIndex(u => u.si === c.si && (c.pi === undefined || (u.pi === c.pi && (c.s === undefined || u.k === c.s))));
+    if (idx >= 0) select(idx, true);
+  });
+  window._flags = new Set(list.filter(c => c.s !== undefined).map(c => `${c.si}.${c.pi}.${c.s}`));
+}
+
+function renderText() {
+  const flags = window._flags || new Set();
+  const notedNew = new Set();
+  if (rev) for (const a of REVISE.annotations) {
+    const o = rev.olds.find(o => o.text === a.on); if (!o) continue;
+    const j = rev.match.get(o.id); if (j !== undefined && a.kind === "note") notedNew.add(j);
+  }
+  let idx = 0;
+  $("rvText").innerHTML = doc.sections.map((sec, si) => {
+    const head = sec.label !== null ? esc(sec.label) : `<span class="untitled">${doc.sections.length > 1 ? "Opening (untitled)" : esc($("title").value.trim())}</span>`;
+    const body = sec.paras.map((p, pi) => `<p class="para"><b class="pn">${pi + 1}</b>` + p.sentences.map((s, k) => {
+      const cls = ["s"];
+      if (flags.has(`${si}.${pi}.${k}`)) cls.push("flag");
+      if (rev && rev.newStatus[idx] !== "same") cls.push(rev.newStatus[idx]);
+      if (notedNew.has(idx)) cls.push("noted");
+      return `<span class="${cls.join(" ")}" data-u="${idx++}"><sup>${k + 1}</sup>${esc(s)}</span>`;
+    }).join(" ") + `</p>`).join("");
+    const count = sec.paras.reduce((n, p) => n + p.sentences.length, 0);
+    return `<section class="sec"><h2><span class="n">${si + 1}</span>${head}<span class="mark">${count} ${count === 1 ? "sentence" : "sentences"}</span></h2>${body || `<p class="para" style="color:var(--ink-faint);font-style:italic">Nothing here; left out.</p>`}</section>`;
+  }).join("");
+  $("rvText").querySelectorAll(".s").forEach(el => el.onclick = () => select(+el.dataset.u, false, true));
+}
+
+function renderRevision() {
+  $("revPanel").hidden = !rev;
+  if (!rev) return;
+  const st = rev.newStatus, same = st.filter(s => s === "same").length, rew = st.filter(s => s === "reworded").length, nw = st.filter(s => s === "new").length;
+  const fates = REVISE.annotations.map(a => {
+    const o = rev.olds.find(o => o.text === a.on);
+    const j = o ? rev.match.get(o.id) : undefined;
+    const oldRef = o ? oldCitation(o).replace(/^[^:]*: /, "") : "";
+    if (j !== undefined) {
+      const n = rev.news[j], changed = st[j] === "reworded";
+      return { a, stays: true, changed, oldRef, newRef: citation(n).replace(/^[^:]*: /, ""), was: o.text, now: n.text };
+    }
+    return { a, stays: false, oldRef, was: o ? o.text : a.on };
+  });
+  const moving = fates.filter(f => !f.stays || f.changed).length;
+  $("revCount").textContent = `· ${moving} of ${fates.length} notes and keeps affected`;
+  const tag = f => {
+    if (f.stays && !f.changed) return `<span class="tag ok">stays, sentence unchanged</span>`;
+    if (f.stays) return `<span class="tag">stays, on the reworded sentence</span>`;
+    if (f.a.kind === "note") return `<span class="tag">set aside as a detached note</span>`;
+    return f.a.remark ? `<span class="tag">remark becomes a detached note on the Kept page</span>` : `<span class="tag">bookmark removed (it had no remark)</span>`;
+  };
+  const what = f => f.a.kind === "note" ? `<b>Note</b> in “${esc(f.a.focus)}”` : `<b>Kept</b>${f.a.remark ? " with a remark" : ""}`;
+  const order = f => !f.stays ? 0 : f.changed ? 1 : 2;
+  $("revBody").innerHTML =
+    `<div class="tally"><span>${same} sentences unchanged</span><span><span class="k" style="background:var(--accent)"></span>${rew} reworded</span><span><span class="k" style="background:#5a8a3a"></span>${nw} new</span><span>${rev.removed.length} gone</span></div>`
+    + fates.sort((x, y) => order(x) - order(y)).map(f => `<div class="fate">
+        <div class="head">${what(f)} ${tag(f)} <span class="ref">${esc(f.oldRef)}${f.newRef && f.newRef !== f.oldRef ? " → " + esc(f.newRef) : ""}</span></div>
+        ${f.a.body || f.a.remark ? `<p class="note">${esc(f.a.body || f.a.remark)}</p>` : ""}
+        ${f.stays && !f.changed ? `<p class="now">${esc(f.now)}</p>` : f.stays ? `<p class="was"><span class="lbl">Was</span>${esc(f.was)}</p><p class="now"><span class="lbl">Now</span>${esc(f.now)}</p>` : `<p class="was"><span class="lbl">Gone</span>${esc(f.was)}</p>`}
+      </div>`).join("")
+    + `<p class="hint">Detached notes keep the passage they were written on, and appear at the end of their focus’s notes under “From passages that changed or were removed”.</p>`;
+}
+function oldCitation(o) {
+  const oldDoc = parse(REVISE.oldText), sec = oldDoc.sections[o.si];
+  const title = $("title").value.trim();
+  return sec.label ? `${title}: ${sec.label} ${o.pi + 1}:${o.k + 1}` : `${title} ${o.pi + 1}:${o.k + 1}`;
+}
+
+function select(i, scroll, fromClick) {
+  current = Math.max(0, Math.min(units.length - 1, i));
+  const u = units[current];
+  document.querySelectorAll(".s.here").forEach(e => e.classList.remove("here"));
+  const el = document.querySelector(`.s[data-u="${current}"]`);
+  if (el) { el.classList.add("here"); if (scroll) el.scrollIntoView({ block: "center", behavior: "smooth" }); }
+  const sec = doc.sections[u.si];
+  const inSec = units.filter(x => x.si === u.si), pos = inSec.indexOf(u) + 1;
+  const len = u.text.length;
+  $("pvRef").textContent = citation(u);
+  $("pvText").style.fontSize = len < 120 ? "28px" : len < 300 ? "24px" : len < 600 ? "21px" : "18px";
+  $("pvText").innerHTML = (u.k === 0 ? `<span class="pilcrow" aria-hidden="true">¶</span>` : "") + esc(u.text);
+  $("pvOf").textContent = `${pos} of ${inSec.length}`;
+  $("pvPrev").disabled = current === 0;
+  $("pvNext").disabled = current === units.length - 1;
+  if (fromClick || scroll) $("preview").classList.add("open");
+}
+
+/* ---------- wiring ---------- */
+document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => setMode(b.dataset.mode));
+document.querySelectorAll("[data-sample]").forEach(b => b.onclick = () => fill(SAMPLES[b.dataset.sample]));
+$("src").addEventListener("input", srcStats);
+$("form").addEventListener("submit", e => { e.preventDefault(); review(); });
+$("cancel").onclick = e => { e.preventDefault(); setMode(mode); };
+$("toSource").onclick = () => show("source");
+$("pvPrev").onclick = () => select(current - 1, true);
+$("pvNext").onclick = () => select(current + 1, true);
+$("pvClose").onclick = () => $("preview").classList.remove("open");
+$("again").onclick = () => setMode(mode);
+$("publish").onclick = () => {
+  const t = $("title").value.trim();
+  if (rev) {
+    const detached = REVISE.annotations.filter(a => { const o = rev.olds.find(o => o.text === a.on); return !(o && rev.match.has(o.id)) && (a.kind === "note" || a.remark); }).length;
+    $("doneTitle").textContent = `Saved “${t}”`;
+    $("doneText").textContent = `${detached} ${detached === 1 ? "note was" : "notes were"} set aside with the passages they were written on. Find them at the end of each focus’s notes, or on the Kept page.`;
+  } else {
+    $("doneTitle").textContent = `Added “${t}” to your texts`;
+    $("doneText").textContent = `${units.length.toLocaleString()} sentences, readable only by you. It’s in Your texts at the top of the library, in search, and in Random.`;
+  }
+  show("done");
+};
+document.addEventListener("keydown", e => {
+  if ($("stepReview").hidden || e.target.closest("input, textarea")) return;
+  if (e.key === "ArrowLeft") { select(current - 1, true); e.preventDefault(); }
+  if (e.key === "ArrowRight") { select(current + 1, true); e.preventDefault(); }
+});
+
+// A file is read in the browser; only its text goes to the server.
+const takeFile = f => {
+  if (!f) return;
+  if (!/\.(txt|md|markdown)$/i.test(f.name) && !/^text\//.test(f.type)) { $("formMsg").textContent = "Only plain text (.txt or .md) for now."; return; }
+  if (f.size > 5 * 1024 * 1024) { $("formMsg").textContent = "That file is over 5 MB."; return; }
+  f.text().then(t => {
+    $("src").value = t; srcStats(); $("formMsg").textContent = "";
+    if (!$("title").value.trim()) $("title").value = f.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
+  });
+};
+$("choose").onclick = () => $("file").click();
+$("file").onchange = e => takeFile(e.target.files[0]);
+const drop = $("drop");
+drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+drop.addEventListener("drop", e => { e.preventDefault(); drop.classList.remove("over"); takeFile(e.dataTransfer.files[0]); });
+
+// ?revise starts in the revision; ?sample=journal|talk fills a sample; ?review goes straight to the review.
+const q = new URLSearchParams(location.search);
+setMode(q.has("revise") ? "revise" : "new");
+if (SAMPLES[q.get("sample")] && !q.has("revise")) fill(SAMPLES[q.get("sample")]);
+if (q.has("review")) review();
+</script>
+</body>
+</html>
