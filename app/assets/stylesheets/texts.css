@@ -1,7 +1,10 @@
 /* ---------- your texts: add a text, review it (see UserTextsController) ---------- */
 .texts-page { max-width: 1180px; margin: 0 auto; padding: 22px 16px 120px; }
 .texts-lede { margin: -8px 0 26px; color: var(--ink-soft); font-size: 17px; max-width: 40em; }
-.texts-inline { text-decoration: none; }
+.texts-latest { margin: 6px 0 0; padding: 0 0 0 18px; list-style: none; font-size: 17px; }
+.texts-latest li { margin: 2px 0; }
+.texts-latest a { text-decoration: none; }
+.texts-latest a:hover { text-decoration: underline; }
 .texts-delete { border: 0; background: none; padding: 0 0 0 6px; font: inherit; color: var(--ink-faint); text-decoration: underline; text-underline-offset: 3px; }
 .texts-delete:hover { color: #b3402a; }
 

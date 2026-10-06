@@ -1,4 +1,4 @@
-# A user's own texts (see UserText): listed on Your texts, added through new > review > create, deleted while nothing
+# A user's own texts (see UserText): listed on Your Texts, added through new > review > create, deleted while nothing
 # is attached to them. Only the owner ever reaches one.
 class UserTextsController < ApplicationController
   def index

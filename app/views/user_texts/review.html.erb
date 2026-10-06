@@ -1,5 +1,5 @@
 <% content_for :title, "Review · #{@text.title} · Study Carrel" %>
-<%= render "shared/header", crumbs: [ [ "Library", library_path ], [ "Your texts", texts_path ], [ "Add a text", new_text_path ] ], focus: Current.focus %>
+<%= render "shared/header", crumbs: [ [ "Library", library_path ], [ "Your Texts", texts_path ], [ "Add a text", new_text_path ] ], focus: Current.focus %>
 <main class="texts-page texts-review" data-controller="text-review" data-action="keydown@window->text-review#key">
   <div class="texts-review-head">
     <h2 class="page-title"><%= @text.title %></h2>

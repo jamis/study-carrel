@@ -43,9 +43,9 @@ class RandomScopeTest < ActiveSupport::TestCase
     3.times { UserText.new(title: "Diary #{it}", source: "Words #{it} here.").publish!(user) }
     diary = user.texts.first
 
-    assert_equal [ "Diary 0", "Your texts", "Whole library" ], RandomScope.chain_for(diary).map(&:label)
+    assert_equal [ "Diary 0", "Your Texts", "Whole library" ], RandomScope.chain_for(diary).map(&:label)
     assert_equal RandomScope.new(OwnTexts.new(user)), RandomScope.default_for(diary)
-    assert_equal [ "Your texts", "Whole library" ], RandomScope.chain_for(OwnTexts.new(user)).map(&:label)
+    assert_equal [ "Your Texts", "Whole library" ], RandomScope.chain_for(OwnTexts.new(user)).map(&:label)
 
     own = 300.times.count { RandomScope.library.unit(user).section.work.own_text? }
     assert_includes 100..200, own, "all three texts together are one branch beside Sacred Texts, the only other one with units here, so about half"

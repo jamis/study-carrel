@@ -21,7 +21,7 @@ class RandomScope
     [ *places, nil ].map { new(it) }
   end
 
-  # The reader's default: the innermost collection (Your texts, for one of the user's own), or the work itself when it
+  # The reader's default: the innermost collection (Your Texts, for one of the user's own), or the work itself when it
   # sits in none.
   def self.default_for(work) = new(work.collection || (OwnTexts.new(work.user) if work.own_text?) || work)
 

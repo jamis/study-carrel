@@ -5,7 +5,7 @@ module ReadingsHelper
   def library_crumbs(collection = nil, work: nil)
     trail = [ [ "Library", library_path, nil ] ]
     (collection ? collection.ancestors + [ collection ] : []).each { |c| trail << [ c.name, collection_path(c), nil ] }
-    trail << [ "Your texts", texts_path, "Only you can see these" ] if work&.own_text?
+    trail << [ "Your Texts", texts_path, "Only you can see these" ] if work&.own_text?
     trail << [ work.title, work_path(work), [ work.byline, work.edition ].compact_blank.join(" · ").presence ] if work
     trail
   end

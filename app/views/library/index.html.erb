@@ -9,9 +9,12 @@
   <% end %>
 
   <div class="list-row">
-    <div class="list-row-title"><%= link_to "Your texts", texts_path %></div>
+    <div class="list-row-title"><%= link_to "Your Texts", texts_path %></div>
     <% if @texts.any? %>
-      <div class="list-row-desc"><%= safe_join(@texts.first(5).map { link_to it.title, work_path(it), class: "texts-inline" }, " · ") %><%= " · …" if @texts.size > 5 %></div>
+      <div class="list-row-desc">Texts you’ve uploaded, which only you can see. The latest:</div>
+      <ul class="texts-latest">
+        <% @texts.sort_by(&:created_at).reverse.first(5).each do |work| %><li><%= link_to work.title, work_path(work) %></li><% end %>
+      </ul>
     <% else %>
       <div class="list-row-desc">A journal, a talk, anything in prose, read a sentence at a time. Only you can see them.</div>
     <% end %>

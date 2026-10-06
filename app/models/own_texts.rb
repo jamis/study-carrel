@@ -5,7 +5,7 @@ class OwnTexts
 
   def initialize(user) = @user = user
 
-  def name = "Your texts"
+  def name = "Your Texts"
 
   def ==(other) = other.is_a?(OwnTexts) && other.user == user
   alias eql? ==

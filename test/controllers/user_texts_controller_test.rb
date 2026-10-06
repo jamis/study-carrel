@@ -66,7 +66,7 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     assert_empty LibrarySearch.new("quiet", user: @user).page(1)
   end
 
-  test "Your texts has its own search and Random, which stay inside the user's texts" do
+  test "Your Texts has its own search and Random, which stay inside the user's texts" do
     work = UserText.new(title: "Journal", source: SOURCE).publish!(@user)
     load_isaiah
     get texts_path
@@ -75,11 +75,20 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
 
     get search_path(q: "quiet", texts: "yours")
     assert_select ".fv-ref", text: "Journal: Monday 1:2"
-    assert_select ".search-scopes a", text: "Your texts"
+    assert_select ".search-scopes a", text: "Your Texts"
     get search_path(q: "comfort", texts: "yours")
     assert_select ".fv-ref", 0
 
     get random_texts_path
     assert_match %r{/read/#{work.slug}/}, response.location
+  end
+
+  test "the library lists the five most recently added texts" do
+    6.times { |i| travel_to(i.days.from_now) { UserText.new(title: "Text #{i}", source: SOURCE).publish!(@user) } }
+    get library_path
+    assert_select ".texts-latest li", 5
+    assert_select ".texts-latest li:first-child", "Text 5"
+    assert_select ".texts-latest", text: /Text 0/, count: 0
+    assert_select ".list-row-meta", /6 texts/
   end
 end
