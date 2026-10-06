@@ -49,4 +49,28 @@ class SentencesTest < ApplicationSystemTestCase
     find("body").send_keys "p"
     assert_no_selector ".whole-group", visible: true
   end
+
+  test "the whole paragraph opens upward when there's no room for it below" do
+    page.current_window.resize_to(1400, 360)
+    visit reading_path("walden", 2, 3)
+    find("body").send_keys "p"
+    assert_selector ".whole-group.above a.current"
+    box = evaluate_script("(r => ({ top: r.top, bottom: r.bottom, height: innerHeight }))(document.querySelector('.whole-group').getBoundingClientRect())")
+    assert_operator box["top"], :>=, 0
+    assert_operator box["bottom"], :<=, box["height"]
+  ensure
+    page.current_window.resize_to(1400, 1000)
+  end
+
+  test "the verse grid opens upward when there's no room for it below" do
+    page.current_window.resize_to(1400, 360)
+    visit reading_path("walden", 2, 3)
+    find(".step-of").click
+    assert_selector ".unit-grid.above .cell.current"
+    box = evaluate_script("(r => ({ top: r.top, bottom: r.bottom, height: innerHeight }))(document.querySelector('.unit-grid').getBoundingClientRect())")
+    assert_operator box["top"], :>=, 0
+    assert_operator box["bottom"], :<=, box["height"]
+  ensure
+    page.current_window.resize_to(1400, 1000)
+  end
 end

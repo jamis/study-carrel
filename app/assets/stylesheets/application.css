@@ -265,6 +265,7 @@
     background: var(--bg); border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
   }
   .unit-grid.open { display: grid; }
+  .unit-grid.above { top: auto; bottom: calc(100% + 6px); }
   .cell {
     position: relative; height: 34px; padding: 0; border: 0; border-radius: 6px; background: none;
     font-family: var(--sans); font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums;
@@ -295,6 +296,7 @@
     background: var(--bg); border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
   }
   .whole-group.open { display: block; }
+  .whole-group.above { top: auto; bottom: calc(100% + 6px); }
   .whole-group a { color: var(--ink-soft); text-decoration: none; border-radius: 3px; }
   .whole-group a:hover { color: var(--ink); }
   .whole-group a.has { text-decoration: underline dotted color-mix(in srgb, var(--accent) 55%, transparent); text-underline-offset: 4px; }

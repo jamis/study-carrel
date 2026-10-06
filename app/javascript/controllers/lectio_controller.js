@@ -116,14 +116,28 @@ export default class extends Controller {
     this.announce()
   }
 
-  // The whole paragraph just opened (the menu controller runs first): fill it in, fitted to the room below (above
-  // the note sheet's handle on a phone).
+  // The whole paragraph just opened (the menu controller runs first): fill it in and fit it to the window.
   wholeOpened() {
     if (!this.wholeTarget.classList.contains("open")) return
+    this.fillWhole()
+    this.fitMenu(this.wholeTarget, this.wholeButtonTarget)
+    this.centerWhole()
+  }
+
+  // Fit a menu that drops from the steps to the room below its button (down to the note sheet's handle on a phone),
+  // or open it upward (under the sticky reference row) when it doesn't fit below and there's more room above, since
+  // the steps sit near the bottom of the window. A long menu scrolls inside, never taller than `cap`.
+  fitMenu(panel, button, cap = Infinity) {
+    panel.classList.remove("above")
+    panel.style.maxHeight = ""
     const handle = this.element.querySelector(".panel-handle")
     const bottom = Math.min(window.innerHeight, handle?.offsetParent ? handle.getBoundingClientRect().top : Infinity)
-    this.wholeTarget.style.maxHeight = `${Math.max(200, bottom - this.wholeTarget.getBoundingClientRect().top - 12)}px`
-    this.fillWhole()
+    const top = this.element.querySelector(".reader-top")?.getBoundingClientRect().bottom ?? 0
+    const { top: buttonTop, bottom: buttonBottom } = button.getBoundingClientRect()
+    const below = bottom - buttonBottom - 18, above = buttonTop - Math.max(0, top) - 18
+    const up = Math.min(panel.scrollHeight, cap) > below && above > below
+    panel.classList.toggle("above", up)
+    panel.style.maxHeight = `${Math.min(cap, Math.max(120, up ? above : below))}px`
   }
 
   // Every sentence of the current paragraph, each a link to itself; the one on screen is marked. The links are
@@ -149,6 +163,10 @@ export default class extends Controller {
       link.classList.toggle("has", this.noted.has(n))
       if (current) link.setAttribute("aria-current", "true"); else link.removeAttribute("aria-current")
     })
+    this.centerWhole()
+  }
+
+  centerWhole() {
     const current = this.wholeTarget.querySelector(".current")
     if (current) this.wholeTarget.scrollTop = current.offsetTop - (this.wholeTarget.clientHeight - current.offsetHeight) / 2
   }
@@ -171,6 +189,7 @@ export default class extends Controller {
     if (!this.gridTarget.classList.contains("open")) return
     const tick = this.tickTargets.find(t => Number(t.dataset.number) === this.currentValue)
     if (!tick) return
+    this.fitMenu(this.gridTarget, this.gridTarget.closest(".steps-menu").querySelector("button"), 360)
     this.gridTarget.scrollTop = tick.offsetTop - (this.gridTarget.clientHeight - tick.offsetHeight) / 2
     tick.focus({ preventScroll: true })
   }
