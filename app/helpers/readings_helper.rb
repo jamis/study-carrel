@@ -22,6 +22,12 @@ module ReadingsHelper
     trail << [ label, work_path(work), "Chapters in #{work.title}#{" (#{work.edition})" if work.edition.present?}" ]
   end
 
+  # A chapter either side, as the trail names it: one in the same work by its own name ("Economy", not "Walden:
+  # Economy"), so a long work title doesn't crowd it out; a numbered chapter, or one in another work, in full.
+  def neighbor_name(section, neighbor)
+    neighbor.work == section.work ? neighbor.reference_name_parts.last : neighbor.name
+  end
+
   def unit_ref(section, unit) = section.reference(unit.label)
 
   # Work title, section name and unit in separate spans (see .ref-work / .ref-section / .ref-unit); the browser updates the unit as the reader moves.

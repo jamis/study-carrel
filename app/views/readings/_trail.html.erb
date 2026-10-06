@@ -9,7 +9,7 @@
 </ol>
 <% if previous_section || next_section %>
   <div class="trail-sides">
-    <% if previous_section %><%= link_to "‹ #{previous_section.name}", reading_path(previous_section.work.slug, previous_section.number) %><% end %>
-    <% if next_section %><%= link_to "#{next_section.name} ›", reading_path(next_section.work.slug, next_section.number), class: "trail-next" %><% end %>
+    <% if previous_section %><%= link_to "‹ #{neighbor_name(section, previous_section)}", reading_path(previous_section.work.slug, previous_section.number), title: previous_section.name %><% end %>
+    <% if next_section %><%= link_to "#{neighbor_name(section, next_section)} ›", reading_path(next_section.work.slug, next_section.number), class: "trail-next", title: next_section.name %><% end %>
   </div>
 <% end %>

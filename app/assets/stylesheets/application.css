@@ -169,6 +169,7 @@
   .menu-btn { display: block; min-width: 44px; min-height: 36px; font-size: 20px; line-height: 1; color: var(--ink-soft); }
   .menu-panel {
     display: none; position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; min-width: 210px;
+    max-width: min(400px, calc(100vw - 16px)); /* a long title or chapter name must not push the menu off a phone's screen */
     flex-direction: column; align-items: stretch; gap: 0; padding: 6px;
     background: var(--bg); border: 1px solid var(--rule); border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
@@ -230,10 +231,11 @@
   .trail a:hover { background: var(--accent-soft); color: var(--ink); }
   .trail a.here { color: var(--ink); font-weight: 600; }
   .trail-sides {
-    display: flex; gap: 16px; margin-top: 4px; padding: 8px 12px 4px; border-top: 1px solid var(--rule);
+    display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 4px; padding: 8px 12px 4px; border-top: 1px solid var(--rule);
     font-family: var(--sans); font-size: 13px; white-space: nowrap;
   }
-  .trail-sides a { color: var(--ink-soft); text-decoration: none; }
+  /* Long names take a line each, and are cut short with an ellipsis rather than widening the menu. */
+  .trail-sides a { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; color: var(--ink-soft); text-decoration: none; }
   .trail-sides a:hover { color: var(--accent); }
   .trail-sides .trail-next { margin-left: auto; }
   .menu-trail { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--rule); }
