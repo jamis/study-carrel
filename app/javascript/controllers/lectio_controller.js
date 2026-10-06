@@ -2,11 +2,14 @@ import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 import { csrfToken, fillId } from "lib/request"
 
-// Switches verses client-side; the whole section is already on the page.
+// Switches verses client-side; the whole section is already on the page. Prose is read a sentence at a time: a
+// sentence is cited by its paragraph ("12:3"), the first of a paragraph opens with a ¶, and the whole paragraph is
+// one tap (or p) away.
 export default class extends Controller {
-  static targets = ["unit", "now", "body", "prevButton", "nextButton", "position", "ref", "refUnit", "grid", "tick", "editor"]
+  static targets = ["unit", "now", "body", "pilcrow", "prevButton", "nextButton", "position", "ref", "refUnit", "grid", "tick", "editor",
+    "whole", "wholeButton"]
   static values = { current: Number, base: String, refTemplate: String, refUnitTemplate: String, positionUrl: String, unitName: String,
-    noteUrlTemplate: String, prevUrl: String, prevLabel: String, nextUrl: String, nextLabel: String }
+    groupName: String, noteUrlTemplate: String, prevUrl: String, prevLabel: String, nextUrl: String, nextLabel: String }
 
   connect() {
     this.bodies = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.textContent.trim()]))
@@ -15,6 +18,10 @@ export default class extends Controller {
     this.sizes = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.dataset.size]))
 
     this.unitIds = new Map(this.unitTargets.map(u => [Number(u.dataset.number), Number(u.dataset.unitId)]))
+    // How each unit is cited ("12:3" for a sentence, else its number), its paragraph, and whether it opens one.
+    this.labels = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.dataset.label]))
+    this.paragraphs = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.dataset.paragraph]))
+    this.opens = new Set(this.unitTargets.filter(u => u.dataset.opens === "true").map(u => Number(u.dataset.number)))
     // Which verses have a note; the editor reports changes as it autosaves.
     this.noted = new Set(this.tickTargets.filter(t => t.classList.contains("has")).map(t => Number(t.dataset.number)))
     // Likewise for kept verses; the ribbon reports those.
@@ -42,7 +49,10 @@ export default class extends Controller {
 
   next() { this.step(1) }
   previous() { this.step(-1) }
-  go(event) { this.select(Number(event.currentTarget.dataset.number)) }
+  go(event) {
+    event.preventDefault() // the whole paragraph's sentences are links
+    this.select(Number(event.currentTarget.dataset.number))
+  }
 
   // Past either end of the chapter, carry on into the neighboring one.
   step(delta) {
@@ -86,8 +96,10 @@ export default class extends Controller {
     const body = this.bodies.get(n)
     this.nowTarget.className = ["now", this.sizes.get(n)].filter(Boolean).join(" ")
     this.bodyTarget.textContent = body
-    this.refUnitTargets.forEach(r => r.textContent = this.refUnitTemplateValue.replace("{n}", n))
-    this.refTargets.forEach(r => r.title = this.refTemplateValue.replace("{n}", n))
+    if (this.hasPilcrowTarget) this.pilcrowTarget.hidden = !this.opens.has(n)
+    const label = this.labels.get(n)
+    this.refUnitTargets.forEach(r => r.textContent = this.refUnitTemplateValue.replace("{n}", label))
+    this.refTargets.forEach(r => r.title = this.refTemplateValue.replace("{n}", label))
     this.fitRefs()
     this.tickTargets.forEach(t => {
       const current = Number(t.dataset.number) === n
@@ -97,9 +109,48 @@ export default class extends Controller {
       if (current && this.tickTargets.includes(document.activeElement)) t.focus({ preventScroll: true })
     })
 
+    if (this.hasWholeTarget && this.wholeTarget.classList.contains("open")) this.fillWhole()
+
     // Swapping the frame replaces the editor; the old one saves itself as it goes.
     this.editorTarget.src = fillId(this.noteUrlTemplateValue, this.unitIds.get(n))
     this.announce()
+  }
+
+  // The whole paragraph just opened (the menu controller runs first): fill it in, fitted to the room below (above
+  // the note sheet's handle on a phone).
+  wholeOpened() {
+    if (!this.wholeTarget.classList.contains("open")) return
+    const handle = this.element.querySelector(".panel-handle")
+    const bottom = Math.min(window.innerHeight, handle?.offsetParent ? handle.getBoundingClientRect().top : Infinity)
+    this.wholeTarget.style.maxHeight = `${Math.max(200, bottom - this.wholeTarget.getBoundingClientRect().top - 12)}px`
+    this.fillWhole()
+  }
+
+  // Every sentence of the current paragraph, each a link to itself; the one on screen is marked. The links are
+  // rebuilt only for a new paragraph: choosing one mustn't swap it out from under the click (which would read as a
+  // click outside, closing the menu).
+  fillWhole() {
+    const paragraph = this.paragraphs.get(this.currentValue)
+    if (this.wholeParagraph !== paragraph) {
+      this.wholeParagraph = paragraph
+      const links = this.numbers.filter(n => this.paragraphs.get(n) === paragraph).map(n => {
+        const link = document.createElement("a")
+        link.href = `${this.baseValue}/${n}`
+        link.textContent = this.bodies.get(n)
+        link.dataset.number = n
+        link.dataset.action = "lectio#go"
+        return link
+      })
+      this.wholeTarget.replaceChildren(...links.flatMap((link, i) => i ? [" ", link] : [link]))
+    }
+    this.wholeTarget.querySelectorAll("a").forEach(link => {
+      const n = Number(link.dataset.number), current = n === this.currentValue
+      link.classList.toggle("current", current)
+      link.classList.toggle("has", this.noted.has(n))
+      if (current) link.setAttribute("aria-current", "true"); else link.removeAttribute("aria-current")
+    })
+    const current = this.wholeTarget.querySelector(".current")
+    if (current) this.wholeTarget.scrollTop = current.offsetTop - (this.wholeTarget.clientHeight - current.offsetHeight) / 2
   }
 
   // The Keep ribbon follows the verse on screen.
@@ -139,22 +190,25 @@ export default class extends Controller {
       const kept = this.kept.has(n)
       tick.classList.toggle("has", has)
       tick.classList.toggle("kept", kept)
-      tick.setAttribute("aria-label", `${this.unitNameValue} ${n}${has ? ", has a note" : ""}${kept ? ", kept" : ""}`)
+      tick.setAttribute("aria-label", `${this.unitNameValue} ${this.labels.get(n)}${has ? ", has a note" : ""}${kept ? ", kept" : ""}`)
     })
   }
 
   // A step arrow names where it goes (as its tooltip and label): the neighboring verse, or at a chapter's edge
   // the neighboring chapter. Hidden at either end of the text.
   fillStep(button, number, edgeLabel) {
-    const label = number !== undefined ? `${this.unitNameValue} ${number}` : edgeLabel
+    const label = number !== undefined ? `${this.unitNameValue} ${this.labels.get(number)}` : edgeLabel
     button.hidden = !label
     button.title = label
     button.setAttribute("aria-label", label)
   }
 
   touchStart(event) {
-    // Scrolling the verse grid must not also turn the page.
-    if (this.gridTarget.contains(event.target)) { this.touchStartPoint = undefined; return }
+    // Scrolling the verse grid or the whole paragraph must not also turn the page.
+    if (this.gridTarget.contains(event.target) || (this.hasWholeTarget && this.wholeTarget.contains(event.target))) {
+      this.touchStartPoint = undefined
+      return
+    }
     const { clientX, clientY } = event.touches[0]
     this.touchStartPoint = { x: clientX, y: clientY }
   }
@@ -173,5 +227,6 @@ export default class extends Controller {
     if (event.target.closest("input, textarea, [contenteditable]") || event.metaKey || event.ctrlKey || event.altKey) return
     if (event.key === "ArrowRight" || event.key === "j") this.next()
     if (event.key === "ArrowLeft" || event.key === "k") this.previous()
+    if (event.key === "p" && this.hasWholeButtonTarget) this.wholeButtonTarget.click()
   }
 }
