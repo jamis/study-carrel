@@ -61,7 +61,6 @@
   .field { display: block; margin-bottom: 18px; }
   .field > span { display: block; margin-bottom: 6px; font: 600 13px var(--sans); color: var(--ink-soft); }
   .field > span small { font-weight: 400; color: var(--ink-faint); }
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   input[type=text], textarea {
     width: 100%; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper);
   }
@@ -179,6 +178,30 @@
   .bar-in { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .bar-in .info { flex: 1; min-width: 12em; font: 13px var(--sans); color: var(--ink-soft); }
 
+  /* ---------- poetry: the form choice, and stanzas in the review ---------- */
+  .form-choice { display: flex; flex-wrap: wrap; gap: 8px; border: 0; margin: 0 0 18px; padding: 0; min-width: 0; }
+  .form-choice legend { padding: 0; margin-bottom: 6px; font: 600 13px var(--sans); color: var(--ink-soft); }
+  .form-choice legend small { font-weight: 400; color: var(--ink-faint); }
+  .form-choice label {
+    flex: 1 1 15em; display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; cursor: pointer;
+    border: 1px solid var(--rule); border-radius: 12px; background: var(--paper);
+  }
+  .form-choice label:has(input:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .form-choice label:has(input:disabled) { cursor: default; }
+  .form-choice label:has(input:disabled:not(:checked)) { opacity: .45; }
+  .form-choice input { margin: 5px 0 0; accent-color: var(--accent); }
+  .form-choice b { display: block; font-weight: 600; font-size: 16px; }
+  .form-choice span span { display: block; font: 13px var(--sans); color: var(--ink-soft); }
+  .verse-hint { margin: -8px 0 18px; font: 13px var(--sans); color: var(--ink-soft); }
+
+  .stanza { margin: 0 0 14px -12px; padding: 6px 12px; border-radius: 6px; font-size: 17px; line-height: 1.6; white-space: pre-line; position: relative; }
+  .stanza.s + .s { margin-left: -12px; }
+  .stanza .pn { position: absolute; right: calc(100% + 4px); top: 10px; font: 400 11.5px var(--sans); color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .stanza.new { box-shadow: inset 3px 0 0 color-mix(in srgb, #5a8a3a 60%, transparent); }
+  .stanza.reworded { box-shadow: inset 3px 0 0 var(--accent); }
+  .fate .was, .fate .now { white-space: pre-line; }
+  .pv-text { white-space: pre-line; }
+
   /* ---------- step 3: done ---------- */
   .done { max-width: 34em; margin: 10vh 0 0; }
   .done p { color: var(--ink-soft); font-size: 17px; }
@@ -193,10 +216,9 @@
     .preview.open { transform: none; }
     .pv-label .x { display: inline-block; }
     .pv-help { display: none; }
-    .para .pn { display: none; }
+    .para .pn, .stanza .pn { display: none; }
   }
   @media (max-width: 599px) {
-    .row { grid-template-columns: 1fr; gap: 0; }
     textarea { min-height: 40vh; }
     .bar-in .info { display: none; }
     .bar-in .btn { flex: 1; justify-content: center; padding: 0 12px; }
@@ -207,8 +229,10 @@
 
 <div class="proto">
   <span>Prototype:</span>
-  <button type="button" data-mode="new" aria-pressed="true">Adding a new text</button>
-  <button type="button" data-mode="revise" aria-pressed="false">Revising a text with notes</button>
+  <button type="button" data-mode="new" data-form="prose" aria-pressed="true">Adding prose</button>
+  <button type="button" data-mode="new" data-form="poetry" aria-pressed="false">Adding poetry</button>
+  <button type="button" data-mode="revise" data-form="prose" aria-pressed="false">Revising prose with notes</button>
+  <button type="button" data-mode="revise" data-form="poetry" aria-pressed="false">Revising a song with notes</button>
 </div>
 
 <header class="nav">
@@ -222,16 +246,19 @@
   <!-- step 1 -->
   <section id="stepSource">
     <h1 id="srcTitle">Add a text</h1>
-    <p class="lede" id="srcLede">A journal, the transcript of a talk, anything in prose. <span class="lock">🔒</span> Only you can see texts you add.</p>
+    <p class="lede" id="srcLede">A journal, the transcript of a talk, poems, song lyrics. <span class="lock">🔒</span> Only you can see texts you add.</p>
     <div class="revising" id="revisingNote" hidden></div>
 
     <div class="source">
       <form id="form" novalidate>
         <label class="field"><span>Title</span><input type="text" id="title" autocomplete="off" placeholder="Journal, spring 2024"></label>
-        <div class="row">
-          <label class="field"><span>Author <small>optional</small></span><input type="text" id="author" autocomplete="off"></label>
-          <label class="field"><span>Short form <small>optional, shown in the reader</small></span><input type="text" id="authorShort" autocomplete="off"></label>
-        </div>
+        <label class="field"><span>Author <small>optional</small></span><input type="text" id="author" autocomplete="off"></label>
+        <fieldset class="form-choice" id="formChoice">
+          <legend>Read it as <small id="formFixed" hidden>(a revision keeps its form)</small></legend>
+          <label><input type="radio" name="form" value="prose" checked><span><b>Prose</b><span>A sentence at a time, like Walden</span></span></label>
+          <label><input type="radio" name="form" value="poetry"><span><b>Poetry or lyrics</b><span>A stanza at a time, line breaks kept</span></span></label>
+        </fieldset>
+        <p class="verse-hint" id="verseHint" hidden>This looks like verse. <button type="button" class="linkish" id="toPoetry">Read it as poetry</button></p>
         <div class="field drop" id="drop">
           <div class="src-head">
             <b>Text</b><span class="grow"></span>
@@ -241,7 +268,7 @@
           <textarea id="src" spellcheck="false" aria-label="Text" placeholder="Paste the text here, or drop a .txt or .md file on this box."></textarea>
           <div class="src-foot">
             <span id="srcStats">Empty</span>
-            <span id="samples">Try a sample: <button type="button" class="linkish" data-sample="journal">journal</button> · <button type="button" class="linkish" data-sample="talk">talk</button></span>
+            <span id="samples">Try a sample: <button type="button" class="linkish" data-sample="journal">journal</button> · <button type="button" class="linkish" data-sample="talk">talk</button> · <button type="button" class="linkish" data-sample="poems">poems</button> · <button type="button" class="linkish" data-sample="song">song</button></span>
           </div>
         </div>
         <div class="actions">
@@ -253,6 +280,7 @@
 
       <aside class="howto" aria-labelledby="howtoHead">
         <h2 id="howtoHead">How the text is read</h2>
+        <div id="howtoBody">
         <ol>
           <li><b>Paragraphs.</b> Blank lines between paragraphs, and line breaks inside one are joined. With no blank lines at all, every line is a paragraph.</li>
           <li><b>Sections.</b> A line starting <code>#&nbsp;</code> starts a section, named by the rest of the line. No headings: one section.</li>
@@ -266,6 +294,7 @@ Woke before six. The house
 was quiet.
 
 Read Isaiah 40 again.</pre>
+        </div>
       </aside>
     </div>
   </section>
@@ -295,7 +324,7 @@ Read Isaiah 40 again.</pre>
         <div class="pv-ref" id="pvRef"></div>
         <p class="pv-text" id="pvText"></p>
         <div class="pv-steps"><button type="button" id="pvPrev" aria-label="Previous sentence">‹</button><span class="of" id="pvOf"></span><button type="button" id="pvNext" aria-label="Next sentence">›</button></div>
-        <p class="pv-help">Pick any sentence to see it here. ← → step through.</p>
+        <p class="pv-help" id="pvHelp">Pick any sentence to see it here. ← → step through.</p>
       </aside>
     </div>
   </section>
@@ -305,7 +334,7 @@ Read Isaiah 40 again.</pre>
     <div class="done">
       <h1 id="doneTitle"></h1>
       <p id="doneText"></p>
-      <div class="actions"><a class="btn primary" href="reader/sentences.html">Start reading</a><button class="btn" type="button" id="again">Back to the prototype</button></div>
+      <div class="actions"><a class="btn primary" id="startReading" href="reader/sentences.html">Start reading</a><button class="btn" type="button" id="again">Back to the prototype</button></div>
     </div>
   </section>
 </main>
@@ -321,7 +350,7 @@ Read Isaiah 40 again.</pre>
 <script>
 /* ---------- samples ---------- */
 const SAMPLES = {
-  journal: { title: "Journal, spring 2024", author: "", authorShort: "", text:
+  journal: { title: "Journal, spring 2024", author: "", text:
 `# 3 March 2024
 
 Woke before six and sat with the lamp for a while before anyone else was up. The house has a particular quiet at that hour. I read Isaiah 40 again and stopped at verse 31, which I have read a hundred times without really hearing it.
@@ -339,7 +368,7 @@ Couldn't sleep. Wrote three pages and threw away two. The one I kept says only t
 
 Rain all day. Played Sgt\\. Pepper on the drive home, loud. Finished the Emerson essay on self-reliance and felt *scolded* in a good way. He says trust thyself, every heart vibrates to that iron string. Maybe. But some days the string is slack.
 ` },
-  talk: { title: "On Attention", author: "Ruth Ellery", authorShort: "Ellery", text:
+  talk: { title: "On Attention", author: "Ruth Ellery", text:
 `Thank you. It's a little strange to stand up here after Dr. Okafor,
 who has known most of you far longer than I have.
 
@@ -367,11 +396,78 @@ Q. How do you practice attention when you have small children?
 
 A. Badly! Mostly badly. But I've learned to count the interruptions
 as part of the practice rather than a failure of it. That helped.
+` },
+  // Poetry: a poem with an indented line, one with no stanza breaks, and a title missing its "# ".
+  poems: { form: "poetry", title: "Small Hours", author: "Ruth Ellery", text:
+`# Lamp
+
+Before the house wakes
+I turn the lamp down low,
+and the window gives me back
+a face I almost know.
+
+The kettle ticks. The dark
+leans in to hear
+what I will say to it.
+    Nothing, this year.
+
+# Small Hours
+
+I have kept the small hours
+the way some people keep bees:
+quietly, in a white veil,
+not quite sure who keeps whom,
+grateful for whatever sweetness
+they leave me before light.
+
+Reservoir
+
+The water held the sky so still
+I could not tell which one was deep.
+We walked the long way round the hill
+and neither of us spoke of sleep.
+` },
+  // Lyrics: part labels, a chorus sung twice, and an instruction to repeat it.
+  song: { form: "poetry", title: "Low Water", author: "", text:
+`[Verse 1]
+The river’s down to stones again,
+the dock leans like a tired man.
+My father said the rain comes in
+to those who wait and understand.
+
+[Chorus]
+So I’ll wait by the low water,
+wait till the low water’s gone.
+Keep a light for the low water,
+keep it burning on.
+
+[Verse 2]
+The barges sit like sleeping cows,
+the ferry hasn’t run since June.
+I count the rings on every post
+and talk a little to the moon.
+
+[Chorus]
+So I’ll wait by the low water,
+wait till the low water’s gone.
+Keep a light for the low water,
+keep it burning on.
+
+[Bridge]
+And if it never rises,
+if the dry years have their way,
+I’ll learn the names of all the stones
+and call that a kind of faith.
+
+Repeat chorus (x2)
 ` }
 };
+for (const s of Object.values(SAMPLES)) s.form ||= "prose";
 
 /* Revising: the journal as it was loaded, with notes and keeps on some of its sentences, and an edited copy. */
-const REVISE = {
+const REVISE_PROSE = {
+  sample: SAMPLES.journal,
+  blurb: "two entries changed, one paragraph deleted, a heading added",
   oldText: SAMPLES.journal.text,
   annotations: [
     { kind: "note", focus: "What does it mean to wait?", on: "\"They shall mount up with wings as eagles.\"", body: "Waiting as a kind of strength, not its absence." },
@@ -401,6 +497,47 @@ Couldn't sleep. Wrote three pages and kept one.
 Rain all day. Played Sgt\\. Pepper on the drive home, loud. Finished the Emerson essay on self-reliance and felt *scolded* in a good way. He says trust thyself, every heart vibrates to that iron string. Maybe. But some days the string is slack.
 `
 };
+
+/* Revising the song: notes on both choruses (the same words twice), a reworded verse, a cut bridge, a verse added. */
+const CHORUS = "[Chorus]\nSo I’ll wait by the low water,\nwait till the low water’s gone.\nKeep a light for the low water,\nkeep it burning on.";
+const REVISE_POETRY = {
+  sample: SAMPLES.song,
+  blurb: "the second verse reworded, the bridge cut, a third verse added",
+  oldText: SAMPLES.song.text,
+  annotations: [
+    { kind: "note", focus: "What does it mean to wait?", on: CHORUS, body: "Waiting as keeping something lit, not just sitting still." },
+    { kind: "note", focus: "What does it mean to wait?", on: CHORUS, nth: 1, body: "The second time it means something else: after the barges, it’s waiting with company." },
+    { kind: "note", focus: "What does it mean to wait?", on: "[Verse 2]\nThe barges sit like sleeping cows,\nthe ferry hasn’t run since June.\nI count the rings on every post\nand talk a little to the moon.", body: "Counting rings: measuring time by what it leaves behind." },
+    { kind: "keep", remark: "Faith as learning the names of what’s left.", on: "[Bridge]\nAnd if it never rises,\nif the dry years have their way,\nI’ll learn the names of all the stones\nand call that a kind of faith." },
+    { kind: "keep", remark: "", on: "[Verse 1]\nThe river’s down to stones again,\nthe dock leans like a tired man.\nMy father said the rain comes in\nto those who wait and understand." },
+  ],
+  newText:
+`[Verse 1]
+The river’s down to stones again,
+the dock leans like a tired man.
+My father said the rain comes in
+to those who wait and understand.
+
+${CHORUS}
+
+[Verse 2]
+The barges sleep like heavy cows,
+the ferry hasn’t run since June.
+I count the rings on every post
+and say a little to the moon.
+
+${CHORUS}
+
+[Verse 3]
+Tonight the sky went green and low,
+the swallows flew in close to ground.
+I left the porch light on for you
+in case the water comes around.
+
+Repeat chorus (x2)
+`
+};
+let REVISE = REVISE_PROSE;
 
 /* ---------- sentences: a port of script/texts/sentences.py ---------- */
 const ABBREVIATIONS = new Set(`Mr Mrs Messrs Dr St Mt Esq Rev Capt Col Gen Lieut Hon Prof Sen Jr Sr Mme Mlle Co No
@@ -473,8 +610,9 @@ function markers(raw, sentences) {
 
 /* ---------- parsing: paragraphs, # sections, sentences ---------- */
 const HEADING = /^# (.*)$/;
-function parse(src) {
+function parse(src, form = "prose") {
   const lines = src.replace(/\r\n?/g, "\n").split("\n");
+  if (form === "poetry") return parsePoetry(lines);
   // Blank lines separate paragraphs only if one falls between two lines of text; blank lines around headings don't count.
   let blankRule = false;
   for (let i = 1; i < lines.length - 1 && !blankRule; i++) {
@@ -501,11 +639,80 @@ function parse(src) {
   });
   flush();
   const headed = sections.some(s => s.label !== null);
-  return { sections, blankRule, headed };
+  return { form: "prose", sections, blankRule, headed };
+}
+
+/* ---------- poetry: stanzas, line breaks kept ---------- */
+// Blank lines separate stanzas, always; with none, a section is one stanza. Each line is trimmed, so indents are lost.
+// A stanza is a paragraph of exactly one "sentence", its lines joined with "\n", so flatten() and the rest still work.
+function parsePoetry(lines) {
+  const sections = []; let cur = null, buf = [], bufLine = 0, indented = false;
+  const flush = () => {
+    if (!buf.length) return;
+    if (!cur) { cur = { label: null, line: bufLine, paras: [] }; sections.push(cur); }
+    const text = buf.join("\n");
+    cur.paras.push({ text, lines: buf, line: bufLine, sentences: [text], markers: [], indented });
+    buf = []; indented = false;
+  };
+  lines.forEach((line, i) => {
+    const h = line.match(HEADING);
+    if (h) { flush(); cur = { label: h[1].trim(), line: i + 1, paras: [] }; sections.push(cur); return; }
+    if (!line.trim()) { flush(); return; }
+    if (!buf.length) bufLine = i + 1;
+    if (/^[ \t]+\S/.test(line)) indented = true;
+    buf.push(line.trim().replace(/\s+/g, " "));
+  });
+  flush();
+  return { form: "poetry", sections, headed: sections.some(s => s.label !== null) };
+}
+
+// A hint on the source step: mostly short lines, many without a closing stop.
+function looksLikeVerse(src) {
+  const lines = src.split("\n").map(l => l.trim()).filter(l => l && !HEADING.test(l));
+  if (lines.length < 6) return false;
+  const short = lines.filter(l => l.length <= 60).length, open = lines.filter(l => !/[.?!][”’")\]]*$/.test(l)).length;
+  return short / lines.length > .8 && open / lines.length > .4;
+}
+
+const PART = /^(?:\[[^\]]+\]|\((?:verse|chorus|refrain|bridge|pre-chorus|intro|outro|hook)[^)]*\)|(?:verse|chorus|refrain|bridge|pre-chorus|intro|outro|hook)(?:\s*\d+)?:?)$/i;
+const REPEAT = /^[\[(]?\s*repeat\b.*|.*\(\s*(?:x\s*\d+|\d+\s*x)\s*\)$/i;
+function poetryChecks(doc) {
+  const out = [], md = [], indents = [], parts = [], seen = new Map();
+  const snip = p => p.lines.join(" / ");
+  doc.sections.forEach((sec, si) => {
+    if (!sec.paras.length) out.push({ what: "Empty section; it will be left out.", si, line: sec.line, snip: "# " + sec.label });
+    if (sec.label === null && doc.headed) out.push({ what: "Text before the first heading becomes an untitled opening section.", si, pi: 0, s: 0, line: sec.line, snip: sec.paras[0] ? snip(sec.paras[0]) : "" });
+    sec.paras.forEach((p, pi) => {
+      const at = { si, pi, s: 0, line: p.line };
+      if (/^#{2,}\s|^#\S/.test(p.lines[0])) out.push({ ...at, what: "Starts with # but isn’t a heading (a heading is # and a space).", snip: snip(p), mark: p.lines[0] });
+      else if (p.lines.length === 1 && p.text.length < 40 && pi < sec.paras.length - 1 && !/[.?!:;,”"’)\]]$/.test(p.text) && !PART.test(p.text) && !REPEAT.test(p.text))
+        out.push({ ...at, what: "Looks like a title. Start the line with “# ” to make it a section of its own.", snip: p.text });
+      p.lines.forEach((line, n) => {
+        const l = { ...at, line: p.line + n, snip: snip(p), mark: line };
+        if (REPEAT.test(line)) out.push({ ...l, what: "An instruction to repeat. It’s read as typed; paste the words in again where they repeat if you want to read them there." });
+        else if (PART.test(line)) parts.push(l);
+        if (line.length > 120) out.push({ ...l, what: `A long line (${line.length} characters). Line breaks are kept as typed; is this prose?` });
+      });
+      if (p.lines.length > 24) out.push({ ...at, what: `A long stanza (${p.lines.length} lines). A blank line would break it up.`, snip: snip(p) });
+      if (p.indented) indents.push({ ...at, snip: snip(p) });
+      if (/\*[^*\s][^*]*\*|_[^_\s][^_]*_|\[[^\]]+\]\([^)]+\)/.test(p.text)) md.push({ ...at, snip: snip(p) });
+      seen.set(p.text, [...(seen.get(p.text) || []), at]);
+    });
+  });
+  for (const [text, places] of seen) if (places.length > 1)
+    out.push({ ...places[0], what: `This stanza comes ${places.length} times. Each is read, and noted, on its own.`, snip: text.split("\n").join(" / ") });
+  // Part labels are common in lyrics, so they are one check, and don't mark every stanza in the text.
+  if (parts.length) out.push({ ...parts[0], quiet: true, what: parts.length === 1
+    ? "Looks like a part label. It’s read as the stanza’s first line; delete it if you’d rather not see it."
+    : `Part labels, like “${parts[0].mark}”, in ${parts.length} stanzas. Each is read as its stanza’s first line; delete them if you’d rather not see them.` });
+  if (indents.length) out.push({ ...indents[0], what: indents.length === 1 ? "An indented line loses its indent." : `Indented lines lose their indent, in ${indents.length} stanzas.` });
+  if (md.length) out.push({ ...md[0], what: md.length === 1 ? "Markdown formatting shows as typed (asterisks and all)." : `Markdown formatting shows as typed, in ${md.length} stanzas.` });
+  return out.sort((a, b) => a.line - b.line);
 }
 
 /* ---------- checks: places a reader of the review should look ---------- */
 function checks(doc) {
+  if (doc.form === "poetry") return poetryChecks(doc);
   const out = [], md = [];
   doc.sections.forEach((sec, si) => {
     if (!sec.paras.length) out.push({ what: "Empty section; it will be left out.", si, line: sec.line, snip: "# " + sec.label });
@@ -538,7 +745,8 @@ function checks(doc) {
 /* ---------- revision: match the new text against the old, as the loader would ---------- */
 // Sections by label, then place. Within a section, sentences by exact text (nearest paragraph first), then anywhere in
 // the work; then each old paragraph is paired with the new one most of its sentences went to, and a leftover in a pair
-// matches the most alike sentence there (a rewording), or failing that the one in its place.
+// matches the most alike sentence there (a rewording), or in its section if its paragraph has no pair, as long as they
+// share at least 30% of their words. Nothing matches by place alone.
 function flatten(doc) {
   const units = [];
   doc.sections.forEach((sec, si) => sec.paras.forEach((p, pi) => p.sentences.forEach((text, k) => units.push({ si, pi, k, text }))));
@@ -549,13 +757,52 @@ function likeness(a, b) {
   const A = words(a), B = words(b), shared = [...A].filter(w => B.has(w)).length;
   return shared / Math.max(1, Math.min(A.size, B.size) + Math.abs(A.size - B.size) / 2);
 }
-function matchRevision(oldDoc, newDoc) {
+function mapSections(oldDoc, newDoc) {
   const secMap = new Map(), usedNew = new Set();
   oldDoc.sections.forEach((s, i) => {
     const j = newDoc.sections.findIndex((n, j) => !usedNew.has(j) && n.label !== null && n.label === s.label);
     if (j >= 0) { secMap.set(i, j); usedNew.add(j); }
   });
   oldDoc.sections.forEach((s, i) => { if (!secMap.has(i) && newDoc.sections[i] && !usedNew.has(i) && newDoc.sections[i].label === null && s.label === null) { secMap.set(i, i); usedNew.add(i); } });
+  return secMap;
+}
+
+// Stanzas have no paragraph to pair, so: exact text in the section (nearest place first, which sorts out a chorus
+// sung twice), then exact text anywhere if it's there only once, then the most alike leftover stanza in the section
+// sharing at least 30% of its words, best pairs first. A stanza merely in the same place is not a match.
+function matchStanzas(oldDoc, newDoc) {
+  const secMap = mapSections(oldDoc, newDoc);
+  const olds = flatten(oldDoc).map((u, id) => ({ ...u, id })), news = flatten(newDoc);
+  const match = new Map(), taken = new Set(), reworded = new Set();
+  for (const o of olds) {
+    if (!secMap.has(o.si)) continue;
+    const j = news.map((n, j) => j).filter(j => !taken.has(j) && news[j].si === secMap.get(o.si) && news[j].text === o.text)
+      .sort((a, b) => Math.abs(news[a].pi - o.pi) - Math.abs(news[b].pi - o.pi))[0];
+    if (j !== undefined) { match.set(o.id, j); taken.add(j); }
+  }
+  for (const o of olds) {
+    if (match.has(o.id)) continue;
+    const cands = news.map((n, j) => j).filter(j => !taken.has(j) && news[j].text === o.text);
+    if (cands.length === 1 && olds.filter(x => x.text === o.text).length === 1) { match.set(o.id, cands[0]); taken.add(cands[0]); }
+  }
+  const pairs = [];
+  for (const o of olds) {
+    if (match.has(o.id) || !secMap.has(o.si)) continue;
+    news.forEach((n, j) => {
+      if (taken.has(j) || n.si !== secMap.get(o.si)) return;
+      const sim = likeness(o.text, n.text);
+      if (sim >= 0.3) pairs.push({ o, j, sim, d: Math.abs(n.pi - o.pi) });
+    });
+  }
+  pairs.sort((a, b) => b.sim - a.sim || a.d - b.d);
+  for (const { o, j } of pairs) if (!match.has(o.id) && !taken.has(j)) { match.set(o.id, j); taken.add(j); reworded.add(j); }
+  const newStatus = news.map((n, j) => taken.has(j) ? (reworded.has(j) ? "reworded" : "same") : "new");
+  return { olds, news, match, newStatus, removed: olds.filter(o => !match.has(o.id)) };
+}
+
+function matchRevision(oldDoc, newDoc) {
+  if (newDoc.form === "poetry") return matchStanzas(oldDoc, newDoc);
+  const secMap = mapSections(oldDoc, newDoc);
 
   const olds = flatten(oldDoc).map((u, id) => ({ ...u, id })), news = flatten(newDoc);
   const match = new Map(); // old id -> new index
@@ -582,13 +829,14 @@ function matchRevision(oldDoc, newDoc) {
   const reworded = new Set();
   for (const o of olds) {
     if (match.has(o.id)) continue;
+    // The most alike leftover sentence in the paired paragraph, or in the section if the paragraph has no pair (a
+    // one-line paragraph reworded), sharing at least 30% of its words. A sentence merely in the same place is not a
+    // match: a note on it is set aside with its passage rather than hung on words it wasn't written about.
     const to = paraPair.get(o.si + "." + o.pi);
-    if (!to) continue;
-    // The most alike leftover sentence in the paired paragraph (shared words), else the one in the same place.
-    const free = news.map((n, j) => j).filter(j => !taken.has(j) && news[j].si + "." + news[j].pi === to);
-    const scored = free.map(j => ({ j, sim: likeness(o.text, news[j].text) })).sort((a, b) => b.sim - a.sim);
-    const j = scored[0] && scored[0].sim >= 0.3 ? scored[0].j : free.find(j => news[j].k === o.k);
-    if (j !== undefined) { match.set(o.id, j); taken.add(j); reworded.add(j); }
+    if (!to && !secMap.has(o.si)) continue;
+    const free = news.map((n, j) => j).filter(j => !taken.has(j) && (to ? news[j].si + "." + news[j].pi === to : news[j].si === secMap.get(o.si)));
+    const best = free.map(j => ({ j, sim: likeness(o.text, news[j].text) })).sort((a, b) => b.sim - a.sim)[0];
+    if (best && best.sim >= 0.3) { match.set(o.id, best.j); taken.add(best.j); reworded.add(best.j); }
   }
   const newStatus = news.map((n, j) => taken.has(j) ? (reworded.has(j) ? "reworded" : "same") : "new");
   const removed = olds.filter(o => !match.has(o.id));
@@ -598,24 +846,55 @@ function matchRevision(oldDoc, newDoc) {
 /* ---------- state and rendering ---------- */
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-let mode = "new", doc = null, units = [], current = 0, rev = null;
+let mode = "new", form = "prose", doc = null, units = [], current = 0, rev = null;
+const HOWTO_PROSE = $("howtoBody").innerHTML;
+const HOWTO_POETRY = `<ol>
+  <li><b>Stanzas.</b> Blank lines separate stanzas, and every line break is kept. With no blank lines, a poem is one stanza.</li>
+  <li><b>Sections.</b> A line starting <code>#&nbsp;</code> starts a section (a poem, or a song), named by the rest of the line. No headings: one section.</li>
+  <li><b>A stanza at a time,</b> like Frost.</li>
+  <li><b>Labels</b> like <code>[Chorus]</code> are read as typed; the review points them out. Indents are lost.</li>
+  <li><b>Everything else</b> shows exactly as typed. Asterisks stay asterisks.</li>
+</ol>
+<pre># Low Water
 
-function setMode(m) {
+The river’s down to stones again,
+the dock leans like a tired man.
+
+So I’ll wait by the low water,
+wait till the low water’s gone.</pre>`;
+const unitWord = n => (form === "poetry" ? "stanza" : "sentence") + (n === 1 ? "" : "s");
+
+function setMode(m, f) {
   mode = m;
-  document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === m));
+  REVISE = f === "poetry" ? REVISE_POETRY : REVISE_PROSE;
+  document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === m && b.dataset.form === f));
   show("source");
   const r = m === "revise";
-  $("srcTitle").textContent = r ? "Revise “Journal, spring 2024”" : "Add a text";
+  $("srcTitle").textContent = r ? `Revise “${REVISE.sample.title}”` : "Add a text";
   $("srcLede").hidden = r;
   $("samples").hidden = r;
-  $("crumbLast").textContent = r ? "Journal, spring 2024 › Revise" : "Add a text";
+  $("crumbLast").textContent = r ? `${REVISE.sample.title} › Revise` : "Add a text";
   const notes = REVISE.annotations.filter(a => a.kind === "note").length, keeps = REVISE.annotations.length - notes;
   $("revisingNote").hidden = !r;
-  $("revisingNote").innerHTML = `This text has <b>${notes} notes</b> and <b>${keeps} kept passages</b>. Edit it freely: anything on a sentence that’s gone is set aside, never lost, and the review shows exactly what moves. <br><small>(Prototype: the box holds an edited copy: two entries changed, one paragraph deleted, a heading added.)</small>`;
-  if (r) fill({ ...SAMPLES.journal, text: REVISE.newText }); else fill({ title: "", author: "", authorShort: "", text: "" });
+  $("revisingNote").innerHTML = `This text has <b>${notes} notes</b> and <b>${keeps} kept passages</b>. Edit it freely: anything on a ${f === "poetry" ? "stanza" : "sentence"} that’s gone is set aside, never lost, and the review shows exactly what moves. <br><small>(Prototype: the box holds an edited copy: ${REVISE.blurb}.)</small>`;
+  document.querySelectorAll("[name=form]").forEach(i => i.disabled = r);
+  $("formFixed").hidden = !r;
+  if (r) fill({ ...REVISE.sample, text: REVISE.newText }); else fill({ form: f, title: "", author: "", text: "" });
 }
-function fill(s) { $("title").value = s.title; $("author").value = s.author; $("authorShort").value = s.authorShort; $("src").value = s.text; srcStats(); }
+function setForm(f) {
+  form = f;
+  document.querySelectorAll("[name=form]").forEach(i => i.checked = i.value === f);
+  $("howtoBody").innerHTML = f === "poetry" ? HOWTO_POETRY : HOWTO_PROSE;
+  $("title").placeholder = f === "poetry" ? "Songs, or Poems of 2024" : "Journal, spring 2024";
+  $("pvHelp").textContent = `Pick any ${unitWord(1)} to see it here. ← → step through.`;
+  $("pvPrev").setAttribute("aria-label", `Previous ${unitWord(1)}`);
+  $("pvNext").setAttribute("aria-label", `Next ${unitWord(1)}`);
+  verseHint();
+}
+function verseHint() { $("verseHint").hidden = form === "poetry" || mode === "revise" || !looksLikeVerse($("src").value); }
+function fill(s) { setForm(s.form); $("title").value = s.title; $("author").value = s.author; $("src").value = s.text; srcStats(); }
 function srcStats() {
+  verseHint();
   const t = $("src").value;
   if (!t.trim()) { $("srcStats").textContent = "Empty"; return; }
   const words = (t.match(/\S+/g) || []).length;
@@ -629,12 +908,14 @@ function show(step) {
   window.scrollTo(0, 0);
 }
 
-function citation(u) {
-  const title = $("title").value.trim() || "Untitled";
-  const sec = doc.sections[u.si];
-  const many = doc.sections.length > 1;
-  const label = sec.label ?? (many ? "Opening" : null);
+// "Journal: 10 March 2024 3:2" for a sentence; "Small Hours: Lamp, stanza 2" for a stanza.
+function reference(title, label, u) {
+  if (form === "poetry") return label ? `${title}: ${label}, stanza ${u.pi + 1}` : `${title}, stanza ${u.pi + 1}`;
   return label ? `${title}: ${label} ${u.pi + 1}:${u.k + 1}` : `${title} ${u.pi + 1}:${u.k + 1}`;
+}
+function citation(u) {
+  const sec = doc.sections[u.si];
+  return reference($("title").value.trim() || "Untitled", sec.label ?? (doc.sections.length > 1 ? "Opening" : null), u);
 }
 
 function review() {
@@ -642,27 +923,39 @@ function review() {
   if (!$("title").value.trim()) { $("formMsg").textContent = "Give it a title."; $("title").focus(); return; }
   if (!src.trim()) { $("formMsg").textContent = "Paste some text, or choose a file."; $("src").focus(); return; }
   $("formMsg").textContent = "";
-  doc = parse(src);
+  doc = parse(src, form);
   units = flatten(doc);
-  rev = mode === "revise" ? matchRevision(parse(REVISE.oldText), doc) : null;
+  rev = mode === "revise" ? matchRevision(parse(REVISE.oldText, form), doc) : null;
 
   const author = $("author").value.trim();
   $("rvTitle").textContent = $("title").value.trim();
   $("rvBy").textContent = author ? author : "";
   const nsec = doc.sections.filter(s => s.paras.length).length;
   const npara = doc.sections.reduce((n, s) => n + s.paras.length, 0);
-  $("rvSummary").innerHTML = `<b>${nsec}</b> ${nsec === 1 ? "section" : "sections"} · <b>${npara}</b> ${npara === 1 ? "paragraph" : "paragraphs"} · <b>${units.length.toLocaleString()}</b> ${units.length === 1 ? "sentence" : "sentences"}`;
-  $("rvRule").textContent = (doc.blankRule
-    ? "Blank lines separate the paragraphs; line breaks inside a paragraph were joined."
-    : "There are no blank lines between paragraphs, so every line is a paragraph.")
-    + (doc.headed ? " Sections come from the # headings." : " No # headings, so it’s one section.");
+  const sec = `<b>${nsec}</b> ${nsec === 1 ? "section" : "sections"}`;
+  if (form === "poetry") {
+    const nlines = doc.sections.reduce((n, s) => n + s.paras.reduce((m, p) => m + p.lines.length, 0), 0);
+    $("rvSummary").innerHTML = `${sec} · <b>${npara}</b> ${unitWord(npara)} · <b>${nlines.toLocaleString()}</b> ${nlines === 1 ? "line" : "lines"}`;
+    $("rvRule").innerHTML = (npara > nsec ? "Blank lines separate the stanzas, and every line break is kept."
+      : "There are no blank lines inside a section, so each is one stanza, every line break kept.")
+      + (doc.headed ? " Sections come from the # headings." : " No # headings, so it’s one section.");
+  } else {
+    $("rvSummary").innerHTML = `${sec} · <b>${npara}</b> ${npara === 1 ? "paragraph" : "paragraphs"} · <b>${units.length.toLocaleString()}</b> ${unitWord(units.length)}`;
+    $("rvRule").innerHTML = esc((doc.blankRule
+      ? "Blank lines separate the paragraphs; line breaks inside a paragraph were joined."
+      : "There are no blank lines between paragraphs, so every line is a paragraph.")
+      + (doc.headed ? " Sections come from the # headings." : " No # headings, so it’s one section."))
+      + (mode === "new" && looksLikeVerse(src) ? ` <button type="button" class="linkish" id="rvPoetry">This looks like verse: read it as poetry instead</button>` : "");
+    if ($("rvPoetry")) $("rvPoetry").onclick = () => { setForm("poetry"); review(); };
+  }
 
   renderRevision();
   renderChecks();
   renderText();
-  $("legend").innerHTML = `<span><i style="background:color-mix(in srgb, var(--accent-soft) 45%, transparent)"></i>Each sentence is shaded in turn</span><span><i style="background:var(--hl)"></i>Worth a look</span>`
-    + (rev ? `<span><i style="box-shadow:inset 0 -2px 0 var(--accent)"></i>Reworded</span><span><i style="box-shadow:inset 0 -2px 0 color-mix(in srgb, #5a8a3a 60%, transparent)"></i>New</span><span><i style="background:none;width:auto">●</i> Has a note</span>` : "");
-  $("barInfo").textContent = rev ? "Saving replaces the text. Nothing on an unchanged sentence moves." : "You can revise the text later; notes on unchanged sentences stay put.";
+  const shade = "color-mix(in srgb, var(--accent-soft) 45%, transparent)", line = form === "poetry" ? "inset 3px 0 0" : "inset 0 -2px 0";
+  $("legend").innerHTML = `<span><i style="background:${shade}"></i>Each ${unitWord(1)} is shaded in turn</span><span><i style="background:var(--hl)"></i>Worth a look</span>`
+    + (rev ? `<span><i style="box-shadow:${line} var(--accent)"></i>Reworded</span><span><i style="box-shadow:${line} color-mix(in srgb, #5a8a3a 60%, transparent)"></i>New</span><span><i style="background:none;width:auto">●</i> Has a note</span>` : "");
+  $("barInfo").textContent = rev ? `Saving replaces the text. Nothing on an unchanged ${unitWord(1)} moves.` : `You can revise the text later; notes on unchanged ${unitWord(2)} stay put.`;
   $("publish").textContent = rev ? "Save the revision" : "Add to your texts";
   show("review");
   select(0, false);
@@ -676,34 +969,42 @@ function renderChecks() {
     let snip = esc(c.snip.length > 160 ? c.snip.slice(0, 160) + "…" : c.snip);
     if (c.mark) snip = snip.replace(esc(c.mark), `<mark>${esc(c.mark)}</mark>`);
     return `<button type="button" class="check" data-i="${i}"><span class="what">${esc(c.what)}</span><span class="where">line ${c.line}</span><span class="snip">${snip}</span></button>`;
-  }).join("") + `<p class="hint">To fix one, edit the text: a heading, a blank line, or a backslash beside the period.</p>`;
+  }).join("") + `<p class="hint">To fix one, edit the text: ${form === "poetry" ? "a heading, a blank line, or a line taken out" : "a heading, a blank line, or a backslash beside the period"}.</p>`;
   $("checksBody").querySelectorAll(".check").forEach(b => b.onclick = () => {
     const c = list[+b.dataset.i];
     const idx = units.findIndex(u => u.si === c.si && (c.pi === undefined || (u.pi === c.pi && (c.s === undefined || u.k === c.s))));
     if (idx >= 0) select(idx, true);
   });
-  window._flags = new Set(list.filter(c => c.s !== undefined).map(c => `${c.si}.${c.pi}.${c.s}`));
+  window._flags = new Set(list.filter(c => c.s !== undefined && !c.quiet).map(c => `${c.si}.${c.pi}.${c.s}`));
 }
+
+// The old unit an annotation hangs on; nth picks among units with the same text (a chorus sung twice).
+const findOld = a => rev.olds.filter(o => o.text === a.on)[a.nth || 0];
 
 function renderText() {
   const flags = window._flags || new Set();
   const notedNew = new Set();
   if (rev) for (const a of REVISE.annotations) {
-    const o = rev.olds.find(o => o.text === a.on); if (!o) continue;
+    const o = findOld(a); if (!o) continue;
     const j = rev.match.get(o.id); if (j !== undefined && a.kind === "note") notedNew.add(j);
   }
   let idx = 0;
+  const classes = (si, pi, k) => {
+    const cls = ["s"];
+    if (form === "poetry") cls.push("stanza");
+    if (flags.has(`${si}.${pi}.${k}`)) cls.push("flag");
+    if (rev && rev.newStatus[idx] !== "same") cls.push(rev.newStatus[idx]);
+    if (notedNew.has(idx)) cls.push("noted");
+    return cls.join(" ");
+  };
   $("rvText").innerHTML = doc.sections.map((sec, si) => {
     const head = sec.label !== null ? esc(sec.label) : `<span class="untitled">${doc.sections.length > 1 ? "Opening (untitled)" : esc($("title").value.trim())}</span>`;
-    const body = sec.paras.map((p, pi) => `<p class="para"><b class="pn">${pi + 1}</b>` + p.sentences.map((s, k) => {
-      const cls = ["s"];
-      if (flags.has(`${si}.${pi}.${k}`)) cls.push("flag");
-      if (rev && rev.newStatus[idx] !== "same") cls.push(rev.newStatus[idx]);
-      if (notedNew.has(idx)) cls.push("noted");
-      return `<span class="${cls.join(" ")}" data-u="${idx++}"><sup>${k + 1}</sup>${esc(s)}</span>`;
-    }).join(" ") + `</p>`).join("");
+    const body = form === "poetry"
+      ? sec.paras.map((p, pi) => `<div class="${classes(si, pi, 0)}" data-u="${idx++}"><b class="pn">${pi + 1}</b>${esc(p.text)}</div>`).join("")
+      : sec.paras.map((p, pi) => `<p class="para"><b class="pn">${pi + 1}</b>` + p.sentences.map((s, k) =>
+          `<span class="${classes(si, pi, k)}" data-u="${idx++}"><sup>${k + 1}</sup>${esc(s)}</span>`).join(" ") + `</p>`).join("");
     const count = sec.paras.reduce((n, p) => n + p.sentences.length, 0);
-    return `<section class="sec"><h2><span class="n">${si + 1}</span>${head}<span class="mark">${count} ${count === 1 ? "sentence" : "sentences"}</span></h2>${body || `<p class="para" style="color:var(--ink-faint);font-style:italic">Nothing here; left out.</p>`}</section>`;
+    return `<section class="sec"><h2><span class="n">${si + 1}</span>${head}<span class="mark">${count} ${unitWord(count)}</span></h2>${body || `<p class="para" style="color:var(--ink-faint);font-style:italic">Nothing here; left out.</p>`}</section>`;
   }).join("");
   $("rvText").querySelectorAll(".s").forEach(el => el.onclick = () => select(+el.dataset.u, false, true));
 }
@@ -712,28 +1013,29 @@ function renderRevision() {
   $("revPanel").hidden = !rev;
   if (!rev) return;
   const st = rev.newStatus, same = st.filter(s => s === "same").length, rew = st.filter(s => s === "reworded").length, nw = st.filter(s => s === "new").length;
+  const short = ref => ref.replace(/^[^:]*: /, "");
   const fates = REVISE.annotations.map(a => {
-    const o = rev.olds.find(o => o.text === a.on);
+    const o = findOld(a);
     const j = o ? rev.match.get(o.id) : undefined;
-    const oldRef = o ? oldCitation(o).replace(/^[^:]*: /, "") : "";
+    const oldRef = o ? short(oldCitation(o)) : "";
     if (j !== undefined) {
       const n = rev.news[j], changed = st[j] === "reworded";
-      return { a, stays: true, changed, oldRef, newRef: citation(n).replace(/^[^:]*: /, ""), was: o.text, now: n.text };
+      return { a, stays: true, changed, oldRef, newRef: short(citation(n)), was: o.text, now: n.text };
     }
     return { a, stays: false, oldRef, was: o ? o.text : a.on };
   });
   const moving = fates.filter(f => !f.stays || f.changed).length;
   $("revCount").textContent = `· ${moving} of ${fates.length} notes and keeps affected`;
   const tag = f => {
-    if (f.stays && !f.changed) return `<span class="tag ok">stays, sentence unchanged</span>`;
-    if (f.stays) return `<span class="tag">stays, on the reworded sentence</span>`;
+    if (f.stays && !f.changed) return `<span class="tag ok">stays, ${unitWord(1)} unchanged</span>`;
+    if (f.stays) return `<span class="tag">stays, on the reworded ${unitWord(1)}</span>`;
     if (f.a.kind === "note") return `<span class="tag">set aside as a detached note</span>`;
     return f.a.remark ? `<span class="tag">remark becomes a detached note on the Kept page</span>` : `<span class="tag">bookmark removed (it had no remark)</span>`;
   };
   const what = f => f.a.kind === "note" ? `<b>Note</b> in “${esc(f.a.focus)}”` : `<b>Kept</b>${f.a.remark ? " with a remark" : ""}`;
   const order = f => !f.stays ? 0 : f.changed ? 1 : 2;
   $("revBody").innerHTML =
-    `<div class="tally"><span>${same} sentences unchanged</span><span><span class="k" style="background:var(--accent)"></span>${rew} reworded</span><span><span class="k" style="background:#5a8a3a"></span>${nw} new</span><span>${rev.removed.length} gone</span></div>`
+    `<div class="tally"><span>${same} ${unitWord(same)} unchanged</span><span><span class="k" style="background:var(--accent)"></span>${rew} reworded</span><span><span class="k" style="background:#5a8a3a"></span>${nw} new</span><span>${rev.removed.length} gone</span></div>`
     + fates.sort((x, y) => order(x) - order(y)).map(f => `<div class="fate">
         <div class="head">${what(f)} ${tag(f)} <span class="ref">${esc(f.oldRef)}${f.newRef && f.newRef !== f.oldRef ? " → " + esc(f.newRef) : ""}</span></div>
         ${f.a.body || f.a.remark ? `<p class="note">${esc(f.a.body || f.a.remark)}</p>` : ""}
@@ -742,9 +1044,8 @@ function renderRevision() {
     + `<p class="hint">Detached notes keep the passage they were written on, and appear at the end of their focus’s notes under “From passages that changed or were removed”.</p>`;
 }
 function oldCitation(o) {
-  const oldDoc = parse(REVISE.oldText), sec = oldDoc.sections[o.si];
-  const title = $("title").value.trim();
-  return sec.label ? `${title}: ${sec.label} ${o.pi + 1}:${o.k + 1}` : `${title} ${o.pi + 1}:${o.k + 1}`;
+  const oldDoc = parse(REVISE.oldText, form), sec = oldDoc.sections[o.si];
+  return reference($("title").value.trim(), sec.label ?? (oldDoc.sections.length > 1 ? "Opening" : null), o);
 }
 
 function select(i, scroll, fromClick) {
@@ -753,12 +1054,13 @@ function select(i, scroll, fromClick) {
   document.querySelectorAll(".s.here").forEach(e => e.classList.remove("here"));
   const el = document.querySelector(`.s[data-u="${current}"]`);
   if (el) { el.classList.add("here"); if (scroll) el.scrollIntoView({ block: "center", behavior: "smooth" }); }
-  const sec = doc.sections[u.si];
   const inSec = units.filter(x => x.si === u.si), pos = inSec.indexOf(u) + 1;
   const len = u.text.length;
   $("pvRef").textContent = citation(u);
-  $("pvText").style.fontSize = len < 120 ? "28px" : len < 300 ? "24px" : len < 600 ? "21px" : "18px";
-  $("pvText").innerHTML = (u.k === 0 ? `<span class="pilcrow" aria-hidden="true">¶</span>` : "") + esc(u.text);
+  $("pvText").style.fontSize = form === "poetry"
+    ? (len < 160 ? "23px" : len < 320 ? "20px" : "17px")
+    : (len < 120 ? "28px" : len < 300 ? "24px" : len < 600 ? "21px" : "18px");
+  $("pvText").innerHTML = (form === "prose" && u.k === 0 ? `<span class="pilcrow" aria-hidden="true">¶</span>` : "") + esc(u.text);
   $("pvOf").textContent = `${pos} of ${inSec.length}`;
   $("pvPrev").disabled = current === 0;
   $("pvNext").disabled = current === units.length - 1;
@@ -766,26 +1068,29 @@ function select(i, scroll, fromClick) {
 }
 
 /* ---------- wiring ---------- */
-document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => setMode(b.dataset.mode));
+document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => setMode(b.dataset.mode, b.dataset.form));
 document.querySelectorAll("[data-sample]").forEach(b => b.onclick = () => fill(SAMPLES[b.dataset.sample]));
+document.querySelectorAll("[name=form]").forEach(i => i.onchange = () => setForm(i.value));
+$("toPoetry").onclick = () => setForm("poetry");
 $("src").addEventListener("input", srcStats);
 $("form").addEventListener("submit", e => { e.preventDefault(); review(); });
-$("cancel").onclick = e => { e.preventDefault(); setMode(mode); };
+$("cancel").onclick = e => { e.preventDefault(); setMode(mode, form); };
 $("toSource").onclick = () => show("source");
 $("pvPrev").onclick = () => select(current - 1, true);
 $("pvNext").onclick = () => select(current + 1, true);
 $("pvClose").onclick = () => $("preview").classList.remove("open");
-$("again").onclick = () => setMode(mode);
+$("again").onclick = () => setMode(mode, form);
 $("publish").onclick = () => {
   const t = $("title").value.trim();
   if (rev) {
-    const detached = REVISE.annotations.filter(a => { const o = rev.olds.find(o => o.text === a.on); return !(o && rev.match.has(o.id)) && (a.kind === "note" || a.remark); }).length;
+    const detached = REVISE.annotations.filter(a => { const o = findOld(a); return !(o && rev.match.has(o.id)) && (a.kind === "note" || a.remark); }).length;
     $("doneTitle").textContent = `Saved “${t}”`;
     $("doneText").textContent = `${detached} ${detached === 1 ? "note was" : "notes were"} set aside with the passages they were written on. Find them at the end of each focus’s notes, or on the Kept page.`;
   } else {
     $("doneTitle").textContent = `Added “${t}” to your texts`;
-    $("doneText").textContent = `${units.length.toLocaleString()} sentences, readable only by you. It’s in Your texts at the top of the library, in search, and in Random.`;
+    $("doneText").textContent = `${units.length.toLocaleString()} ${unitWord(units.length)}, readable only by you. It’s in Your texts at the top of the library, in search, and in Random.`;
   }
+  $("startReading").href = form === "poetry" ? "reader/e.html" : "reader/sentences.html";
   show("done");
 };
 document.addEventListener("keydown", e => {
@@ -811,9 +1116,10 @@ drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add(
 drop.addEventListener("dragleave", () => drop.classList.remove("over"));
 drop.addEventListener("drop", e => { e.preventDefault(); drop.classList.remove("over"); takeFile(e.dataTransfer.files[0]); });
 
-// ?revise starts in the revision; ?sample=journal|talk fills a sample; ?review goes straight to the review.
+// ?revise starts in the revision; ?poetry picks poetry (and the song, when revising); ?sample=journal|talk|poems|song
+// fills a sample; ?review goes straight to the review.
 const q = new URLSearchParams(location.search);
-setMode(q.has("revise") ? "revise" : "new");
+setMode(q.has("revise") ? "revise" : "new", q.has("poetry") ? "poetry" : "prose");
 if (SAMPLES[q.get("sample")] && !q.has("revise")) fill(SAMPLES[q.get("sample")]);
 if (q.has("review")) review();
 </script>
