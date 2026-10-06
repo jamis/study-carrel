@@ -3,7 +3,7 @@
 <%= render "shared/header", crumbs: library_crumbs(@work.collection, work: @work), random: RandomScope.chain_for(@work), focus: Current.focus %>
 <main class="page">
   <h2 class="page-title"><%= @work.title %></h2>
-  <p class="page-lede"><%= [ @work.byline, @work.edition, pluralize(@sections.size, "section") ].compact_blank.join(" · ") %></p>
+  <p class="page-lede"><%= [ @work.byline, @work.edition, pluralize(@sections.size, "section") ].compact_blank.join(" · ") %><% if @work.user == Current.user %> · <%= link_to "Revise", edit_text_path(@work) %><% end %></p>
   <%= render "shared/search_form", place: @work %>
 
   <% if numbered %>

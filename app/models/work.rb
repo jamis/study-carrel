@@ -53,7 +53,7 @@ class Work < ApplicationRecord
 
   def own_text? = user_id.present?
 
-  # Deletes a user's own text, which must have nothing hanging off it (see UserTextsController#destroy).
+  # Deletes a user's own text, once its notes and keeps are set aside (see DetachedNote.set_aside!).
   def remove!
     transaction do
       units = Unit.joins(:section).where(sections: { work_id: id })
@@ -64,12 +64,6 @@ class Work < ApplicationRecord
       sections.delete_all
       delete
     end
-  end
-
-  # Whether anything of the user's is attached to this text: a note in any focus, or a keep.
-  def annotated?
-    units = Unit.joins(:section).where(sections: { work_id: id }).select(:id)
-    Note.where(unit_id: units).exists? || Keep.where(unit_id: units).exists?
   end
 
   private

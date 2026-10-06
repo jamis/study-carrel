@@ -12,7 +12,7 @@
   <h2 class="page-title all-notes-title">Kept</h2>
   <p class="page-lede"><%= pluralize(@keeps.size, "passage") %> you wanted to come back to</p>
 
-  <% if @keeps.empty? %>
+  <% if @keeps.empty? && @detached.empty? %>
     <p class="page-empty">Nothing kept yet. When a passage stays with you, tap the ribbon beside the text.</p>
   <% end %>
 
@@ -34,4 +34,6 @@
       </div>
     </section>
   <% end %>
+
+  <%= render "detached_notes/list", detached_notes: @detached %>
 </main>

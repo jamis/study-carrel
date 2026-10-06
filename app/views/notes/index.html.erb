@@ -2,7 +2,7 @@
 <main class="page">
   <div class="page-bar">
     <%= link_to safe_join(["← Back", tag.span(" to reading", class: "wide-only")]), root_path, class: "chip" %>
-    <% if @notes.any? %>
+    <% if @notes.any? || @detached.any? %>
       <span class="page-bar-actions" data-controller="clipboard" data-clipboard-url-value="<%= export_notes_path %>">
         <button class="chip" type="button" data-action="clipboard#copy" data-clipboard-target="button">Copy<span class="wide-only"> Markdown</span></button>
         <%= link_to safe_join(["Download", tag.span(" .md", class: "wide-only")]), export_notes_path, class: "chip", data: { turbo: false } %>
@@ -12,7 +12,7 @@
   <h2 class="page-title all-notes-title"><%= @focus.title %></h2>
   <p class="page-lede"><%= pluralize(@notes.size, "note") %>, in reading order</p>
 
-  <% if @notes.empty? %>
+  <% if @notes.empty? && @detached.empty? %>
     <p class="page-empty">No notes yet. Open a verse and write what it says to your question.</p>
   <% end %>
 
@@ -28,4 +28,6 @@
       <div class="fv-note"><%= note.content %></div>
     </section>
   <% end %>
+
+  <%= render "detached_notes/list", detached_notes: @detached %>
 </main>

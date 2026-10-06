@@ -3,6 +3,7 @@ class NotesController < ApplicationController
 
   def index
     @notes = @focus.notes_in_reading_order
+    @detached = @focus.detached_notes.includes(:rich_text_content)
   end
 
   def export

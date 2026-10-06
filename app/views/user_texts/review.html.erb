@@ -1,5 +1,5 @@
 <% content_for :title, "Review · #{@text.title} · Study Carrel" %>
-<%= render "shared/header", crumbs: [ [ "Library", library_path ], [ "Your Texts", texts_path ], [ "Add a text", new_text_path ] ], focus: Current.focus %>
+<%= render "shared/header", crumbs: user_text_crumbs(@work), focus: Current.focus %>
 <main class="texts-page texts-review" data-controller="text-review" data-action="keydown@window->text-review#key">
   <div class="texts-review-head">
     <h2 class="page-title"><%= @text.title %></h2>
@@ -16,6 +16,41 @@
           "There are no blank lines between paragraphs, so every line is a paragraph." %>
     <%= @text.headed? ? "Sections come from the # headings." : "No # headings, so it’s one section." %>
   </p>
+
+  <% if @revision %>
+    <% counts = @revision.counts; fates = @revision.fates; moving = fates.count { it.fate != :stays } %>
+    <details class="texts-panel texts-changes" open>
+      <summary>What changes <span>· <%= fates.empty? ? "no notes or keeps on this text" : "#{moving} of #{pluralize(fates.size, "note and keep", plural: "notes and keeps")} affected" %></span></summary>
+      <div class="texts-panel-body">
+        <p class="texts-tally">
+          <span><%= pluralize(counts.fetch(:same, 0), "sentence") %> unchanged</span>
+          <span><i class="reworded"></i><%= counts.fetch(:reworded, 0) %> reworded</span>
+          <span><i class="new"></i><%= counts.fetch(:new, 0) %> new</span>
+          <span><%= counts.fetch(:gone, 0) %> gone</span>
+        </p>
+        <% fates.each do |fate| %>
+          <div class="texts-fate">
+            <div class="head">
+              <%= fate_subject(fate.record) %> <%= fate_tag(fate) %>
+              <span class="ref"><%= fate.old_citation %><%= " → #{fate.new_citation}" if fate.new_citation && fate.new_citation != fate.old_citation %></span>
+            </div>
+            <% words = fate.record.is_a?(Note) ? fate.record.content.to_plain_text : fate.record.remark %>
+            <% if words.present? %><p class="said"><%= words.truncate(240) %></p><% end %>
+            <% if fate.fate == :stays %>
+              <p class="now"><%= fate.was %></p>
+            <% elsif fate.fate == :reworded %>
+              <p class="was"><span class="lbl">Was</span><%= fate.was %></p><p class="now"><span class="lbl">Now</span><%= fate.now %></p>
+            <% else %>
+              <p class="was"><span class="lbl">Gone</span><%= fate.was %></p>
+            <% end %>
+          </div>
+        <% end %>
+        <% if fates.any? { it.fate == :detached } %>
+          <p class="texts-hint">Set-aside notes keep the passage they were written on, and are listed after their focus’s notes under “From passages that changed or were removed”.</p>
+        <% end %>
+      </div>
+    </details>
+  <% end %>
 
   <% checks = @text.checks %>
   <% if checks.any? %>
@@ -34,9 +69,11 @@
     </details>
   <% end %>
 
-  <p class="texts-legend"><span><i class="shade"></i>Each sentence is shaded in turn</span><% if checks.any? %><span><i class="flag"></i>Worth a look</span><% end %></p>
+  <p class="texts-legend"><span><i class="shade"></i>Each sentence is shaded in turn</span><% if checks.any? %><span><i class="flag"></i>Worth a look</span><% end %><% if @revision %><span><i class="reworded"></i>Reworded</span><span><i class="new"></i>New</span><% end %></p>
 
-  <% flagged = checks.select(&:sentence).map { [ it.section, it.paragraph, it.sentence ].join(".") }.to_set %>
+  <% flagged = checks.select(&:sentence).map { [ it.section, it.paragraph, it.sentence ].join(".") }.to_set
+     statuses = @revision&.statuses || []
+     j = -1 %>
   <div class="texts-review-grid">
     <div class="texts-text">
       <% @text.sections.each_with_index do |section, si| %>
@@ -45,9 +82,9 @@
         <section class="texts-sec">
           <h3><%= @text.label_for(section) || tag.span(@text.title, class: "untitled") %><span class="mark"><%= pluralize(count, "sentence") %></span></h3>
           <% section.paragraphs.each.with_index(1) do |paragraph, p| %>
-            <p class="texts-para"><b class="pn"><%= p %></b><% paragraph.sentences.each.with_index(1) do |sentence, s| %><% position += 1 %>
-              <%= tag.span class: [ "s", ("flag" if flagged.include?("#{si}.#{p - 1}.#{s - 1}")) ], tabindex: 0,
-                    data: { key: "#{si}.#{p - 1}.#{s - 1}", ref: review_reference(@text, section, p, s), of: "#{position} of #{count}", first: (s == 1),
+            <p class="texts-para"><b class="pn"><%= p %></b><% paragraph.sentences.each.with_index(1) do |sentence, s| %><% position += 1; j += 1 %>
+              <%= tag.span class: [ "s", ("flag" if flagged.include?("#{si}.#{p - 1}.#{s - 1}")), (statuses[j] if statuses[j] != :same) ], tabindex: 0,
+                    data: { key: "#{si}.#{p - 1}.#{s - 1}", ref: @text.reference(section, p, s), of: "#{position} of #{count}", first: (s == 1),
                             action: "click->text-review#pick keydown.enter->text-review#pick" } do %><sup><%= s %></sup><%= sentence %><% end %>
             <% end %></p>
           <% end %>
@@ -69,12 +106,14 @@
   </div>
 
   <%# A plain form post: the review and the form answer with a page, not a redirect, which Turbo won't take. %>
-  <%= form_with model: @text, url: texts_path, multipart: true, class: "texts-bar", data: { turbo: false } do |f| %>
+  <%= form_with model: @text, url: (@work ? text_path(@work) : texts_path), method: (@work ? :patch : :post), multipart: true,
+        class: "texts-bar", data: { turbo: false } do |f| %>
     <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %>
     <div class="texts-bar-in">
-      <span class="info">You can delete it later, as long as nothing is noted or kept in it.</span>
-      <%= f.button "Edit the text", type: "submit", name: "edit", value: "1", class: "chip", formaction: review_texts_path, formnovalidate: true %>
-      <%= f.button "Add to your texts", type: "submit", class: "primary" %>
+      <span class="info"><%= @work ? "Saving replaces the text. Nothing on an unchanged sentence moves." : "You can revise it later; notes on unchanged sentences stay put." %></span>
+      <%= f.button "Edit the text", type: "submit", name: "edit", value: "1", class: "chip", formaction: (@work ? review_text_path(@work) : review_texts_path),
+            formnovalidate: true %>
+      <%= f.button(@work ? "Save the revision" : "Add to your texts", type: "submit", class: "primary") %>
     </div>
   <% end %>
 </main>

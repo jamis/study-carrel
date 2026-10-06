@@ -15,8 +15,10 @@
       <div class="list-row-title as-work"><%= link_to work.title, work_path(work) %></div>
       <div class="list-row-meta">
         <%= [ work.author, pluralize(@sentence_counts.fetch(work.id, 0), "sentence"), "added #{l work.created_at.to_date, format: :long}" ].compact.join(" · ") %>
+        <%= link_to "Revise", edit_text_path(work), class: "texts-action" %>
+        <% attached = @annotation_counts.fetch(work.id, 0) %>
         <%= button_to "Delete", text_path(work), method: :delete, class: "texts-delete", form_class: "inline-form",
-              form: { data: { turbo_confirm: "Delete “#{work.title}”? This can’t be undone." } } %>
+              form: { data: { turbo_confirm: "Delete “#{work.title}”? This can’t be undone.#{" Its #{pluralize(attached, "note or kept passage", plural: "notes and kept passages")} will be set aside with the passages they were written on." if attached.positive?}" } } %>
       </div>
     </div>
   <% end %>

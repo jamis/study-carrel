@@ -1,0 +1,20 @@
+<%# Notes (or kept remarks) set aside because their passage is gone, with the passage as it was. detached_notes: the list %>
+<% if detached_notes.any? %>
+  <h3 class="page-sub detached-head">From passages that changed or were removed</h3>
+  <% detached_notes.each do |detached| %>
+    <% long = detached.passage.length > 300 %>
+    <section class="fv-item detached" id="<%= dom_id(detached) %>" <%= tag.attributes(data: { controller: "expand" }) if long %>>
+      <span class="fv-ref"><%= detached.citation %></span>
+      <span class="detached-why">set aside <%= l detached.created_at.to_date, format: :long %>, when <%= detached.why %></span>
+      <p class="fv-quote<%= " clamped" if long %>" data-expand-target="text"><%= detached.passage %></p>
+      <% if long %>
+        <button class="fv-more" type="button" data-action="expand#toggle" data-expand-target="button" aria-expanded="false">Show full passage</button>
+      <% end %>
+      <div class="fv-note"><%= detached.content %></div>
+      <div class="kept-actions">
+        <%= button_to "Discard", detached_note_path(detached), method: :delete, class: "chip", form_class: "inline-form",
+              data: { turbo_confirm: "Discard this #{detached.kept? ? "remark" : "note"}? It can’t be brought back." } %>
+      </div>
+    </section>
+  <% end %>
+<% end %>

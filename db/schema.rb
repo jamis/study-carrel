@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_06_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -60,6 +60,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_180000) do
     t.boolean "single_work", default: false, null: false
     t.index ["parent_id"], name: "index_collections_on_parent_id"
     t.index ["slug"], name: "index_collections_on_slug", unique: true
+  end
+
+  create_table "detached_notes", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "focus_id"
+    t.boolean "kept", default: false, null: false
+    t.string "citation", null: false
+    t.string "work_title", null: false
+    t.text "passage", null: false
+    t.string "reason", null: false
+    t.datetime "noted_at", null: false
+    t.datetime "edited_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["focus_id"], name: "index_detached_notes_on_focus_id"
+    t.index ["user_id", "kept", "created_at"], name: "index_detached_notes_on_user_id_and_kept_and_created_at"
+    t.index ["user_id"], name: "index_detached_notes_on_user_id"
   end
 
   create_table "foci", force: :cascade do |t|
@@ -182,6 +199,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_180000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "collections", "collections", column: "parent_id", on_delete: :nullify
+  add_foreign_key "detached_notes", "foci", on_delete: :nullify
+  add_foreign_key "detached_notes", "users"
   add_foreign_key "foci", "units", column: "last_unit_id", on_delete: :nullify
   add_foreign_key "foci", "users"
   add_foreign_key "invitations", "users", column: "created_by_id"

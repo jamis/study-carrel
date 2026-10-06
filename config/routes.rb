@@ -37,11 +37,14 @@ Rails.application.routes.draw do
   get "random", to: "random_readings#show", as: :random
   get "collections/:collection/random", to: "random_readings#show", as: :random_collection
   get "works/:work/random", to: "random_readings#show", as: :random_work
-  # A user's own texts. Adding one is new > review (which can go back to new with the text) > create.
+  # A user's own texts. Adding one is new > review (which can go back to new with the text) > create; revising one is
+  # edit > review > update.
   get "texts/random", to: "random_readings#show", defaults: { texts: "yours" }, as: :random_texts
-  resources :texts, only: %i[index new create destroy], param: :slug, controller: "user_texts" do
+  resources :texts, only: %i[index new create edit update destroy], param: :slug, controller: "user_texts" do
     post :review, on: :collection
+    match :review, on: :member, via: %i[post patch] # the revision's form is a PATCH, and "Edit the text" posts it here
   end
+  resources :detached_notes, only: :destroy
   resources :collections, only: :show, param: :slug
   resources :works, only: :show, param: :slug
   get "read/:slug/:section(/:number)", to: "readings#show", as: :reading

@@ -50,19 +50,15 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".list-row-title", "Journal"
   end
 
-  test "a text can be deleted until something is noted or kept in it" do
+  test "deleting a text removes its sentences, history and search entries" do
     work = UserText.new(title: "Journal", source: SOURCE).publish!(@user)
     unit = work.sections.first.units.first
-    @user.keeps.create!(unit:)
-    delete text_path(work)
-    assert Work.exists?(work.id)
-
-    @user.keeps.delete_all
     Visit.record(@user, unit)
     delete text_path(work)
     assert_redirected_to texts_path
     assert_not Work.exists?(work.id)
     assert_not Unit.exists?(unit.id)
+    assert_empty Visit.where(unit_id: unit.id)
     assert_empty LibrarySearch.new("quiet", user: @user).page(1)
   end
 
@@ -98,5 +94,85 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
       get reading_path(work.slug, 1, 1)
       assert_select ".trail li", text: "Your Texts", count: 2 # the rail's popover and the phone menu
     end
+  end
+
+  REVISED = "# Monday\n\nWoke early. Coffee first.\nRead a little more.\n"
+
+  def noted_text
+    work = UserText.new(title: "Journal", source: SOURCE).publish!(@user)
+    units = work.sections.first.units.index_by(&:body)
+    @user.foci.current_one.notes.create!(unit: units.fetch("Woke early."), content: "Early, again.")
+    @user.foci.current_one.notes.create!(unit: units.fetch("Read a little."), content: "Which book?")
+    @user.keeps.create!(unit: units.fetch("The house was quiet."), remark: "Quiet as rest.")
+    work
+  end
+
+  test "revising: the form starts from the text as it was, and the review says what happens to each note and keep" do
+    work = noted_text
+    get edit_text_path(work)
+    assert_select "h2", "Revise “Journal”"
+    assert_select "textarea[name='user_text[source]']", text: SOURCE.sub(/\A\n/, "")
+
+    patch review_text_path(work), params: params(source: REVISED)
+    assert_response :success
+    assert_select ".texts-changes summary", /2 of 3 notes and keeps affected/
+    assert_select ".texts-fate", 3
+    assert_select ".texts-fate .head", text: /Note in “What is rest\?” stays, sentence unchanged/
+    assert_select ".texts-fate .head", text: /Kept, with a remark remark set aside/
+    assert_select ".texts-fate .was", text: "WasRead a little."
+    assert_select ".texts-fate .now", text: "NowRead a little more."
+    assert_select "form.texts-bar[action=?] input[name=_method][value=patch]", text_path(work)
+    assert_equal SOURCE, work.reload.source, "the review saves nothing"
+  end
+
+  test "saving a revision keeps what survives and sets aside the rest, shown after the focus's notes and on Kept" do
+    work = noted_text
+    patch text_path(work), params: params(source: REVISED)
+    assert_redirected_to texts_path
+    assert_equal "Saved “Journal”. One note was set aside with the passages they were written on.", flash[:notice]
+    assert_equal REVISED, work.reload.source
+    assert_equal [ "Early, again.", "Which book?" ], Note.all.map { it.content.to_plain_text }.sort
+
+    get notes_path
+    assert_select ".detached", 0, "the notes both survived"
+    get kept_path
+    assert_select ".detached .fv-ref", "Journal: Monday 1:2"
+    assert_select ".detached .fv-quote", "The house was quiet."
+    assert_select ".detached .fv-note", /Quiet as rest/
+    get export_notes_path
+    assert_no_match "Quiet as rest", response.body, "a kept remark belongs to no focus"
+  end
+
+  test "deleting a text with notes sets them aside first; a set-aside note can be discarded, by its owner only" do
+    work = noted_text
+    get texts_path
+    assert_select "form[data-turbo-confirm*='3 notes and kept passages will be set aside']"
+    delete text_path(work)
+    assert_not Work.exists?(work.id)
+    assert_equal 3, @user.detached_notes.count
+    assert_equal [ "deleted" ], @user.detached_notes.pluck(:reason).uniq
+
+    get export_notes_path
+    assert_match "## From passages that changed or were removed\n\n### Journal: Monday 1:1\n\n> Woke early.\n\nEarly, again.", response.body
+
+    detached = @user.detached_notes.first
+    sign_in_as users(:two)
+    delete detached_note_path(detached)
+    assert_response :not_found
+    sign_in_as @user
+    delete detached_note_path(detached)
+    assert_not DetachedNote.exists?(detached.id)
+  end
+
+  test "another user can't revise someone's text" do
+    work = noted_text
+    sign_in_as users(:two)
+    get edit_text_path(work)
+    assert_response :not_found
+    patch review_text_path(work), params: params(source: REVISED)
+    assert_response :not_found
+    patch text_path(work), params: params(source: REVISED)
+    assert_response :not_found
+    assert_equal SOURCE, work.reload.source
   end
 end

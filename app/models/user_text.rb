@@ -41,6 +41,16 @@ class UserText
   # A section's label as it will be saved.
   def label_for(section) = section.label || (OPENING if headed?)
 
+  # A sentence's reference as the reader will cite it (see Section#name): "Journal: 10 March 2024 3:2", or
+  # "Journal 3:2" for a text with no headings.
+  def reference(section, paragraph, sentence)
+    label = label_for(section)
+    place = "#{paragraph}:#{sentence}"
+    return "#{title} #{place}" if label.nil?
+
+    label.match?(/\A\d+\z/) ? "#{title} #{label} #{place}" : "#{title}: #{label} #{place}"
+  end
+
   def paragraph_count = sections.sum { it.paragraphs.size }
   def sentence_count = sections.sum { |s| s.paragraphs.sum { it.sentences.size } }
 

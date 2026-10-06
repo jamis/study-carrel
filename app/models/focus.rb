@@ -1,6 +1,7 @@
 class Focus < ApplicationRecord
   belongs_to :user
   has_many :notes, dependent: :destroy
+  has_many :detached_notes, -> { ordered }, dependent: :nullify
   belongs_to :last_unit, class_name: "Unit", optional: true
 
   validates :title, presence: true

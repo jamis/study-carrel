@@ -11,6 +11,7 @@ class KeepsController < ApplicationController
       keeps.order(created_at: :desc, id: :desc)
     end
     @has_focus = Current.user.foci.current.exists?
+    @detached = Current.user.detached_notes.where(kept: true).includes(:rich_text_content)
   end
 
   def create

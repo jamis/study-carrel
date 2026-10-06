@@ -1,22 +1,37 @@
-# A user's own texts (see UserText): listed on Your Texts, added through new > review > create, deleted while nothing
-# is attached to them. Only the owner ever reaches one.
+# A user's own texts (see UserText): listed on Your Texts, added through new > review > create, revised through
+# edit > review > update (see TextRevision), and deleted. Notes and remarked keeps on sentences that a revision or a
+# deletion takes away are set aside as detached notes. Only the owner ever reaches a text.
 class UserTextsController < ApplicationController
+  before_action :set_work, only: %i[edit update destroy]
+
   def index
     @texts = Current.user.texts.to_a
-    @sentence_counts = Unit.joins(:section).where(sections: { work_id: @texts }).group("sections.work_id").count
+    units = Unit.joins(:section).where(sections: { work_id: @texts })
+    @sentence_counts = units.group("sections.work_id").count
+    @annotation_counts = Note.joins(unit: :section).merge(units).group("sections.work_id").count
+                             .merge(Keep.joins(unit: :section).merge(units).group("sections.work_id").count) { |_, a, b| a + b }
   end
 
   def new
     @text = UserText.new
   end
 
-  # How the text will be read, before anything is saved. "Edit the text" comes back here with edit=1.
+  def edit
+    @text = UserText.new(title: @work.title, author: @work.author, source: @work.source)
+    render :new
+  end
+
+  # How the text will be read (and, for a revision, what happens to its notes), before anything is saved. "Edit the
+  # text" comes back here with edit=1.
   def review
+    @work = Current.user.texts.find_by!(slug: params[:slug]) if params[:slug]
     @text = UserText.new(text_params)
     if params[:edit]
       render :new
     elsif @text.invalid?
       render :new, status: :unprocessable_content
+    else
+      @revision = TextRevision.new(@work, @text) if @work
     end
   end
 
@@ -28,18 +43,35 @@ class UserTextsController < ApplicationController
     redirect_to reading_path(work.slug, 1, 1)
   end
 
-  # Until notes can be set aside (detached), a text with notes or keeps on it stays.
+  def update
+    @text = UserText.new(text_params)
+    return render(:new, status: :unprocessable_content) if @text.invalid?
+
+    detached = set_aside_count { TextRevision.new(@work, @text).apply! }
+    redirect_to texts_path, notice: "Saved “#{@work.title}”.#{set_aside_message(detached)}"
+  end
+
   def destroy
-    work = Current.user.texts.find_by!(slug: params[:slug])
-    if work.annotated?
-      redirect_to texts_path, alert: "“#{work.title}” has notes or kept passages, so it can’t be deleted yet."
-    else
-      work.remove!
-      redirect_to texts_path, notice: "Deleted “#{work.title}”."
+    detached = set_aside_count do
+      DetachedNote.set_aside!(Unit.joins(:section).where(sections: { work_id: @work.id }), reason: "deleted")
+      @work.remove!
     end
+    redirect_to texts_path, notice: "Deleted “#{@work.title}”.#{set_aside_message(detached)}"
   end
 
   private
 
+  def set_work = @work = Current.user.texts.find_by!(slug: params[:slug])
+
   def text_params = params.expect(user_text: %i[title author source])
+
+  def set_aside_count
+    before = Current.user.detached_notes.count
+    yield
+    Current.user.detached_notes.count - before
+  end
+
+  def set_aside_message(count)
+    " #{count == 1 ? "One note was" : "#{count} notes were"} set aside with the passages they were written on." if count.positive?
+  end
 end
