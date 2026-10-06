@@ -9,7 +9,9 @@
   <% if @current %>
     <h3 class="page-sub">Current</h3>
     <div class="list-row">
-      <div class="list-row-title"><%= @current.title %></div>
+      <%# Home resumes the current focus where it was left (or opens the library if nothing is read yet). %>
+      <div class="list-row-title"><%= link_to @current.title, root_path,
+            title: (@current.last_unit ? "Continue reading at #{@current.last_unit.reference}" : "Choose where to begin") %></div>
       <div class="list-row-meta">since <%= l @current.created_at.to_date, format: :long %></div>
     </div>
   <% end %>

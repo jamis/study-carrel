@@ -79,4 +79,16 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     assert_select ".focus-actions a[href=?]", new_focus_path, text: "New focus"
     assert_select ".focus-actions a[href=?]", foci_path
   end
+
+  test "the current focus links to where its reading left off" do
+    focus = users(:one).foci.start!(title: "What is holy?")
+    get foci_path
+    assert_select ".list-row-title a[href=?][title=?]", root_path, "Choose where to begin", text: "What is holy?"
+
+    focus.update!(last_unit: verse(3))
+    get foci_path
+    assert_select ".list-row-title a[title=?]", "Continue reading at Isaiah 40:3"
+    get root_path
+    assert_redirected_to reading_path("isaiah-kjv", 40, 3)
+  end
 end
