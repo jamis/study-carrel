@@ -20,7 +20,7 @@ module ReadingsHelper
     trail << [ label, work_path(work), "Chapters in #{work.title}#{" (#{work.edition})" if work.edition.present?}" ]
   end
 
-  def unit_ref(section, unit) = section.reference(unit.number)
+  def unit_ref(section, unit) = section.reference(unit.label)
 
   # Work title, section name and unit in separate spans (see .ref-work / .ref-section / .ref-unit); the browser updates the unit as the reader moves.
   def unit_ref_parts(section, unit)
@@ -28,7 +28,7 @@ module ReadingsHelper
     safe_join([
       (tag.span(work, class: "ref-work") if work.present?),
       tag.span(name, class: "ref-section"),
-      tag.span(section.reference_unit_template.sub("{n}", unit.number.to_s), class: "ref-unit", data: { lectio_target: "refUnit" })
+      tag.span(section.reference_unit_template.sub("{n}", unit.label), class: "ref-unit", data: { lectio_target: "refUnit" })
     ])
   end
 

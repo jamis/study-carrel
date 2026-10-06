@@ -96,6 +96,88 @@ class TextLoaderTest < ActiveSupport::TestCase
     assert_equal "Walden: Two, paragraph 1", named.units.first.reference
   end
 
+  PROSE = <<~TXT
+    work: Walden
+    unit: sentence
+    group: paragraph
+
+    section: 2
+    label: Where I Lived
+    1.1 I went to the woods.
+    1.2 I wished to live
+    deliberately.
+    2.1 Simplify, simplify.
+  TXT
+
+  test "prose reads a sentence at a time, numbered in reading order and cited by paragraph and sentence" do
+    work = TextLoader.new(PROSE).load
+    units = work.sections.first.units
+
+    assert work.sentences?
+    assert_equal "paragraph", work.group_name
+    assert_equal [ 1, 2, 3 ], units.map(&:number)
+    assert_equal [ [ 1, 1 ], [ 1, 2 ], [ 2, 1 ] ], units.map { [ it.paragraph, it.sentence ] }
+    assert_equal "I wished to live deliberately.", units.second.body
+    assert_equal "Walden: Where I Lived 1:2", units.second.reference
+    assert_equal [ units.second.id ], LibrarySearch.new("deliberately").page(1).map(&:id)
+  end
+
+  test "a paragraph loaded before prose was split keeps its notes on its first sentence" do
+    old = TextLoader.new(<<~TXT).load
+      work: Walden
+      unit: paragraph
+
+      section: 2
+      label: Where I Lived
+      1. I went to the woods. I wished to live deliberately.
+      2. Simplify, simplify.
+    TXT
+    first, second = old.sections.first.units.to_a
+    note = users(:one).foci.start!(title: "F").notes.create!(unit: second, content: "<p>twice</p>")
+
+    TextLoader.new(PROSE).load
+    units = old.sections.first.units.reload
+
+    assert_equal [ "I went to the woods.", "I wished to live deliberately.", "Simplify, simplify." ], units.map(&:body)
+    assert_equal first.id, units.first.id
+    assert_equal second.id, units.third.id
+    assert_equal units.third, note.reload.unit
+    assert_equal 3, Unit.count
+  end
+
+  test "re-splitting follows a sentence by its text, deletes what nothing needs and keeps what something does" do
+    work = TextLoader.new(PROSE.sub("2.1 Simplify, simplify.", "2.1 Simplify, simplify.\n2.2 Our life is frittered away.\n2.3 By detail.")).load
+    units = work.sections.first.units.to_a
+    focus = users(:one).foci.start!(title: "F")
+    focus.notes.create!(unit: units[3], content: "<p>frittered</p>")
+
+    # The first paragraph is now one sentence, and "Our life…" and "By detail." merge into one.
+    resplit = PROSE.sub("1.1 I went to the woods.\n1.2 I wished to live\ndeliberately.", "1.1 I went to the woods. I wished to live deliberately.")
+                   .sub("2.1 Simplify, simplify.", "2.1 Simplify, simplify.\n2.2 Our life is frittered away by detail.")
+    TextLoader.new(resplit).load
+    after = work.sections.first.units.reload
+
+    assert_equal units[0].id, after[0].id, "same place, new text"
+    assert_equal units[2].id, after[1].id, "same text, new place"
+    assert_equal units[3].id, after[2].id, "the noted sentence keeps its note"
+    assert_equal [ 1, 2, 3 ], after.map(&:number)
+    assert_not Unit.exists?(units[1].id)
+    assert_not Unit.exists?(units[4].id)
+    assert_equal Unit.count, Unit.connection.select_value("SELECT count(*) FROM unit_search")
+
+    # A sentence that disappears while a keep holds it stays, after the last sentence.
+    Keep.create!(user: users(:one), unit: after[2])
+    TextLoader.new(resplit.sub("\n2.2 Our life is frittered away by detail.", "")).load
+    assert_equal [ [ 1, 1 ], [ 2, 1 ], [ 2, 2 ] ], work.sections.first.units.reload.map { [ it.paragraph, it.sentence ] }
+    assert_equal 3, after[2].reload.number
+  end
+
+  test "rejects sentences out of order, and plain units in a sentence work" do
+    assert_raises(TextLoader::Error) { TextLoader.new(PROSE.sub("1.2 I wished", "1.3 I wished")).load }
+    assert_raises(TextLoader::Error) { TextLoader.new(PROSE.sub("2.1 Simplify", "1.1 Simplify")).load }
+    assert_raises(TextLoader::Error) { TextLoader.new(PROSE.sub("2.1 Simplify", "2. Simplify")).load }
+  end
+
   test "rejects text outside a unit" do
     assert_raises(TextLoader::Error) { TextLoader.new("work: X\n\nsection: 1\nstray\n").load }
   end

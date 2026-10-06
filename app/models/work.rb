@@ -42,6 +42,9 @@ class Work < ApplicationRecord
 
   def name = [ title, edition ].compact_blank.join(" ")
 
+  # Prose is read a sentence at a time; each sentence belongs to a group (a paragraph, a thought) named by group_name.
+  def sentences? = unit_name == "sentence"
+
   private
 
   def siblings = collection ? collection.works : Work.none

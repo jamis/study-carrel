@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_05_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_06_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -135,6 +135,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_150000) do
     t.text "body", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "paragraph"
+    t.integer "sentence"
     t.index ["section_id", "number"], name: "index_units_on_section_id_and_number", unique: true
     t.index ["section_id"], name: "index_units_on_section_id"
   end
@@ -169,6 +171,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_150000) do
     t.string "unit_name", default: "verse", null: false
     t.string "author"
     t.string "author_short"
+    t.string "group_name"
     t.index ["collection_id"], name: "index_works_on_collection_id"
     t.index ["slug"], name: "index_works_on_slug", unique: true
   end

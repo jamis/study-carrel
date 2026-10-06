@@ -7,7 +7,11 @@ class Unit < ApplicationRecord
   validates :number, presence: true, uniqueness: { scope: :section_id }
   validates :body, presence: true
 
-  def reference = section.reference(number)
+  # How the unit is numbered in a reference: "12:3" (paragraph 12, sentence 3) for a sentence of prose, otherwise
+  # its number.
+  def label = sentence ? "#{paragraph}:#{sentence}" : number.to_s
+
+  def reference = section.reference(label)
 
   # Refreshes the full-text index (see LibrarySearch) for the units of the given sections, or of every section.
   def self.reindex_search(section_ids = nil)
@@ -16,5 +20,10 @@ class Unit < ApplicationRecord
       connection.exec_delete("DELETE FROM unit_search#{" WHERE rowid IN (#{units.select(:id).to_sql})" if section_ids}")
       connection.exec_insert("INSERT INTO unit_search(rowid, body) #{units.select(:id, :body).to_sql}")
     end
+  end
+
+  # Drops units from the full-text index before they are deleted.
+  def self.unindex_search(ids)
+    connection.exec_delete("DELETE FROM unit_search WHERE rowid IN (#{ids.map(&:to_i).join(",")})") if ids.any?
   end
 end

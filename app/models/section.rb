@@ -11,16 +11,17 @@ class Section < ApplicationRecord
   # Chapters are numbered ("Isaiah 40"); other texts name their sections ("Walden: Economy").
   def name = numbered? ? "#{work.title} #{display_label}" : "#{work.title}: #{display_label}"
 
-  # How to cite a unit, with a placeholder the browser can fill as the reader moves.
-  def reference_template = numbered? ? "#{name}:{n}" : "#{name}, #{work.unit_name} {n}"
-  def reference(number) = reference_template.sub("{n}", number.to_s)
+  # How to cite a unit, with a placeholder the browser can fill (with Unit#label) as the reader moves: "Isaiah 40:3",
+  # "Emily Dickinson: Success, stanza 2", or for a sentence of prose "Walden: Economy 12:3".
+  def reference_template = "#{name}#{reference_unit_template}"
+  def reference(label) = reference_template.sub("{n}", label.to_s)
 
   # The reference's leading part split in two: the work title (which the panel may drop when space is short) and the
   # section name. Numbered chapters have no separable title ("Isaiah 40").
   def reference_name_parts = numbered? ? [ "", name ] : [ "#{work.title}: ", display_label ]
 
   # The same reference in parts, so a long name can truncate while the unit number stays visible.
-  def reference_unit_template = numbered? ? ":{n}" : ", #{work.unit_name} {n}"
+  def reference_unit_template = work.sentences? ? " {n}" : numbered? ? ":{n}" : ", #{work.unit_name} {n}"
 
   def numbered? = display_label.match?(/\A\d+\z/)
 
