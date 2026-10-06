@@ -11,10 +11,7 @@
         <p class="signin-alert" role="alert"><%= @text.errors.full_messages.map { it.sub(/\ASource /, "The text ") }.to_sentence %>.</p>
       <% end %>
       <label class="texts-field"><span>Title</span><%= f.text_field :title, autocomplete: "off", required: true, autofocus: @text.title.blank?, data: { text_source_target: "title" } %></label>
-      <div class="texts-row">
-        <label class="texts-field"><span>Author <small>optional</small></span><%= f.text_field :author, autocomplete: "off" %></label>
-        <label class="texts-field"><span>Short form <small>optional, shown in the reader</small></span><%= f.text_field :author_short, autocomplete: "off" %></label>
-      </div>
+      <label class="texts-field"><span>Author <small>optional</small></span><%= f.text_field :author, autocomplete: "off" %></label>
       <div class="texts-field">
         <div class="texts-src-head">
           <label for="user_text_source">Text</label>

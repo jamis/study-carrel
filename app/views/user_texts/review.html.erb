@@ -70,7 +70,7 @@
 
   <%# A plain form post: the review and the form answer with a page, not a redirect, which Turbo won't take. %>
   <%= form_with model: @text, url: texts_path, multipart: true, class: "texts-bar", data: { turbo: false } do |f| %>
-    <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :author_short %><%= f.hidden_field :source %>
+    <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %>
     <div class="texts-bar-in">
       <span class="info">You can delete it later, as long as nothing is noted or kept in it.</span>
       <%= f.button "Edit the text", type: "submit", name: "edit", value: "1", class: "chip", formaction: review_texts_path, formnovalidate: true %>

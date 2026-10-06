@@ -10,7 +10,6 @@
 .texts-field { display: block; margin-bottom: 18px; }
 .texts-field > span, .texts-src-head label { display: block; margin-bottom: 6px; font: 600 13px var(--sans); color: var(--ink-soft); }
 .texts-field small { font-weight: 400; color: var(--ink-faint); }
-.texts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .texts-form input[type="text"], .texts-form textarea {
   width: 100%; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); color: var(--ink);
 }
@@ -116,7 +115,6 @@
   .texts-preview-help { display: none; }
 }
 @media (max-width: 599px) {
-  .texts-row { grid-template-columns: 1fr; gap: 0; }
   .texts-form textarea { min-height: 40vh; }
   .texts-bar-in .info { display: none; }
   .texts-bar-in > * { flex: 1; }

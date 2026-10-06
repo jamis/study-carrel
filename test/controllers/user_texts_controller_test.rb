@@ -9,7 +9,7 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
   end
 
-  def params(**attrs) = { user_text: { title: "Journal", author: "", author_short: "", source: SOURCE, **attrs } }
+  def params(**attrs) = { user_text: { title: "Journal", author: "", source: SOURCE, **attrs } }
 
   test "review shows how the text will be read, without saving anything" do
     assert_no_difference -> { Work.count } do

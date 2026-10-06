@@ -41,5 +41,5 @@ class UserTextsController < ApplicationController
 
   private
 
-  def text_params = params.expect(user_text: %i[title author author_short source])
+  def text_params = params.expect(user_text: %i[title author source])
 end

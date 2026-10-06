@@ -21,16 +21,14 @@ class UserText
 
   attribute :title, :string
   attribute :author, :string
-  attribute :author_short, :string
   attribute :source, :string
 
   validates :title, presence: true, length: { maximum: 200 }
-  validates :author, :author_short, length: { maximum: 200 }
+  validates :author, length: { maximum: 200 }
   validate :source_is_usable
 
   def title = super.to_s.strip
   def author = super.to_s.strip.presence
-  def author_short = super.to_s.strip.presence
   def source = super.to_s.delete_prefix("\uFEFF").gsub(/\r\n?/, "\n")
 
   def sections = @sections ||= parse
@@ -74,7 +72,7 @@ class UserText
   # Adds the text to the user's library. Returns the new work.
   def publish!(user)
     Work.transaction do
-      work = user.texts.create!(title:, author:, author_short:, source:, slug: unique_slug, unit_name: "sentence", group_name: "paragraph")
+      work = user.texts.create!(title:, author:, source:, slug: unique_slug, unit_name: "sentence", group_name: "paragraph")
       now = Time.current
       kept_sections.each.with_index(1) do |section, number|
         record = work.sections.create!(number:, label: label_for(section))
