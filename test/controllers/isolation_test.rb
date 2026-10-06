@@ -96,4 +96,42 @@ class IsolationTest < ActionDispatch::IntegrationTest
     get export_notes_path
     assert_no_match "Other's private thought", response.body
   end
+
+  test "a reader's own text is invisible to everyone else: not listed, read, searched, rolled, noted, kept or deleted" do
+    work = UserText.new(title: "Diary", source: "Private words about porcupines.").publish!(@owner)
+    unit = work.sections.sole.units.sole
+    other_focus = @other.foci.start!(title: "Other's focus")
+    sign_in_as @other
+
+    get library_path
+    assert_no_match "Diary", response.body
+    get texts_path
+    assert_no_match "Diary", response.body
+    get work_path(work)
+    assert_response :not_found
+    get reading_path(work.slug, 1, 1)
+    assert_response :not_found
+    get search_path(q: "porcupines")
+    assert_no_match "Private words", response.body
+    get search_path(q: "porcupines", work: work.slug)
+    assert_response :not_found
+    get random_work_path(work.slug)
+    assert_response :not_found
+    20.times { get random_path; assert_no_match work.slug, response.location.to_s }
+    get unit_note_path(unit)
+    assert_response :not_found
+    put unit_note_path(unit), params: { note: { content: "Mine" } }, as: :turbo_stream
+    assert_response :not_found
+    post unit_keep_path(unit), as: :json
+    assert_response :not_found
+    patch position_path, params: { unit_id: unit.id }
+    assert_response :not_found
+    delete text_path(work)
+    assert_response :not_found
+
+    assert Work.exists?(work.id)
+    assert_empty Note.where(unit:)
+    assert_empty Keep.where(unit:)
+    assert_nil other_focus.reload.last_unit
+  end
 end

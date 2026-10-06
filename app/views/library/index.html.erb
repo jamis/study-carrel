@@ -8,6 +8,16 @@
     <p class="page-empty">No texts are loaded yet. Run <code>bin/rails db:seed</code> on the server.</p>
   <% end %>
 
+  <div class="list-row">
+    <div class="list-row-title"><%= link_to "Your texts", texts_path %></div>
+    <% if @texts.any? %>
+      <div class="list-row-desc"><%= safe_join(@texts.first(5).map { link_to it.title, work_path(it), class: "texts-inline" }, " · ") %><%= " · …" if @texts.size > 5 %></div>
+    <% else %>
+      <div class="list-row-desc">A journal, a talk, anything in prose, read a sentence at a time. Only you can see them.</div>
+    <% end %>
+    <div class="list-row-meta"><%= pluralize(@texts.size, "text") if @texts.any? %><%= link_to "Add a text", new_text_path %></div>
+  </div>
+
   <%= render partial: "collections/row", collection: @collections, as: :collection, locals: { work_counts: @work_counts } %>
 
   <% @loose_works.each do |work| %>

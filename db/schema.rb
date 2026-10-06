@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_06_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_06_180000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -172,8 +172,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_120000) do
     t.string "author"
     t.string "author_short"
     t.string "group_name"
+    t.integer "user_id"
+    t.text "source"
     t.index ["collection_id"], name: "index_works_on_collection_id"
     t.index ["slug"], name: "index_works_on_slug", unique: true
+    t.index ["user_id"], name: "index_works_on_user_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -193,6 +196,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_120000) do
   add_foreign_key "visits", "units"
   add_foreign_key "visits", "users"
   add_foreign_key "works", "collections"
+  add_foreign_key "works", "users"
 
   # Virtual tables defined in this database.
   # Note that virtual tables may not work with other database engines. Be careful if changing database.

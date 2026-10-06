@@ -1,0 +1,51 @@
+<% content_for :title, "Add a text · Study Carrel" %>
+<%= render "shared/header", crumbs: [ [ "Library", library_path ], [ "Your texts", texts_path ], [ "Add a text", new_text_path ] ], focus: Current.focus %>
+<main class="texts-page">
+  <h2 class="page-title">Add a text</h2>
+  <p class="texts-lede">A journal, the transcript of a talk, anything in prose. Only you can see texts you add.</p>
+
+  <div class="texts-source">
+    <%= form_with model: @text, url: review_texts_path, multipart: true, class: "texts-form",
+          data: { turbo: false, controller: "text-source", action: "dragover->text-source#over dragleave->text-source#leave drop->text-source#drop" } do |f| %>
+      <% if @text.errors.any? %>
+        <p class="signin-alert" role="alert"><%= @text.errors.full_messages.map { it.sub(/\ASource /, "The text ") }.to_sentence %>.</p>
+      <% end %>
+      <label class="texts-field"><span>Title</span><%= f.text_field :title, autocomplete: "off", required: true, autofocus: @text.title.blank?, data: { text_source_target: "title" } %></label>
+      <div class="texts-row">
+        <label class="texts-field"><span>Author <small>optional</small></span><%= f.text_field :author, autocomplete: "off" %></label>
+        <label class="texts-field"><span>Short form <small>optional, shown in the reader</small></span><%= f.text_field :author_short, autocomplete: "off" %></label>
+      </div>
+      <div class="texts-field">
+        <div class="texts-src-head">
+          <label for="user_text_source">Text</label>
+          <button type="button" class="texts-linkish" data-action="text-source#choose">Choose a file…</button>
+          <input type="file" accept=".txt,.md,.markdown,text/plain,text/markdown" hidden data-text-source-target="file" data-action="text-source#pick">
+        </div>
+        <%= f.text_area :source, spellcheck: false, required: true, placeholder: "Paste the text here, or drop a .txt or .md file on this box.",
+              data: { text_source_target: "source", action: "input->text-source#count" } %>
+        <div class="texts-src-foot"><span data-text-source-target="stats"></span><span class="texts-error" data-text-source-target="error" role="status"></span></div>
+      </div>
+      <div class="texts-actions">
+        <%= f.submit "Review", class: "primary", name: nil %>
+        <%= link_to "Cancel", texts_path, class: "chip" %>
+      </div>
+    <% end %>
+
+    <aside class="texts-howto" aria-labelledby="howto-head">
+      <h3 id="howto-head">How the text is read</h3>
+      <ol>
+        <li><b>Paragraphs.</b> Blank lines between paragraphs, and line breaks inside one are joined. With no blank lines at all, every line is a paragraph.</li>
+        <li><b>Sections.</b> A line starting <code>#&nbsp;</code> starts a section, named by the rest of the line. No headings: one section.</li>
+        <li><b>Sentences.</b> Each paragraph is read a sentence at a time, like Walden.</li>
+        <li><b>A backslash</b> beside <code>.</code> <code>?</code> <code>!</code> decides a split: <code>Sgt\. Pepper</code> isn’t an ending, <code>with M.\ We</code> is. <code>\\</code> is a backslash.</li>
+        <li><b>Everything else</b> shows exactly as typed. Asterisks stay asterisks.</li>
+      </ol>
+      <pre># 3 March 2024
+
+Woke before six. The house
+was quiet.
+
+Read Isaiah 40 again.</pre>
+    </aside>
+  </div>
+</main>

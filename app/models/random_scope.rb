@@ -2,7 +2,7 @@
 # library (place nil). Rolls are balanced: each branch of the library gets an even chance at every level (Sacred
 # Texts > Bible, Book of Mormon, Quran, ... alike), then the roll picks evenly among the units of the work it reaches;
 # a single-work collection (the Bible) counts as one branch and is even by unit inside, so Obadiah is no likelier than
-# Psalm 119's verses.
+# Psalm 119's verses. A user's own texts are one more branch of the library, all of them together.
 class RandomScope
   attr_reader :place
 
@@ -36,8 +36,9 @@ class RandomScope
   alias eql? ==
   def hash = place.hash
 
-  # A random unit, or nil when the scope holds none.
-  def unit
+  # A random unit of the works the user can see, or nil when the scope holds none.
+  def unit(user)
+    @user = user
     work_id = weighted_work(work_ids_under(balanced_leaf)) or return
     # A random offset, not ORDER BY RANDOM(): SQLite returns the same row for the latter when the scope is a subquery.
     Unit.joins(:section).where(sections: { work_id: }).order(:id).offset(rand(counts[work_id])).includes(section: :work).first
@@ -65,9 +66,12 @@ class RandomScope
     ids.find { |id| (roll -= counts[id]) < 0 }
   end
 
-  def branches(collection)
-    id = collection&.id
-    collections.select { it.parent_id == id } + works.select { it.collection_id == id }
+  def branches(node)
+    return works.select(&:user_id) if node == :own_texts
+
+    id = node&.id
+    found = collections.select { it.parent_id == id } + works.select { it.collection_id == id && !it.user_id }
+    node.nil? && works.any?(&:user_id) ? found << :own_texts : found
   end
 
   # Ids of the works with any units under a node; nil is the whole library.
@@ -80,7 +84,7 @@ class RandomScope
   end
 
   # Units per work, for the works that have any.
-  def counts = @counts ||= Unit.joins(:section).group("sections.work_id").count
-  def works = @works ||= Work.where(id: counts.keys).ordered.select(:id, :collection_id).to_a
+  def counts = @counts ||= Unit.visible_to(@user).group("sections.work_id").count
+  def works = @works ||= Work.where(id: counts.keys).ordered.select(:id, :collection_id, :user_id).to_a
   def collections = @collections ||= Collection.ordered.to_a
 end

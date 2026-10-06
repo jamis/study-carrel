@@ -1,0 +1,80 @@
+<% content_for :title, "Review · #{@text.title} · Study Carrel" %>
+<%= render "shared/header", crumbs: [ [ "Library", library_path ], [ "Your texts", texts_path ], [ "Add a text", new_text_path ] ], focus: Current.focus %>
+<main class="texts-page texts-review" data-controller="text-review" data-action="keydown@window->text-review#key">
+  <div class="texts-review-head">
+    <h2 class="page-title"><%= @text.title %></h2>
+    <% if @text.author %><span class="texts-by"><%= @text.author %></span><% end %>
+  </div>
+  <% sections = @text.kept_sections %>
+  <p class="texts-summary">
+    <b><%= sections.size %></b> <%= "section".pluralize(sections.size) %> ·
+    <b><%= @text.paragraph_count.to_fs(:delimited) %></b> <%= "paragraph".pluralize(@text.paragraph_count) %> ·
+    <b><%= @text.sentence_count.to_fs(:delimited) %></b> <%= "sentence".pluralize(@text.sentence_count) %>
+  </p>
+  <p class="texts-rule">
+    <%= @text.blank_lines_separate? ? "Blank lines separate the paragraphs; line breaks inside a paragraph were joined." :
+          "There are no blank lines between paragraphs, so every line is a paragraph." %>
+    <%= @text.headed? ? "Sections come from the # headings." : "No # headings, so it’s one section." %>
+  </p>
+
+  <% checks = @text.checks %>
+  <% if checks.any? %>
+    <details class="texts-panel" open>
+      <summary>Worth a look <span>· <%= checks.size %></span></summary>
+      <div class="texts-panel-body">
+        <% checks.each do |check| %>
+          <button type="button" class="texts-check" data-action="text-review#jump"
+                  data-sentence="<%= [ check.section, check.paragraph || 0, check.sentence || 0 ].join(".") %>">
+            <span class="what"><%= check.message %></span><span class="where">line <%= check.line %></span>
+            <span class="snip"><%= check_excerpt(check) %></span>
+          </button>
+        <% end %>
+        <p class="texts-hint">To fix one, edit the text: a heading, a blank line, or a backslash beside the period.</p>
+      </div>
+    </details>
+  <% end %>
+
+  <p class="texts-legend"><span><i class="shade"></i>Each sentence is shaded in turn</span><% if checks.any? %><span><i class="flag"></i>Worth a look</span><% end %></p>
+
+  <% flagged = checks.select(&:sentence).map { [ it.section, it.paragraph, it.sentence ].join(".") }.to_set %>
+  <div class="texts-review-grid">
+    <div class="texts-text">
+      <% @text.sections.each_with_index do |section, si| %>
+        <% next if section.paragraphs.empty? %>
+        <% count = section.paragraphs.sum { it.sentences.size }; position = 0 %>
+        <section class="texts-sec">
+          <h3><%= @text.label_for(section) || tag.span(@text.title, class: "untitled") %><span class="mark"><%= pluralize(count, "sentence") %></span></h3>
+          <% section.paragraphs.each.with_index(1) do |paragraph, p| %>
+            <p class="texts-para"><b class="pn"><%= p %></b><% paragraph.sentences.each.with_index(1) do |sentence, s| %><% position += 1 %>
+              <%= tag.span class: [ "s", ("flag" if flagged.include?("#{si}.#{p - 1}.#{s - 1}")) ], tabindex: 0,
+                    data: { key: "#{si}.#{p - 1}.#{s - 1}", ref: review_reference(@text, section, p, s), of: "#{position} of #{count}", first: (s == 1),
+                            action: "click->text-review#pick keydown.enter->text-review#pick" } do %><sup><%= s %></sup><%= sentence %><% end %>
+            <% end %></p>
+          <% end %>
+        </section>
+      <% end %>
+    </div>
+
+    <aside class="texts-preview" data-text-review-target="preview" aria-live="polite">
+      <div class="texts-preview-label">How it reads <button class="icon-btn" type="button" aria-label="Close" data-action="text-review#close">✕</button></div>
+      <div class="texts-preview-ref" data-text-review-target="ref"></div>
+      <p class="texts-preview-text" data-text-review-target="text"></p>
+      <div class="texts-preview-steps">
+        <button type="button" aria-label="Previous sentence" data-action="text-review#previous" data-text-review-target="prev">‹</button>
+        <span data-text-review-target="of"></span>
+        <button type="button" aria-label="Next sentence" data-action="text-review#next" data-text-review-target="next">›</button>
+      </div>
+      <p class="texts-preview-help">Pick any sentence to see it here. ← → step through.</p>
+    </aside>
+  </div>
+
+  <%# A plain form post: the review and the form answer with a page, not a redirect, which Turbo won't take. %>
+  <%= form_with model: @text, url: texts_path, multipart: true, class: "texts-bar", data: { turbo: false } do |f| %>
+    <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :author_short %><%= f.hidden_field :source %>
+    <div class="texts-bar-in">
+      <span class="info">You can delete it later, as long as nothing is noted or kept in it.</span>
+      <%= f.button "Edit the text", type: "submit", name: "edit", value: "1", class: "chip", formaction: review_texts_path, formnovalidate: true %>
+      <%= f.button "Add to your texts", type: "submit", class: "primary" %>
+    </div>
+  <% end %>
+</main>

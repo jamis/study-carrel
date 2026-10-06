@@ -8,6 +8,7 @@
 <%= link_to search_path, class: "menu-item menu-search", data: { controller: "search-key", action: "keydown@window->search-key#key" } do %>Search<kbd>/</kbd><% end %>
 <%= render "shared/random_menu", scopes: random, default: random_default %>
 <%= link_to "Kept", kept_path, class: "menu-item menu-kept" %>
+<%= link_to "Your texts", texts_path, class: "menu-item" %>
 <button class="menu-item" type="button" data-action="theme#toggle">Light / dark</button>
 <% if Current.user.admin? %><%= link_to "Invitations", admin_invitations_path, class: "menu-item" %><% end %>
 <%= button_to "Sign out", session_path, method: :delete, class: "menu-item", form_class: "signout" %>

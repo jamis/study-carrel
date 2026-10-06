@@ -8,10 +8,11 @@ class LibrarySearch
   # snippet() marks matches with these; the view escapes the text and then turns them into <mark>.
   MARK_START, MARK_END = "\u0002", "\u0003"
 
-  attr_reader :query, :place
+  attr_reader :query, :place, :user
 
-  def initialize(query, place: nil)
-    @query, @place = query.to_s.strip, place
+  # Only the bundled library and the user's own texts are searched (see Work.visible_to).
+  def initialize(query, place: nil, user: nil)
+    @query, @place, @user = query.to_s.strip, place, user
   end
 
   # The FTS5 expression: each word or phrase quoted, so the reader's punctuation and words like NOT or OR are just
@@ -53,7 +54,7 @@ class LibrarySearch
   def matches
     return Unit.none unless searching?
 
-    units = Unit.joins("JOIN unit_search ON unit_search.rowid = units.id").joins(section: :work)
+    units = Unit.visible_to(user).joins("JOIN unit_search ON unit_search.rowid = units.id")
                 .where("unit_search MATCH ?", expression)
     case place
     when nil then units

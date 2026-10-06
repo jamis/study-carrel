@@ -1,0 +1,24 @@
+<% content_for :title, "Your texts · Study Carrel" %>
+<%= render "shared/header", crumbs: [ [ "Library", library_path ], [ "Your texts", texts_path ] ], focus: Current.focus %>
+<main class="page">
+  <div class="page-bar">
+    <h2 class="page-title">Your texts</h2>
+    <%= link_to "Add a text", new_text_path, class: "chip" %>
+  </div>
+  <p class="texts-lede">Journals, talks, anything in prose you’ve added. Only you can see them.</p>
+  <% if flash[:alert] || flash[:notice] %><p class="<%= flash[:alert] ? "signin-alert" : "signin-notice" %>" role="status"><%= flash[:alert] || flash[:notice] %></p><% end %>
+
+  <% if @texts.empty? %>
+    <p class="page-empty">Nothing here yet. <%= link_to "Add a text", new_text_path %> to read it a sentence at a time, with your focus beside it.</p>
+  <% end %>
+  <% @texts.each do |work| %>
+    <div class="list-row texts-row-item">
+      <div class="list-row-title as-work"><%= link_to work.title, work_path(work) %></div>
+      <div class="list-row-meta">
+        <%= [ work.author, pluralize(@sentence_counts.fetch(work.id, 0), "sentence"), "added #{l work.created_at.to_date, format: :long}" ].compact.join(" · ") %>
+        <%= button_to "Delete", text_path(work), method: :delete, class: "texts-delete", form_class: "inline-form",
+              form: { data: { turbo_confirm: "Delete “#{work.title}”? This can’t be undone." } } %>
+      </div>
+    </div>
+  <% end %>
+</main>

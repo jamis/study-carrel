@@ -2,7 +2,7 @@ class ReadingsController < ApplicationController
   include RequiresFocus
 
   def show
-    work = Work.find_by!(slug: params[:slug])
+    work = Work.visible_to(Current.user).find_by!(slug: params[:slug])
     @section = work.sections.find_by!(number: params[:section])
     @units = @section.units.to_a
     @current = (params[:number] ? @units.find { |u| u.number == params[:number].to_i } : resume_unit || @units.first) or

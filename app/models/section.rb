@@ -9,7 +9,12 @@ class Section < ApplicationRecord
   def previous_section = work.sections.where("number < ?", number).last || work.previous_work&.sections&.last
 
   # Chapters are numbered ("Isaiah 40"); other texts name their sections ("Walden: Economy").
-  def name = numbered? ? "#{work.title} #{display_label}" : "#{work.title}: #{display_label}"
+  # A user's text with no headings is one unnamed section, cited by the work alone ("Journal 3:2").
+  def name
+    return work.title if label.blank? && work.own_text?
+
+    numbered? ? "#{work.title} #{display_label}" : "#{work.title}: #{display_label}"
+  end
 
   # How to cite a unit, with a placeholder the browser can fill (with Unit#label) as the reader moves: "Isaiah 40:3",
   # "Emily Dickinson: Success, stanza 2", or for a sentence of prose "Walden: Economy 12:3".

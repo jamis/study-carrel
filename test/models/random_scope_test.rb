@@ -10,7 +10,7 @@ class RandomScopeTest < ActiveSupport::TestCase
     @genesis = Work.find_by!(slug: "genesis-kjv")
   end
 
-  def slugs(scope, times = 200) = times.times.map { scope.unit.section.work.slug }.tally
+  def slugs(scope, times = 200) = times.times.map { scope.unit(nil).section.work.slug }.tally
 
   test "each branch gets an even chance, and a single-work collection is even by unit inside" do
     seen = slugs(RandomScope.new(Collection.find_by!(slug: "sacred-texts")))
@@ -19,7 +19,7 @@ class RandomScopeTest < ActiveSupport::TestCase
   end
 
   test "a scope with no units yields nothing" do
-    assert_nil RandomScope.new(Collection.find_by!(slug: "poetry")).unit
+    assert_nil RandomScope.new(Collection.find_by!(slug: "poetry")).unit(nil)
   end
 
   test "the chain runs from the work out to the library, and the default is the innermost collection" do

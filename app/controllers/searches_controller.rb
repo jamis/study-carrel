@@ -4,7 +4,7 @@ class SearchesController < ApplicationController
 
   def show
     @place = library_place
-    @search = LibrarySearch.new(params[:q], place: @place)
+    @search = LibrarySearch.new(params[:q], place: @place, user: Current.user)
     @page = [ params[:page].to_i, 1 ].max
     @units = @search.page(@page) if @search.searching?
   end

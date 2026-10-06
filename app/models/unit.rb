@@ -7,6 +7,9 @@ class Unit < ApplicationRecord
   validates :number, presence: true, uniqueness: { scope: :section_id }
   validates :body, presence: true
 
+  # Units of the works a user may see (see Work.visible_to).
+  def self.visible_to(user) = joins(section: :work).merge(Work.visible_to(user))
+
   # How the unit is numbered in a reference: "12:3" (paragraph 12, sentence 3) for a sentence of prose, otherwise
   # its number.
   def label = sentence ? "#{paragraph}:#{sentence}" : number.to_s

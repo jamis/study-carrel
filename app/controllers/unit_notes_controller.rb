@@ -29,6 +29,6 @@ class UnitNotesController < ApplicationController
 
   private
 
-  def set_unit = @unit = Unit.find(params[:unit_id])
+  def set_unit = @unit = Unit.visible_to(Current.user).find(params[:unit_id])
   def set_note = @note = @focus.notes.find_by(unit: @unit)
 end

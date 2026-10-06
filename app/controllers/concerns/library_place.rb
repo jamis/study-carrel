@@ -3,7 +3,7 @@ module LibraryPlace
   private
 
   def library_place
-    if params[:work].present? then Work.find_by!(slug: params[:work])
+    if params[:work].present? then Work.visible_to(Current.user).find_by!(slug: params[:work])
     elsif params[:collection].present? then Collection.find_by!(slug: params[:collection])
     end
   end
