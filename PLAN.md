@@ -1,74 +1,24 @@
-# Study Carrel: Plan to v1
+# Study Carrel: Plan
 
-Last updated: 2026-10-02
-See `DECISIONS.md` for decisions and `prototype/index.html` for the reference design.
+Last updated: 2026-10-07
 
-## Stack
-**Rails + Hotwire + SQLite.** (Rails confirmed by the user.)
+The proof of concept is complete and deployed (https://studycarrel.jamisbuck.org; Capistrano, see `SERVER.md`). The original build steps are in `docs/plan-history.md`. Decisions are indexed in `DECISIONS.md`.
 
-- Small, single-user, server-rendered app. Rails 8's built-in auth and PWA support cover most needs.
-- Notes editor: try **Lexxy** (current state unverified). Step 9 is a spike. Fallback: Action Text/Trix.
-- The whole chapter loads on the page and a small Stimulus controller switches verses, so there is no network round trip per verse.
+## Done since the proof of concept
 
-## Steps
-
-Each step is small, can be checked on its own, and leaves the app working.
-
-### A. Foundation
-1. ✅ **Scaffold.** New Rails app with SQLite and Hotwire, an empty home page, and a git repo. Keep the prototype in `prototype/` as the reference.
-2. ✅ **Port the look.** Move the prototype's CSS and layout into the Rails layout and a static mock view. It should look identical to the prototype, with no data yet.
-3. ✅ **Auth.** One user with a login page, using Rails' built-in generator. Everything else sits behind it.
-
-### B. Texts
-4. ✅ **Text models.** Work > Section > Unit (number, text), plus a seed loader that reads plain-text files.
-5. ✅ **Load Isaiah 40.** Put the KJV text in a data file and seed it. Verify it against a trusted source (the prototype copy was typed from memory).
-6. ✅ **Read a chapter.** The reading view renders real units in lectio mode: focus band, verse, faded neighbors, verse strip. Navigation via a Stimulus controller (buttons, arrow keys, swipe). The URL reflects the verse.
-
-> Check-in after step 6: first point where real text can be read in the real app.
-
-### C. Focus
-7. ✅ **Focus model.** One current focus, shown in the sticky band. Minimal create form, plus a first-run state when none exists.
-8. ✅ **Focus details.** Dropdown with description and edit, plus archive and a simple past-foci list.
-
-### D. Notes
-9. ✅ **Editor spike.** Try Lexxy in an isolated page and confirm it works on a phone. Decide Lexxy or Trix. **Result: Lexxy 1.0.0 passes; use it.** Bold and Markdown lists worked on desktop; typing, bold and the collapsing toolbar worked in a 390px mobile emulation (not a real phone, so recheck at step 20). Theming is via `--lexxy-*` CSS variables.
-10. ✅ **Notes, plain.** Create and delete notes attached to the current unit, shown in the side panel, with the mobile bottom sheet. Plain text only, to prove the data flow.
-11. ✅ **Rich notes.** Swap in the chosen editor, with the compact field and an expand control.
-12. ✅ **Verse-strip markers and counts.** Show which verses have notes.
-13. ✅ **All-notes view.** All notes in reading order, with a jump back to the verse.
-13a. ✅ **One autosaved note per verse** (2026-10-03). Replaced the note list and composer with an always-open editor; unique index on `(focus_id, unit_id)`; old multi-note code removed.
-14. ✅ **Markdown export.** Copy or download as Markdown.
-
-### E. Finish
-15. ✅ **Remember position.** Save the current verse per focus, so the app reopens where you left off.
-16. ✅ **More texts.** Add 2-3 more: one poetry collection and one prose work. Prose will test chunking and long-paragraph sizing. **Choose the texts at this step, not before.** **Done:** the whole KJV Old Testament (39 books, cross-checked against two other sources), Emily Dickinson's poems (442, a stanza per unit) and Thoreau's *Walden* (18 chapters, a paragraph per unit). Build scripts are in `script/texts/`. Left as candidates: (see `collections.yml` and the `collection:`/`position:` headers; the loader is non-destructive and uses bulk upserts).
-17. ✅ **Chapter navigation.** First real browsing UI: collection pages (e.g. an "Old Testament" page listing its books), a book page with a chapter grid, Next/Previous that continues into the next chapter and book, and a compact verse strip for long chapters (Psalm 119 has 176 verses).
-18. ✅ **PWA basics.** Manifest, icon, installable on a phone.
-19. ✅ **Deploy.** Live at https://studycarrel.jamisbuck.org on a DigitalOcean droplet (Ubuntu 24.04, 512 MB), no Docker: Capistrano deploys to a `deploy` user (`bundle exec cap production deploy`, rollback with `deploy:rollback`), Puma runs under systemd, Caddy does HTTPS. Setup is in `SERVER.md`; config in `config/deploy.rb` and `config/server/`. Backups: Litestream streams the primary database to a private Backblaze B2 bucket, with a 30-day lifecycle rule (restore tested). The repo is public (`jamis/study-carrel`, MIT). Gotchas on this small droplet: bundle with one job, and 1 GB of swap.
-19b. ✅ **Random.** "Random" on the library, each collection and each work (and in the reader's menu) drops you into a random unit in lectio mode: uniform within a work or collection; the library picks a collection first. It moves your position like normal reading.
-20. ✅ **Polish.** An accessibility pass (lang, focus rings, live verse, aria state), feedback when a note fails to save, diagonal swipes ignored, a phone pass (two-row nav with a ⋯ menu, no zoomed-out page on long chapters, strip drags no longer turn the page), empty states (no texts loaded, empty library, "Add one" link on a focus with no description), edit-note (inline Lexxy form in a Turbo Frame; no "edited" marker), and a keyboard pass (Esc closes the focus dropdown and notes sheet, the verse strip is a single tab stop, a closed phone sheet is out of the tab order). Checked on a real iPhone: installs to the home screen and looks right.
-
-**proof-of-concept is complete.**
-
-## Needed for v1
-
-- **History.** Built (see DECISIONS.md). Show where you've been recently (random hops make this matter) and jump straight back to any of those places. Global per user, not per focus, so a trail survives starting a new focus.
-- **Bookmarks/Favorites** (built as "Keep"; see DECISIONS.md). Sometimes I'll stumble across something profound that's unrelated to my current focus, but which I want to remember to come back to.
-- ✅ **Random, extended** (2026-10-05; see DECISIONS.md). The reader's Random defaults to the innermost collection (or the work, if it has none), with the wider scopes behind a ▾ in the menu, and rolls are balanced across the library's branches. Tried and dropped: an "Another" button in the reader and configurable weighting.
-- ✅ **Prose by sentence** (2026-10-06; see DECISIONS.md). Every work in the Prose collection is read a sentence at a time, with ¶ opening each paragraph and the whole paragraph one tap (or `p`) away; search and Random work on sentences. Deploy: run `study_carrel:load_texts` after deploying, which moves existing prose notes, keeps and history to their paragraph's first sentence.
-- ✅ **Library Search** (2026-10-05; see DECISIONS.md). Search the entire library, or within a collection or work. SQLite FTS5 over unit text; results in reading order with a count per work. Not yet: matching work/section titles or references ("Psalm 23"), searching your own notes.
+History, Keep, Random extended, Library search, Prose by sentence, User texts (prose, then poetry and lyrics). Deploy notes still worth knowing: after deploying prose-by-sentence changes, run `study_carrel:load_texts`; after schema changes, `bin/rails db:migrate`.
 
 ## Later (wanted, not scheduled)
 
-- **New user signups.** Done (invitation links). Not yet: password reset, removing users or revoking access, emailing invitations, encrypting notes.
-- **More works**. Religious texts, as well as more classics and poetry. Done: KJV New Testament, Book of Mormon, Poe, Frost, Dhammapada, Tao Te Ching, Bhagavad Gita, Quran (Rodwell, traditional sura order restored), Marcus Aurelius. Candidates: Upanishads, Analects, Zhuangzi, Apocrypha, Augustine, Thomas à Kempis, Whitman, Blake, Shakespeare's sonnets, Emerson.
+- **Accounts.** Invitations are done. Not yet: password reset, removing users or revoking access, emailing invitations.
+- **More works.** Religious texts, as well as more classics and poetry. Candidates: Upanishads, Analects, Zhuangzi, Apocrypha, Augustine, Thomas à Kempis, Whitman, Blake, Shakespeare's sonnets.
 - **Doctrine and Covenants and Pearl of Great Price.** Deferred: no clean public-domain text exists online. The Wikisource D&C is the modern copyrighted text. Options are OCR of the 1908 Deseret News D&C (archive.org `thedoctrineandco00smituoft`) cross-checked against two other pre-1923 scans, and the 1913 Pearl of Great Price on Wikisource. Label both as older public-domain editions; D&C 138 and the Official Declarations would be missing.
-- ✅ **User texts** (2026-10-06; see DECISIONS.md). Private prose texts a user adds as plain text, read a sentence at a time: add, review, read, search, Random, revise and delete, with notes on sentences a revision or deletion takes away set aside as detached notes. Deploy: run `bin/rails db:migrate`.
 - **Deleting foci.** Not supported yet. Detaching its notes (as for a deleted text) may be the way to do it, so nothing written is lost by accident.
+- **Random over kept passages.**
+- **Search, extended.** Matching work/section titles and references ("Psalm 23"); searching your own notes.
 - **Backups, extended.** A scheduled restore check, and a resize to 1 GB if the 512 MB droplet feels tight.
-- **Encrypted notes, foci.** Keep personal information private.
+- **Encryption at rest** for notes, foci and user texts.
 
-## Notes
+## Deferred from v1
 
-- Suggested first batch: steps 1-3 together, then check in after step 6.
-- Deferred from v1 (see `DECISIONS.md`): full-chapter reading view, verse ranges, word-level highlights, cross-reference links, Margin Map / Synthesis, offline support.
+Full-chapter reading view, verse ranges, word-level highlights, cross-reference links (`@Psalm 23:1`) with previews, a "current answer" document with version history, Margin Map / Synthesis, offline support.
