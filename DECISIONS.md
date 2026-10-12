@@ -18,7 +18,7 @@ This is the index. Each line is the rule in force; the linked file has the detai
 | Topic | In force | Details |
 |---|---|---|
 | Foci | One at a time; stands directly over the passage, unlabeled soft italic with a thought bubble and a rule across the column, scrolling with it. Home (`/` signed in) is the focuses page: an index card per focus, the current one wide with the way back into reading. | [foci-and-notes](docs/decisions/foci-and-notes.md) |
-| Notes | One per unit per focus (unique index), always-open autosaving Lexxy editor docked right / bottom sheet on phones. Each focus has its own notes page (`/foci/:id/notes`), "Notes on this focus" in the menu; no page across focuses. | [foci-and-notes](docs/decisions/foci-and-notes.md) |
+| Notes | One per unit per focus (unique index), always-open autosaving Lexxy editor docked right / bottom sheet on phones. Each focus has its own notes page (`/foci/:id/notes`), "Notes on this focus" in the menu; no page across focuses. It's laid out as in the reader, passages left under the focus and notes on a sheet at right; the passage cell links back into reading. | [foci-and-notes](docs/decisions/foci-and-notes.md) |
 | Users | A few invited people; single-use invitation links, no email; 30-day sessions; sign out everywhere. | [users](docs/decisions/users.md) |
 | Landing page | Public `/` for visitors, with its own layout; no contact address anywhere. | [users](docs/decisions/users.md) |
 | Reader | Lectio only: one unit at a time, `‹ n of N ›` and a verse grid; left-aligned, ~34em measure, type steps down for long units. Design reference: `prototype/reader/e.html`. | [reader](docs/decisions/reader.md) |

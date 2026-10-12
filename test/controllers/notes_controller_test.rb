@@ -51,13 +51,22 @@ class AllNotesTest < ActionDispatch::IntegrationTest
 
     get focus_notes_path(@focus)
     assert_response :success
-    assert_select ".fv-ref", count: 2
-    assert_select ".fv-ref" do |refs|
+    assert_select ".nb-ref", count: 2
+    assert_select ".nb-ref" do |refs|
       assert_equal [ "Isaiah 40:3", "Isaiah 40:25" ], refs.map { |r| r.text.strip }
     end
-    assert_select ".fv-item:first-of-type .fv-note", 1
-    assert_select ".fv-ref[href=?]", reading_path("isaiah-kjv", 40, 25)
-    assert_select ".fv-note", text: /not mine/, count: 0
+    assert_select ".nb-note", 2
+    assert_select ".nb-linked a.nb-ref[href=?]", reading_path("isaiah-kjv", 40, 25)
+    assert_select ".nb-note", text: /not mine/, count: 0
+  end
+
+  test "a detached note has its passage but nothing to open" do
+    @focus.detached_notes.create!(user: users(:one), citation: "Morning 3", work_title: "Morning", passage: "Grey field.",
+                                  reason: "revised", noted_at: 1.day.ago, edited_at: 1.day.ago, content: "<p>set apart</p>")
+    get focus_notes_path(@focus)
+    assert_select ".nb-detached .nb-ref", "Morning 3"
+    assert_select ".nb-detached a", 0
+    assert_select ".nb-detached + .nb-note", /set apart/
   end
 
   test "empty state" do
@@ -76,9 +85,9 @@ class AllNotesTest < ActionDispatch::IntegrationTest
     now = users(:one).foci.start!(title: "Now")
     get focus_notes_path(@focus.reload)
     assert_response :success
-    assert_select ".page-title", "Holy"
-    assert_select ".page-lede", /· #{@focus.created_at.strftime("%b %Y")}/
-    assert_select ".fv-note", /from before/
+    assert_select ".nb-focus-title", "Holy"
+    assert_select ".nb-lede", /· #{@focus.created_at.strftime("%b %Y")}/
+    assert_select ".nb-note", /from before/
     assert_select "a.menu-item[href=?]", focus_notes_path(now)
     assert_equal now, users(:one).foci.current_one, "reading them doesn't make it current"
   end
@@ -94,8 +103,8 @@ class AllNotesTest < ActionDispatch::IntegrationTest
     @focus.notes.create!(unit: long, content: "x")
     @focus.notes.create!(unit: verse(4), content: "y")
     get focus_notes_path(@focus)
-    assert_select ".fv-quote.clamped", 1
-    assert_select ".fv-more", 1
+    assert_select ".nb-quote.clamped", 1
+    assert_select ".nb-more", 1
   end
 end
 

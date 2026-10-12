@@ -45,7 +45,17 @@ Notes that lose their unit (a revised or deleted user text) become detached note
 
 ## Notes pages
 
-**Every focus has its own notes page**, `/foci/:id/notes` (decided 2026-10-12; it was one "All notes" page at `/notes`, which showed only the current focus's notes despite the name). The page is titled with the focus, under "Your focuses", and lists its notes in reading order with their passages, then its detached notes; Copy Markdown and Download `.md` export the same. A past focus's page adds its dates to the line under the title. The rail stays the current focus's.
+**Every focus has its own notes page**, `/foci/:id/notes` (decided 2026-10-12; it was one "All notes" page at `/notes`, which showed only the current focus's notes despite the name). The page is titled with the focus, under "Your focuses", and lists its notes in reading order with their passages, then its detached notes; Copy Markdown and Download `.md` export the same. A past focus's page adds its dates to the count line. The rail stays the current focus's.
+
+**Laid out beside the text, as in the reader** (decided 2026-10-12): the passages down the left under the focus, the notes on a sheet of paper down the right that runs the length of the page, each note level with its passage. On phones, one column: each passage, then its note on a slip of paper under it.
+
+- The focus is set as it stands over the passage in the reader (thought bubble, soft italic, 19–22px, its description faint below, a rule under it), well clear of the page head. It used to be a 36px accent heading crowded against the top, and the passage, italic, looked too much like the note under it, especially for long verses and stanzas.
+- The count, "9 notes, in reading order", heads the sheet.
+- Passage and note never share a colour or a side: the passage in soft ink on the desk, the note in full ink on paper. Passages over 300 characters or four lines clamp to four lines, with "Show full passage".
+- **The passage cell is the way back into reading**, to that passage with its note open. The reference is set as a link, with the Continue reading icon and "Open" at the end of its line, and the link stretches over the whole cell. Pointing anywhere on it washes the cell, underlines the reference and draws an accent rule down its note, so you see which passage and note you'd open. On phones "Open" always shows. "Show full passage" stays its own button. The note itself isn't a link, so it can be selected and copied; the passage text can't be selected here.
+- Detached notes follow under "From passages that changed or were removed", in the same two columns: the reference grey and not a link (there's nothing to open), why it was set aside, and Discard under the note.
+
+Prototyped against the old single column with the passage stepped back (an epigraph), notes as index cards, and a commonplace book with each passage folded to its first words in the margin; the prototypes were discarded.
 
 - The ⋯ menu's item is "Notes on this focus (12)", for the current focus. The cards link each focus's count to its page.
 - `/notes` still works: it redirects to the current focus's page.

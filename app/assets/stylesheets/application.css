@@ -557,6 +557,91 @@ a.fv-ref:hover { text-decoration: underline; }
 @media (max-width: 599px) { .page-actions .wide-only { display: none; } }
 .fv-quote { white-space: pre-line; }
 
+/* ---------- a focus's notes page (notes/index) ---------- */
+/* As in the reader: the passages down the left under the focus, the notes on a sheet of paper down the right that
+   runs the length of the page, each note level with its passage. Passage and note never share a size or colour. */
+.notes-page { max-width: 1120px; }
+.nb-sheet { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin-top: 36px; }
+.nb-sheet::before {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 50%; right: 0;
+  background: var(--paper); border-left: 1px solid var(--rule); border-radius: 0 6px 6px 0; box-shadow: var(--shadow);
+}
+.nb-sheet.nb-empty::before { display: none; }
+.nb-sheet > * { position: relative; grid-column: 1; }
+
+/* The focus as it stands over the passage in the reader, no bigger; the count heads the sheet. */
+.nb-focus { padding: 0 40px 14px 0; border-bottom: 1px solid var(--rule); }
+.nb-focus-head { display: flex; align-items: flex-start; gap: 8px; }
+.nb-focus-head .focus-mark { margin-top: .4em; }
+.nb-focus-title { margin: 0; font-size: clamp(19px, 2.4vw, 22px); line-height: 1.3; font-weight: 400; font-style: italic; color: var(--ink-soft); text-wrap: balance; }
+.nb-focus-desc { margin: 6px 0 0 25px; font-size: 15px; font-style: italic; color: var(--ink-faint); white-space: pre-line; }
+.nb-lede {
+  grid-column: 2; align-self: end; margin: 0; padding: 18px 28px 14px 32px; border-bottom: 1px solid var(--rule);
+  font: 600 11px var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint);
+}
+.nb-sheet .page-empty { padding-top: 22px; }
+
+.nb-passage { padding: 26px 40px 26px 0; }
+.nb-note { grid-column: 2; padding: 26px 28px 26px 32px; font-size: 17px; line-height: 1.6; transition: box-shadow .15s; }
+.nb-note + .nb-passage { border-top: 1px solid var(--rule); }
+.nb-note .lexxy-content > :first-child { margin-top: 0; }
+.nb-note .lexxy-content > :last-child { margin-bottom: 0; }
+.nb-note-actions { margin-top: 12px; }
+.nb-ref-row { display: flex; align-items: center; gap: 8px; }
+.nb-ref { font: 600 13px var(--sans); color: var(--accent); text-decoration: none; }
+.nb-quote { margin: 6px 0 0; font-size: 17px; line-height: 1.55; color: var(--ink-soft); white-space: pre-line; }
+.nb-quote.clamped { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.nb-more { margin-top: 4px; border: 0; background: none; padding: 0; color: var(--accent); font: 12px var(--sans); cursor: pointer; }
+.nb-more:hover { text-decoration: underline; }
+
+/* The passage cell is the way to that passage (and its note) in the reader: the reference is a link, with the
+   Continue reading icon and "Open" at the end of its line, and the link stretches over the whole cell. Pointing
+   anywhere on it washes the cell, underlines the reference and marks its note at right. "Show full passage" stays
+   its own button, above the link. */
+.nb-linked { z-index: 0; } /* so the wash sits behind everything in the cell */
+.nb-linked::before {
+  content: ""; position: absolute; z-index: -1; inset: 8px 18px 8px -14px; border-radius: 8px; transition: background .15s;
+}
+.nb-linked > :not(.nb-ref-row) { position: relative; }
+.nb-linked .nb-ref::after { content: ""; position: absolute; z-index: 2; inset: 8px 18px 8px -14px; border-radius: 8px; }
+.nb-linked .nb-more { z-index: 3; }
+.nb-open {
+  display: inline-flex; align-items: center; gap: 5px; margin-left: auto; font: 12px var(--sans); color: var(--ink-faint);
+  opacity: 0; transition: opacity .15s;
+}
+.nb-open svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.nb-linked:is(:hover, :has(:focus-visible))::before { background: color-mix(in srgb, var(--accent-soft) 70%, transparent); }
+.nb-linked:hover .nb-ref { text-decoration: underline; text-underline-offset: 3px; }
+.nb-linked:is(:hover, :has(:focus-visible)) .nb-open { opacity: 1; color: var(--accent); }
+.nb-linked:hover .nb-quote { color: var(--ink); }
+.nb-linked:is(:hover, :has(:focus-visible)) + .nb-note { box-shadow: inset 3px 0 0 var(--accent); }
+.nb-linked .nb-ref:focus-visible { outline: 0; }
+.nb-linked .nb-ref:focus-visible::after { outline: 2px solid var(--accent); }
+
+.nb-detached-head {
+  grid-column: 1 / -1; margin: 0; padding: 40px 0 0;
+  font: 600 11px var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint);
+}
+.nb-detached .nb-ref { color: var(--ink-faint); } /* its passage is gone: nothing to open */
+.nb-why { margin: 2px 0 0; font: 12px var(--sans); color: var(--ink-faint); }
+
+/* Phones: one column. The passage on the desk, its note on a slip of paper under it; "Open" always shows. */
+@media (max-width: 899px) {
+  .nb-sheet { display: block; margin-top: 28px; }
+  .nb-sheet::before, .nb-lede { display: none; }
+  .nb-focus { padding-right: 0; }
+  .nb-passage { padding: 26px 0 0; }
+  .nb-note + .nb-passage { border-top: 0; margin-top: 8px; }
+  .nb-note {
+    margin-top: 12px; padding: 14px 16px 16px; background: var(--paper);
+    border: 1px solid var(--rule); border-radius: 6px; box-shadow: 0 1px 0 var(--rule);
+  }
+  .nb-quote { font-size: 16px; }
+  .nb-open { opacity: 1; }
+  .nb-linked:hover + .nb-note { box-shadow: 0 1px 0 var(--rule); }
+  .nb-linked:active::before { background: color-mix(in srgb, var(--accent-soft) 70%, transparent); }
+}
+
 /* ---------- library pages ---------- */
 .works { display: flex; flex-direction: column; }
 .work-link { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--rule); text-decoration: none; color: var(--ink); }
