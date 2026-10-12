@@ -21,19 +21,10 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".works li", text: "Old Testament", count: 0
   end
 
-  test "sends a focus with no reading yet to the library" do
+  test "home for a signed-in reader is the focuses page" do
     users(:one).foci.start!(title: "Holy")
     sign_in_as users(:one)
     get root_path
-    assert_redirected_to library_path
-  end
-
-  test "resumes the last verse read under the focus" do
-    focus = users(:one).foci.start!(title: "Holy")
-    unit = Unit.joins(:section).order("sections.number", :number).first
-    focus.update!(last_unit: unit)
-    sign_in_as users(:one)
-    get root_path
-    assert_redirected_to reading_path("isaiah-kjv", unit.section.number, unit.number)
+    assert_redirected_to foci_path
   end
 end

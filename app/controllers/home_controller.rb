@@ -1,17 +1,9 @@
 class HomeController < ApplicationController
   allow_unauthenticated_access only: :index
 
+  # Visitors get the landing page; signed in, home is the focuses page.
   def index
-    return render_landing unless authenticated?
-
-    focus = Current.focus or return redirect_to new_focus_path
-
-    if (unit = focus.last_unit)
-      return redirect_to reading_path(unit.section.work.slug, unit.section.number, unit.number)
-    end
-
-    # Nothing read yet under this focus: let them choose where to begin.
-    redirect_to library_path
+    authenticated? ? redirect_to(foci_path) : render_landing
   end
 
   private

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Home C: Contents</title>
+<link rel="stylesheet" href="common.css">
+<script src="common.js"></script>
+<style>
+  main { padding: 32px 16px 96px; }
+  .page {
+    max-width: 44em; margin: 0 auto; padding: clamp(28px, 6vw, 64px) clamp(20px, 6vw, 72px) 56px;
+    background: var(--paper); border: 1px solid var(--rule); box-shadow: var(--shadow); border-radius: 2px;
+  }
+  .page h1 { text-align: center; font-weight: 400; font-size: 15px; letter-spacing: .3em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 6px; }
+  .page .rule { width: 60px; height: 1px; background: var(--accent); margin: 0 auto 36px; opacity: .6; }
+
+  .year { font-family: var(--sans); font-size: 12px; color: var(--ink-faint); letter-spacing: .1em; margin: 28px 0 6px; }
+  .year:first-of-type { margin-top: 0; }
+  ol { list-style: none; margin: 0; padding: 0; }
+
+  details { border-bottom: 1px solid transparent; }
+  details[open] { border-bottom-color: var(--rule); padding-bottom: 14px; margin-bottom: 6px; }
+  summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 2.6em 1fr auto; align-items: baseline; padding: 7px 0; }
+  summary::-webkit-details-marker { display: none; }
+  summary .num { font-variant: small-caps; color: var(--ink-faint); font-size: 15px; }
+  summary .t { display: flex; align-items: baseline; min-width: 0; font-size: 19px; }
+  summary .t span { flex: 0 1 auto; }
+  summary .t::after { content: ""; flex: 1; min-width: 1.5em; margin: 0 8px; border-bottom: 1.5px dotted var(--ink-faint); transform: translateY(-5px); }
+  summary .n { font-family: var(--sans); font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  summary:hover .t span { color: var(--accent); }
+  li.current summary .t span { font-style: italic; }
+  li.current summary .num { color: var(--accent); }
+  li.current summary .num::before { content: "❧"; margin-left: -1.4em; position: absolute; color: var(--accent); font-variant: normal; }
+  summary .num { position: relative; }
+
+  .open { margin-left: 2.6em; }
+  .open .meta { margin-bottom: 8px; }
+  .open .desc { margin: 0 0 10px; color: var(--ink-soft); font-size: 17px; }
+  .open blockquote { margin: 0 0 12px; padding-left: 14px; border-left: 2px solid var(--rule); }
+  .open blockquote .meta { margin: 4px 0 0; }
+  .open .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+  .colophon { text-align: center; margin-top: 40px; }
+  .colophon a { font-style: italic; text-decoration: none; }
+  .colophon a:hover { text-decoration: underline; }
+  @media (max-width: 520px) {
+    main { padding: 0 0 80px; }
+    .page { border: 0; box-shadow: none; }
+    summary { grid-template-columns: 2em 1fr auto; }
+    .open { margin-left: 2em; }
+  }
+</style>
+</head>
+<body>
+<div data-top></div>
+<main>
+  <div class="page">
+    <h1>Contents</h1>
+    <div class="rule"></div>
+    <div id="toc"></div>
+    <p class="colophon"><a href="#">Begin a new question…</a></p>
+  </div>
+</main>
+<div data-switch></div>
+<script>
+  const roman = (n) => [["x", 10], ["ix", 9], ["v", 5], ["iv", 4], ["i", 1]].reduce((s, [r, v]) => { while (n >= v) { s += r; n -= v; } return s; }, "");
+
+  Home.render = () => {
+    const { esc, span, plural } = Home;
+    // oldest is i; the newest (current) sits at the top, as a notebook you keep adding to
+    const total = FOCI.length;
+    const byYear = new Map();
+    FOCI.forEach((f, i) => {
+      const y = f.started.slice(0, 4);
+      if (!byYear.has(y)) byYear.set(y, []);
+      byYear.get(y).push({ f, n: total - i });
+    });
+    document.getElementById("toc").innerHTML = [...byYear].map(([y, items]) => `
+      <div class="year">${y}</div>
+      <ol>${items.map(({ f, n }) => `
+        <li class="${f.current ? "current" : ""}">
+          <details ${f.current ? "open" : ""}>
+            <summary><span class="num">${roman(n)}.</span><span class="t"><span>${esc(f.title)}</span></span><span class="n">${f.notes}</span></summary>
+            <div class="open">
+              <div class="meta">${f.current ? "Current · " : ""}${span(f)} · ${f.works.join(", ")}</div>
+              ${f.description ? `<p class="desc">${esc(f.description)}</p>` : ""}
+              <blockquote><span class="quote">${esc(f.latest.text)}</span><div class="meta">${esc(f.latest.ref)}, ${f.latest.when}</div></blockquote>
+              <div class="actions">
+                ${f.current
+                  ? `<a class="chip primary" href="${Home.read}">Continue at ${esc(f.last.ref)}</a>`
+                  : `<button class="chip" type="button" data-restore="${f.id}">Make current</button>`}
+                <a class="chip" href="#">${plural(f.notes, "note")}</a>
+                ${f.current ? `<a class="chip" href="#">Edit</a>` : ""}
+              </div>
+            </div>
+          </details>
+        </li>`).join("")}
+      </ol>`).join("");
+  };
+</script>
+</body>
+</html>

@@ -26,6 +26,7 @@ class InvitationsFlowTest < ActionDispatch::IntegrationTest
     sam = User.find_by!(email_address: "sam@example.com")
     assert_not sam.admin?
     follow_redirect!
+    follow_redirect!
     assert_redirected_to new_focus_path   # signed in, with nothing begun yet
 
     sign_out

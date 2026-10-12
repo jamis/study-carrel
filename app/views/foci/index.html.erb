@@ -1,33 +1,44 @@
 <% content_for :title, "Focuses · Study Carrel" %>
-<main class="page">
-  <div class="page-bar">
-    <%= link_to "← Back to reading", root_path, class: "chip" %>
-    <%= link_to "New focus", new_focus_path, class: "chip" %>
+<%= render "shared/header", crumbs: [ [ "Focuses", foci_path ] ], focus: @current %>
+<%# Home for a signed-in reader: every focus as an index card. The current one is wide, ribboned, and the way back
+    into reading; past ones can be made current again. %>
+<main class="cards-page">
+  <h1 class="page-title">Your focuses</h1>
+  <div class="cards">
+    <% if (focus = @current) %>
+      <article class="card card-current">
+        <div class="card-ribbon" aria-hidden="true"></div>
+        <div class="card-label">Current · <%= focus_span(focus) %></div>
+        <h2 class="card-title"><%= focus.title %></h2>
+        <% if focus.description.present? %><p class="card-desc"><%= focus.description %></p><% end %>
+        <%# The way back into reading: its own panel, so it doesn't read as one more line of text. %>
+        <% if (unit = focus.last_unit) %>
+          <%= link_to continue_path, class: "card-continue" do %>
+            <span class="card-continue-go">Continue at <%= unit.reference %> →</span>
+            <span class="card-passage"><%= truncate(unit.body, length: 140, separator: " ") %></span>
+          <% end %>
+          <%= link_to "or find something new in the library →", library_path, class: "card-elsewhere" %>
+        <% else %>
+          <%= link_to continue_path, class: "card-continue" do %><span class="card-continue-go">Choose where to begin →</span><% end %>
+        <% end %>
+        <div class="card-foot">
+          <span class="card-notes"><%= notes_line(@note_counts.fetch(focus.id, 0), @works_read.fetch(focus.id, []), link: notes_path) %></span>
+        </div>
+      </article>
+    <% end %>
+    <% @past.each do |focus| %>
+      <article class="card">
+        <div class="card-label"><%= focus_span(focus) %></div>
+        <h2 class="card-title"><%= focus.title %></h2>
+        <% if focus.description.present? %><p class="card-desc card-clamp"><%= focus.description %></p><% end %>
+        <div class="card-foot">
+          <span class="card-notes"><%= notes_line(@note_counts.fetch(focus.id, 0), @works_read.fetch(focus.id, [])) %></span>
+          <%= button_to "Make current", restore_focus_path(focus), method: :patch, class: "chip", form_class: "inline-form" %>
+        </div>
+      </article>
+    <% end %>
+    <%= link_to new_focus_path, class: "card card-new" do %>
+      <span class="card-new-plus">+</span>A new question
+    <% end %>
   </div>
-  <h2 class="page-title">Focuses</h2>
-
-  <% if @current %>
-    <h3 class="page-sub">Current</h3>
-    <div class="list-row">
-      <%# Home resumes the current focus where it was left (or opens the library if nothing is read yet). %>
-      <div class="list-row-title"><%= link_to @current.title, root_path,
-            title: (@current.last_unit ? "Continue reading at #{@current.last_unit.reference}" : "Choose where to begin") %></div>
-      <div class="list-row-meta">since <%= l @current.created_at.to_date, format: :long %></div>
-    </div>
-  <% end %>
-
-  <h3 class="page-sub">Past</h3>
-  <% if @past.empty? %>
-    <p class="page-empty">Nothing here yet. Focuses you set aside will be kept here.</p>
-  <% end %>
-  <% @past.each do |focus| %>
-    <div class="list-row">
-      <div class="list-row-title"><%= focus.title %></div>
-      <% if focus.description.present? %><div class="list-row-desc"><%= focus.description %></div><% end %>
-      <div class="list-row-meta">
-        <%= l focus.created_at.to_date, format: :long %> – <%= l focus.archived_at.to_date, format: :long %>
-        · <%= button_to "Make current", restore_focus_path(focus), method: :patch, class: "chip", form_class: "inline-form" %>
-      </div>
-    </div>
-  <% end %>
 </main>

@@ -1,7 +1,7 @@
 <% content_for :title, "Kept · Study Carrel" %>
 <main class="page">
   <div class="page-bar">
-    <%= link_to safe_join(["← Back", tag.span(" to reading", class: "wide-only")]), root_path, class: "chip" %>
+    <%= link_to safe_join(["← Back", tag.span(" to reading", class: "wide-only")]), continue_path, class: "chip" %>
     <% if @keeps.any? %>
       <span class="page-bar-actions" aria-label="Order">
         <%= link_to "Newest", kept_path, class: "chip#{" current" unless params[:order] == "reading"}" %>

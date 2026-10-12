@@ -11,6 +11,17 @@ class Focus < ApplicationRecord
 
   scope :past, -> { where.not(archived_at: nil).order(archived_at: :desc) }
 
+  # For the focuses page, called on a set of foci (user.foci): a query apiece, keyed by focus id.
+  def self.note_counts = Note.where(focus_id: select(:id)).group(:focus_id).count
+
+  # The titles of the works each focus has notes in, in library order.
+  def self.works_read
+    Work.joins(sections: { units: :notes }).where(notes: { focus_id: select(:id) })
+        .group("notes.focus_id", "works.id").order("works.position", "works.id")
+        .pluck("notes.focus_id", "works.title")
+        .group_by(&:first).transform_values { |pairs| pairs.map(&:last) }
+  end
+
   def notes_in_reading_order
     notes.includes(:rich_text_content, unit: { section: :work })
          .joins(unit: { section: :work })

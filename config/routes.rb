@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   patch "position", to: "positions#update"
+  get "continue", to: "continuations#show"
   resources :foci, only: %i[index new create edit update] do
     member do
       patch :restore

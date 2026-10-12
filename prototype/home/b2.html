@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Home B2: Card File</title>
+<link rel="stylesheet" href="common.css">
+<script src="common.js"></script>
+<style>
+  :root { --card: #fffdf7; --card-2: #f8f3e8; }
+  :root[data-theme="dark"] { --card: #231e17; --card-2: #1f1a14; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --card: #231e17; --card-2: #1f1a14; } }
+
+  main { max-width: 640px; margin: 0 auto; padding: 32px 16px 96px; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 30px; }
+  .head h1 { font-size: clamp(26px, 4.5vw, 34px); font-weight: 400; margin: 0; }
+  .head a { font-family: var(--sans); font-size: 14px; text-decoration: none; }
+
+  /* the file: each card has a tab sticking up; tabs step across in thirds like a real card file */
+  .file { position: relative; padding-top: 26px; }
+  .card { position: relative; margin-top: -6px; }
+  .tab {
+    position: absolute; top: -26px; height: 27px; width: 33.333%; padding: 4px 14px 0; border: 1px solid var(--rule); border-bottom: 0;
+    border-radius: 8px 8px 0 0; background: var(--card-2); font-family: var(--sans); font-size: 12px; color: var(--ink-soft);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
+  }
+  .card:nth-child(3n+1) .tab { left: 0; }
+  .card:nth-child(3n+2) .tab { left: 33.333%; }
+  .card:nth-child(3n) .tab { left: 66.666%; }
+  .card + .card { margin-top: 20px; }
+  .body {
+    position: relative; border: 1px solid var(--rule); border-radius: 0 0 4px 4px; background: var(--card-2);
+    box-shadow: 0 -2px 6px rgba(60, 40, 20, .04);
+  }
+  .card:nth-child(3n+1) .body { border-top-left-radius: 0; }
+  .card:not(:nth-child(3n+1)) .body { border-top-left-radius: 4px; }
+  .card:nth-child(3n) .body { border-top-right-radius: 0; }
+
+  /* filed: only the title shows, as if you were looking down into the box */
+  .pull { display: block; width: 100%; text-align: left; border: 0; background: transparent; padding: 12px 18px 14px; }
+  .pull .t { font-size: 19px; font-style: italic; }
+  .pull:hover .t { color: var(--accent); }
+  .full { display: none; padding: 6px 22px 22px; }
+
+  /* pulled up: the card comes forward and shows everything */
+  .card.out .tab, .card.out .body { background: var(--card); }
+  .card.out .body { box-shadow: var(--shadow); }
+  .card.out .tab { color: var(--accent); font-weight: 600; z-index: 1; }
+  .card.out .pull { display: none; }
+  .card.out .full { display: block; }
+  .full h2 { margin: 12px 0 8px; font-size: clamp(24px, 4.5vw, 30px); font-weight: 400; font-style: italic; line-height: 1.25; }
+  .full .desc { color: var(--ink-soft); margin: 0 0 14px; }
+  .full .resume { display: block; margin: 16px 0; padding: 12px 14px; border-left: 2px solid var(--accent); background: var(--bg); text-decoration: none; color: inherit; border-radius: 0 6px 6px 0; }
+  .full .resume:hover { background: var(--accent-soft); }
+  .full .resume .go { color: var(--accent); }
+  .full .resume p { margin: 2px 0 0; }
+  .full ul { list-style: none; padding: 0; margin: 14px 0 18px; border-top: 1px solid var(--rule); }
+  .full li { padding: 8px 0; border-bottom: 1px solid var(--rule); }
+  .full li .meta { font-size: 12px; }
+  .full li .quote { display: block; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  @media (max-width: 480px) { .tab { font-size: 11px; padding: 5px 8px 0; } }
+</style>
+</head>
+<body>
+<div data-top></div>
+<main>
+  <div class="head">
+    <h1>Your foci</h1>
+    <a href="#">+ New focus</a>
+  </div>
+  <div class="file" id="file"></div>
+</main>
+<div data-switch></div>
+<script>
+  let out = null;
+
+  Home.render = () => {
+    const { esc, span, plural } = Home;
+    if (!FOCI.some((f) => f.id === out)) out = FOCI[0].id;
+    document.getElementById("file").innerHTML = FOCI.map((f) => `
+      <section class="card ${f.id === out ? "out" : ""}">
+        <div class="tab">${f.current ? "Current" : span(f)}</div>
+        <div class="body">
+          <button class="pull" type="button" data-pull="${f.id}"><span class="t">${esc(f.title)}</span>
+            <span class="meta">· ${plural(f.notes, "note")}</span></button>
+          <div class="full">
+            <h2>${esc(f.title)}</h2>
+            ${f.description ? `<p class="desc">${esc(f.description)}</p>` : ""}
+            <div class="meta">${span(f)} · ${plural(f.notes, "note")} · ${f.keeps} kept · ${f.works.join(", ")}</div>
+            <a class="resume" href="${Home.read}">
+              <span class="meta go">${f.current ? "Continue at" : "Stopped at"} ${esc(f.last.ref)} →</span>
+              <p>${esc(f.last.text)}</p>
+            </a>
+            <div class="label">Latest notes</div>
+            <ul>${[f.latest, ...f.recent].map((n) => `<li><span class="quote">${esc(n.text)}</span><span class="meta">${esc(n.ref)}</span></li>`).join("")}</ul>
+            <div class="actions">
+              ${f.current
+                ? `<a class="chip" href="#">All ${f.notes} notes</a><a class="chip" href="#">Edit</a>`
+                : `<button class="chip primary" type="button" data-restore="${f.id}">Make current</button><a class="chip" href="#">All ${f.notes} notes</a>`}
+            </div>
+          </div>
+        </div>
+      </section>`).join("");
+  };
+
+  document.addEventListener("click", (e) => {
+    const p = e.target.closest("[data-pull]");
+    if (p) { out = Number(p.dataset.pull); Home.render(); }
+  });
+</script>
+</body>
+</html>

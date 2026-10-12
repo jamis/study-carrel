@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Home A: Lectern</title>
+<link rel="stylesheet" href="common.css">
+<script src="common.js"></script>
+<style>
+  main { max-width: 40em; margin: 0 auto; padding: 36px 16px 96px; }
+
+  /* the current focus: large, quiet, with the way back in */
+  .now { padding-bottom: 32px; border-bottom: 1px solid var(--rule); }
+  .now h1 { font-size: clamp(28px, 5.5vw, 40px); font-weight: 400; font-style: italic; line-height: 1.2; margin: 8px 0 12px; }
+  .now .desc { color: var(--ink-soft); font-size: 18px; margin: 0 0 14px; }
+  .now .meta { margin-bottom: 26px; }
+  .resume {
+    display: block; text-decoration: none; color: inherit; padding: 16px 18px; border-left: 2px solid var(--accent);
+    background: var(--paper); border-radius: 0 8px 8px 0;
+  }
+  .resume:hover { background: var(--accent-soft); }
+  .resume .ref { font-family: var(--sans); font-size: 13px; color: var(--accent); }
+  .resume .text { font-size: 19px; margin: 4px 0 0; }
+  .latest { margin: 22px 0 0; }
+  .latest p { margin: 4px 0 0; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+
+  /* past foci */
+  .past h2 { margin: 36px 0 6px; }
+  .row { padding: 14px 0; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: baseline; }
+  .row h3 { margin: 0; font-size: 20px; font-weight: 400; font-style: italic; }
+  .row .meta { grid-column: 1; }
+  .row .chip { grid-row: 1 / span 2; grid-column: 2; align-self: center; opacity: 0; transition: opacity .15s; }
+  .row:hover .chip, .row .chip:focus-visible { opacity: 1; }
+  @media (hover: none) { .row .chip { opacity: 1; } }
+  .row .desc { grid-column: 1; color: var(--ink-soft); font-size: 16px; margin: 2px 0 0; }
+  @media (max-width: 520px) {
+    .row { grid-template-columns: 1fr; }
+    .row .chip { grid-row: auto; grid-column: 1; justify-self: start; margin-top: 6px; }
+  }
+</style>
+</head>
+<body>
+<div data-top></div>
+<main id="home"></main>
+<div data-switch></div>
+<script>
+  Home.render = () => {
+    const { esc, span, plural } = Home;
+    const [cur, ...past] = FOCI;
+    document.getElementById("home").innerHTML = `
+      <section class="now">
+        <div class="label">Your focus</div>
+        <h1>${esc(cur.title)}</h1>
+        ${cur.description ? `<p class="desc">${esc(cur.description)}</p>` : ""}
+        <div class="meta">${span(cur)} · ${plural(cur.notes, "note")} · ${cur.works.join(", ")}</div>
+        <a class="resume" href="${Home.read}">
+          <div class="ref">Continue at ${esc(cur.last.ref)} →</div>
+          <p class="text">${esc(cur.last.text)}</p>
+        </a>
+        <div class="latest">
+          <div class="label">Your last note · ${esc(cur.latest.ref)}, ${cur.latest.when}</div>
+          <p class="quote">${esc(cur.latest.text)}</p>
+        </div>
+        <div class="actions">
+          <a class="chip" href="#">All ${cur.notes} notes</a>
+          <a class="chip" href="#">Edit</a>
+          <a class="chip" href="#">Start a new focus</a>
+        </div>
+      </section>
+      <section class="past">
+        <h2 class="label">Earlier foci</h2>
+        ${past.map((f) => `
+          <div class="row">
+            <h3>${esc(f.title)}</h3>
+            ${f.description ? `<p class="desc">${esc(f.description)}</p>` : ""}
+            <div class="meta">${span(f)} · <a href="#">${plural(f.notes, "note")}</a></div>
+            <button class="chip" type="button" data-restore="${f.id}">Make current</button>
+          </div>`).join("")}
+      </section>`;
+  };
+</script>
+</body>
+</html>

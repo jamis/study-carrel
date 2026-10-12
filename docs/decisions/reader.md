@@ -29,7 +29,7 @@ Left-aligned (ragged right), not centered, and flush with the focus. The text ke
 
 **Minimal** (decided 2026-10-04).
 
-**Library, collection, work, search and kept pages** share a top bar (`shared/_header`), with Random scoped to the collection or work and "Continue reading" in the menu:
+**Library, collection, work, search, kept and focuses pages** share a top bar (`shared/_header`), with Random scoped to the collection or work and "Continue reading" in the menu:
 
 - Collapsible breadcrumbs (Library › collections › work › chapter, no "Study Carrel" brand) and one ⋯ menu.
 - The first and last crumbs always show; middle ones drop out nearest the root first, leaving a "…".

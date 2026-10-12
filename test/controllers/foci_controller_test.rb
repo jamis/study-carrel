@@ -8,6 +8,8 @@ class FociControllerTest < ActionDispatch::IntegrationTest
 
   test "first run: no focus sends you to the new-focus form" do
     get root_path
+    assert_redirected_to foci_path
+    follow_redirect!
     assert_redirected_to new_focus_path
     get reading_path("isaiah-kjv", 40)
     assert_redirected_to new_focus_path
@@ -17,7 +19,7 @@ class FociControllerTest < ActionDispatch::IntegrationTest
 
   test "creating a focus shows it in the band" do
     post foci_path, params: { focus: { title: "What does it mean to be holy?", description: "Set apart or good?" } }
-    assert_redirected_to root_path
+    assert_redirected_to continue_path
     follow_redirect!
     assert_redirected_to library_path
     get reading_path("isaiah-kjv", 1)
@@ -51,7 +53,7 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     get edit_focus_path(@focus)
     assert_response :success
     patch focus_path(@focus), params: { focus: { title: "Holy, revisited" } }
-    assert_redirected_to root_path
+    assert_redirected_to foci_path
     assert_equal "Holy, revisited", @focus.reload.title
   end
 
@@ -64,10 +66,12 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     @focus.archive!
     other = users(:one).foci.start!(title: "Light")
     get foci_path
-    assert_select ".list-row-title", "Light"
-    assert_select ".list-row-title", "Holy"
+    assert_select ".card-current .card-title", "Light"
+    assert_select ".card:not(.card-current) .card-title", "Holy"
+    assert_select "form[action=?] button", restore_focus_path(@focus), text: "Make current"
 
     patch restore_focus_path(@focus)
+    assert_redirected_to foci_path
     assert_equal "Holy", users(:one).foci.current_one.title
     assert other.reload.archived?
     assert_equal 1, Focus.current.count
@@ -80,15 +84,43 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     assert_select ".focus-actions a[href=?]", foci_path
   end
 
-  test "the current focus links to where its reading left off" do
+  test "the current card links to where its reading left off" do
     focus = users(:one).foci.start!(title: "What is holy?")
     get foci_path
-    assert_select ".list-row-title a[href=?][title=?]", root_path, "Choose where to begin", text: "What is holy?"
+    assert_select ".card-current .card-continue[href=?]", continue_path, text: "Choose where to begin →"
+    assert_select ".card-elsewhere", false   # beginning already means choosing in the library
 
     focus.update!(last_unit: verse(3))
     get foci_path
-    assert_select ".list-row-title a[title=?]", "Continue reading at Isaiah 40:3"
-    get root_path
-    assert_redirected_to reading_path("isaiah-kjv", 40, 3)
+    assert_select ".card-current .card-continue", /Continue at Isaiah 40:3/
+    assert_select ".card-current .card-passage", /Prepare ye the way/
+    assert_select ".card-current .card-elsewhere[href=?]", library_path
+  end
+
+  test "each card says how many notes it has and which works they're in" do
+    @focus.notes.create!(unit: verse(3), content: "A thought")
+    @focus.notes.create!(unit: verse(8), content: "Another")
+    @focus.archive!
+    light = users(:one).foci.start!(title: "Light")
+
+    get foci_path
+    assert_select ".card-current .card-notes", "No notes yet"
+    assert_select ".card:not(.card-current)" do
+      assert_select ".card-desc", "Set apart?"
+      assert_select ".card-notes", "2 notes in Isaiah"
+      assert_select ".card-notes a", false   # a past focus's notes have no page yet
+    end
+
+    light.notes.create!(unit: verse(1), content: "Comfort first")
+    get foci_path
+    assert_select ".card-current .card-notes", "1 note in Isaiah"
+    assert_select ".card-current .card-notes a[href=?]", notes_path, text: "1 note"
+  end
+
+  test "another reader's focuses never appear" do
+    users(:two).foci.start!(title: "Someone else's question")
+    get foci_path
+    assert_select ".card-title", text: "Someone else's question", count: 0
+    assert_select ".card-title", count: 1
   end
 end

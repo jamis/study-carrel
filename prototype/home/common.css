@@ -1,0 +1,86 @@
+/* Shared look for the home (focuses) prototypes: the app's tokens, the library top bar and its ⋯ menu. */
+:root {
+  --bg: #f6f1e7;
+  --paper: #fbf8f1;
+  --ink: #2b2620;
+  --ink-soft: #6b6256;
+  --ink-faint: #a39a8c;
+  --rule: #e2d9c8;
+  --accent: #8a4b2a;
+  --accent-soft: #f0dcc9;
+  --hl: #f7e3a4;
+  --shadow: 0 8px 30px rgba(60, 40, 20, .12);
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+:root[data-theme="dark"] {
+  --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685; --ink-faint: #6e665a;
+  --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d; --hl: #5a4a1e;
+  --shadow: 0 8px 30px rgba(0, 0, 0, .5);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685; --ink-faint: #6e665a;
+    --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d; --hl: #5a4a1e;
+    --shadow: 0 8px 30px rgba(0, 0, 0, .5);
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink); overflow-x: clip;
+  font-family: var(--serif); line-height: 1.5; -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- top bar (as shared/_header) ---------- */
+.top { position: sticky; top: 0; z-index: 20; }
+.nav { background: var(--bg); border-bottom: 1px solid var(--rule); }
+.nav-in {
+  position: relative; max-width: 1180px; margin: 0 auto; padding: 10px 16px;
+  display: flex; align-items: center; gap: 12px; font-family: var(--sans); font-size: 14px;
+}
+.crumbs { flex: 1; min-width: 0; font-weight: 600; }
+.icon-btn { border: 0; background: transparent; padding: 6px 8px; border-radius: 8px; font-size: 16px; }
+.icon-btn:hover { background: var(--accent-soft); }
+.menu { position: relative; }
+.menu-panel {
+  display: none; position: absolute; right: 0; top: calc(100% + 6px); min-width: 210px; z-index: 30;
+  flex-direction: column; padding: 6px; background: var(--paper); border: 1px solid var(--rule);
+  border-radius: 10px; box-shadow: var(--shadow);
+}
+.menu-panel.open { display: flex; }
+.menu-item {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  padding: 8px 10px; border: 0; border-radius: 6px; background: transparent; text-align: left;
+  color: var(--ink-soft); text-decoration: none; font-family: var(--sans); font-size: 14px;
+}
+.menu-item:hover { background: var(--accent-soft); color: var(--ink); }
+.menu-item kbd { font: inherit; font-size: 12px; color: var(--ink-faint); }
+.menu-sep { height: 1px; background: var(--rule); margin: 4px 6px; }
+
+/* ---------- shared bits ---------- */
+.chip {
+  display: inline-block; border: 1px solid var(--rule); background: transparent; color: var(--ink-soft);
+  padding: 6px 12px; border-radius: 999px; font-size: 13px; font-family: var(--sans); text-decoration: none; white-space: nowrap;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chip.primary { border-color: var(--accent); color: var(--accent); }
+.label { font-family: var(--sans); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; }
+.meta { font-family: var(--sans); font-size: 13px; color: var(--ink-soft); }
+.quote { font-style: italic; color: var(--ink-soft); }
+.go { font-family: var(--sans); font-size: 14px; text-decoration: none; }
+.go:hover { text-decoration: underline; }
+
+/* the layout switcher tab on the left edge, as in the reader prototypes */
+.switch {
+  position: fixed; left: 0; bottom: 16px; z-index: 40; display: flex; flex-direction: column;
+  font-family: var(--sans); font-size: 12px; background: var(--paper); border: 1px solid var(--rule); border-left: 0;
+  border-radius: 0 8px 8px 0; overflow: hidden; box-shadow: var(--shadow);
+}
+.switch a { padding: 6px 10px; color: var(--ink-soft); text-decoration: none; }
+.switch a:hover { background: var(--accent-soft); }
+.switch a.on { color: var(--accent); font-weight: 600; }

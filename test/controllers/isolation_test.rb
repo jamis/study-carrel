@@ -14,6 +14,7 @@ class IsolationTest < ActionDispatch::IntegrationTest
   test "a new reader starts with no focus, not the owner's" do
     sign_in_as @other
     get root_path
+    follow_redirect!
     assert_redirected_to new_focus_path
     get reading_path("isaiah-kjv", 40, 3)
     assert_redirected_to new_focus_path

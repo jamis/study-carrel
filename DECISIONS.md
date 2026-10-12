@@ -1,6 +1,6 @@
 # Study Carrel: Decisions
 
-Last updated: 2026-10-07
+Last updated: 2026-10-12
 
 A web app for reading text (scripture, poetry, prose) against a **focus**: a question, metaphor, or thesis ("What does it mean to be holy?" while reading Isaiah 40). The reader sees one passage at a time with the focus pinned above it and writes a note on it.
 
@@ -17,10 +17,10 @@ This is the index. Each line is the rule in force; the linked file has the detai
 
 | Topic | In force | Details |
 |---|---|---|
-| Foci | One at a time; compact, quiet, sticky, left-aligned at the top of the reading column. | [foci-and-notes](docs/decisions/foci-and-notes.md) |
+| Foci | One at a time; compact, quiet, sticky, left-aligned at the top of the reading column. Home (`/` signed in) is the focuses page: an index card per focus, the current one wide with the way back into reading. | [foci-and-notes](docs/decisions/foci-and-notes.md) |
 | Notes | One per unit per focus (unique index), always-open autosaving Lexxy editor docked right / bottom sheet on phones. | [foci-and-notes](docs/decisions/foci-and-notes.md) |
 | Users | A few invited people; single-use invitation links, no email; 30-day sessions; sign out everywhere. | [users](docs/decisions/users.md) |
-| Landing page | Public `/` with its own layout; no contact address anywhere. | [users](docs/decisions/users.md) |
+| Landing page | Public `/` for visitors, with its own layout; no contact address anywhere. | [users](docs/decisions/users.md) |
 | Reader | Lectio only: one unit at a time, `‹ n of N ›` and a verse grid; left-aligned, ~34em measure, type steps down for long units. Design reference: `prototype/reader/e.html`. | [reader](docs/decisions/reader.md) |
 | Navigation | Library pages: shared top bar with collapsible crumbs and ⋯ menu. Reader: no top bar, an icon rail on the left (one ⋯ on phones). | [reader](docs/decisions/reader.md) |
 | Library | Collection (nesting) > Work > Section > Unit; optional `author`/`author_short`; bundled corpus built by `script/texts/`. | [library](docs/decisions/library.md) |

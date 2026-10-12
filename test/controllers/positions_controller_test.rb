@@ -28,7 +28,7 @@ class PositionsControllerTest < ActionDispatch::IntegrationTest
 
   test "the app reopens at the saved verse" do
     @focus.update!(last_unit: verse(25))
-    get root_path
+    get continue_path
     assert_redirected_to reading_path("isaiah-kjv", 40, 25)
 
     get reading_path("isaiah-kjv", 40)
@@ -44,7 +44,7 @@ class PositionsControllerTest < ActionDispatch::IntegrationTest
   test "each focus remembers its own place" do
     @focus.update!(last_unit: verse(25))
     users(:one).foci.start!(title: "Next")
-    get root_path
+    get continue_path
     assert_redirected_to library_path
   end
 

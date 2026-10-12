@@ -1,7 +1,7 @@
 <% content_for :title, "Invitations · Study Carrel" %>
 <main class="page">
   <div class="page-bar">
-    <%= link_to "← Back to reading", root_path, class: "chip" %>
+    <%= link_to "← Back to reading", continue_path, class: "chip" %>
   </div>
   <h2 class="page-title">Invitations</h2>
   <p class="page-lede">An invitation is a single-use link that lets one person sign up, good for <%= Invitation::EXPIRES_IN.inspect %>. Anyone who has the link can use it, so send it only to the person you mean.</p>

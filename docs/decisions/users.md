@@ -13,6 +13,6 @@
 
 ## Landing page
 
-**Public landing page at `/`** (decided 2026-10-04) for signed-out visitors, using its own layout (`layouts/landing`, CSS inline) so it can't leak into app styles. Signed-in users still go straight to reading. Prototype: `prototype/landing.html`.
+**Public landing page at `/`** (decided 2026-10-04) for signed-out visitors, using its own layout (`layouts/landing`, CSS inline) so it can't leak into app styles. Signed-in users go to the focuses page (see [foci-and-notes.md](foci-and-notes.md)). Prototype: `prototype/landing.html`.
 
 No contact address or email link anywhere, because signups are by invitation only and the author doesn't want to be reachable by strangers.
