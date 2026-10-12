@@ -22,6 +22,7 @@ This is the index. Each line is the rule in force; the linked file has the detai
 | Users | A few invited people; single-use invitation links, no email; 30-day sessions; sign out everywhere. | [users](docs/decisions/users.md) |
 | Landing page | Public `/` for visitors, with its own layout; no contact address anywhere. | [users](docs/decisions/users.md) |
 | Reader | Lectio only: one unit at a time, `‹ n of N ›` and a verse grid; left-aligned, ~34em measure, type steps down for long units. Design reference: `prototype/reader/e.html`. | [reader](docs/decisions/reader.md) |
+| Clause by clause | Off by default; `;` turns it on until turned off or the reader is left. The current clause highlighted, the rest dimmed; the arrows step by clause. Split in the browser, for reading only: notes stay with the passage. Breaks chosen under the pips. | [reader](docs/decisions/reader.md) |
 | Navigation | One icon rail down the left of every signed-in page: ⋯ at the top, labels shown on hover; Go up (the trail) in the reader, Continue reading elsewhere; the way up above each page's title. One ⋯ top right on phones. | [reader](docs/decisions/reader.md) |
 | Library | Collection (nesting) > Work > Section > Unit; optional `author`/`author_short`; bundled corpus built by `script/texts/`. | [library](docs/decisions/library.md) |
 | Prose by sentence | Prose is read a sentence at a time; split at build time (`sentences.py`), grouped by paragraph, ¶ view with `p`. | [prose-by-sentence](docs/decisions/prose-by-sentence.md) |

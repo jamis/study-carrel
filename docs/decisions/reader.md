@@ -21,6 +21,16 @@ Visual tone (ideas, not decisions): quiet study desk, not a productivity tool. S
 - Prose is read a sentence at a time; see [prose-by-sentence.md](prose-by-sentence.md).
 - Full-chapter reading view deferred as a possible future option.
 
+### Clause by clause
+
+**A long passage can be read a clause at a time** (decided 2026-10-12, in every text, not only prose). Prototype: `prototype/reader/clauses.html`. Of its four looks (Spotlight dimming the rest, Lines setting a clause to a line, Magnify shrinking the rest, Marker highlighting) **Marker with Spotlight's dimming** was chosen: the current clause on a soft highlight, the rest of the passage dimmed in place, nothing reflowed.
+
+- Splitting is done in the browser (`lib/clauses.js`) and only for reading: notes, keeps, history, the reference and `n of N` stay with the whole passage.
+- **Off by default.** `;` (or the ; button after ¶) turns it on, and only that turns it on: clicking the text does not, since that surprised. It then stays on from passage to passage and chapter to chapter until turned off or the reader is left (sessionStorage, cleared by any page that isn't the reader).
+- While on, the arrows (and `j`/`k`, swipe) step a clause at a time and carry on into the next passage; stepping back lands on the previous passage's last clause. `J`/`K` skip a whole passage. Clicking a clause moves there.
+- Breaks at `.` `?` `!` (a verse can hold several sentences, as Jonah 4:2 does; not after an abbreviation or an initial, though "I." still ends one), at `,` `;` `:` (each needing a space after, so 1,000 and 3:16 hold), after `—`, and around `( )` (off by default). A lone word joins the next clause; two words stand alone ("no invention, no hope"), since splitting too often beats too seldom.
+- A pip per clause after the ; shows where you are and opens **Break at**, where each mark can be turned off. That choice is kept in the browser (localStorage), not on the server.
+
 ## Text alignment
 
 Left-aligned (ragged right), not centered, and flush with the focus. The text keeps a ~34em measure at every width (revised 2026-10-05). Type size steps down for longer units (long sentences of prose). Demo of long prose: open `prototype/index.html?text=prose`.

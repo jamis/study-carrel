@@ -1,13 +1,15 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 import { csrfToken, fillId } from "lib/request"
+import { splitClauses, savedBreaks, saveBreaks, clauseMode } from "lib/clauses"
 
 // Switches verses client-side; the whole section is already on the page. Prose is read a sentence at a time: a
 // sentence is cited by its paragraph ("12:3"), the first of a paragraph opens with a ¶, and the whole paragraph is
-// one tap (or p) away.
+// one tap (or p) away. A long passage can also be read a clause at a time (; turns it on and off): the arrows then
+// step through its clauses, marked in place with the rest dimmed, and on into the next passage.
 export default class extends Controller {
   static targets = ["unit", "now", "body", "pilcrow", "prevButton", "nextButton", "position", "ref", "refUnit", "grid", "tick", "editor",
-    "whole", "wholeButton"]
+    "whole", "wholeButton", "clausesButton", "clauseMenu", "pips", "breaks", "mark"]
   static values = { current: Number, base: String, refTemplate: String, refUnitTemplate: String, positionUrl: String, unitName: String,
     groupName: String, noteUrlTemplate: String, prevUrl: String, prevLabel: String, nextUrl: String, nextLabel: String }
 
@@ -29,6 +31,13 @@ export default class extends Controller {
     this.fitRefs = () => this.refTargets.forEach(r => this.fitRef(r))
     this.refObserver = new ResizeObserver(this.fitRefs)
     this.refTargets.filter(r => r.closest(".panel")).forEach(r => this.refObserver.observe(r))
+    this.breaksSet = savedBreaks()
+    const mode = clauseMode.get()
+    this.clausesOn = !!mode
+    this.clause = mode === "last" ? Infinity : 0
+    // Turbo may show a cached copy of the page first; leave "last" for the real one.
+    if (mode === "last" && !document.documentElement.hasAttribute("data-turbo-preview")) clauseMode.set("on")
+    this.renderPassage()
     this.updateMarkers()
     this.announce()
     this.savePosition()
@@ -54,18 +63,30 @@ export default class extends Controller {
     this.select(Number(event.currentTarget.dataset.number))
   }
 
-  // Past either end of the chapter, carry on into the neighboring one.
+  // Reading by clause, step through the passage's clauses first; stepping back lands on the last clause.
   step(delta) {
-    const i = this.numbers.indexOf(this.currentValue) + delta
-    if (i >= 0 && i < this.numbers.length) return this.select(this.numbers[i])
-
-    const url = delta > 0 ? this.nextUrlValue : this.prevUrlValue
-    if (url) Turbo.visit(url)
+    if (this.splitting && this.clauses[this.clause + delta]) {
+      this.clause += delta
+      return this.renderPassage()
+    }
+    this.stepUnit(delta, delta < 0 ? "last" : "first")
   }
 
-  select(number) {
+  // Past either end of the chapter, carry on into the neighboring one.
+  stepUnit(delta, at = "first") {
+    const i = this.numbers.indexOf(this.currentValue) + delta
+    if (i >= 0 && i < this.numbers.length) return this.select(this.numbers[i], at)
+
+    const url = delta > 0 ? this.nextUrlValue : this.prevUrlValue
+    if (!url) return
+    if (this.clausesOn && at === "last") clauseMode.set("last")
+    Turbo.visit(url)
+  }
+
+  select(number, at = "first") {
     if (!this.bodies.has(number)) return
     this.currentValue = number
+    this.clause = at === "last" ? Infinity : 0
     history.replaceState(history.state, "", `${this.baseValue}/${number}`)
     this.render()
     this.savePosition()
@@ -88,14 +109,8 @@ export default class extends Controller {
 
   render() {
     const n = this.currentValue
-    const i = this.numbers.indexOf(n)
-    this.fillStep(this.prevButtonTarget, this.numbers[i - 1], this.prevLabelValue)
-    this.fillStep(this.nextButtonTarget, this.numbers[i + 1], this.nextLabelValue)
     this.positionTarget.textContent = n
-
-    const body = this.bodies.get(n)
-    this.nowTarget.className = ["now", this.sizes.get(n)].filter(Boolean).join(" ")
-    this.bodyTarget.textContent = body
+    this.renderPassage()
     if (this.hasPilcrowTarget) this.pilcrowTarget.hidden = !this.opens.has(n)
     const label = this.labels.get(n)
     this.refUnitTargets.forEach(r => r.textContent = this.refUnitTemplateValue.replace("{n}", label))
@@ -114,6 +129,73 @@ export default class extends Controller {
     // Swapping the frame replaces the editor; the old one saves itself as it goes.
     this.editorTarget.src = fillId(this.noteUrlTemplateValue, this.unitIds.get(n))
     this.announce()
+  }
+
+  // The passage, whole or as clauses with the current one marked, and the steps either side of it. Moving between
+  // clauses redraws only this: the note, the grid and the reference belong to the whole passage.
+  renderPassage() {
+    const n = this.currentValue, i = this.numbers.indexOf(n), body = this.bodies.get(n)
+    this.clauses = splitClauses(body, this.breaksSet)
+    this.clause = Math.max(0, Math.min(this.clauses.length - 1, this.clause))
+    const split = this.splitting
+
+    this.nowTarget.className = ["now", this.sizes.get(n), split && "clauses"].filter(Boolean).join(" ")
+    if (split) {
+      this.bodyTarget.replaceChildren(...this.clauses.flatMap(({ text, gap }, k) => {
+        const span = document.createElement("span")
+        span.className = k === this.clause ? "clause current" : "clause"
+        span.dataset.clause = k
+        span.textContent = text
+        return [span, gap]
+      }))
+    } else {
+      this.bodyTarget.textContent = body
+    }
+
+    const unit = (number) => number !== undefined && `${this.unitNameValue} ${this.labels.get(number)}`
+    const within = (delta) => split && this.clauses[this.clause + delta]
+    this.fillStep(this.prevButtonTarget, within(-1) ? "Previous clause" : unit(this.numbers[i - 1]) || this.prevLabelValue)
+    this.fillStep(this.nextButtonTarget, within(1) ? "Next clause" : unit(this.numbers[i + 1]) || this.nextLabelValue)
+
+    this.clausesButtonTarget.setAttribute("aria-pressed", this.clausesOn)
+    this.clausesButtonTarget.title = this.clausesOn ? `Read the whole ${this.unitNameValue.toLowerCase()} (;)` : "Read clause by clause (;)"
+    this.clauseMenuTarget.hidden = !this.clausesOn
+    this.pipsTarget.replaceChildren(...this.clauses.map((_, k) => {
+      const pip = document.createElement("i")
+      if (split && k === this.clause) pip.className = "current"
+      return pip
+    }))
+    this.pipsTarget.setAttribute("aria-label", `Clause ${this.clause + 1} of ${this.clauses.length}; where to break`)
+    this.markTargets.forEach(m => m.setAttribute("aria-pressed", this.breaksSet.has(m.dataset.mark)))
+  }
+
+  get splitting() { return this.clausesOn && this.clauses.length > 1 }
+
+  toggleClauses() {
+    this.clausesOn = !this.clausesOn
+    this.clause = 0
+    clauseMode.set(this.clausesOn && "on")
+    this.renderPassage()
+  }
+
+  // Reading by clause, a click on a clause moves there (but not the click that ends a selection of the text).
+  pickClause(event) {
+    const clause = this.splitting && event.target.closest("[data-clause]")
+    if (!clause || String(window.getSelection())) return
+    this.clause = Number(clause.dataset.clause)
+    this.renderPassage()
+  }
+
+  toggleBreak(event) {
+    const mark = event.currentTarget.dataset.mark
+    if (this.breaksSet.has(mark)) this.breaksSet.delete(mark); else this.breaksSet.add(mark)
+    saveBreaks(this.breaksSet)
+    this.clause = 0
+    this.renderPassage()
+  }
+
+  breaksOpened() {
+    if (this.breaksTarget.classList.contains("open")) this.fitMenu(this.breaksTarget, this.pipsTarget)
   }
 
   // The whole paragraph just opened (the menu controller runs first): fill it in and fit it to the window.
@@ -213,10 +295,9 @@ export default class extends Controller {
     })
   }
 
-  // A step arrow names where it goes (as its tooltip and label): the neighboring verse, or at a chapter's edge
-  // the neighboring chapter. Hidden at either end of the text.
-  fillStep(button, number, edgeLabel) {
-    const label = number !== undefined ? `${this.unitNameValue} ${this.labels.get(number)}` : edgeLabel
+  // A step arrow names where it goes (as its tooltip and label): the next clause, the neighboring verse, or at a
+  // chapter's edge the neighboring chapter. Hidden at either end of the text.
+  fillStep(button, label) {
     button.hidden = !label
     button.title = label
     button.setAttribute("aria-label", label)
@@ -246,6 +327,9 @@ export default class extends Controller {
     if (event.target.closest("input, textarea, [contenteditable]") || event.metaKey || event.ctrlKey || event.altKey) return
     if (event.key === "ArrowRight" || event.key === "j") this.next()
     if (event.key === "ArrowLeft" || event.key === "k") this.previous()
+    if (event.key === "J") this.stepUnit(1)
+    if (event.key === "K") this.stepUnit(-1)
     if (event.key === "p" && this.hasWholeButtonTarget) this.wholeButtonTarget.click()
+    if (event.key === ";") this.toggleClauses()
   }
 }
