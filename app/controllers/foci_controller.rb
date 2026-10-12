@@ -38,9 +38,10 @@ class FociController < ApplicationController
     end
   end
 
+  # Back to the cards, where the newly current card arrives with a small flourish (flash[:made_current]).
   def restore
     @focus.restore!
-    redirect_to foci_path
+    redirect_to foci_path, flash: { made_current: true }
   end
 
   private

@@ -68,13 +68,18 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     get foci_path
     assert_select ".card-current .card-title", "Light"
     assert_select ".card:not(.card-current) .card-title", "Holy"
-    assert_select "form[action=?] button", restore_focus_path(@focus), text: "Make current"
+    assert_select ".card-past form[action=?] button.card-pick[aria-label=?]", restore_focus_path(@focus), "Make “Holy” current"
 
     patch restore_focus_path(@focus)
     assert_redirected_to foci_path
     assert_equal "Holy", users(:one).foci.current_one.title
     assert other.reload.archived?
     assert_equal 1, Focus.current.count
+
+    follow_redirect!
+    assert_select ".card-current.card-arrived .card-title", "Holy"
+    get foci_path
+    assert_select ".card-arrived", false
   end
 
   test "the band offers edit, new focus and all foci" do

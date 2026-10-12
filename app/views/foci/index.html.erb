@@ -1,12 +1,12 @@
 <% content_for :title, "Focuses · Study Carrel" %>
 <%= render "shared/header", crumbs: [ [ "Focuses", foci_path ] ], focus: @current %>
 <%# Home for a signed-in reader: every focus as an index card. The current one is wide, ribboned, and the way back
-    into reading; past ones can be made current again. %>
+    into reading; clicking a past one makes it current again. %>
 <main class="cards-page">
   <h1 class="page-title">Your focuses</h1>
   <div class="cards">
     <% if (focus = @current) %>
-      <article class="card card-current">
+      <article class="card card-current<%= " card-arrived" if flash[:made_current] %>">
         <div class="card-ribbon" aria-hidden="true"></div>
         <div class="card-label">Current · <%= focus_span(focus) %></div>
         <h2 class="card-title"><%= focus.title %></h2>
@@ -27,13 +27,15 @@
       </article>
     <% end %>
     <% @past.each do |focus| %>
-      <article class="card">
+      <article class="card card-past">
+        <%# The whole card is the button: it's stretched over the card, under nothing else clickable. %>
+        <%= button_to restore_focus_path(focus), method: :patch, class: "card-pick", form_class: "inline-form",
+              title: "Make this focus current", aria: { label: "Make “#{focus.title}” current" } do %><% end %>
         <div class="card-label"><%= focus_span(focus) %></div>
         <h2 class="card-title"><%= focus.title %></h2>
         <% if focus.description.present? %><p class="card-desc card-clamp"><%= focus.description %></p><% end %>
         <div class="card-foot">
           <span class="card-notes"><%= notes_line(@note_counts.fetch(focus.id, 0), @works_read.fetch(focus.id, [])) %></span>
-          <%= button_to "Make current", restore_focus_path(focus), method: :patch, class: "chip", form_class: "inline-form" %>
         </div>
       </article>
     <% end %>
