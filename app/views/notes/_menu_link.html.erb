@@ -1,0 +1,2 @@
+<% label = focus.notes.any? ? "Notes on this focus (#{focus.notes.count})" : "Notes on this focus" %>
+<%= link_to label, focus_notes_path(focus), class: "menu-item", id: "focus_notes_link" %>

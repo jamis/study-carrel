@@ -461,8 +461,10 @@ a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu
 
 /* A past card is one big button that makes it current. */
 .card-pick { position: absolute; inset: 0; z-index: 1; width: 100%; padding: 0; border: 0; border-radius: inherit; background: none; cursor: pointer; }
-.card-past:hover { border-color: var(--accent); }
-.card-past:hover .card-title { color: var(--accent); }
+.card-past .card-notes a { position: relative; z-index: 2; }
+/* (not while pointing at its notes link, which doesn't make it current) */
+.card-past:hover:not(:has(.card-notes a:hover)) { border-color: var(--accent); }
+.card-past:hover:not(:has(.card-notes a:hover)) .card-title { color: var(--accent); }
 
 /* the current focus: twice as wide, a ribbon, and the way back into reading */
 .card-current { grid-column: span 2; border-color: var(--accent); }

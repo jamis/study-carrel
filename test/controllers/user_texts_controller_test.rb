@@ -163,13 +163,13 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     assert_equal REVISED, work.reload.source
     assert_equal [ "Early, again.", "Which book?" ], Note.all.map { it.content.to_plain_text }.sort
 
-    get notes_path
+    get focus_notes_path(@user.foci.current_one)
     assert_select ".detached", 0, "the notes both survived"
     get kept_path
     assert_select ".detached .fv-ref", "Journal: Monday 1:2"
     assert_select ".detached .fv-quote", "The house was quiet."
     assert_select ".detached .fv-note", /Quiet as rest/
-    get export_notes_path
+    get export_focus_notes_path(@user.foci.current_one)
     assert_no_match "Quiet as rest", response.body, "a kept remark belongs to no focus"
   end
 
@@ -182,7 +182,7 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 3, @user.detached_notes.count
     assert_equal [ "deleted" ], @user.detached_notes.pluck(:reason).uniq
 
-    get export_notes_path
+    get export_focus_notes_path(@user.foci.current_one)
     assert_match "## From passages that changed or were removed\n\n### Journal: Monday 1:1\n\n> Woke early.\n\nEarly, again.", response.body
 
     detached = @user.detached_notes.first
@@ -191,6 +191,7 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     sign_in_as @user
     delete detached_note_path(detached)
+    assert_redirected_to focus_notes_path(detached.focus)
     assert_not DetachedNote.exists?(detached.id)
   end
 

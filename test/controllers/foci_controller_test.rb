@@ -117,13 +117,13 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     assert_select ".card:not(.card-current)" do
       assert_select ".card-desc", "Set apart?"
       assert_select ".card-notes", "2 notes in Isaiah"
-      assert_select ".card-notes a", false   # a past focus's notes have no page yet
+      assert_select ".card-notes a[href=?]", focus_notes_path(@focus), text: "2 notes"
     end
 
     light.notes.create!(unit: verse(1), content: "Comfort first")
     get foci_path
     assert_select ".card-current .card-notes", "1 note in Isaiah"
-    assert_select ".card-current .card-notes a[href=?]", notes_path, text: "1 note"
+    assert_select ".card-current .card-notes a[href=?]", focus_notes_path(light), text: "1 note"
   end
 
   test "another reader's focuses never appear" do

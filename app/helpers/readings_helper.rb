@@ -12,7 +12,7 @@ module ReadingsHelper
   end
 
   # Above a page's title, quietly, the way up: every step of its crumbs but the last (the title names the page itself).
-  # A block adds the page's actions at the right (Kept's order, All notes' export).
+  # A block adds the page's actions at the right (Kept's order, the notes page's export).
   def page_head(crumbs = [], &actions)
     up = crumbs[0...-1]
     return if up.empty? && !actions

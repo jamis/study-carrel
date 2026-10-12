@@ -23,14 +23,16 @@ Rails.application.routes.draw do
     member do
       patch :restore
     end
+    # Every focus has its notes page, the current one's or a past one's.
+    resources :notes, only: :index do
+      get :export, on: :collection
+    end
   end
   resources :units, only: [] do
     resource :note, only: %i[show update], controller: "unit_notes"
     resource :keep, only: %i[create update destroy]
   end
-  resources :notes, only: :index do
-    get :export, on: :collection
-  end
+  get "notes", to: "notes#current" # the old address of the current focus's notes
   get "history", to: "history#index"
   get "kept", to: "keeps#index"
   get "library", to: "library#index"

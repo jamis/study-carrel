@@ -49,7 +49,7 @@ class AllNotesTest < ActionDispatch::IntegrationTest
     old = users(:one).foci.create!(title: "Old", archived_at: 1.day.ago)
     old.notes.create!(unit: verse(1), content: "not mine")
 
-    get notes_path
+    get focus_notes_path(@focus)
     assert_response :success
     assert_select ".fv-ref", count: 2
     assert_select ".fv-ref" do |refs|
@@ -61,14 +61,31 @@ class AllNotesTest < ActionDispatch::IntegrationTest
   end
 
   test "empty state" do
-    get notes_path
+    get focus_notes_path(@focus)
     assert_select ".page-empty"
   end
 
   test "the reading page links to it with a count" do
     @focus.notes.create!(unit: verse(3), content: "x")
     get reading_path("isaiah-kjv", 40)
-    assert_select "a.menu-item[href=?]", notes_path, text: "All notes (1)"
+    assert_select "a.menu-item[href=?]", focus_notes_path(@focus), text: "Notes on this focus (1)"
+  end
+
+  test "a past focus's notes have their page too, with the rail still on the current focus" do
+    @focus.notes.create!(unit: verse(3), content: "from before")
+    now = users(:one).foci.start!(title: "Now")
+    get focus_notes_path(@focus.reload)
+    assert_response :success
+    assert_select ".page-title", "Holy"
+    assert_select ".page-lede", /· #{@focus.created_at.strftime("%b %Y")}/
+    assert_select ".fv-note", /from before/
+    assert_select "a.menu-item[href=?]", focus_notes_path(now)
+    assert_equal now, users(:one).foci.current_one, "reading them doesn't make it current"
+  end
+
+  test "the old address goes to the current focus's notes" do
+    get "/notes"
+    assert_redirected_to focus_notes_path(@focus)
   end
 
   test "long passages are clamped with a way to expand them" do
@@ -76,7 +93,7 @@ class AllNotesTest < ActionDispatch::IntegrationTest
     long.update!(body: "word " * 100)
     @focus.notes.create!(unit: long, content: "x")
     @focus.notes.create!(unit: verse(4), content: "y")
-    get notes_path
+    get focus_notes_path(@focus)
     assert_select ".fv-quote.clamped", 1
     assert_select ".fv-more", 1
   end
@@ -91,7 +108,7 @@ class ExportTest < ActionDispatch::IntegrationTest
   end
 
   test "downloads the Markdown" do
-    get export_notes_path
+    get export_focus_notes_path(@focus)
     assert_response :success
     assert_match "text/markdown", response.content_type
     assert_match 'filename="holy.md"', response.headers["Content-Disposition"]
@@ -99,10 +116,10 @@ class ExportTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "hello"
   end
 
-  test "all-notes page offers copy and download" do
-    get notes_path
-    assert_select "[data-controller=clipboard][data-clipboard-url-value=?]", export_notes_path
+  test "the notes page offers copy and download" do
+    get focus_notes_path(@focus)
+    assert_select "[data-controller=clipboard][data-clipboard-url-value=?]", export_focus_notes_path(@focus)
     assert_select "[data-clipboard-text-value]", count: 0
-    assert_select "a[href=?]", export_notes_path
+    assert_select "a[href=?]", export_focus_notes_path(@focus)
   end
 end

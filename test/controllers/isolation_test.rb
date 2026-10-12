@@ -32,11 +32,16 @@ class IsolationTest < ActionDispatch::IntegrationTest
     @other.foci.start!(title: "Other's focus")
     sign_in_as @other
 
-    get notes_path
+    get "/notes"
+    follow_redirect!
     assert_no_match "Owner's private thought", response.body
-    get export_notes_path
+    get export_focus_notes_path(@other.foci.current_one)
     assert_no_match "Owner's private thought", response.body
     assert_no_match "Owner's focus", response.body
+    get focus_notes_path(@owner_focus)
+    assert_response :not_found
+    get export_focus_notes_path(@owner_focus)
+    assert_response :not_found
     get foci_path
     assert_no_match "Owner's focus", response.body
     get reading_path("isaiah-kjv", 40, 3)
@@ -92,10 +97,10 @@ class IsolationTest < ActionDispatch::IntegrationTest
     @other.foci.current_one.notes.create!(unit: verse(2), content: "Other's private thought")
     sign_in_as @owner
 
-    get notes_path
-    assert_no_match "Other's private thought", response.body
-    get export_notes_path
-    assert_no_match "Other's private thought", response.body
+    get focus_notes_path(@other.foci.current_one)
+    assert_response :not_found
+    get export_focus_notes_path(@other.foci.current_one)
+    assert_response :not_found
   end
 
   test "a reader's own text is invisible to everyone else: not listed, read, searched, rolled, noted, kept or deleted" do

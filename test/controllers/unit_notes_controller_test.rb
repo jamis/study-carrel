@@ -15,7 +15,7 @@ class UnitNotesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "true", response.headers["X-Noted"]
     assert_equal [ @focus, @unit ], [ Note.last.focus, Note.last.unit ]
-    assert_match "All notes (1)", response.body
+    assert_match "Notes on this focus (1)", response.body
   end
 
   test "a save from an editor opened under another focus is refused" do
