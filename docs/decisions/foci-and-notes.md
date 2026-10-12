@@ -20,14 +20,16 @@ One focus at a time. No parallel foci in v1. The focus is the app's current stat
 
 ## Focus presentation
 
-The focus is the hero of the screen, but compact and quiet:
+**The focus stands directly over the passage** (decided 2026-10-12): the first thing your eye lands on for every passage, read together with the text rather than as a header for the screen.
 
-- A small muted label and a ~20px italic title in soft ink, accent only on hover (revised 2026-10-04: the filled pill and 32px accent title read as a shout).
-- At the top of the reading column (since 2026-10-05; it was a band under the nav), sticky so it stays visible while scrolling.
-- Left-aligned (decided 2026-10-03) so a short focus doesn't get lost in the middle; it lines up with the body text.
-- The description opens as a dropdown.
+- No label. The focus in soft-ink italic, 19–22px, accent on hover; a statement (a thesis, a metaphor) mustn't pass for the passage's title, and the soft italic reads as an epigraph, not a heading.
+- A small thought bubble before it, in the faint ink of the keep ribbon and in the ribbon's slot, so the focus lines up with the reference below; wrapped lines stay clear of it. (The drawing is a stand-in, to be replaced with a better one.)
+- A chevron at the end of its last line opens the description as a dropdown.
+- A hairline rule across the whole column sets it off from the passage.
+- Not sticky: it scrolls away with the top of a long passage, and the reference row sticks to the top instead. On phones it starts level with the ⋯ and keeps clear of it.
+- Left-aligned (decided 2026-10-03), flush with the body text.
 
-Prototype feedback: a thin bar felt lost; a large hero banner was too big.
+History: a thin bar felt lost and a large hero banner too big; a filled pill with a 32px accent title read as a shout (2026-10-04); a small label and soft title, sticky at the top of the column (2026-10-05), turned out too faint, especially on phones. Five ways to give it more presence were prototyped on 2026-10-12 (a heading, a paper slip, the focus heading the note, a focus that brightens on each new verse, and the focus over the passage); the last was chosen, then refined (no label, soft ink, the rule across the column, the bubble). The prototypes were discarded.
 
 ## Notes
 

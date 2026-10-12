@@ -132,7 +132,7 @@ export default class extends Controller {
     panel.style.maxHeight = ""
     const handle = this.element.querySelector(".panel-handle")
     const bottom = Math.min(window.innerHeight, handle?.offsetParent ? handle.getBoundingClientRect().top : Infinity)
-    const top = this.element.querySelector(".reader-top")?.getBoundingClientRect().bottom ?? 0
+    const top = this.element.querySelector(".now-head")?.getBoundingClientRect().bottom ?? 0
     const { top: buttonTop, bottom: buttonBottom } = button.getBoundingClientRect()
     const below = bottom - buttonBottom - 18, above = buttonTop - Math.max(0, top) - 18
     const up = Math.min(panel.scrollHeight, cap) > below && above > below

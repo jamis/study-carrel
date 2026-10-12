@@ -27,7 +27,7 @@
   <% prev_unit = (@units[at - 1] if at.positive?) %>
   <% next_unit = @units[at + 1] %>
   <div class="reader-col">
-    <div class="reader-top" data-reader-top><%= render "foci/band", focus: @focus %></div>
+    <%= render "foci/band", focus: @focus %>
     <article class="lectio" data-action="touchstart->lectio#touchStart touchend->lectio#touchEnd keydown@document->lectio#key">
       <div class="now <%= unit_size_class(@current.body) %>" aria-live="polite" data-lectio-target="now"><div class="now-head"><%= render "keeps/ribbon", unit: @current, kept: @kept %><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span></div><span class="pilcrow" aria-hidden="true" data-lectio-target="pilcrow" <%= "hidden" unless @current.sentence == 1 %>>¶</span><span data-lectio-target="body"><%= @current.body %></span></div>
 

@@ -8,7 +8,7 @@ A web application, usable from laptop and phone, with the same functionality on 
 
 **Committed** (2026-10-02): `prototype/index.html` is the reference for look and feel: lectio-only, compact sticky focus, left-aligned text with length-adaptive sizing.
 
-**Reader revised** (2026-10-05) after five layouts were tried in `prototype/reader/` (A desk, B open book, C single column, D rail and ruler, E rail and steps): **E** was chosen, `prototype/reader/e.html` (D's rail and docked note with A's `‹ 3 of 31 ›`; D's hairline ruler was dropped).
+**Reader revised** (2026-10-05) after five layouts were tried in `prototype/reader/` (A desk, B open book, C single column, D rail and ruler, E rail and steps): **E** was chosen, `prototype/reader/e.html` (D's rail and docked note with A's `‹ 3 of 31 ›`; D's hairline ruler was dropped). Its focus is out of date: since 2026-10-12 the focus stands over the passage, not sticky at the top (see [foci-and-notes.md](foci-and-notes.md)).
 
 Visual tone (ideas, not decisions): quiet study desk, not a productivity tool. Serif reading face, warm paper tones, dark mode for night reading, a calm but prominent focus line, and no gamification or streaks.
 

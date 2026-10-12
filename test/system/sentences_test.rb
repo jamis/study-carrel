@@ -53,6 +53,7 @@ class SentencesTest < ApplicationSystemTestCase
   test "the whole paragraph opens upward when there's no room for it below" do
     page.current_window.resize_to(1400, 360)
     visit reading_path("walden", 2, 3)
+    execute_script("document.querySelector('.steps').scrollIntoView({ block: 'end' })") # the steps at the bottom of the window
     find("body").send_keys "p"
     assert_selector ".whole-group.above a.current"
     box = evaluate_script("(r => ({ top: r.top, bottom: r.bottom, height: innerHeight }))(document.querySelector('.whole-group').getBoundingClientRect())")
@@ -65,6 +66,7 @@ class SentencesTest < ApplicationSystemTestCase
   test "the verse grid opens upward when there's no room for it below" do
     page.current_window.resize_to(1400, 360)
     visit reading_path("walden", 2, 3)
+    execute_script("document.querySelector('.steps').scrollIntoView({ block: 'end' })") # the steps at the bottom of the window
     find(".step-of").click
     assert_selector ".unit-grid.above .cell.current"
     box = evaluate_script("(r => ({ top: r.top, bottom: r.bottom, height: innerHeight }))(document.querySelector('.unit-grid').getBoundingClientRect())")

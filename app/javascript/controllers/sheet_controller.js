@@ -7,7 +7,6 @@ export default class extends Controller {
   // On phones the on-screen keyboard covers the bottom of the page without resizing it. Track the
   // visible area so the sheet can sit above the keyboard and shrink to fit (--kb, --vvh in the CSS).
   connect() {
-    this.#trackHeader()
     this.viewport = window.visualViewport
     if (!this.viewport) return
     this.fit = () => this.#fit()
@@ -17,7 +16,6 @@ export default class extends Controller {
   }
 
   disconnect() {
-    this.headerObserver?.disconnect()
     this.viewport?.removeEventListener("resize", this.fit)
     this.viewport?.removeEventListener("scroll", this.fit)
   }
@@ -42,17 +40,6 @@ export default class extends Controller {
   preview({ detail: { text } }) {
     this.previewTarget.textContent = text || "Write a note"
     this.previewTarget.classList.toggle("empty", !text)
-  }
-
-  // The passage's reference row sticks just below the sticky focus band, whose height varies (the focus can
-  // wrap), so publish it as --top-h on the document.
-  #trackHeader() {
-    const header = document.querySelector("[data-reader-top]")
-    if (!header) return
-    const set = () => document.documentElement.style.setProperty("--top-h", `${header.offsetHeight}px`)
-    this.headerObserver = new ResizeObserver(set)
-    this.headerObserver.observe(header)
-    set()
   }
 
   #fit() {
