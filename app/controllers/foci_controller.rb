@@ -38,7 +38,8 @@ class FociController < ApplicationController
     end
   end
 
-  # Back to the cards, where the newly current card arrives with a small flourish (flash[:made_current]).
+  # Back to the cards, where the card moves into the current slot (a view transition) and its ribbon unrolls
+  # (flash[:made_current]).
   def restore
     @focus.restore!
     redirect_to foci_path, flash: { made_current: true }

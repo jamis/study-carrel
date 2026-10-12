@@ -1,4 +1,7 @@
 <% content_for :title, "Focuses · Study Carrel" %>
+<%# View transitions on this page only (Turbo needs the tag on both sides): each card is named for its focus, so a card
+    made current travels into the current slot, and the old current card goes back among the rest. %>
+<% content_for :head do %><meta name="view-transition" content="same-origin"><% end %>
 <%= render "shared/header", crumbs: [ [ "Focuses", foci_path ] ], focus: @current %>
 <%# Home for a signed-in reader: every focus as an index card. The current one is wide, ribboned, and the way back
     into reading; clicking a past one makes it current again. %>
@@ -6,7 +9,7 @@
   <h1 class="page-title">Your focuses</h1>
   <div class="cards">
     <% if (focus = @current) %>
-      <article class="card card-current<%= " card-arrived" if flash[:made_current] %>">
+      <article class="card card-current<%= " card-arrived" if flash[:made_current] %>" style="view-transition-name: focus-<%= focus.id %>">
         <div class="card-ribbon" aria-hidden="true"></div>
         <div class="card-label">Current · <%= focus_span(focus) %></div>
         <h2 class="card-title"><%= focus.title %></h2>
@@ -27,7 +30,7 @@
       </article>
     <% end %>
     <% @past.each do |focus| %>
-      <article class="card card-past">
+      <article class="card card-past" style="view-transition-name: focus-<%= focus.id %>">
         <%# The whole card is the button: it's stretched over the card, under nothing else clickable. %>
         <%= button_to restore_focus_path(focus), method: :patch, class: "card-pick", form_class: "inline-form",
               title: "Make this focus current", aria: { label: "Make “#{focus.title}” current" } do %><% end %>

@@ -458,11 +458,18 @@ a:not(.chip):not(.crumb):not(.brand):not(.tick):not(.work-link):not(.menu-item):
 .card-current .card-title { font-size: clamp(24px, 3.6vw, 30px); padding-right: 36px; }
 .card-ribbon { position: absolute; top: -1px; right: 22px; width: 18px; height: 34px; background: var(--accent);
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%); }
-/* Just made current: the card settles into place, and its ribbon unrolls onto it. */
-.card-arrived { animation: card-arrive .2s ease-out both; }
-.card-arrived .card-ribbon { transform-origin: top; animation: ribbon-lay .15s .1s cubic-bezier(.2, .8, .2, 1) both; }  /* all done in .25s */
-@keyframes card-arrive { from { opacity: .4; transform: translateY(8px); } }
+/* Just made current: the card moves into place (a view transition, see foci/index), then its ribbon unrolls onto it. */
+.card-arrived .card-ribbon { transform-origin: top; animation: ribbon-lay .15s .3s cubic-bezier(.2, .8, .2, 1) both; }
 @keyframes ribbon-lay { from { transform: scaleY(0); } }
+/* The cards don't stretch to fit as they change shape: each crossfades at its own size, pinned top-left, while its
+   box moves. Only the cards move; the rest of the page doesn't fade. */
+::view-transition-group(*) { animation-duration: .3s; animation-timing-function: cubic-bezier(.2, .8, .2, 1); overflow: clip; border-radius: 4px; }
+::view-transition-old(*), ::view-transition-new(*) { animation-duration: .3s; height: 100%; object-fit: none; object-position: left top; }
+::view-transition-group(root) { border-radius: 0; }
+::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
 .card-continue {
   display: block; margin: 6px 0 4px; padding: 12px 16px; border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
   background: var(--bg); text-decoration: none; transition: background .15s;

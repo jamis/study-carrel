@@ -78,6 +78,10 @@ class FociManagementTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_select ".card-current.card-arrived .card-title", "Holy"
+    # each card is named for its focus, so the view transition can carry it from one slot to the other
+    assert_select "meta[name=view-transition][content=same-origin]"
+    assert_select ".card-current[style=?]", "view-transition-name: focus-#{@focus.id}"
+    assert_select ".card-past[style=?]", "view-transition-name: focus-#{other.id}"
     get foci_path
     assert_select ".card-arrived", false
   end
