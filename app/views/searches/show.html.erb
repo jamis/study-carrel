@@ -1,7 +1,7 @@
 <% content_for :title, "#{"#{@search.query} · " if @search.searching?}Search · Study Carrel" %>
-<%= render "shared/header", crumbs: [ [ "Library", library_path, nil ], [ "Search", search_path, nil ] ],
-      random: (RandomScope.chain_for(@place) if @place), focus: Current.focus %>
+<%= render "shared/rail", random: (RandomScope.chain_for(@place) if @place), focus: Current.focus, here: :search %>
 <main class="page">
+  <%= page_head [ [ "Library", library_path ], [ "Search", search_path ] ] %>
   <h2 class="page-title">Search</h2>
   <%= render "shared/search_form", place: @place, query: @search.query, autofocus: !@search.searching? %>
 

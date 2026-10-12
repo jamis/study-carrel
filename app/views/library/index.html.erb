@@ -1,5 +1,5 @@
 <% content_for :title, "Library · Study Carrel" %>
-<%= render "shared/header", crumbs: library_crumbs, focus: Current.focus %>
+<%= render "shared/rail", focus: Current.focus, here: :library %>
 <main class="page">
   <h2 class="page-title">Library</h2>
   <%= render "shared/search_form" %>

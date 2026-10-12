@@ -14,7 +14,7 @@
       data-lectio-prev-label-value="<%= @previous_section&.name %>"
       data-lectio-next-url-value="<%= edge_url(@next_section, :next) %>"
       data-lectio-next-label-value="<%= @next_section&.name %>">
-  <%= render "readings/rail", section: @section, previous_section: @previous_section, next_section: @next_section, focus: @focus,
+  <%= render "shared/rail", section: @section, previous_section: @previous_section, next_section: @next_section, focus: @focus,
              random: RandomScope.chain_for(@section.work), random_default: RandomScope.default_for(@section.work) %>
 
   <div hidden>

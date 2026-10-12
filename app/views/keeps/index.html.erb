@@ -1,14 +1,14 @@
 <% content_for :title, "Kept · Study Carrel" %>
+<%= render "shared/rail", focus: Current.focus, here: :kept %>
 <main class="page">
-  <div class="page-bar">
-    <%= link_to safe_join(["← Back", tag.span(" to reading", class: "wide-only")]), continue_path, class: "chip" %>
-    <% if @keeps.any? %>
-      <span class="page-bar-actions" aria-label="Order">
+  <% if @keeps.any? %>
+    <%= page_head do %>
+      <span class="page-actions" aria-label="Order">
         <%= link_to "Newest", kept_path, class: "chip#{" current" unless params[:order] == "reading"}" %>
         <%= link_to "Reading order", kept_path(order: "reading"), class: "chip#{" current" if params[:order] == "reading"}" %>
       </span>
     <% end %>
-  </div>
+  <% end %>
   <h2 class="page-title all-notes-title">Kept</h2>
   <p class="page-lede"><%= pluralize(@keeps.size, "passage") %> you wanted to come back to</p>
 

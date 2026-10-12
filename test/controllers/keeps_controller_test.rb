@@ -123,6 +123,13 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".hist-kept", 1
   end
 
+  test "Kept has the rail, its own icon marked, and no back chip" do
+    get kept_path
+    assert_select ".rail a.rail-btn[href=?][aria-current=page]", kept_path
+    assert_select ".rail a.rail-continue[href=?]", continue_path
+    assert_select "a", text: /Back/, count: 0
+  end
+
   test "starting a focus from a kept passage opens at it" do
     @user.keeps.create!(unit: verse(25), remark: "the heart of it")
     get new_focus_path(unit_id: verse(25).id)

@@ -1,10 +1,12 @@
-<%# The ⋯ menu's items, shared by the top bar and the reader's rail.
+<%# The ⋯ menu's items, in the rail (shared/_rail). Those the rail has its own icons for (.menu-foci, .menu-library,
+    .menu-continue, .menu-search, .menu-kept, and Recent places) show only on phones, where the rail is just the ⋯.
     focus: the current focus (nil if none); reading: on the reading view (no "Continue reading");
-    random / random_default: as for shared/_header %>
+    random / random_default: as for shared/_rail %>
 <%= render "notes/all_link", focus: focus if focus %>
-<%= link_to "All focuses", foci_path, class: "menu-item" %>
+<%= link_to "Your focuses", foci_path, class: "menu-item menu-foci" %>
+<% unless reading %><%= link_to "Library", library_path, class: "menu-item menu-library" %><% end %>
 <button class="menu-item menu-history" type="button" data-history-open data-action="menu#close">Recent places<kbd>h</kbd></button>
-<% unless reading %><%= link_to "Continue reading", continue_path, class: "menu-item" %><% end %>
+<% if focus && !reading %><%= link_to "Continue reading", continue_path, class: "menu-item menu-continue" %><% end %>
 <%= link_to search_path, class: "menu-item menu-search", data: { controller: "search-key", action: "keydown@window->search-key#key" } do %>Search<kbd>/</kbd><% end %>
 <%= render "shared/random_menu", scopes: random, default: random_default %>
 <%= link_to "Kept", kept_path, class: "menu-item menu-kept" %>

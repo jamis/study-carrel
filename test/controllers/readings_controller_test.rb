@@ -73,26 +73,29 @@ class ReadingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "title", "Isaiah 40 · Study Carrel"
   end
 
-  test "the rail shows where you are, from the library down to the chapter, with the chapters either side" do
+  test "the rail's Go up shows the library down to the chapter, with the chapters either side" do
     get reading_path("isaiah-kjv", 40, 25)
-    assert_select ".crumbs", 0
-    labels = css_select("#rail-library .trail li").map { |i| i.text.strip }
+    assert_select ".page-trail", 0
+    assert_select ".rail button[aria-controls=rail-up]", text: "Go up"
+    labels = css_select("#rail-up .trail li").map { |i| i.text.strip }
     assert_equal "Library", labels.first
     assert_equal "Isaiah 40", labels.last
     assert_includes labels, "Old Testament"
     assert_equal 1, labels.count { |t| t.start_with?("Isaiah") }
-    assert_select "#rail-library .trail li:last-child a[aria-current=page]", "Isaiah 40"
-    assert_select "#rail-library .trail-sides a[href=?]", reading_path("isaiah-kjv", 39), text: /Isaiah 39/
-    assert_select "#rail-library .trail-sides a[href=?]", reading_path("isaiah-kjv", 41), text: /Isaiah 41/
+    assert_select "#rail-up .trail li:last-child a[aria-current=page]", "Isaiah 40"
+    assert_select "#rail-up .trail-sides a[href=?]", reading_path("isaiah-kjv", 39), text: /Isaiah 39/
+    assert_select "#rail-up .trail-sides a[href=?]", reading_path("isaiah-kjv", 41), text: /Isaiah 41/
   end
 
-  test "the rail has recent places, search, kept and the menu" do
+  test "the rail has your focuses, recent places, search, kept and the menu, but not continue reading" do
     get reading_path("isaiah-kjv", 40, 25)
+    assert_select ".rail a.rail-btn[href=?]", foci_path, text: "Your focuses"
     assert_select ".rail .history-btn[aria-label=?]", "Recent places"
     assert_select ".rail a.rail-btn[href=?]", search_path
     assert_select ".rail a.rail-btn[href=?]", kept_path
     assert_select ".rail #nav-menu a.menu-item[href=?]", foci_path
-    assert_select ".rail #nav-menu", text: /Continue reading/, count: 0
+    assert_select ".rail a[href=?]", continue_path, count: 0
+    assert_select ".rail a.rail-btn[href=?]", library_path, count: 0
   end
 
   test "requires sign in" do

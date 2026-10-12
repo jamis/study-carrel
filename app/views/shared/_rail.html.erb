@@ -1,0 +1,45 @@
+<%# The rail: the app's tools down the left edge of every signed-in page, the ⋯ menu at the top. Pointing at it (or
+    tabbing into it) widens it over the page with each icon's name beside it; on phones only the ⋯ stays, top right,
+    and the menu takes in the rest.
+    focus: the current focus (nil if none)
+    section, previous_section, next_section: on the reading view; Go up then opens the library trail, and Continue
+      reading (the way back from everywhere else) is left out
+    here: the page the rail links to that this is (:foci, :library, :search or :kept), marked current
+    random / random_default: the RandomScope places Random can roll in, innermost first, and the one it rolls in %>
+<% section = local_assigns[:section]
+   here = local_assigns[:here]
+   random = local_assigns[:random] || [ RandomScope.library ]
+   random_default = local_assigns[:random_default] || random.first
+   trail = (render("readings/trail", section: section, previous_section: previous_section, next_section: next_section) if section)
+   continue_unit = (focus.last_unit if focus && !section) %>
+<nav class="rail" aria-label="Tools" data-controller="theme rail" data-action="mouseenter->rail#fit focusin->rail#fit">
+  <div class="rail-item menu" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
+    <button class="icon-btn menu-btn rail-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-menu"
+            data-menu-target="button" data-action="menu#toggle"><span class="rail-dots" aria-hidden="true">⋯</span><span class="rail-label">Menu</span></button>
+    <div class="menu-panel rail-pop" id="nav-menu" data-menu-target="panel">
+      <% if trail %><div class="menu-trail"><%= trail %></div><% end %>
+      <%= render "shared/menu_items", focus: focus, reading: section.present?, random: random, random_default: random_default %>
+    </div>
+  </div>
+  <span class="rail-gap rail-only"></span>
+  <%= link_to foci_path, class: "icon-btn rail-btn rail-only", aria: { label: "Your focuses", current: ("page" if here == :foci) } do %><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="15" height="11" rx="1"/><path d="M6 4h14a1 1 0 0 1 1 1v10"/></svg><span class="rail-label">Your focuses</span><% end %>
+  <% if trail %>
+    <div class="rail-item rail-only" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
+      <button class="icon-btn rail-btn" type="button" aria-label="Go up" aria-expanded="false" aria-controls="rail-up"
+              data-menu-target="button" data-action="menu#toggle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg><span class="rail-label">Go up</span></button>
+      <div class="menu-panel rail-pop" id="rail-up" data-menu-target="panel"><%= trail %></div>
+    </div>
+  <% else %>
+    <%= link_to library_path, class: "icon-btn rail-btn rail-only", aria: { label: "Library", current: ("page" if here == :library) } do %><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg><span class="rail-label">Library</span><% end %>
+  <% end %>
+  <%= render "shared/history" %>
+  <%= link_to search_path, class: "icon-btn rail-btn rail-only", aria: { label: "Search", current: ("page" if here == :search) } do %><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg><span class="rail-label">Search<kbd>/</kbd></span><% end %>
+  <%= link_to kept_path, class: "icon-btn rail-btn rail-only", aria: { label: "Kept", current: ("page" if here == :kept) } do %><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z"/></svg><span class="rail-label">Kept</span><% end %>
+  <% if focus && !section %>
+    <%# Below the rest, so the icons above keep their places on every page. Where it goes is on a second line, shortened
+        like the note panel's reference: the work title goes first, then the section name ellipsizes; the number stays. %>
+    <span class="rail-gap rail-only"></span>
+    <%= link_to continue_path, class: "icon-btn rail-btn rail-only rail-continue",
+          aria: { label: ["Continue reading", continue_unit&.reference].compact.join(" at ") } do %><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5z"/><path d="M13 4h5.5c.8 0 1.5.7 1.5 1.5V11"/><path d="M13 20v-9"/><path d="m16 15 3 3-3 3"/><path d="M13 18h6"/></svg><span class="rail-label rail-label-2">Continue reading<% if continue_unit %><span class="rail-dest ref" data-rail-target="dest"><%= unit_ref_parts(continue_unit.section, continue_unit) %></span><% end %></span><% end %>
+  <% end %>
+</nav>

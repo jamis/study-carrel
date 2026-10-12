@@ -29,16 +29,14 @@ Left-aligned (ragged right), not centered, and flush with the focus. The text ke
 
 **Minimal** (decided 2026-10-04).
 
-**Library, collection, work, search, kept and focuses pages** share a top bar (`shared/_header`), with Random scoped to the collection or work and "Continue reading" in the menu:
+**One rail on every signed-in page** (decided 2026-10-12, replacing the library pages' top bar and the "← Back to reading" chips on Kept, All notes and Invitations). Before, there were three kinds of chrome: a top bar on library pages, the reader's rail with its ⋯ at the bottom left (hard to find), and pages with only a back chip. Prototyped in `prototype/nav/` (since removed): A, the rail everywhere; A2, A with labels; B, one top bar everywhere, faded in the reader. **A2** was chosen. B's bar put two lines of chrome over the passage again; a fourth option, keeping the split and fixing its seams, was held in reserve.
 
-- Collapsible breadcrumbs (Library › collections › work › chapter, no "Study Carrel" brand) and one ⋯ menu.
-- The first and last crumbs always show; middle ones drop out nearest the root first, leaving a "…".
-- The work crumb is skipped when the chapter name already starts with it ("Isaiah 40").
-- Edition and author appear only as tooltips.
+- The rail (`shared/_rail`) runs down the left: the ⋯ menu at the **top**, then Your focuses (home), Library, Recent places, Search, Kept; off the reader, **Continue reading** sits below the rest, so the icons above keep their places on every page.
+- **Labels on hover**: pointing at the rail (or tabbing into it) widens it over the page at once, each icon's name and key beside it, so the icons can be learned without tooltips (there are none). Its 52px column stays put, so nothing beneath moves; an open popover folds the labels away so it sits beside its icon.
+- The labels alone set the open rail's width (~180px). Continue reading names where it goes on a second line that adds no width, shortened like the note panel's reference: the work title goes first, then the section name ellipsizes; the number always stays.
+- **In the reader**, Library's slot is **Go up** (a call to action; "Where you are" was the wrong name): a popover with the library trail, indented a level per step, and the chapters either side. The work crumb is skipped when the chapter name already starts with it ("Isaiah 40"). Elsewhere the slot is a plain link to the library.
+- **Above a page's title**, quietly, the way up (`page_head`): its crumbs but the last (the title names the page), e.g. Library › Sacred Texts › Old Testament over "Isaiah". Edition and author appear only as tooltips. A page's actions sit at the right of that line (Kept's order, All notes' export).
+- The ⋯ menu (`shared/_menu_items`) holds the rest: All notes, Random (scoped to the collection or work), Your Texts, light/dark, Invitations for admins, Sign out.
+- **On phones** the rail collapses to a single ⋯ at the top right on every page, whose menu takes in everything (and, in the reader, the trail at its top).
 
-**The reader has no top bar** (decided 2026-10-05; it made the page feel cluttered):
-
-- A thin icon rail down the left (`readings/_rail`) holds *Where you are* (a popover with the library trail, indented a level per step, and the chapters either side), Recent places, Search, Kept, and the ⋯ menu at the bottom (All notes, All focuses, Random, light/dark, Invitations for admins, Sign out).
-- On phones the rail collapses to a single ⋯ at the top right whose menu takes in the trail and everything else.
-
-Both menus render `shared/_menu_items`. The library pages keep their top bar for now.
+Not given the rail: the focus form (new, edit), sign-in and sign-up, which are single-purpose pages with their own way out.

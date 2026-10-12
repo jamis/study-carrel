@@ -39,25 +39,43 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
       assert_equal [ "Old Testament", "New Testament" ], links.map { |l| l.text.strip }
     end
     get collection_path("old-testament")
-    assert_select ".crumbs a.crumb[href=?]", collection_path("bible"), text: "Bible"
-    assert_select ".crumbs li:last-child a[aria-current=page]", "Old Testament"
+    assert_select ".page-trail li:last-child a[href=?]", collection_path("bible"), text: "Bible"
+    assert_select ".page-title", "Old Testament"
   end
 
-  test "library pages share the reading nav: breadcrumbs, history and the menu" do
+  test "library pages have the rail, with the way back to reading, and the way up above the title" do
     [ library_path, collection_path("old-testament"), work_path("genesis-kjv") ].each do |path|
       get path
-      assert_select "header.top .crumbs a.crumb[href=?]", library_path, text: "Library"
-      assert_select "header.top .history-btn"
-      assert_select "header.top .menu-btn"
-      assert_select "header.top .menu-item", text: "Continue reading"
-      assert_select ".page-bar", 0
+      assert_select ".rail a.rail-btn[href=?]", library_path, text: "Library"
+      assert_select ".rail .history-btn"
+      assert_select ".rail .menu-btn"
+      assert_select ".rail a.rail-continue[href=?]", continue_path
+      assert_select ".rail #rail-up", 0
     end
+    assert_select ".page-trail a[href=?]", library_path, text: "Library"
     get work_path("genesis-kjv")
-    assert_select ".crumbs li:last-child a[aria-current=page]", "Genesis"
+    assert_select ".page-trail li:last-child a", "Old Testament"
+    assert_select ".page-trail a", text: "Genesis", count: 0
     assert_select ".menu-row a[href=?]", random_work_path("genesis-kjv"), text: /Random\s*Genesis/
     get library_path
     assert_select ".menu-row a[href=?]", random_path
     assert_select ".menu-more", 0
+  end
+
+  test "the rail's Continue reading names where it goes, in parts the label can shorten" do
+    unit = Work.find_by!(title: "Walden").sections.first.units.first
+    users(:one).foci.current_one.update!(last_unit: unit)
+    get library_path
+    assert_select ".rail-continue[aria-label=?]", "Continue reading at #{unit.reference}"
+    assert_select ".rail-continue .rail-dest .ref-work", "Walden:"
+    assert_select ".rail-continue .rail-dest .ref-section", "Economy"
+  end
+
+  test "with no focus, the rail has no Continue reading" do
+    users(:one).foci.current_one.archive!
+    get library_path
+    assert_select ".rail-continue", 0
+    assert_select ".menu-continue", 0
   end
 
   test "a collection lists its books in order" do
@@ -124,9 +142,9 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-lectio-prev-label-value=?]", "Genesis 1"
     assert_select "[data-lectio-target=prevButton][title=?]", "Genesis 1"
     assert_select "[data-lectio-target=nextButton][title=?]", "Exodus 1"
-    assert_select "#rail-library .trail a[href=?]", work_path("genesis-kjv"), text: "Genesis 2"
-    assert_select "#rail-library .trail a[href=?]", library_path, text: "Library"
-    assert_select "#rail-library .trail-sides a[href=?]", reading_path("exodus-kjv", 1), text: /Exodus 1/
+    assert_select "#rail-up .trail a[href=?]", work_path("genesis-kjv"), text: "Genesis 2"
+    assert_select "#rail-up .trail a[href=?]", library_path, text: "Library"
+    assert_select "#rail-up .trail-sides a[href=?]", reading_path("exodus-kjv", 1), text: /Exodus 1/
   end
 
   test "a text whose verse numbers skip ahead renders neighbors by position" do

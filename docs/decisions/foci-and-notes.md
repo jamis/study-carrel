@@ -14,7 +14,7 @@ One focus at a time. No parallel foci in v1. The focus is the app's current stat
 - No note is quoted on the cards (tried 2026-10-12): out of its passage a note lacks context, and the works line under it read as its source.
 - A dashed "A new question" card starts a new focus. No totals or tallies across focuses.
 - No focuses yet: you go to the new-focus form.
-- "Continue reading" (the ⋯ menu, the "Back to reading" chips) is `/continue`, which resumes the current focus where it left off.
+- "Continue reading" (in the rail off the reader, and the current focus's card) is `/continue`, which resumes the current focus where it left off.
 - After **starting** a focus you go straight to reading. After **editing** one or **making one current** you come back to the cards, as does Cancel on either form.
 - The UI says "focuses", never "foci" (the code keeps `Focus`/`foci`).
 

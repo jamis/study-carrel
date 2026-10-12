@@ -1,7 +1,8 @@
 <% revising = @work.present? %>
 <% content_for :title, "#{revising ? "Revise #{@work.title}" : "Add a text"} · Study Carrel" %>
-<%= render "shared/header", crumbs: user_text_crumbs(@work), focus: Current.focus %>
+<%= render "shared/rail", focus: Current.focus %>
 <main class="texts-page">
+  <%= page_head user_text_crumbs(@work) %>
   <% if revising %>
     <h2 class="page-title">Revise “<%= @work.title %>”</h2>
     <% unit = @text.poetry? ? "stanza" : "sentence" %>

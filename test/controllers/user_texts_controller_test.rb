@@ -122,8 +122,8 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
   test "the reader names the sections either side by their own names, the work's title only as a tooltip" do
     work = UserText.new(title: "Quick to Help, Slow to Judge", source: "# Being Present\n\nOne.\n\n# Showing Up\n\nTwo.\n\n# Withholding Judgment\n\nThree.\n").publish!(@user)
     get reading_path(work.slug, 2, 1)
-    assert_select "#rail-library .trail-sides a[title='Quick to Help, Slow to Judge: Being Present']", "‹ Being Present"
-    assert_select "#rail-library .trail-sides a.trail-next", "Withholding Judgment ›"
+    assert_select "#rail-up .trail-sides a[title='Quick to Help, Slow to Judge: Being Present']", "‹ Being Present"
+    assert_select "#rail-up .trail-sides a.trail-next", "Withholding Judgment ›"
   end
 
   REVISED = "# Monday\n\nWoke early. Coffee first.\nRead a little more.\n"

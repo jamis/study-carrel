@@ -11,6 +11,18 @@ module ReadingsHelper
     trail
   end
 
+  # Above a page's title, quietly, the way up: every step of its crumbs but the last (the title names the page itself).
+  # A block adds the page's actions at the right (Kept's order, All notes' export).
+  def page_head(crumbs = [], &actions)
+    up = crumbs[0...-1]
+    return if up.empty? && !actions
+
+    trail = tag.nav(class: "page-trail", aria: { label: "Breadcrumb" }) do
+      tag.ol { safe_join(up.map { |label, path, title| tag.li(link_to(label, path, title: title)) }) }
+    end
+    tag.div(class: "page-head") { safe_join([ up.any? ? trail : tag.span, (capture(&actions) if actions) ]) }
+  end
+
   # The reading view's trail ends with the chapter. When the chapter's name is the work's title plus a number
   # ("Isaiah 40") the work crumb is skipped; when it is "Work: Label" (Pensées: Of the Means of Belief) the work
   # stays as its own crumb and the last one shows just the label, so it reads as a chapter of that work.
