@@ -31,4 +31,6 @@ This is the index. Each line is the rule in force; the linked file has the detai
 | Random | Scoped (innermost collection by default) and balanced across branches. | [random](docs/decisions/random.md) |
 | Search | FTS5 over unit text, every word required, reading order, a sentence at a time for prose; titles and notes not searched. | [search](docs/decisions/search.md) |
 
+**Exploratory, not decided:** [discovery](docs/decisions/discovery.md) holds brainstorm notes on helping new users find something to study (an exploring focus, curated lists, keeps in place of notes). Nothing in it is a rule.
+
 The original brief (v1 scope, open questions, early design implications) is in [origins](docs/decisions/origins.md).
