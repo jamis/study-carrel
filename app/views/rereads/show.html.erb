@@ -1,0 +1,101 @@
+<% content_for :title, "Reread · #{@focus.title} · Study Carrel" %>
+<%# Rereading a focus's notes: every one in reading order down the column, the one you're on lit and the rest dimmed
+    in place; the focus's scratchpad docked at right (a bottom sheet on phones), and over its foot, when called up,
+    the labels in use as a cloud or as tallies. The current focus's notes can be edited here, as in the reader. %>
+<main class="reader reread" data-controller="reread"
+      data-reread-position-url-value="<%= focus_reread_path(@focus) %>"
+      data-reread-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
+      data-reread-editor-url-template-value="<%= (unit_note_path("{id}") if @editable) %>"
+      data-action="keydown@document->reread#key mouseover->reread#light click@document->reread#away">
+  <%= render "shared/rail", focus: Current.focus %>
+
+  <div class="reader-col reread-col">
+    <%= page_head [ [ "Your focuses", foci_path ], [ "Notes", focus_notes_path(@focus) ], [ "Reread" ] ] %>
+    <header class="rr-focus">
+      <div class="nb-focus-head"><%= render "foci/mark" %><h1 class="nb-focus-title"><%= @focus.title %></h1></div>
+    </header>
+
+    <div class="rr-lede">
+      <span class="menu" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
+        Rereading
+        <button class="rr-filter" type="button" aria-expanded="false" data-menu-target="button" data-action="menu#toggle"><%= @label ? "the #{pluralize(@notes.size, "note")} labelled “#{@label.name}”" : pluralize(@notes.size, "note") %> ▾</button>
+        <span class="menu-panel rr-filter-menu" data-menu-target="panel">
+          <%= link_to focus_reread_path(@focus), class: "menu-item", aria: { current: ("page" unless @label) } do %>All notes<small><%= @all.size %></small><% end %>
+          <% @all.flat_map(&:labels).uniq.sort_by { it.name.downcase }.each do |label| %>
+            <%= link_to focus_reread_path(@focus, label: label.id), class: "menu-item", aria: { current: ("page" if label == @label) } do %><%= label.name %><small><%= @all.count { it.label_ids.include?(label.id) } %></small><% end %>
+          <% end %>
+        </span>
+      </span>
+      <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>c</kbd> for the labels</span>
+    </div>
+
+    <% if @notes.empty? %>
+      <p class="page-empty"><%= @label ? "No notes here carry “#{@label.name}” any more." : "No notes yet. Open a verse and write what it says to your question." %></p>
+    <% end %>
+
+    <div class="rr-run">
+      <% @notes.each do |note|
+           unit = note.unit %>
+        <article class="rr-row<%= " here" if note == @here %>" id="<%= dom_id(note, :reread) %>" data-reread-target="row"
+                 data-note-id="<%= note.id %>" data-unit-id="<%= unit.id %>" data-action="click->reread#pick">
+          <div class="rr-head">
+            <%= link_to unit_ref(unit.section, unit), reading_path(unit.section.work.slug, unit.section.number, unit.number), class: "rr-ref" %>
+            <span class="rr-open">Open in the reader →</span>
+          </div>
+          <p class="rr-passage"><%= unit.body %></p>
+          <div class="rr-note" id="<%= dom_id(unit, :reread_text) %>"><%= note.content %></div>
+          <div class="rr-editor composer" data-reread-target="slot"></div>
+          <%= render "rereads/note_labels", note: note %>
+        </article>
+      <% end %>
+    </div>
+
+    <%# The label picker, under the + label of the note you're on: your labels, filtered as you type; Enter or a click
+        puts the note on one, or on a new label of what you typed. %>
+    <div class="rr-picker" data-reread-target="picker" hidden>
+      <input type="text" maxlength="40" placeholder="Label this note" autocomplete="off" aria-label="Label" data-reread-target="pickerInput"
+             data-action="input->reread#filterPicker keydown->reread#pickerKey">
+      <div class="rr-picker-options" role="listbox" data-reread-target="pickerOptions"></div>
+    </div>
+    <%= form_with url: focus_note_labels_path(@focus, 0), method: :post, class: "rr-label-form", data: { reread_target: "labelForm" } do %>
+      <input type="hidden" name="name">
+    <% end %>
+  </div>
+
+  <aside class="panel reread-pad" data-controller="sheet" data-reread-target="pad"
+         data-action="keydown.esc@window->sheet#escape scratchpad:text@window->sheet#preview">
+    <button class="panel-handle" type="button" aria-expanded="false" data-sheet-target="handle" data-action="sheet#toggle">
+      <span class="panel-label">Scratchpad</span>
+      <% pad_text = @focus.scratchpad&.to_plain_text.to_s.squish.truncate(200) %>
+      <span class="preview<%= " empty" if pad_text.blank? %>" data-sheet-target="preview"><%= pad_text.presence || "Half-thoughts, questions, things to compare…" %></span>
+      <span class="go" data-sheet-target="label" aria-hidden="true">▴</span>
+    </button>
+    <button class="rr-summon rr-summon-phone" type="button" aria-expanded="false" data-action="reread#toggleLabels">Labels</button>
+    <div class="panel-head rr-pad-head">
+      <span class="panel-label">Scratchpad</span>
+      <button class="rr-summon" type="button" aria-expanded="false" data-action="reread#toggleLabels">Labels<kbd>c</kbd></button>
+    </div>
+    <div class="composer">
+      <%= form_with model: @focus, url: focus_scratchpad_path(@focus), method: :put,
+            data: { controller: "autosave", autosave_focus_id_value: @focus.id, autosave_param_value: "scratchpad", action: "submit->autosave#prevent" } do |form| %>
+        <%= form.rich_textarea :scratchpad, preset: "notes", rows: 8, placeholder: "Half-thoughts, questions, things to compare…",
+              aria: { label: "Scratchpad" },
+              data: { autosave_target: "editor", action: "lexxy:initialize->autosave#ready lexxy:change->autosave#changed lexxy:blur->autosave#save" } %>
+        <p class="autosave-status" aria-live="polite" data-autosave-target="status">&nbsp;</p>
+      <% end %>
+    </div>
+
+    <%# The labels in use, called up over the foot of the scratchpad (Labels, or c) and put away again (×, Esc, c). %>
+    <section class="rr-labels-panel" aria-label="Labels" data-reread-target="labelsPanel">
+      <div class="rr-labels-head">
+        <span class="panel-label">Labels on this focus</span>
+        <span class="rr-views">
+          <button type="button" data-view="cloud" data-action="reread#view">Cloud</button><button type="button" data-view="tallies" data-action="reread#view">Tallies</button>
+        </span>
+        <button class="rr-close" type="button" aria-label="Put the labels away" data-action="reread#toggleLabels">×</button>
+      </div>
+      <div class="rr-labels-body" id="reread_labels"><%= render "rereads/labels", focus: @focus, notes: @all %></div>
+      <p class="rr-labels-hint">Point at a label to light its notes; tap it to put the note you're on on it, or take it off.</p>
+    </section>
+  </aside>
+</main>

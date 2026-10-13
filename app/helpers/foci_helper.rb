@@ -11,6 +11,9 @@ module FociHelper
   end
 
   # "12 notes in Ruth, Leviticus and Deuteronomy", or "No notes yet". The count can link (to the notes page).
+  # "· Reread", after a focus's notes line on its card (it reads the notes, and leaves a past focus in the past).
+  def reread_link(focus) = safe_join([ " · ", link_to("Reread", focus_reread_path(focus)) ])
+
   def notes_line(count, works, link: nil)
     return "No notes yet" if count.zero?
 

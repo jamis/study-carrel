@@ -1,0 +1,34 @@
+<%# The labels in use on a focus: as a cloud (each label a pill, alphabetical, larger the more of the focus's notes it
+    holds; labels used only under other focuses trail faint and dashed) and as tallies (a mark per note, in reading
+    order, filled where the note carries the label). CSS shows one or the other.
+    focus; notes: the focus's notes in reading order, with their labels %>
+<% counts = focus.label_counts
+   elsewhere = focus.labels_elsewhere
+   here, away = focus.user.labels.alphabetical.partition { counts.key?(it.id) }
+   most = counts.values.max || 1 %>
+<div data-reread-target="labelsBody">
+<% if here.empty? && away.empty? %>
+  <p class="rr-none">No labels yet. Put the note you're on on one with + label, or <kbd>l</kbd>.</p>
+<% end %>
+<div class="rr-cloud">
+  <% here.each do |label|
+       n = counts[label.id]
+       also = elsewhere[label.id] %>
+    <button type="button" class="rr-word" style="font-size: <%= 15 + (17 * Math.sqrt(n.to_f / most)).round %>px"
+            data-label-id="<%= label.id %>" data-label-name="<%= label.name %>" data-action="reread#toggleLabel"
+            title="<%= label.name %>: <%= pluralize(n, "note") %><%= "; also under #{also.to_sentence}" if also %>"><%= label.name %></button>
+  <% end %>
+  <% away.each do |label| %>
+    <button type="button" class="rr-word away" data-label-id="<%= label.id %>" data-label-name="<%= label.name %>" data-action="reread#toggleLabel"
+            title="<%= label.name %>: under <%= elsewhere[label.id]&.to_sentence %>"><%= label.name %></button>
+  <% end %>
+</div>
+<div class="rr-tallies">
+  <% here.sort_by { -counts[it.id] }.each do |label| %>
+    <button type="button" class="rr-tally" data-label-id="<%= label.id %>" data-action="reread#toggleLabel">
+      <span class="rr-tally-name"><%= label.name %></span><span class="rr-tally-n"><%= counts[label.id] %></span>
+      <span class="rr-ticks"><% notes.each do |note| %><i data-note-id="<%= note.id %>"<%= ' class="on"'.html_safe if note.label_ids.include?(label.id) %>></i><% end %></span>
+    </button>
+  <% end %>
+</div>
+</div>

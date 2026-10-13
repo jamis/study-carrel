@@ -1,0 +1,2 @@
+<%= turbo_stream.replace dom_id(@note, :labels), partial: "rereads/note_labels", locals: { note: @note.reload } %>
+<%= turbo_stream.update "reread_labels", partial: "rereads/labels", locals: { focus: @focus, notes: @focus.notes_in_reading_order.includes(:labels) } %>

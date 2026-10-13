@@ -7,15 +7,17 @@ const MAX_RETRY = 60000
 // Browsers refuse keepalive requests with bodies over 64 KB.
 const KEEPALIVE_LIMIT = 60000
 
-// The always-open note editor: saves a moment after typing stops, when focus leaves the
-// editor, and when the verse changes (this controller disconnecting).
+// An always-open editor that saves itself: a verse's note, or a focus's scratchpad (param "scratchpad"). It saves a
+// moment after typing stops, when focus leaves the editor, and when the verse changes (this controller disconnecting).
 //
 // While the editor is on screen, failed saves retry with backoff. Once it's gone it never
 // retries: a newer editor for the same verse may have saved since. Instead, text that didn't
 // save waits in sessionStorage and comes back the next time this verse's editor opens.
+//
+// It announces "<param>:text" as the text changes and "<param>:saved" after each save.
 export default class extends Controller {
   static targets = ["editor", "status"]
-  static values = { unitId: Number, focusId: Number, delay: { type: Number, default: 800 } }
+  static values = { unitId: Number, focusId: Number, param: { type: String, default: "note" }, delay: { type: Number, default: 800 } }
 
   connect() {
     this.attempts = 0
@@ -72,7 +74,7 @@ export default class extends Controller {
     let failure = "Couldn't save; retrying…"
     let retry = true
     try {
-      const body = JSON.stringify({ focus_id: this.focusIdValue, note: { content: value } })
+      const body = JSON.stringify({ focus_id: this.focusIdValue, [this.paramValue]: { content: value } })
       const response = await fetch(this.element.action, {
         method: "PUT",
         headers: {
@@ -93,7 +95,7 @@ export default class extends Controller {
         // Server trouble may pass; any other refusal will only repeat.
         retry = response.status >= 500 || response.status === 408 || response.status === 429
         if (response.status === 409) failure = "Not saved: this focus is no longer current."
-        else if (!retry) failure = "Couldn't save this note."
+        else if (!retry) failure = this.paramValue === "note" ? "Couldn't save this note." : "Couldn't save."
         throw new Error(response.status)
       }
 
@@ -101,7 +103,7 @@ export default class extends Controller {
       this.attempts = 0
       this.#unsaved = null
       const noted = response.headers.get("X-Noted") === "true"
-      window.dispatchEvent(new CustomEvent("note:saved", { detail: { unitId: this.unitIdValue, noted } }))
+      window.dispatchEvent(new CustomEvent(`${this.paramValue}:saved`, { detail: { unitId: this.unitIdValue, noted } }))
       Turbo.renderStreamMessage(await response.text())
       this.#status(this.restored ? "Saved changes that hadn't saved before" : "Saved")
       this.restored = false
@@ -119,7 +121,7 @@ export default class extends Controller {
   }
 
   get #storageKey() {
-    return `unsaved-note:${this.focusIdValue}:${this.unitIdValue}`
+    return `unsaved-${this.paramValue}:${this.focusIdValue}:${this.unitIdValue}`
   }
 
   // Storage can be unavailable (private windows, blocked site data); then there's nothing to restore.
@@ -134,10 +136,10 @@ export default class extends Controller {
     } catch {}
   }
 
-  // The note's plain text, for the phone sheet's handle (sheet_controller.js).
+  // The plain text, for the phone sheet's handle (sheet_controller.js).
   #announceText() {
     const text = new DOMParser().parseFromString(this.editorTarget.value, "text/html").body.textContent.replace(/\s+/g, " ").trim()
-    window.dispatchEvent(new CustomEvent("note:text", { detail: { text } }))
+    window.dispatchEvent(new CustomEvent(`${this.paramValue}:text`, { detail: { text } }))
   }
 
   #status(text) {

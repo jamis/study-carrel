@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_13_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -74,6 +74,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
     t.datetime "edited_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "label_names", default: [], null: false
     t.index ["focus_id"], name: "index_detached_notes_on_focus_id"
     t.index ["user_id", "kept", "created_at"], name: "index_detached_notes_on_user_id_and_kept_and_created_at"
     t.index ["user_id"], name: "index_detached_notes_on_user_id"
@@ -87,7 +88,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
     t.datetime "updated_at", null: false
     t.integer "last_unit_id"
     t.integer "user_id", null: false
+    t.integer "reread_note_id"
     t.index ["last_unit_id"], name: "index_foci_on_last_unit_id"
+    t.index ["reread_note_id"], name: "index_foci_on_reread_note_id"
     t.index ["user_id", "archived_at", "created_at"], name: "index_foci_on_user_id_and_archived_at_and_created_at"
   end
 
@@ -115,6 +118,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
     t.index ["unit_id"], name: "index_keeps_on_unit_id"
     t.index ["user_id", "unit_id"], name: "index_keeps_on_user_id_and_unit_id", unique: true
     t.index ["user_id"], name: "index_keeps_on_user_id"
+  end
+
+  create_table "labels", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "name", null: false, collation: "NOCASE"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "name"], name: "index_labels_on_user_id_and_name", unique: true
+  end
+
+  create_table "note_labels", force: :cascade do |t|
+    t.integer "note_id", null: false
+    t.integer "label_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["label_id"], name: "index_note_labels_on_label_id"
+    t.index ["note_id", "label_id"], name: "index_note_labels_on_note_id_and_label_id", unique: true
   end
 
   create_table "notes", force: :cascade do |t|
@@ -225,12 +245,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
   add_foreign_key "collections", "collections", column: "parent_id", on_delete: :nullify
   add_foreign_key "detached_notes", "foci", on_delete: :nullify
   add_foreign_key "detached_notes", "users"
+  add_foreign_key "foci", "notes", column: "reread_note_id", on_delete: :nullify
   add_foreign_key "foci", "units", column: "last_unit_id", on_delete: :nullify
   add_foreign_key "foci", "users"
   add_foreign_key "invitations", "users", column: "created_by_id"
   add_foreign_key "invitations", "users", column: "redeemed_by_id", on_delete: :nullify
   add_foreign_key "keeps", "units"
   add_foreign_key "keeps", "users"
+  add_foreign_key "labels", "users"
+  add_foreign_key "note_labels", "labels", on_delete: :cascade
+  add_foreign_key "note_labels", "notes", on_delete: :cascade
   add_foreign_key "notes", "foci"
   add_foreign_key "notes", "units"
   add_foreign_key "sections", "works"

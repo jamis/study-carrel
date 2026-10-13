@@ -18,6 +18,7 @@ class User < ApplicationRecord
   has_many :detached_notes, -> { ordered }, dependent: :destroy
   has_many :texts, -> { order(:title, :id) }, class_name: "Work", inverse_of: :user
   has_many :shelves, -> { order(:name, :id) }, dependent: :destroy
+  has_many :labels, dependent: :delete_all
   has_many :invitations, foreign_key: :created_by_id, inverse_of: :created_by, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }

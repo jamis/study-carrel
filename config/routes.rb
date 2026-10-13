@@ -26,7 +26,11 @@ Rails.application.routes.draw do
     # Every focus has its notes page, the current one's or a past one's.
     resources :notes, only: :index do
       get :export, on: :collection
+      resources :labels, only: %i[create destroy], controller: "note_labels"
     end
+    # Rereading a focus's notes one at a time, labelling them, with its scratchpad: the page, and where it left off.
+    resource :reread, only: %i[show update]
+    resource :scratchpad, only: :update
   end
   resources :units, only: [] do
     resource :note, only: %i[show update], controller: "unit_notes"

@@ -2,7 +2,7 @@ class NotesController < ApplicationController
   before_action :set_focus, except: :current
 
   def index
-    @notes = @focus.notes_in_reading_order
+    @notes = @focus.notes_in_reading_order.includes(:labels)
     @detached = @focus.detached_notes.includes(:rich_text_content)
   end
 

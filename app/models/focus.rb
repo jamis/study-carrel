@@ -3,6 +3,10 @@ class Focus < ApplicationRecord
   has_many :notes, dependent: :destroy
   has_many :detached_notes, -> { ordered }, dependent: :nullify
   belongs_to :last_unit, class_name: "Unit", optional: true
+  belongs_to :reread_note, class_name: "Note", optional: true
+
+  # Rough thoughts while rereading this focus's notes.
+  has_rich_text :scratchpad
 
   validates :title, presence: true
 
@@ -26,6 +30,16 @@ class Focus < ApplicationRecord
     notes.includes(:rich_text_content, unit: { section: :work })
          .joins(unit: { section: :work })
          .order("works.position", "works.id", "sections.number", "units.number", :created_at, :id)
+  end
+
+  # How many of this focus's notes carry each label, keyed by label id.
+  def label_counts = NoteLabel.joins(:note).where(notes: { focus_id: id }).group(:label_id).count
+
+  # The titles of the user's other focuses each label is used under, keyed by label id.
+  def labels_elsewhere
+    NoteLabel.joins(note: :focus).where(foci: { user_id: user_id }).where.not(notes: { focus_id: id })
+             .distinct.order("foci.created_at").pluck(:label_id, "foci.title")
+             .group_by(&:first).transform_values { |pairs| pairs.map(&:last) }
   end
 
   def archived? = archived_at.present?

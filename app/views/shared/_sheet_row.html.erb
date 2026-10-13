@@ -3,6 +3,7 @@
     citation, passage, content: the reference, the passage's text, the note (or kept remark; may be nil)
     href: where the passage is read; the whole passage cell links there (nil for a detached note, whose passage is gone)
     actions: buttons under the note
+    labels: the note's label names, quietly under it (a detached note's are kept as text)
     detached: the detached note, which says why it was set aside and can be discarded %>
 <% detached = local_assigns[:detached]
    href = local_assigns[:href]
@@ -25,6 +26,9 @@
 </div>
 <div class="nb-note">
   <%= content %>
+  <% if (labels = local_assigns[:labels].presence || detached&.label_names.presence) %>
+    <p class="nb-labels"><%= labels.join(" · ") %></p>
+  <% end %>
   <% if actions || detached %>
     <div class="nb-note-actions">
       <%= actions %>

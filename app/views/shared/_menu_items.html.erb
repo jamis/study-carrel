@@ -3,6 +3,7 @@
     focus: the current focus (nil if none); reading: on the reading view (no "Continue reading");
     random / random_default: as for shared/_rail %>
 <%= render "notes/menu_link", focus: focus if focus %>
+<% if focus&.notes&.any? %><%= link_to "Reread these notes", focus_reread_path(focus), class: "menu-item" %><% end %>
 <%= link_to "Your focuses", foci_path, class: "menu-item menu-foci" %>
 <% unless reading %><%= link_to "Library", library_path, class: "menu-item menu-library" %><% end %>
 <button class="menu-item menu-history" type="button" data-history-open data-action="menu#close">Recent places<kbd>h</kbd></button>

@@ -176,4 +176,37 @@ class IsolationTest < ActionDispatch::IntegrationTest
     get new_shelf_path
     assert_no_match "Owner's diary", response.body
   end
+
+  test "another reader's reread, scratchpad, labels and position can't be seen, changed or used" do
+    label = @owner_note.label!("Owner's label")
+    @owner_focus.update!(scratchpad: "Owner's scratch")
+    mine = @other.foci.start!(title: "Other's focus")
+    my_note = mine.notes.create!(unit: verse(4), content: "Mine")
+    sign_in_as @other
+
+    get focus_reread_path(@owner_focus)
+    assert_response :not_found
+    get focus_reread_path(mine, label: label.id)
+    assert_response :not_found
+    patch focus_reread_path(@owner_focus), params: { note_id: @owner_note.id }, as: :json
+    assert_response :not_found
+    patch focus_reread_path(mine), params: { note_id: @owner_note.id }, as: :json
+    assert_response :not_found
+    put focus_scratchpad_path(@owner_focus), params: { scratchpad: { content: "Hijacked" } }, as: :json
+    assert_response :not_found
+    post focus_note_labels_path(@owner_focus, @owner_note), params: { name: "Hijacked" }, as: :turbo_stream
+    assert_response :not_found
+    delete focus_note_label_path(@owner_focus, @owner_note, label), as: :turbo_stream
+    assert_response :not_found
+    delete focus_note_label_path(mine, my_note, label), as: :turbo_stream
+    assert_response :not_found
+
+    post focus_note_labels_path(mine, my_note), params: { name: "Owner's label" }, as: :turbo_stream
+    assert_not_equal label, my_note.labels.sole, "a label of the same name is the reader's own"
+    get focus_reread_path(mine)
+    assert_no_match "Owner's scratch", response.body
+    assert_equal [ label ], @owner_note.labels.reload
+    assert_equal "Owner's scratch", @owner_focus.reload.scratchpad.to_plain_text
+    assert_nil @owner_focus.reread_note
+  end
 end

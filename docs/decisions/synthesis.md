@@ -1,6 +1,6 @@
 # Synthesis (exploratory)
 
-> **Tentative. Nothing here is decided.** These are notes from a brainstorm (2026-10-13) to experiment with. Don't build from this file, and don't treat any of it as a rule, until it has been settled and moved into the index as a decision.
+> **Mostly tentative.** These are notes from a brainstorm (2026-10-13) to experiment with. The reread (labels, the scratchpad, the cloud) has since been decided and built: see [reread.md](reread.md), which is the rule for it. The rest (free notes, essays) isn't decided; don't build from it, or treat it as a rule, until it has been settled and moved into the index.
 
 ## The problem
 
@@ -49,7 +49,8 @@ Labels on notes, like sorting index cards into piles as you reread, but many-to-
 
 - **Labels belong to the user, not the focus.** "attention" on a note under *What does it mean to be holy?* and on another under *What is Sabbath for?* is the same label, so a label connects focuses without any new concept.
 - A label's page groups its notes **under their focus**, laid out like a notes page (focus, passage, note), so no note is seen without the question it answers.
-- During the reread a quiet row of chips under the note, offering existing labels first. Renaming and merging easy. No counts, tag clouds or "unlabelled" nagging: labels are for thinking, and fast tagging turns into filing, which is the productivity-tool feel the app avoids.
+- During the reread a quiet row of chips under the note, offering existing labels first. Renaming and merging easy. No "unlabelled" nagging: labels are for thinking, not filing.
+- **The labels in use should be visible as you go**, so you see the shape of the synthesis forming: which labels hold the most notes and where in the focus they gather. Pointing at a label lights its notes. Built as a cloud and tallies on a panel over the scratchpad; see [reread.md](reread.md).
 - The same labels on keeps, perhaps (IDEAS.md asks for tags on kept passages), rather than building them twice.
 - A written statement per label ("what this pile says") was considered and dropped: the scratchpad holds that kind of nuance.
 
