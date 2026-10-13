@@ -651,7 +651,7 @@ a.fv-ref:hover { text-decoration: underline; }
   grid-column: 1 / -1; margin: 0; padding: 40px 0 0;
   font: 600 11px var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint);
 }
-.nb-detached .nb-ref { color: var(--ink-faint); } /* its passage is gone: nothing to open */
+.nb-passage:not(.nb-linked) .nb-ref { color: var(--ink-faint); } /* a detached note's passage is gone, a note on the whole has none: nothing to open */
 .nb-why { margin: 2px 0 0; font: 12px var(--sans); color: var(--ink-faint); }
 
 /* Phones: one column. The passage on the desk, its note on a slip of paper under it; "Open" always shows. */

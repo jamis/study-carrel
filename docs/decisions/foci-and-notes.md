@@ -35,6 +35,8 @@ History: a thin bar felt lost and a large hero banner too big; a filled pill wit
 
 **One note per verse per focus** (decided 2026-10-03), enforced by a unique index on `(focus_id, unit_id)`.
 
+**Notes on the focus as a whole** (decided 2026-10-13): what you notice across passages rather than on one. They have no unit (`notes.unit_id` is empty; the index still holds one note per passage, as SQLite treats each NULL as distinct), any number per focus, labelled like any note. They're written in the reread (see [reread.md](reread.md)), not in the reader, and saved to their own focus, so a past focus's can be written and changed too. On the notes page they follow the notes on passages under "On the whole focus", each dated where a passage would be, and the count reads "8 notes, in reading order, and 2 on the whole"; in the export, a "## On the whole focus" section. They count on the focus's card but name no work.
+
 - An always-open Lexxy editor, docked as a full-height page down the right (a bottom sheet on phones, whose handle shows the note's first line).
 - **Autosaves** as you type (and on leaving the verse); clearing it deletes the note. There is no add/expand step.
 - Toolbar shrunk (icons about 35% smaller) and moved below the text; on desktop it shows only while the editor has focus (decided 2026-10-05).

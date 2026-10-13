@@ -1,0 +1,20 @@
+<%# One note on the reread page. A note on a passage shows the passage and links into the reader; one on the focus as
+    a whole has neither. editor_url: where its editor loads from (the reader's, for the current focus's notes on
+    passages; its own, for notes on the whole focus; none for a past focus's notes on passages). %>
+<% unit = note.unit
+   editor_url = note.free? ? focus_note_path(focus, note) : (unit_note_path(unit) if focus == Current.focus) %>
+<article class="rr-row<%= " here" if here %><%= " rr-free" if note.free? %>" id="<%= dom_id(note, :reread) %>" data-reread-target="row"
+         data-note-id="<%= note.id %>" data-editor-url="<%= editor_url %>" data-action="click->reread#pick">
+  <div class="rr-head">
+    <% if unit %>
+      <%= link_to unit_ref(unit.section, unit), reading_path(unit.section.work.slug, unit.section.number, unit.number), class: "rr-ref" %>
+      <span class="rr-open">Open in the reader →</span>
+    <% else %>
+      <span class="rr-ref rr-whole">Written <%= l note.created_at.to_date, format: :long %></span>
+    <% end %>
+  </div>
+  <% if unit %><p class="rr-passage"><%= unit.body %></p><% end %>
+  <div class="rr-note" id="<%= dom_id(unit || note, :reread_text) %>"><%= note.content %></div>
+  <div class="rr-editor composer"></div>
+  <%= render "rereads/note_labels", note: note %>
+</article>

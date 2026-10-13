@@ -15,12 +15,16 @@ const KEEPALIVE_LIMIT = 60000
 // save waits in sessionStorage and comes back the next time this verse's editor opens.
 //
 // It announces "<param>:text" as the text changes and "<param>:saved" after each save.
+//
+// A new note on the focus as a whole has nowhere to save until its first save makes it: the form posts, and the reply
+// says where to save from then on (X-Save-Url, X-Save-Method), and where to start again if clearing it deletes it.
 export default class extends Controller {
   static targets = ["editor", "status"]
-  static values = { unitId: Number, focusId: Number, param: { type: String, default: "note" }, delay: { type: Number, default: 800 } }
+  static values = { unitId: Number, focusId: Number, param: { type: String, default: "note" }, key: String, delay: { type: Number, default: 800 } }
 
   connect() {
     this.attempts = 0
+    this.method ||= (this.element.querySelector("input[name=_method]")?.value || this.element.getAttribute("method") || "put").toUpperCase()
     this.retryNow = () => { if (this.retrying && document.visibilityState === "visible") this.save() }
     window.addEventListener("online", this.retryNow)
     document.addEventListener("visibilitychange", this.retryNow)
@@ -76,7 +80,7 @@ export default class extends Controller {
     try {
       const body = JSON.stringify({ focus_id: this.focusIdValue, [this.paramValue]: { content: value } })
       const response = await fetch(this.element.action, {
-        method: "PUT",
+        method: this.method,
         headers: {
           "Content-Type": "application/json",
           "Accept": "text/vnd.turbo-stream.html",
@@ -102,8 +106,14 @@ export default class extends Controller {
       this.saved = value
       this.attempts = 0
       this.#unsaved = null
+      const saveTo = response.headers.get("X-Save-Url")
+      if (saveTo) {
+        this.element.action = saveTo
+        this.method = response.headers.get("X-Save-Method") || "PUT"
+      }
       const noted = response.headers.get("X-Noted") === "true"
-      window.dispatchEvent(new CustomEvent(`${this.paramValue}:saved`, { detail: { unitId: this.unitIdValue, noted } }))
+      const noteId = response.headers.get("X-Note-Id")
+      window.dispatchEvent(new CustomEvent(`${this.paramValue}:saved`, { detail: { unitId: this.unitIdValue, noteId, noted, element: this.element } }))
       Turbo.renderStreamMessage(await response.text())
       this.#status(this.restored ? "Saved changes that hadn't saved before" : "Saved")
       this.restored = false
@@ -121,7 +131,7 @@ export default class extends Controller {
   }
 
   get #storageKey() {
-    return `unsaved-${this.paramValue}:${this.focusIdValue}:${this.unitIdValue}`
+    return `unsaved-${this.paramValue}:${this.keyValue || `${this.focusIdValue}:${this.unitIdValue}`}`
   }
 
   // Storage can be unavailable (private windows, blocked site data); then there's nothing to restore.

@@ -1,6 +1,7 @@
 # Renders a focus and its notes as Markdown: the focus, then each noted verse
-# (quoted) with its note underneath, in reading order, then any notes set aside
-# because their passage changed or was removed (see DetachedNote).
+# (quoted) with its note underneath, in reading order, then the notes on the
+# focus as a whole, then any notes set aside because their passage changed or
+# was removed (see DetachedNote).
 class MarkdownExport
   def initialize(focus)
     @focus = focus
@@ -16,6 +17,12 @@ class MarkdownExport
       out << "## #{note.unit.reference}"
       out << quote(note.unit.body)
       out << note_markdown(note)
+    end
+
+    free = @focus.free_notes
+    if free.any?
+      out << "## On the whole focus"
+      free.each { out << note_markdown(it) }
     end
 
     detached = @focus.detached_notes.includes(:rich_text_content)

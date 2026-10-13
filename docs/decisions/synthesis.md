@@ -1,6 +1,6 @@
 # Synthesis (exploratory)
 
-> **Mostly tentative.** These are notes from a brainstorm (2026-10-13) to experiment with. The reread (labels, the scratchpad, the cloud) has since been decided and built: see [reread.md](reread.md), which is the rule for it. The rest (free notes, essays) isn't decided; don't build from it, or treat it as a rule, until it has been settled and moved into the index.
+> **Mostly tentative.** These are notes from a brainstorm (2026-10-13) to experiment with. The reread (labels, the scratchpad, the cloud) and free notes (notes on the focus as a whole) have since been decided and built: see [reread.md](reread.md) and [foci-and-notes.md](foci-and-notes.md), which are the rule for them. The rest (essays) isn't decided; don't build from it, or treat it as a rule, until it has been settled and moved into the index.
 
 ## The problem
 
@@ -26,6 +26,8 @@ Step 2 is optional: sometimes you'll go straight from notes to writing. The rere
 Every phase leaves something behind (keeps, notes, labels, essays) for the next round to draw on.
 
 ## Free notes
+
+> Built 2026-10-13 as "notes on the focus as a whole"; [foci-and-notes.md](foci-and-notes.md) and [reread.md](reread.md) have the rules. They stay separate from detached notes (one has no passage, the other lost its passage), and they're written only in the reread for now, not from the reader. The notes below are the brainstorm.
 
 A note that belongs to the focus but to no passage: what you noticed *across* passages ("Isaiah keeps pairing holiness with the poor") rather than what one passage said to you.
 
@@ -79,5 +81,5 @@ One per focus: freeform, unlabelled, always there, picked up where you left off.
 3. **The writing layout:** the essay in the main column with sources on a sheet at right inverts the reader (text left, your writing right). Which side the essay belongs on wants prototyping.
 4. **The scratchpad in a multi-focus essay:** several scratchpads among the sources, or a scratch area per essay as well.
 5. **Labels across focuses from the start?** It's the main thing labels offer, but a label page mixing focuses needs care.
-6. **Free notes and detached notes:** one table or two.
+6. ~~**Free notes and detached notes:** one table or two.~~ Two: free notes are notes with no unit; detached notes stay as they are.
 7. **Phones:** writing an essay on a phone, with the sources as a bottom sheet, under the same-features rule.

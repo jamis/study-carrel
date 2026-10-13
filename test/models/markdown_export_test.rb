@@ -20,6 +20,15 @@ class MarkdownExportTest < ActiveSupport::TestCase
     assert md.end_with?("\n")
   end
 
+  test "notes on the focus as a whole come after those on passages" do
+    @focus.notes.create!(unit: verse(3), content: "<p>On a verse.</p>")
+    @focus.notes.create!(content: "<p>Across them all.</p>")
+
+    md = MarkdownExport.new(@focus).to_s
+    assert_includes md, "## On the whole focus\n\nAcross them all."
+    assert_operator md.index("On a verse."), :<, md.index("## On the whole focus")
+  end
+
   test "filename comes from the focus title" do
     assert_equal "what-does-it-mean-to-be-holy.md", MarkdownExport.new(@focus).filename
   end

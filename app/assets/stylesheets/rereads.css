@@ -73,6 +73,32 @@
 }
 .rr-row.here .rr-add:hover { color: var(--accent); border-color: var(--accent); }
 
+/* Notes on the focus as a whole, after those on passages; a new one is written in a row of its own. */
+.rr-free-notes:not(:has(.rr-row)) .rr-free-head { display: none; }
+.rr-free-head { margin: 34px 0 8px 24px; font: 600 10px var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+.rr-ref.rr-whole { color: var(--ink-soft); }
+/* At the end of the run, a blank slip to write on (as "A new question" is on the focuses page). */
+.rr-new {
+  display: block; width: 100%; margin-top: 18px; padding: 16px 24px; border: 1px dashed var(--rule); border-radius: 10px; background: none;
+  text-align: left; font-family: var(--serif); font-size: 17px; font-style: italic; color: var(--ink-faint);
+}
+.rr-new:hover { border-color: var(--accent); color: var(--accent); }
+.rr-unsaved .rr-note { display: none; }
+
+/* "Make a note of this", over a selection in the scratchpad; and the word that it's done. */
+.rr-lift {
+  position: fixed; z-index: 60; transform: translate(-50%, calc(-100% - 8px)); padding: 6px 12px; border: 0; border-radius: 8px;
+  background: var(--ink); color: var(--bg); font-family: var(--sans); font-size: 13px; box-shadow: var(--shadow);
+}
+.rr-lift:hover { background: var(--accent); }
+.rr-lift[hidden] { display: none; }
+.rr-toast {
+  position: fixed; z-index: 60; left: 50%; bottom: 24px; transform: translateX(-50%); margin: 0; padding: 9px 14px; border-radius: 10px;
+  background: var(--ink); color: var(--bg); font-family: var(--sans); font-size: 13.5px; box-shadow: var(--shadow);
+}
+.rr-toast[hidden] { display: none; }
+.rr-toast button { border: 0; background: none; padding: 0; margin-left: 6px; color: var(--accent-soft); text-decoration: underline; font: inherit; }
+
 /* The label picker, under + label. */
 .rr-picker {
   position: absolute; z-index: 25; width: 270px; padding: 8px; font-family: var(--sans);
@@ -100,7 +126,8 @@
 .rr-summon { border: 0; background: none; padding: 2px 0; font-family: var(--sans); font-size: 12.5px; color: var(--accent); }
 .rr-summon:hover { text-decoration: underline; }
 .rr-summon kbd { font: inherit; font-size: 11px; color: var(--ink-faint); margin-left: 5px; }
-.rr-summon-phone { display: none; }
+.rr-pad-tools { display: flex; align-items: baseline; gap: 16px; }
+.rr-pad-tools-phone { display: none; }
 
 .rr-labels-panel {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 10; max-height: 62%; display: flex; flex-direction: column;
@@ -114,7 +141,8 @@
 .rr-views button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
 .rr-close { border: 0; background: none; padding: 0 2px; font-size: 18px; line-height: 1; color: var(--ink-faint); }
 .rr-close:hover { color: var(--accent); }
-.rr-labels-body { min-height: 0; overflow-y: auto; }
+/* Padded as far as a tally's hover reaches past its text, so the rows fit inside it and it never scrolls sideways. */
+.rr-labels-body { min-height: 0; margin: 0 -8px; padding: 0 8px; overflow-x: hidden; overflow-y: auto; }
 .rr-labels-hint { margin: 12px 0 0; font-family: var(--sans); font-size: 11.5px; color: var(--ink-faint); }
 .rr-none { margin: 0; font-family: var(--sans); font-size: 13px; color: var(--ink-faint); }
 .rr-none kbd { font: inherit; }
@@ -156,13 +184,14 @@
   .reread-col { padding: 14px 8px 60vh; }
   .reread-col > .page-head { padding: 0 44px 0 8px; }
   .rr-focus { margin-top: 10px; padding: 0 44px 0 8px; }
-  .rr-lede, .reread .page-empty { margin-left: 16px; }
+  .rr-lede, .reread .page-empty, .rr-free-head { margin-left: 16px; }
+  .rr-toast { bottom: 76px; max-width: calc(100vw - 32px); }
   .rr-keys { display: none; }
   .rr-row { padding: 14px 12px 14px 16px; }
-  .rr-summon-phone { display: block; position: absolute; top: 15px; right: 44px; z-index: 2; }
-  .reread-pad .panel-handle .preview { margin-right: 52px; }
+  .rr-pad-tools-phone { display: flex; position: absolute; top: 15px; right: 44px; z-index: 2; }
+  .reread-pad .panel-handle .preview { margin-right: 120px; }
   .reread-pad { overflow: visible; }
-  .reread-pad:not(.open) > .rr-summon-phone, .reread-pad.labels-open > .rr-labels-panel { visibility: visible; }
+  .reread-pad:not(.open) > .rr-pad-tools-phone, .reread-pad.labels-open > .rr-labels-panel { visibility: visible; }
   .reread-pad:not(.open) > .rr-labels-panel {
     bottom: 100%; max-height: 50vh; border: 1px solid var(--rule); border-bottom: 0; border-radius: 14px 14px 0 0;
     box-shadow: 0 -8px 24px rgba(60, 40, 20, .1);

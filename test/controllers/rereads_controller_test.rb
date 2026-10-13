@@ -12,7 +12,7 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
   test "every note, in reading order, the first one lit" do
     get focus_reread_path(@focus)
     assert_response :success
-    assert_select ".rr-row .rr-ref" do |refs|
+    assert_select ".rr-row[data-note-id] .rr-ref" do |refs|
       assert_equal [ "Isaiah 40:3", "Isaiah 40:25" ], refs.map { it.text.strip }
     end
     assert_select ".rr-row.here", 1
@@ -38,8 +38,8 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
   test "rereads only the notes carrying one label" do
     waiting = @late.label!("waiting")
     get focus_reread_path(@focus, label: waiting.id)
-    assert_select ".rr-row", 1
-    assert_select ".rr-row .rr-ref", "Isaiah 40:25"
+    assert_select ".rr-row[data-note-id]", 1
+    assert_select ".rr-row[data-note-id] .rr-ref", "Isaiah 40:25"
     assert_select ".rr-filter", /labelled “waiting”/
   end
 
@@ -58,14 +58,14 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".rr-tallies .rr-tally:first-child .rr-ticks i.on", 2
   end
 
-  test "the current focus's notes get the reader's editor; a past focus's are only read" do
+  test "the current focus's notes on passages get the reader's editor; a past focus's are only read" do
     get focus_reread_path(@focus)
-    assert_select "[data-reread-editor-url-template-value*=?]", "/note"
+    assert_select "#reread_note_#{@late.id}[data-editor-url=?]", unit_note_path(verse(25))
 
     users(:one).foci.start!(title: "Rest")
     get focus_reread_path(@focus)
     assert_response :success
-    assert_select "[data-reread-editor-url-template-value=?]", ""
+    assert_select "#reread_note_#{@late.id}[data-editor-url=?]", ""
   end
 
   test "the scratchpad is saved, the current focus's or a past one's" do

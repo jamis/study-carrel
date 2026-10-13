@@ -59,4 +59,43 @@ class RereadTest < ApplicationSystemTestCase
     within(".rr-row.here") { assert_text "Saved" }
     assert_equal "The wilderness Met there.", @first.reload.content.to_plain_text.strip
   end
+
+  test "writing a note on the whole focus, labelling it, and leaving an empty one behind" do
+    visit focus_reread_path(@focus)
+    within(".rr-pad-head") { click_on "New note" }
+    within(".rr-row.here") { find("lexxy-editor [contenteditable]").send_keys "Holiness keeps stooping." }
+    within(".rr-row.here") { assert_text "Saved" }
+    note = @focus.free_notes.sole
+    assert_equal "Holiness keeps stooping.", note.content.to_plain_text.strip
+    assert_selector ".rr-row.here#reread_note_#{note.id}"
+
+    find("body").send_keys :escape, "l"
+    find(".rr-picker input").send_keys "the poor", :enter
+    assert_selector ".rr-row.here .rr-chip", text: "the poor"
+    assert_equal [ "the poor" ], note.labels.reload.map(&:name)
+
+    find("body").send_keys "n"
+    assert_selector ".rr-row.here.rr-unsaved"
+    find("body").send_keys :escape, "k"
+    assert_no_selector ".rr-unsaved"
+    assert_equal 1, @focus.free_notes.count
+  end
+
+  test "making a note of a line in the scratchpad" do
+    @focus.update!(scratchpad: "<p>Compare Amos 5?</p>")
+    visit focus_reread_path(@focus)
+    execute_script <<~JS
+      const line = document.querySelector(".reread-pad .lexxy-editor__content p")
+      const range = document.createRange()
+      range.selectNodeContents(line)
+      getSelection().removeAllRanges()
+      getSelection().addRange(range)
+    JS
+    click_on "Make a note of this"
+    assert_text "Made a note on the whole focus."
+    assert_selector "#reread_free .rr-row", text: "Compare Amos 5?"
+    assert_equal "Compare Amos 5?", @focus.free_notes.sole.content.to_plain_text.strip
+    click_on "Go to it"
+    assert_selector ".rr-row.here", text: "Compare Amos 5?"
+  end
 end

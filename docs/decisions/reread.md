@@ -1,17 +1,24 @@
 # Reread
 
-The first part of synthesis (see [synthesis.md](synthesis.md), still exploratory for what comes after): going back over a focus's notes one at a time, labelling them as you go, with a scratchpad beside them for rough thoughts. Decided 2026-10-13 and built as a page of its own; it may later merge with the notes page if the two turn out to overlap too much.
+The first part of synthesis (see [synthesis.md](synthesis.md), still exploratory for essays): going back over a focus's notes one at a time, labelling them as you go, with a scratchpad beside them for rough thoughts. Decided 2026-10-13 and built as a page of its own; it may later merge with the notes page if the two turn out to overlap too much.
 
 ## The page
 
 **`/foci/:id/reread`, for any focus**, the current one or a past one, without making a past one current. The rail stays the current focus's.
 
-- Every note in reading order down one column, as on the notes page (reference, passage, note), the one you're on lit and the rest dimmed in place, as clause by clause dims the rest of a passage. The passage is clamped to two lines except on the lit note.
+- Every note on a passage in reading order down one column, as on the notes page (reference, passage, note), then the notes on the focus as a whole under "On the whole focus", each dated. The one you're on is lit and the rest dimmed in place, as clause by clause dims the rest of a passage. The passage is clamped to two lines except on the lit note.
 - `j`/`k` (or `←`/`→`) move, as does clicking a note. The lit note scrolls to the middle.
 - **Where you left off** is kept per focus (`foci.reread_note_id`, cleared if that note goes), so the reread opens there again.
 - The way up: Your focuses › Notes. The reference links into the reader, with "Open in the reader →" on the lit note.
 - `?label=` rereads only the notes carrying one label, chosen from "Rereading 8 notes ▾" over the run.
-- **Editing:** the current focus's lit note gets the reader's editor in place (`e` puts the cursor at its end). A past focus's notes are only read here: the reader's note editor saves to the current focus, and editing a past focus's notes was a nice-to-have left out to keep this simple.
+- **Editing:** the current focus's lit note gets the reader's editor in place (`e` puts the cursor at its end). A past focus's notes on passages are only read here: the reader's note editor saves to the current focus, and editing them was a nice-to-have left out to keep this simple. Notes on the whole focus save to their own focus, so they can be edited on any focus.
+
+## Notes on the whole focus
+
+See [foci-and-notes.md](foci-and-notes.md) for what they are. Here is where they're written:
+
+- **New note** (`n`), by the scratchpad beside Labels (on phones, on its sheet's handle, which closes the sheet), and a dashed "+ New note" slip at the end of the run, open a new row at the end with its editor. The first save makes the note (the reply tells the editor where to save from then on), and it can be labelled once it exists. Moving on from a new row left empty removes it. Clearing a note deletes it, as in the reader. (It was "+ Note on the whole focus", a faint link at the end of the run only: hard to find on a long run, and wordy.)
+- **Make a note of this:** select some of the scratchpad and a button over the selection turns it into a note on the whole focus at the end of the run (its lines as paragraphs); "Made a note on the whole focus · Go to it" says so. The scratchpad keeps the working, the note the result. The words stay in the scratchpad.
 
 ## Labels
 

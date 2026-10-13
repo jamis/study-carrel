@@ -24,6 +24,7 @@ class UnitNotesController < ApplicationController
     end
 
     response.set_header "X-Noted", noted.to_s
+    response.set_header "X-Note-Id", @note.id.to_s if noted
     respond_to { |format| format.turbo_stream }
   end
 

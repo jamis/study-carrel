@@ -23,8 +23,9 @@ Rails.application.routes.draw do
     member do
       patch :restore
     end
-    # Every focus has its notes page, the current one's or a past one's.
-    resources :notes, only: :index do
+    # Every focus has its notes page, the current one's or a past one's. Notes on the focus as a whole (free notes)
+    # are written in its reread: new and show are their editors, create and update their autosave.
+    resources :notes, only: %i[index new create show update] do
       get :export, on: :collection
       resources :labels, only: %i[create destroy], controller: "note_labels"
     end

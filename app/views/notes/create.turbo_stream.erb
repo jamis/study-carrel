@@ -1,0 +1,9 @@
+<% if @lifted %>
+  <%# Made a note of from the scratchpad: a new row at the end of the reread's notes on the whole focus. %>
+  <%= turbo_stream.append "reread_free", partial: "rereads/row", locals: { note: @note, focus: @focus, here: false } %>
+<% else %>
+  <%# The new note's editor made it: its row's labels, now it has an id to label. %>
+  <%= turbo_stream.replace "new_note_labels", partial: "rereads/note_labels", locals: { note: @note } %>
+<% end %>
+<%= turbo_stream.update "reread_labels", partial: "rereads/labels", locals: { focus: @focus, notes: @focus.notes_for_reread } %>
+<%= turbo_stream.replace "focus_notes_link", partial: "notes/menu_link", locals: { focus: @focus } if @focus == Current.focus %>
