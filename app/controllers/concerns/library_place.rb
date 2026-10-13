@@ -1,5 +1,5 @@
 # The work or collection a request names by slug (params[:work] or params[:collection]), the user's own texts
-# (params[:texts]), or nil for the whole library.
+# (params[:texts]), one of their shelves (params[:shelf]), or nil for the whole library.
 module LibraryPlace
   private
 
@@ -7,6 +7,7 @@ module LibraryPlace
     if params[:work].present? then Work.visible_to(Current.user).find_by!(slug: params[:work])
     elsif params[:collection].present? then Collection.find_by!(slug: params[:collection])
     elsif params[:texts].present? then OwnTexts.new(Current.user)
+    elsif params[:shelf].present? then Current.user.shelves.find_by!(slug: params[:shelf])
     end
   end
 end

@@ -3,6 +3,7 @@
 <main class="page">
   <%= page_head library_crumbs(@collection) %>
   <h2 class="page-title"><%= @collection.name %></h2>
+  <div class="page-lede<%= " page-lede-tight" if @collection.description.present? %>"><%= @collection.single_work? ? pluralize(@collection.all_works.count, "book") : pluralize(@work_counts.fetch(@collection.id), "work") %> · <%= render "shelves/put", thing: @collection %></div>
   <% if @collection.description.present? %><p class="page-lede"><%= @collection.description %></p><% end %>
   <%= render "shared/search_form", place: @collection %>
 

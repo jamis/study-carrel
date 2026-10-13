@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -146,6 +146,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_120000) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "shelf_items", force: :cascade do |t|
+    t.integer "shelf_id", null: false
+    t.integer "work_id"
+    t.integer "collection_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_id"], name: "index_shelf_items_on_collection_id"
+    t.index ["shelf_id", "collection_id"], name: "index_shelf_items_on_shelf_id_and_collection_id", unique: true
+    t.index ["shelf_id", "work_id"], name: "index_shelf_items_on_shelf_id_and_work_id", unique: true
+    t.index ["work_id"], name: "index_shelf_items_on_work_id"
+    t.check_constraint "(work_id IS NULL) <> (collection_id IS NULL)", name: "shelf_item_is_one_thing"
+  end
+
+  create_table "shelves", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.string "slug", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_shelves_on_slug", unique: true
+    t.index ["user_id"], name: "index_shelves_on_user_id"
+  end
+
   create_table "units", force: :cascade do |t|
     t.integer "section_id", null: false
     t.integer "number", null: false
@@ -211,6 +235,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_120000) do
   add_foreign_key "notes", "units"
   add_foreign_key "sections", "works"
   add_foreign_key "sessions", "users"
+  add_foreign_key "shelf_items", "collections", on_delete: :cascade
+  add_foreign_key "shelf_items", "shelves", on_delete: :cascade
+  add_foreign_key "shelf_items", "works", on_delete: :cascade
+  add_foreign_key "shelves", "users"
   add_foreign_key "units", "sections"
   add_foreign_key "visits", "units"
   add_foreign_key "visits", "users"

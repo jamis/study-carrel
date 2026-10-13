@@ -1,0 +1,86 @@
+/* ---------- shelves: a user's own groups of works and collections (see ShelvesController) ---------- */
+.shelf-holds { margin-left: 8px; font-family: var(--sans); font-size: 13px; color: var(--ink-soft); }
+.shelf-desc { margin: -16px 0 24px; color: var(--ink-soft); font-size: 17px; }
+.page-lede-tight { margin-bottom: 6px; }
+.menu-label { padding: 8px 12px 2px; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-faint); }
+
+/* A page's own action at the end of the line under its title, as Revise is on a user's text. */
+div.page-lede { position: relative; }
+.shelf-put { display: inline; }
+.lede-link { border: 0; background: none; padding: 0; font: inherit; color: var(--accent); text-decoration: underline; cursor: pointer; }
+.lede-link[aria-expanded="true"] { text-decoration: none; }
+
+/* Put on a shelf…: a checklist dropping from that line (a sheet on phones) */
+.shelf-pop {
+  display: none; position: absolute; left: 0; top: calc(100% + 8px); z-index: 30; width: min(340px, calc(100vw - 32px));
+  padding: 6px; background: var(--bg); border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+  font-family: var(--sans); font-size: 14px; color: var(--ink);
+}
+.shelf-pop.open { display: block; }
+.pop-head { padding: 6px 12px 4px; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-soft); }
+.pop-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; min-height: 40px; border-radius: 8px; cursor: pointer; }
+.pop-row:hover { background: var(--accent-soft); }
+.pop-row.through { cursor: default; }
+.pop-row.through:hover { background: none; }
+.pop-row input { margin: 3px 0 0; accent-color: var(--accent); }
+.pop-name { color: var(--ink); font-size: 15px; }
+.pop-why { display: block; font-size: 12px; color: var(--ink-soft); }
+.pop-new-btn { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 9px 12px; border-radius: 8px; color: var(--accent); }
+.pop-new-btn:hover { background: var(--accent-soft); }
+.pop-new-btn[aria-expanded="true"] { display: none; }
+.pop-new { display: flex; gap: 6px; padding: 6px; }
+.pop-new[hidden] { display: none; }
+.pop-new input { flex: 1; min-width: 0; padding: 7px 12px; border: 1px solid var(--rule); border-radius: 999px; background: var(--paper); color: var(--ink); font: inherit; }
+.pop-new input:focus { border-color: var(--accent); outline: none; }
+.pop-foot { margin: 0; padding: 6px 12px 4px; border-top: 1px solid var(--rule); font-size: 12px; color: var(--ink-faint); }
+@media (max-width: 599px) {
+  .shelf-pop { position: fixed; left: 0; right: 0; top: auto; bottom: 0; width: auto; border-radius: 14px 14px 0 0; padding: 10px 8px calc(14px + env(safe-area-inset-bottom)); }
+  .pop-row { min-height: 48px; }
+  body:has(.shelf-pop.open)::after { content: ""; position: fixed; inset: 0; z-index: 29; background: rgba(0, 0, 0, .25); }
+}
+
+/* The editor: the name, then what's on the shelf, then the library tree with a box beside everything */
+.shelf-name-input, .shelf-desc-input { width: 100%; border: 0; border-bottom: 1px solid var(--rule); background: transparent; font-family: var(--serif); }
+.shelf-name-input { margin: 6px 0; padding: 2px 0; color: var(--ink); font-size: clamp(26px, 4.5vw, 36px); }
+.shelf-desc-input { margin: 0 0 8px; padding: 4px 0; color: var(--ink-soft); font-size: 17px; }
+.shelf-name-input:focus, .shelf-desc-input:focus { outline: none; border-color: var(--accent); }
+.shelf-name-input::placeholder, .shelf-desc-input::placeholder { color: var(--ink-faint); }
+.shelf-holding { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; font-family: var(--sans); }
+.held-empty { font-size: 13px; color: var(--ink-faint); font-style: italic; }
+.held { display: inline-flex; align-items: center; gap: 4px; padding: 3px 4px 3px 12px; border-radius: 999px; background: var(--accent-soft); font-size: 13px; }
+.held button { width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--ink-soft); line-height: 1; }
+.held button:hover { background: var(--bg); color: var(--accent); }
+.shelf-find {
+  width: 100%; margin-bottom: 10px; padding: 9px 14px; border: 1px solid var(--rule); border-radius: 999px;
+  background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 15px;
+}
+.shelf-find:focus { border-color: var(--accent); outline: none; }
+.shelf-tree, .shelf-tree ul { list-style: none; margin: 0; padding: 0; }
+.shelf-tree ul { padding-left: 22px; }
+.shelf-tree { border-top: 1px solid var(--rule); }
+.shelf-tree > li { padding: 4px 0; border-bottom: 1px solid var(--rule); }
+.tree-row { display: flex; align-items: center; gap: 4px; min-height: 38px; }
+.tree-toggle { flex: none; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--ink-faint); font-size: 11px; transition: transform .15s; }
+.tree-toggle:hover { background: var(--accent-soft); color: var(--accent); }
+.tree-toggle[aria-expanded="true"] { transform: rotate(90deg); }
+.tree-spacer { flex: none; width: 26px; }
+.tree-row label { display: flex; flex: 1; align-items: center; gap: 9px; min-width: 0; padding: 4px 0; cursor: pointer; }
+.tree-row input { flex: none; width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
+.tree-name { font-size: 18px; }
+.tree-row.coll .tree-name, .tree-group .tree-name { font-style: italic; }
+.tree-row.coll.single .tree-name { font-style: normal; }
+.tree-group .tree-name { flex: 1; padding: 4px 0 4px 25px; }
+.tree-row.through .tree-name { color: var(--ink-soft); }
+.tree-row.through label { cursor: default; }
+.tree-meta { flex: none; font-family: var(--sans); font-size: 12px; color: var(--ink-faint); text-align: right; }
+.tree-row.on .tree-meta, .tree-row.some .tree-meta { color: var(--accent); }
+.shelf-edit-foot { display: flex; align-items: center; gap: 16px; margin-top: 28px; font-family: var(--sans); font-size: 14px; }
+.shelf-edit-foot .primary { padding: 9px 20px; }
+.shelf-cancel { color: var(--ink-soft) !important; }
+.shelf-delete-form { margin-top: 36px; }
+.shelf-delete { border: 0; background: none; padding: 0; font-family: var(--sans); font-size: 13px; color: var(--ink-faint); text-decoration: underline; text-underline-offset: 3px; }
+.shelf-delete:hover { color: #b3402a; }
+@media (max-width: 599px) {
+  .tree-row { min-height: 46px; }
+  .tree-meta { max-width: 9em; }
+}

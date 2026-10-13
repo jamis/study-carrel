@@ -1,0 +1,6 @@
+<%# "Put on a shelf…", at the end of the line under a work's or collection's title, opening the picker under that line
+    (a sheet on phones). thing: the work or collection %>
+<div class="shelf-put" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
+  <button class="lede-link" type="button" aria-expanded="false" aria-controls="shelf-pop" data-menu-target="button" data-action="menu#toggle">Put on a shelf…</button>
+  <div class="shelf-pop" id="shelf-pop" role="dialog" aria-label="Put on a shelf" data-menu-target="panel"><%= render "shelves/picker", thing: %></div>
+</div>

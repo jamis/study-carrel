@@ -140,4 +140,40 @@ class IsolationTest < ActionDispatch::IntegrationTest
     assert_empty Keep.where(unit:)
     assert_nil other_focus.reload.last_unit
   end
+
+  test "another reader's shelf can't be seen, rolled in, searched, changed or added to" do
+    shelf = @owner.shelves.create!(name: "Owner's shelf")
+    shelf.replace!([ verse(3).section.work ])
+    sign_in_as @other
+
+    get library_path
+    assert_no_match "Owner's shelf", response.body
+    get work_path("isaiah-kjv")
+    assert_no_match "Owner's shelf", response.body
+    [ shelf_path(shelf), edit_shelf_path(shelf), random_shelf_path(shelf), search_path(q: "comfort", shelf: shelf.slug) ].each do |path|
+      get path
+      assert_response :not_found, path
+    end
+    patch shelf_path(shelf), params: { shelf: { name: "Hijacked" }, items: [ "" ] }
+    assert_response :not_found
+    delete shelf_path(shelf)
+    assert_response :not_found
+    post shelf_item_path(shelf, key: "work-#{verse(3).section.work.id}")
+    assert_response :not_found
+    assert_equal "Owner's shelf", shelf.reload.name
+    assert_equal 1, shelf.items.count
+  end
+
+  test "another reader's text can't be put on a shelf" do
+    diary = UserText.new(title: "Owner's diary", source: "Private words.").publish!(@owner)
+    mine = @other.shelves.create!(name: "Mine")
+    sign_in_as @other
+
+    post shelf_item_path(mine, key: "work-#{diary.id}")
+    assert_response :not_found
+    post shelves_path, params: { shelf: { name: "Sneaky" }, items: [ "work-#{diary.id}" ] }
+    assert_empty @other.shelves.find_by!(name: "Sneaky").items
+    get new_shelf_path
+    assert_no_match "Owner's diary", response.body
+  end
 end

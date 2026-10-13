@@ -1,0 +1,33 @@
+<%# One work or collection in the shelf editor's tree, with what's under a collection nested inside it (child
+    collections, then works, as on its page). Folded unless it's top level or holds something on the shelf.
+    thing: the work or collection; shelf; depth: 0 at the top %>
+<% collection = thing if thing.is_a?(Collection)
+   kids = collection ? @collections_by_parent.fetch(collection.id, []) + @works_by_collection.fetch(collection.id, []) : []
+   via = (shelf.via(thing) unless shelf.on?(thing))
+   name = shelf_thing_name(thing)
+   meta = if collection
+            collection.single_work? ? pluralize(collection.all_works.count, "book") : pluralize(@work_counts.fetch(collection.id), "work")
+          elsif thing.short_author.present? && !thing.collection&.name.to_s.include?(thing.short_author)
+            thing.short_author
+          end
+   open = depth.zero? || @open_ids.include?(collection&.id) %>
+<li data-find="<%= [ name, thing.try(:author) ].compact.join(" ").downcase %>">
+  <div class="tree-row<%= " coll" if collection %><%= " single" if collection&.single_work? %>">
+    <% if kids.any? %>
+      <button class="tree-toggle" type="button" aria-expanded="<%= open %>" data-action="shelf-editor#toggle" aria-label="Show what’s in <%= name %>">▶</button>
+    <% else %>
+      <span class="tree-spacer"></span>
+    <% end %>
+    <label>
+      <input type="checkbox" name="items[]" value="<%= Shelf.key_for(thing) %>" data-shelf-editor-target="box" data-name="<%= name %>"
+             data-action="shelf-editor#refresh" <%= "checked" if shelf.on?(thing) || via %> <%= "disabled data-through" if via %>>
+      <span class="tree-name"><%= name %></span>
+    </label>
+    <span class="tree-meta" data-default="<%= meta %>"><%= via ? "through #{via.name}" : meta %></span>
+  </div>
+  <% if kids.any? %>
+    <ul<%= " hidden" unless open %>>
+      <% kids.each do |kid| %><%= render "shelves/tree_node", thing: kid, shelf:, depth: depth + 1 %><% end %>
+    </ul>
+  <% end %>
+</li>

@@ -1,0 +1,33 @@
+<% content_for :title, "#{@shelf.name} · Study Carrel" %>
+<%= render "shared/rail", random: RandomScope.chain_for(@shelf), focus: Current.focus %>
+<main class="page">
+  <%= page_head [ [ "Library", library_path ], [ @shelf.name, shelf_path(@shelf) ] ] %>
+  <h2 class="page-title"><%= @shelf.name %></h2>
+  <p class="page-lede shelf-lede">Your shelf · <%= @members.any? ? "#{pluralize(@work_count, "work")} in all" : "empty" %> · only you can see it · <%= link_to "Edit shelf", edit_shelf_path(@shelf) %></p>
+  <% if @shelf.description %><p class="shelf-desc"><%= @shelf.description %></p><% end %>
+
+  <% if @members.empty? %>
+    <p class="page-empty">Nothing on this shelf yet. <%= link_to "Choose works for it", edit_shelf_path(@shelf) %>, or use “Put on a shelf…” on any work or collection.</p>
+  <% else %>
+    <%= render "shared/search_form", place: @shelf %>
+  <% end %>
+
+  <% @members.grep(Collection).each do |collection| %>
+    <div class="list-row">
+      <div class="list-row-title<%= " as-work" if collection.single_work? %>"><%= link_to collection.name, collection_path(collection) %></div>
+      <% if collection.description.present? %><div class="list-row-desc"><%= collection.description %></div><% end %>
+      <div class="list-row-meta">
+        <%= [ (pluralize(@work_counts.fetch(collection.id), "work") unless collection.single_work?), ("in #{collection.parent.name}" if collection.parent) ].compact.join(" · ") %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="works">
+    <% @members.grep(Work).each do |work| %>
+      <%= link_to work_path(work), class: "work-link" do %>
+        <span class="work-link-title"><%= work.title %></span>
+        <span class="work-link-meta"><%= work.own_text? ? "Your Texts" : [ work.byline, work.edition, work.collection&.name ].compact_blank.join(" · ") %></span>
+      <% end %>
+    <% end %>
+  </div>
+</main>

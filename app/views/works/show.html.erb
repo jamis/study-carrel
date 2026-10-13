@@ -4,7 +4,7 @@
 <main class="page">
   <%= page_head library_crumbs(@work.collection, work: @work) %>
   <h2 class="page-title"><%= @work.title %></h2>
-  <p class="page-lede"><%= [ @work.byline, @work.edition, pluralize(@sections.size, "section") ].compact_blank.join(" · ") %><% if @work.user == Current.user %> · <%= link_to "Revise", edit_text_path(@work) %><% end %></p>
+  <div class="page-lede"><%= [ @work.byline, @work.edition, pluralize(@sections.size, "section") ].compact_blank.join(" · ") %><% if @work.user == Current.user %> · <%= link_to "Revise", edit_text_path(@work) %><% end %> · <%= render "shelves/put", thing: @work %></div>
   <%= render "shared/search_form", place: @work %>
 
   <% if numbered %>

@@ -22,5 +22,6 @@ Results come in **reading order, not relevance**, 50 to a page, with highlighted
 - The library, collection and work pages each have a search box scoped to themselves. The boxes read "Find words in Poetry" (not "Search Poetry", which suggested finding a work by title), and the search page's hint says titles aren't searched (2026-10-05).
 - The ⋯ menu has Search, and `/` opens it (or focuses the box).
 - User texts are included for their owner (see [user-texts.md](user-texts.md)).
+- A shelf has its own box and scope (`?shelf=`, 2026-10-12), searching every work on it and under its collections (see [shelves.md](shelves.md)).
 
 Left out for now: matching titles and references, and searching notes.

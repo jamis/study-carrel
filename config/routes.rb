@@ -48,6 +48,12 @@ Rails.application.routes.draw do
     match :review, on: :member, via: %i[post patch] # the revision's form is a PATCH, and "Edit the text" posts it here
   end
   resources :detached_notes, only: :destroy
+  # A user's shelves: works and collections grouped to roll Random and search in. "Put on a shelf…" on a work or
+  # collection page adds or takes off one thing (shelf_items, keyed "work-12" or "collection-3").
+  resources :shelves, only: %i[show new create edit update destroy], param: :slug do
+    resource :item, only: %i[create destroy], controller: "shelf_items"
+  end
+  get "shelves/:shelf/random", to: "random_readings#show", as: :random_shelf
   resources :collections, only: :show, param: :slug
   resources :works, only: :show, param: :slug
   get "read/:slug/:section(/:number)", to: "readings#show", as: :reading

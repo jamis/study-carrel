@@ -2,7 +2,8 @@
 # library (place nil). Rolls are balanced: each branch of the library gets an even chance at every level (Sacred
 # Texts > Bible, Book of Mormon, Quran, ... alike), then the roll picks evenly among the units of the work it reaches;
 # a single-work collection (the Bible) counts as one branch and is even by unit inside, so Obadiah is no likelier than
-# Psalm 119's verses. A user's own texts (OwnTexts) are one more branch of the library, all of them together.
+# Psalm 119's verses. A user's own texts (OwnTexts) are one more branch of the library, all of them together. A shelf
+# (Shelf) is a place of its own, whose branches are the works and collections on it.
 class RandomScope
   attr_reader :place
 
@@ -12,7 +13,7 @@ class RandomScope
 
   # The places enclosing a work or collection, innermost first: itself, its collections out to the top, the library.
   def self.chain_for(place)
-    return [ new(place), library ] if place.is_a?(OwnTexts)
+    return [ new(place), library ] if place.is_a?(OwnTexts) || place.is_a?(Shelf)
     return [ new(place), new(OwnTexts.new(place.user)), library ] if place.is_a?(Work) && place.own_text?
 
     collection = place.is_a?(Work) ? place.collection : place
@@ -72,6 +73,7 @@ class RandomScope
 
   def branches(node)
     return works.select(&:user_id) if node.is_a?(OwnTexts)
+    return collections.select { node.collection_ids.include?(it.id) } + works.select { node.work_item_ids.include?(it.id) } if node.is_a?(Shelf)
 
     id = node&.id
     found = collections.select { it.parent_id == id } + works.select { it.collection_id == id && !it.user_id }

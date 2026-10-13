@@ -76,4 +76,10 @@ class LibrarySearchTest < ActiveSupport::TestCase
     Unit.reindex_search
     assert_equal [ "Matthew 1:1" ], refs("father")
   end
+
+  test "a shelf searches the works on it and under its collections" do
+    shelf = users(:one).shelves.create!(name: "Mine")
+    shelf.replace!([ Collection.find_by!(slug: "old-testament"), Work.find_by!(slug: "walden") ])
+    assert_equal [ "Walden: Economy, paragraph 1", "Genesis 2:1" ], refs("holy", place: shelf), "in library order"
+  end
 end

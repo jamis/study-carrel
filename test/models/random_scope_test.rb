@@ -52,4 +52,17 @@ class RandomScopeTest < ActiveSupport::TestCase
     assert 50.times.all? { RandomScope.new(OwnTexts.new(user)).unit(user).section.work.user == user }
     assert 50.times.none? { RandomScope.library.unit(users(:two)).section.work.own_text? }
   end
+
+  test "a shelf rolls evenly among what's on it, and is its own place out to the library" do
+    user = users(:one)
+    shelf = user.shelves.create!(name: "Mine")
+    shelf.replace!([ Collection.find_by!(slug: "bible"), Work.find_by!(slug: "dhammapada") ])
+
+    seen = 200.times.map { RandomScope.new(shelf).unit(user).section.work.slug }.tally
+    assert_operator seen["dhammapada"], :>, 60, "the Dhammapada is one of two things on the shelf: #{seen}"
+    assert_equal [ "Mine", "Whole library" ], RandomScope.chain_for(shelf).map(&:label)
+
+    shelf.replace!([ Collection.find_by!(slug: "poetry") ])
+    assert_nil RandomScope.new(shelf).unit(user)
+  end
 end

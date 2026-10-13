@@ -1,0 +1,37 @@
+<%# What "Put on a shelf…" opens on a work or collection page: each of the user's shelves, ticked when the thing is
+    on it, or ticked and greyed when it's on it through a collection; then a new shelf. Ticking saves at once, and the
+    picker is drawn again in place. thing: the work or collection %>
+<% key = Shelf.key_for(thing)
+   name = shelf_thing_name(thing) %>
+<div id="shelf-picker">
+  <div class="pop-head">Put <%= name %> on</div>
+  <% Current.user.shelves.each do |shelf| %>
+    <% if !shelf.on?(thing) && (via = shelf.via(thing)) %>
+      <label class="pop-row through">
+        <input type="checkbox" checked disabled>
+        <span><span class="pop-name"><%= shelf.name %></span><span class="pop-why">On it through <%= via.name %></span></span>
+      </label>
+    <% else %>
+      <% on = shelf.on?(thing)
+         taken = (shelf.under(thing) if !on && thing.is_a?(Collection)) %>
+      <%= form_with url: shelf_item_path(shelf, key:), method: on ? :delete : :post, id: "shelf-pick-#{shelf.id}", data: { controller: "submit" } do %>
+        <label class="pop-row">
+          <input type="checkbox" <%= "checked" if on %> data-action="submit#submit">
+          <span>
+            <span class="pop-name"><%= shelf.name %></span>
+            <% if taken.present? %><span class="pop-why">Would take in <%= taken.map { shelf_thing_name(it) }.to_sentence %>, already on it</span><% end %>
+          </span>
+        </label>
+      <% end %>
+    <% end %>
+  <% end %>
+  <div data-controller="disclosure">
+    <button class="pop-new-btn" type="button" aria-expanded="false" aria-controls="new-shelf" data-disclosure-target="button" data-action="disclosure#toggle">New shelf…</button>
+    <%= form_with url: shelves_path, id: "new-shelf", class: "pop-new", html: { hidden: true }, data: { disclosure_target: "panel" } do %>
+      <%= hidden_field_tag :key, key, id: nil %>
+      <input type="text" name="shelf[name]" placeholder="Name the shelf" aria-label="New shelf’s name" required maxlength="80" autocomplete="off">
+      <button class="chip" type="submit">Add</button>
+    <% end %>
+  </div>
+  <% if thing.is_a?(Collection) %><p class="pop-foot">Everything in <%= name %>, now and later.</p><% end %>
+</div>

@@ -5,6 +5,7 @@ module SearchHelper
     when nil then {}
     when Work then { work: place.slug }
     when OwnTexts then { texts: "yours" }
+    when Shelf then { shelf: place.slug }
     else { collection: place.slug }
     end
   end

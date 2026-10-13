@@ -21,6 +21,22 @@
     <div class="list-row-meta"><%= pluralize(@texts.size, "text") if @texts.any? %><%= link_to "Add a text", new_text_path %></div>
   </div>
 
+  <div class="list-row">
+    <div class="list-row-title">Your shelves</div>
+    <% if @shelves.any? %>
+      <div class="list-row-desc">Works and collections you’ve put together, to roll Random and search in. Only you can see them.</div>
+      <ul class="texts-latest">
+        <% @shelves.each do |shelf| %>
+          <% names = shelf.members.map { shelf_thing_name(it) } %>
+          <li><%= link_to shelf.name, shelf_path(shelf) %><span class="shelf-holds"><%= names.size > 3 ? "#{names.first(3).join(" · ")} and #{names.size - 3} more" : names.join(" · ").presence || "nothing yet" %></span></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="list-row-desc">Put works and collections together (favorite poets, one tradition’s scripture) to roll Random and search in. Only you can see them.</div>
+    <% end %>
+    <div class="list-row-meta"><% if @shelves.any? %><%= pluralize(@shelves.size, "shelf", plural: "shelves") %> ·<% end %><%= link_to "New shelf", new_shelf_path %></div>
+  </div>
+
   <%= render partial: "collections/row", collection: @collections, as: :collection, locals: { work_counts: @work_counts } %>
 
   <% @loose_works.each do |work| %>

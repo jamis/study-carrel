@@ -1,5 +1,5 @@
 # Full-text search over the library's units (the unit_search FTS5 table), in one work, a collection with everything
-# nested under it, the user's own texts (OwnTexts), or the whole library (place nil). Every word must appear; "quoted words" match as a phrase, and a
+# nested under it, the user's own texts (OwnTexts), one of their shelves (Shelf), or the whole library (place nil). Every word must appear; "quoted words" match as a phrase, and a
 # trailing * matches the start of a word (sanctif*). Words are stemmed, so "holiness" finds "holy". Results come in
 # reading order, with a count per work for narrowing.
 class LibrarySearch
@@ -60,6 +60,7 @@ class LibrarySearch
     when nil then units
     when Work then units.where(sections: { work_id: place.id })
     when OwnTexts then units.where(works: { user_id: place.user.id })
+    when Shelf then units.where(sections: { work_id: place.work_ids })
     else units.where(works: { collection_id: place.self_and_descendant_ids })
     end
   end

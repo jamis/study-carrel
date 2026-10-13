@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shelves</title>
+<style>
+  :root {
+    --bg: #f6f1e7; --paper: #fbf8f1; --ink: #2b2620; --ink-soft: #6b6256; --ink-faint: #a39a8c;
+    --rule: #e2d9c8; --accent: #8a4b2a; --accent-soft: #f0dcc9; --hl: #f7e3a4;
+    --shadow: 0 8px 30px rgba(60, 40, 20, .12);
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685; --ink-faint: #6e665a;
+    --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d; --hl: #5a4a1e;
+    --shadow: 0 8px 30px rgba(0, 0, 0, .5);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685; --ink-faint: #6e665a;
+      --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d; --hl: #5a4a1e;
+      --shadow: 0 8px 30px rgba(0, 0, 0, .5);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { overflow-x: clip; background: var(--bg); color: var(--ink); font-family: var(--serif); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  a { color: var(--accent); }
+
+  .chip { border: 1px solid var(--rule); background: transparent; padding: 6px 12px; border-radius: 999px; font-size: 13px; font-family: var(--sans); white-space: nowrap; }
+  a.chip { color: inherit; text-decoration: none; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); }
+  .chip:disabled { opacity: .5; cursor: default; border-color: var(--rule); color: inherit; }
+  .icon-btn { border: 0; background: transparent; padding: 6px 8px; border-radius: 8px; font-size: 16px; }
+  .icon-btn:hover { background: var(--accent-soft); }
+
+  /* prototype switcher, not part of the design */
+  .proto { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; padding: 6px 16px; font: 12px var(--sans); color: var(--ink-faint); border-bottom: 1px dashed var(--rule); }
+  .proto button { border: 0; background: none; padding: 2px 0; color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; }
+  .proto button[aria-pressed="true"] { color: var(--accent); text-decoration: none; font-weight: 600; }
+  .proto .sep { color: var(--rule); }
+
+  /* ---------- the ⋯ menu and the rail, as in the app ---------- */
+  .menu { position: relative; display: flex; align-items: center; }
+  .menu-btn { display: block; min-width: 44px; min-height: 36px; font-size: 20px; line-height: 1; color: var(--ink-soft); }
+  .menu-panel {
+    display: none; position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; min-width: 210px;
+    max-width: min(400px, calc(100vw - 16px)); flex-direction: column; align-items: stretch; padding: 6px;
+    background: var(--bg); border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+  }
+  .menu-panel.open { display: flex; }
+  .menu-panel .menu-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 40px; padding: 8px 12px;
+    border: 0; border-radius: 8px; background: transparent; text-align: left; font: inherit; font-size: 15px; color: var(--ink); text-decoration: none; cursor: pointer;
+  }
+  .menu-panel .menu-item:hover { background: var(--accent-soft); color: var(--ink); }
+  .menu-item kbd { font: inherit; font-size: 12px; color: var(--ink-soft); }
+  .menu-row { display: flex; align-items: stretch; gap: 2px; }
+  .menu-row .menu-item { flex: 1; min-width: 0; }
+  .menu-note { min-width: 0; max-width: 11em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--ink-soft); }
+  .menu-more { border: 0; border-radius: 8px; background: transparent; padding: 0 12px; font-size: 13px; color: var(--ink-soft); cursor: pointer; }
+  .menu-more:hover { background: var(--accent-soft); }
+  .menu-more[aria-expanded="true"] { transform: rotate(180deg); }
+  .menu-sub { margin: 0 0 4px 12px; padding-left: 6px; border-left: 1px solid var(--rule); }
+  .menu-sub .menu-item { font-size: 14px; }
+  .menu-label { padding: 8px 12px 2px; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-faint); }
+  @media (max-width: 719px) { .menu-panel .menu-item { min-height: 44px; } }
+
+  body:has(> .rail) { display: grid; grid-template-columns: 52px minmax(0, 1fr); grid-template-rows: auto 1fr; min-height: 100vh; }
+  body:has(> .rail) > :not(.rail) { grid-column: 2; min-width: 0; width: 100%; }
+  .rail {
+    grid-row: 1 / span 2; position: sticky; top: 0; z-index: 20; align-self: start; height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 14px 8px;
+  }
+  .rail-item { position: relative; display: flex; }
+  .rail-gap { flex: none; height: 10px; }
+  .rail-btn { display: inline-flex; align-items: center; gap: 12px; min-width: 36px; height: 36px; padding: 0 9px; color: var(--ink-faint); text-decoration: none; }
+  .rail .rail-btn:hover, .rail .rail-btn[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
+  .rail .rail-btn[aria-current="page"] { color: var(--accent); }
+  .rail-btn svg { flex: none; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .rail .menu-btn { display: inline-flex; min-width: 36px; font-size: 19px; color: var(--ink-soft); }
+  .rail-dots { flex: none; width: 18px; text-align: center; }
+  .rail .menu-panel { left: calc(100% + 8px); right: auto; top: 0; font-family: var(--sans); font-size: 14px; }
+  .rail .menu-panel .phone-only { display: none; }
+  .rail-label { display: none; font-family: var(--sans); font-size: 14px; color: var(--ink-soft); white-space: nowrap; }
+  .rail-btn:hover .rail-label, .rail-btn[aria-current="page"] .rail-label { color: inherit; }
+  @media (min-width: 900px) {
+    .rail:is(:hover, :has(:focus-visible)):not(:has(.open)) { width: max-content; padding-right: 14px; background: var(--bg); border-right: 1px solid var(--rule); box-shadow: 8px 0 24px rgba(0, 0, 0, .08); }
+    .rail:is(:hover, :has(:focus-visible)):not(:has(.open)) .rail-label { display: inline; }
+    .rail:is(:hover, :has(:focus-visible)):not(:has(.open)) :is(.rail-btn, .rail-item) { width: 100%; }
+    .rail:is(:hover, :has(:focus-visible)):not(:has(.open)) .rail-btn { padding-right: 14px; }
+  }
+  @media (max-width: 899px) {
+    body:has(> .rail) { display: block; }
+    .rail { position: fixed; top: 8px; right: 6px; height: auto; padding: 0; flex-direction: row; }
+    .rail .rail-only { display: none; }
+    .rail .menu .menu-panel { left: auto; right: 0; top: calc(100% + 4px); overflow-y: auto; max-height: calc(100dvh - 60px); }
+    .rail .menu-panel .phone-only { display: flex; }
+    .page > :first-child { padding-right: 44px; }
+    .proto { padding-right: 56px; }
+  }
+
+  /* ---------- pages, as in the app ---------- */
+  .page { max-width: 40em; margin: 0 auto; padding: 22px 16px 80px; }
+  .page-head { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 32px; margin-bottom: 4px; font-family: var(--sans); }
+  .page-trail ol { display: flex; flex-wrap: wrap; margin: 0; padding: 0; list-style: none; font-size: 13px; }
+  .page-trail li + li::before { content: "›"; margin: 0 7px; color: var(--ink-faint); }
+  .page-trail a { color: var(--ink-soft); text-decoration: none; }
+  .page-trail a:hover { color: var(--accent); }
+  .page-actions { display: flex; gap: 8px; margin-left: auto; }
+  .page-title { font-size: clamp(26px, 4.5vw, 36px); font-weight: 400; margin: 6px 0 20px; }
+  .page-lede { color: var(--ink-soft); font-family: var(--sans); font-size: 13px; margin: -12px 0 28px; }
+  .page-desc { color: var(--ink-soft); font-size: 17px; margin: -18px 0 24px; }
+  /* The page's own actions sit at the end of the line under its title, as Revise does on a user's text. */
+  div.page-lede { position: relative; }
+  .lede-link { border: 0; background: none; padding: 0; font: inherit; color: var(--accent); text-decoration: underline; cursor: pointer; }
+  .lede-link[aria-expanded="true"] { text-decoration: none; }
+  .page-empty { color: var(--ink-soft); font-style: italic; }
+  .page-sub { font-family: var(--sans); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin: 26px 0 10px; }
+  .list-row { padding: 12px 0; border-bottom: 1px solid var(--rule); }
+  .list-row-title { font-size: 20px; font-style: italic; }
+  .list-row-title.as-work { font-style: normal; }
+  .list-row-title.as-work a { color: var(--ink); text-decoration: none; }
+  .list-row-title.as-work a:hover { color: var(--accent); }
+  .list-row-title a { text-decoration: none; }
+  .list-row-title a:hover { text-decoration: underline; }
+  .list-row-desc { color: var(--ink-soft); font-size: 16px; margin-top: 4px; }
+  .list-row-meta { font-family: var(--sans); font-size: 13px; color: var(--ink-soft); margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .list-row-meta > * + *::before { content: "·"; margin-right: 6px; color: var(--ink-faint); }
+  .texts-latest { margin: 6px 0 0; padding: 0 0 0 18px; list-style: none; font-size: 17px; }
+  .texts-latest li { margin: 2px 0; }
+  .texts-latest a { text-decoration: none; }
+  .texts-latest a:hover { text-decoration: underline; }
+  .texts-latest .holds { font-family: var(--sans); font-size: 13px; color: var(--ink-soft); margin-left: 8px; }
+  .works { display: flex; flex-direction: column; }
+  .work-link { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--rule); text-decoration: none; color: var(--ink); }
+  .work-link:hover .work-link-title { color: var(--accent); }
+  .work-link-title { font-size: 20px; }
+  .work-link-meta { font-family: var(--sans); font-size: 13px; color: var(--ink-soft); text-align: right; }
+  .search-form { display: flex; gap: 8px; align-items: center; margin: 0 0 24px; font-family: var(--sans); }
+  .search-form input[type="search"] { flex: 1; min-width: 0; padding: 9px 14px; border: 1px solid var(--rule); border-radius: 999px; background: var(--paper); color: var(--ink); font: inherit; font-size: 15px; }
+  .search-form input[type="search"]:focus { border-color: var(--accent); outline: none; }
+  .search-form .chip { padding: 9px 14px; }
+  .stand-in { color: var(--ink-faint); font-family: var(--sans); font-size: 13px; font-style: italic; border: 1px dashed var(--rule); border-radius: 8px; padding: 14px 16px; }
+
+  /* ---------- 1. Put on a shelf…: a checklist under the chip (a sheet on phones) ---------- */
+  .shelf-pop {
+    display: none; position: absolute; left: 0; top: calc(100% + 8px); z-index: 30; width: min(340px, calc(100vw - 32px));
+    padding: 6px; background: var(--bg); border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+    font-family: var(--sans); font-size: 14px;
+  }
+  .shelf-pop.open { display: block; }
+  .pop-head { padding: 6px 12px 4px; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-soft); }
+  .pop-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; min-height: 40px; border-radius: 8px; cursor: pointer; }
+  .pop-row:hover { background: var(--accent-soft); }
+  .pop-row.through { cursor: default; }
+  .pop-row.through:hover { background: none; }
+  .pop-row input { margin: 3px 0 0; accent-color: var(--accent); }
+  .pop-row .name { color: var(--ink); font-size: 15px; }
+  .pop-row .why { display: block; font-size: 12px; color: var(--ink-soft); }
+  .pop-new { display: flex; gap: 6px; padding: 6px 6px 4px; border-top: 1px solid var(--rule); margin-top: 4px; }
+  .pop-new input { flex: 1; min-width: 0; padding: 7px 12px; border: 1px solid var(--rule); border-radius: 999px; background: var(--paper); color: var(--ink); font: inherit; }
+  .pop-new input:focus { border-color: var(--accent); outline: none; }
+  .pop-new-btn { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 9px 12px; border-radius: 8px; color: var(--accent); }
+  .pop-new-btn:hover { background: var(--accent-soft); }
+  .pop-foot { padding: 6px 12px 4px; font-size: 12px; color: var(--ink-faint); }
+  .scrim { display: none; }
+  @media (max-width: 599px) {
+    .shelf-pop { position: fixed; left: 0; right: 0; top: auto; bottom: 0; width: auto; border-radius: 14px 14px 0 0; padding: 10px 8px calc(14px + env(safe-area-inset-bottom)); }
+    .pop-row { min-height: 48px; }
+    .scrim.open { display: block; position: fixed; inset: 0; z-index: 29; background: rgba(0, 0, 0, .25); }
+  }
+
+  /* ---------- 2. The shelf editor: name, then the library tree with a box beside everything ---------- */
+  .name-input { width: 100%; margin: 6px 0 6px; padding: 2px 0; border: 0; border-bottom: 1px solid var(--rule); background: transparent; color: var(--ink); font-family: var(--serif); font-size: clamp(26px, 4.5vw, 36px); }
+  .desc-input { width: 100%; margin: 0 0 22px; padding: 4px 0; border: 0; border-bottom: 1px solid var(--rule); background: transparent; color: var(--ink-soft); font-family: var(--serif); font-size: 17px; }
+  .name-input:focus, .desc-input:focus { outline: none; border-color: var(--accent); }
+  .name-input::placeholder, .desc-input::placeholder { color: var(--ink-faint); }
+  .holding { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; font-family: var(--sans); }
+  .holding .empty { font-size: 13px; color: var(--ink-faint); font-style: italic; }
+  .held { display: inline-flex; align-items: center; gap: 4px; padding: 3px 4px 3px 12px; border-radius: 999px; background: var(--accent-soft); font-size: 13px; }
+  .held.coll { font-style: italic; }
+  .held button { border: 0; background: none; width: 22px; height: 22px; border-radius: 50%; color: var(--ink-soft); line-height: 1; padding: 0; font-style: normal; }
+  .held button:hover { background: var(--bg); color: var(--accent); }
+  .tree-find { margin-bottom: 10px; }
+  .tree, .tree ul { list-style: none; margin: 0; padding: 0; }
+  .tree ul { padding-left: 22px; }
+  .tree { border-top: 1px solid var(--rule); }
+  .tree > li { border-bottom: 1px solid var(--rule); padding: 4px 0; }
+  .tree-row { display: flex; align-items: center; gap: 4px; min-height: 38px; }
+  .tree-toggle { flex: none; width: 26px; height: 26px; border: 0; border-radius: 6px; background: none; color: var(--ink-faint); font-size: 11px; transition: transform .15s; }
+  .tree-toggle:hover { background: var(--accent-soft); color: var(--accent); }
+  .tree-toggle[aria-expanded="true"] { transform: rotate(90deg); }
+  .tree-spacer { flex: none; width: 26px; }
+  .tree-row label { display: flex; align-items: center; gap: 9px; flex: 1; min-width: 0; cursor: pointer; padding: 4px 0; }
+  .tree-row input { flex: none; width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
+  .tree-name { font-size: 18px; }
+  .tree-row.coll .tree-name { font-style: italic; }
+  .tree-row.coll.single .tree-name { font-style: normal; }
+  .tree-row.through .tree-name { color: var(--ink-soft); }
+  .tree-row.through label { cursor: default; }
+  .tree-meta { flex: none; font-family: var(--sans); font-size: 12px; color: var(--ink-faint); text-align: right; }
+  .tree-row.on .tree-meta, .tree-row.some .tree-meta { color: var(--accent); }
+  mark { background: var(--hl); color: inherit; border-radius: 2px; }
+  .edit-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 28px; font-family: var(--sans); }
+  .btn-primary { border: 0; background: var(--accent); color: var(--bg); padding: 9px 18px; border-radius: 999px; font-family: var(--sans); font-size: 14px; }
+  .btn-primary:disabled { opacity: .45; cursor: default; }
+  .link-btn { border: 0; background: none; padding: 4px 0; color: var(--ink-soft); font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+  .link-btn:hover { color: var(--accent); }
+  .confirm { margin-top: 18px; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); font-family: var(--sans); font-size: 14px; }
+  .confirm p { margin: 0 0 10px; }
+  .confirm .row { display: flex; gap: 8px; }
+  @media (max-width: 599px) { .tree-row { min-height: 46px; } .tree-meta { max-width: 9em; } }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; z-index: 40; transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+    width: max-content; max-width: calc(100vw - 32px); padding: 12px 16px; border: 1px solid var(--rule); border-radius: 12px;
+    background: var(--paper); box-shadow: var(--shadow); font-family: var(--sans); font-size: 14px; transition: opacity .2s, transform .2s;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .toast small { display: block; margin-top: 3px; color: var(--ink-soft); font-size: 12px; }
+</style>
+</head>
+<body>
+<nav class="rail" aria-label="Tools">
+  <div class="rail-item menu">
+    <button class="icon-btn menu-btn rail-btn" type="button" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="menuPanel"><span class="rail-dots" aria-hidden="true">⋯</span><span class="rail-label">Menu</span></button>
+    <div class="menu-panel" id="menuPanel"></div>
+  </div>
+  <span class="rail-gap rail-only"></span>
+  <a class="icon-btn rail-btn rail-only" href="#library" aria-label="Your focuses" data-inert><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="15" height="11" rx="1"/><path d="M6 4h14a1 1 0 0 1 1 1v10"/></svg><span class="rail-label">Your focuses</span></a>
+  <a class="icon-btn rail-btn rail-only" href="#library" id="railLibrary" aria-label="Library"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg><span class="rail-label">Library</span></a>
+  <a class="icon-btn rail-btn rail-only" href="#library" aria-label="Search" data-inert><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg><span class="rail-label">Search</span></a>
+  <a class="icon-btn rail-btn rail-only" href="#library" aria-label="Kept" data-inert><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z"/></svg><span class="rail-label">Kept</span></a>
+</nav>
+
+<div class="proto">
+  <span>Shelves (1 + 2):</span>
+  <button type="button" data-go="#library">Library</button>
+  <button type="button" data-go="#shelf/poets">A shelf</button>
+  <button type="button" data-go="#edit/poets">Editing it</button>
+  <button type="button" data-go="#new">New shelf</button>
+  <button type="button" data-go="#c/robert-frost">Robert Frost</button>
+  <button type="button" data-go="#c/poetry/put">Putting Poetry on a shelf</button>
+  <button type="button" data-go="#w/walden">Walden</button>
+  <button type="button" data-go="#w/isaiah">Isaiah</button>
+  <span class="sep">|</span>
+  <button type="button" data-theme-set="auto">Auto</button>
+  <button type="button" data-theme-set="light">Light</button>
+  <button type="button" data-theme-set="dark">Dark</button>
+  <span class="sep">|</span>
+  <button type="button" id="reset">Reset shelves</button>
+</div>
+
+<main class="page" id="page"></main>
+<div class="scrim" id="scrim"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+// ---------- the library (the real tree, abridged only in that the Bible's books are all here but nothing below a work is) ----------
+const OT = "Genesis Exodus Leviticus Numbers Deuteronomy Joshua Judges Ruth|1 Samuel|2 Samuel|1 Kings|2 Kings|1 Chronicles|2 Chronicles|Ezra Nehemiah Esther Job Psalms Proverbs Ecclesiastes|Song of Solomon|Isaiah Jeremiah Lamentations Ezekiel Daniel Hosea Joel Amos Obadiah Jonah Micah Nahum Habakkuk Zephaniah Haggai Zechariah Malachi"
+const NT = "Matthew Mark Luke John Acts Romans|1 Corinthians|2 Corinthians|Galatians Ephesians Philippians Colossians|1 Thessalonians|2 Thessalonians|1 Timothy|2 Timothy|Titus Philemon Hebrews James|1 Peter|2 Peter|1 John|2 John|3 John|Jude Revelation"
+const BOM = "1 Nephi|2 Nephi|Jacob|Enos|Jarom|Omni|Words of Mormon|Mosiah|Alma|Helaman|3 Nephi|4 Nephi|Mormon|Ether|Moroni"
+const books = s => s.split("|").flatMap(part => /^\d|^(Song|Words)/.test(part) ? [part] : part.split(" ")).filter(Boolean)
+
+const w = (name, author) => ({ kind: "w", name, author })
+const c = (name, opts, kids) => ({ kind: "c", name, ...opts, kids })
+
+const LIBRARY = [
+  c("Poetry", { desc: "Poems, read a stanza at a time." }, [
+    c("Emily Dickinson", { desc: "Her poems as first published after her death, a stanza at a time." },
+      ["Poems, First Series", "Poems, Second Series", "Poems, Third Series", "The Single Hound", "Further Poems"].map(t => w(t, "Dickinson"))),
+    c("Robert Frost", { desc: "His first five books, as gathered in the 1930 Collected Poems, plus “The Pasture”." },
+      ["The Pasture", "A Boy’s Will", "North of Boston", "Mountain Interval", "New Hampshire", "West-Running Brook"].map(t => w(t, "Frost"))),
+    c("Edgar Allan Poe", { desc: "The poems, from the 1900 Bell edition." },
+      ["Poems", "Poems Written in Youth", "Tamerlane", "Al Aaraaf"].map(t => w(t, "Poe"))),
+  ]),
+  c("Prose", { desc: "Essays and books, read a sentence at a time." }, [
+    w("Walden", "Thoreau"), w("Meditations", "Marcus Aurelius"), w("Pensées", "Pascal"),
+    w("Essays, First Series", "Emerson"), w("Essays, Second Series", "Emerson"), w("Essays", "Montaigne"),
+  ]),
+  c("Sacred Texts", { desc: "Scripture from several traditions, in public-domain translations." }, [
+    c("Bible", { single: true, desc: "The King James Version, Old and New Testaments." }, [
+      c("Old Testament", { single: true }, books(OT).map(t => w(t))),
+      c("New Testament", { single: true }, books(NT).map(t => w(t))),
+    ]),
+    c("Book of Mormon", { single: true, desc: "Public-domain text (Project Gutenberg #17)." }, books(BOM).map(t => w(t))),
+    w("Dhammapada"), w("Tao Te Ching"), w("Bhagavad Gita"), w("Quran"),
+  ]),
+]
+const YOUR_TEXTS = c("Your Texts", { own: true, desc: "Texts you’ve uploaded, which only you can see." },
+  [w("Quick to Help, Slow to Judge", "you"), w("Journal, 2025", "you")])
+
+const slug = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[’']/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+const NODES = new Map()
+let order = 0
+function index(node, parent) {
+  node.key = `${node.kind}/${slug(node.name)}`
+  if (NODES.has(node.key)) node.key += "-" + slug(parent.name)
+  node.parent = parent; node.order = order++
+  NODES.set(node.key, node)
+  for (const kid of node.kids || []) index(kid, node)
+}
+LIBRARY.forEach(n => index(n, null))
+index(YOUR_TEXTS, null)
+const TREE = [...LIBRARY, YOUR_TEXTS]
+
+const ancestors = n => { const a = []; for (let p = n.parent; p; p = p.parent) a.unshift(p); return a }
+const isUnder = (n, maybeAncestor) => ancestors(n).includes(maybeAncestor)
+const leaves = n => n.kind === "w" ? [n] : n.kids.flatMap(leaves)
+// As the app counts works: a single-work collection (the Bible) is one, however many books it holds.
+const workCount = n => n.kids.reduce((sum, k) => sum + (k.kind === "w" ? 1 : k.single ? 1 : workCount(k)), 0)
+const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch])
+
+// ---------- shelves: { id, name, desc, members: [node keys] }, kept in this browser only ----------
+const SEED = () => [
+  { id: "poets", name: "Poets I love", desc: "", members: ["c/robert-frost", "c/emily-dickinson", "w/walden"] },
+  { id: "lds", name: "Latter-day Saint scripture", desc: "The Bible and the Book of Mormon, together.", members: ["c/bible", "c/book-of-mormon"] },
+]
+let shelves
+try { shelves = JSON.parse(localStorage.getItem("shelves-proto")) } catch {}
+if (!Array.isArray(shelves)) shelves = SEED()
+const save = () => { try { localStorage.setItem("shelves-proto", JSON.stringify(shelves)) } catch {} }
+const shelfById = id => shelves.find(s => s.id === id)
+const members = s => s.members.map(k => NODES.get(k)).filter(Boolean).sort((a, b) => a.order - b.order)
+
+// Where a node stands on a shelf: on it; on it through a collection above it; holding some members below it; or off.
+function standing(shelf, node) {
+  if (shelf.members.includes(node.key)) return { on: true }
+  const via = ancestors(node).find(a => shelf.members.includes(a.key))
+  if (via) return { via }
+  const below = node.kind === "c" ? members(shelf).filter(m => isUnder(m, node)) : []
+  return { below }
+}
+// Putting a collection on a shelf takes in anything already there from under it, so nothing is counted twice.
+function put(shelf, node) {
+  shelf.members = shelf.members.filter(k => !isUnder(NODES.get(k), node)).concat(node.key)
+  save()
+}
+function take(shelf, node) { shelf.members = shelf.members.filter(k => k !== node.key); save() }
+function newShelf(name, firstMember) {
+  const base = slug(name) || "shelf"
+  let id = base, i = 2
+  while (shelfById(id)) id = `${base}-${i++}`
+  const shelf = { id, name: name.trim(), desc: "", members: firstMember ? [firstMember.key] : [] }
+  shelves.push(shelf); save()
+  return shelf
+}
+const shelvesHolding = node => shelves.filter(s => { const st = standing(s, node); return st.on || st.via })
+const summary = s => {
+  const m = members(s)
+  if (!m.length) return "nothing yet"
+  const names = m.map(n => n.name)
+  return names.length > 3 ? `${names.slice(0, 3).join(" · ")} and ${names.length - 3} more` : names.join(" · ")
+}
+const totalWorks = s => new Set(members(s).flatMap(leaves)).size
+
+// ---------- Random: even among a shelf's members, then balanced inside a collection as now ----------
+function rollIn(node) {
+  if (node.kind === "w") return node
+  if (node.single) { const all = leaves(node); return all[Math.floor(Math.random() * all.length)] } // even by verse in the real thing
+  return rollIn(node.kids[Math.floor(Math.random() * node.kids.length)])
+}
+function roll(place) {
+  if (place.members) {
+    const m = members(place)
+    if (!m.length) return toast(`Nothing on ${esc(place.name)} to roll in yet.`)
+    const pick = m[Math.floor(Math.random() * m.length)]
+    const work = rollIn(pick)
+    const from = pick === work ? "" : ` (from ${esc(pick.name)})`
+    toast(`Random in ${esc(place.name)} → <b>${esc(work.name)}</b>${from}`,
+      `Each of the ${m.length} things on this shelf gets an even chance. This would open the reader there.`)
+  } else {
+    const work = rollIn(place)
+    toast(`Random in ${esc(place.name)} → <b>${esc(work.name)}</b>`, "This would open the reader there.")
+  }
+}
+
+// ---------- pages ----------
+const page = document.getElementById("page")
+let editing = null // the editor's open rows and filter, kept across re-renders
+
+function trail(crumbs) {
+  if (!crumbs.length) return "<span></span>"
+  return `<nav class="page-trail" aria-label="Breadcrumb"><ol>${crumbs.map(([label, href]) => `<li><a href="${href}">${esc(label)}</a></li>`).join("")}</ol></nav>`
+}
+const nodeHref = n => n.own && !n.parent ? "#c/your-texts" : `#${n.kind}/${n.key.split("/")[1]}`
+const nodeTrail = n => [["Library", "#library"], ...ancestors(n).map(a => [a.name, nodeHref(a)])]
+const searchForm = label => `<form class="search-form" role="search" data-search="${esc(label)}">
+  <input type="search" placeholder="Find words in ${esc(label)}" aria-label="Find words in ${esc(label)}" autocomplete="off">
+  <button class="chip" type="submit">Search</button></form>`
+
+function renderLibrary() {
+  const rows = shelves.length
+    ? `<div class="list-row-desc">Works and collections you’ve put together, to roll Random and search in. Only you can see them.</div>
+       <ul class="texts-latest">${shelves.map(s => `<li><a href="#shelf/${s.id}">${esc(s.name)}</a><span class="holds">${esc(summary(s))}</span></li>`).join("")}</ul>`
+    : `<div class="list-row-desc">Put works and collections together (favorite poets, one tradition’s scripture) to roll Random and search in. Only you can see them.</div>`
+  page.innerHTML = `
+    <h2 class="page-title">Library</h2>
+    ${searchForm("the library")}
+    <div class="list-row">
+      <div class="list-row-title"><a href="#c/your-texts">Your Texts</a></div>
+      <div class="list-row-desc">Texts you’ve uploaded, which only you can see. The latest:</div>
+      <ul class="texts-latest">${YOUR_TEXTS.kids.map(k => `<li><a href="${nodeHref(k)}">${esc(k.name)}</a></li>`).join("")}</ul>
+      <div class="list-row-meta"><span>2 texts</span><a href="#library" data-inert>Add a text</a></div>
+    </div>
+    <div class="list-row">
+      <div class="list-row-title">Your shelves</div>
+      ${rows}
+      <div class="list-row-meta">${shelves.length ? `<span>${plural(shelves.length, "shelf").replace("shelfs", "shelves")}</span>` : ""}<a href="#new">New shelf</a></div>
+    </div>
+    ${LIBRARY.map(collectionRow).join("")}`
+}
+
+function collectionRow(n) {
+  return `<div class="list-row">
+    <div class="list-row-title${n.single ? " as-work" : ""}"><a href="${nodeHref(n)}">${esc(n.name)}</a></div>
+    ${n.desc ? `<div class="list-row-desc">${esc(n.desc)}</div>` : ""}
+    ${n.single ? "" : `<div class="list-row-meta"><span>${plural(workCount(n), "work")}</span></div>`}
+  </div>`
+}
+
+function renderShelf(shelf) {
+  const m = members(shelf)
+  const colls = m.filter(n => n.kind === "c"), works = m.filter(n => n.kind === "w")
+  const where = n => [n.author && n.author !== "you" ? n.author : null, ancestors(n).at(-1)?.name].filter(Boolean).join(" · ")
+  page.innerHTML = `
+    <div class="page-head">${trail([["Library", "#library"]])}
+</div>
+    <h2 class="page-title">${esc(shelf.name)}</h2>
+    <p class="page-lede">Your shelf · ${m.length ? plural(totalWorks(shelf), "work") + " in all" : "empty"} · only you can see it · <a href="#edit/${shelf.id}">Edit shelf</a></p>
+    ${shelf.desc ? `<p class="page-desc">${esc(shelf.desc)}</p>` : ""}
+    ${m.length ? searchForm(shelf.name) : ""}
+    ${m.length ? "" : `<p class="page-empty">Nothing on this shelf yet. <a href="#edit/${shelf.id}">Choose works for it</a>, or use “Put on a shelf…” on any work or collection.</p>`}
+    ${colls.map(n => `<div class="list-row">
+        <div class="list-row-title${n.single ? " as-work" : ""}"><a href="${nodeHref(n)}">${esc(n.name)}</a></div>
+        ${n.desc ? `<div class="list-row-desc">${esc(n.desc)}</div>` : ""}
+        <div class="list-row-meta">${n.single ? `<span>${plural(leaves(n).length, "book")}</span>` : `<span>${plural(workCount(n), "work")}</span>`}${n.parent ? `<span>in ${esc(n.parent.name)}</span>` : ""}</div>
+      </div>`).join("")}
+    ${works.length ? `<div class="works">${works.map(n => `<a class="work-link" href="${nodeHref(n)}">
+        <span class="work-link-title">${esc(n.name)}</span><span class="work-link-meta">${esc(where(n))}</span></a>`).join("")}</div>` : ""}`
+}
+
+// A collection or work page, with "Put on a shelf…" at the end of the line under its title (1).
+function renderNode(n) {
+  const kids = n.kids || []
+  const head = `<div class="page-head">${trail(nodeTrail(n))}</div>`
+  const put = `<button class="lede-link" type="button" id="putBtn" aria-expanded="false" aria-controls="shelfPop">Put on a shelf…</button>
+    <div class="shelf-pop" id="shelfPop" role="dialog" aria-label="Put on a shelf"></div>`
+  const lede = parts => `<div class="page-lede">${parts.filter(Boolean).map(esc).concat(put).join(" · ")}</div>`
+  if (n.kind === "w") {
+    page.innerHTML = `${head}
+      <h2 class="page-title">${esc(n.name)}</h2>
+      ${lede([n.author && n.author !== "you" ? n.author : null, n.parent?.name])}
+      ${searchForm(n.name)}
+      <div class="stand-in">The work’s chapters, as now.</div>`
+  } else {
+    const subs = kids.filter(k => k.kind === "c"), works = kids.filter(k => k.kind === "w")
+    page.innerHTML = `${head}
+      <h2 class="page-title">${esc(n.name)}</h2>
+      ${lede([n.single ? plural(leaves(n).length, "book") : plural(workCount(n), "work")])}
+      ${n.desc ? `<p class="page-desc">${esc(n.desc)}</p>` : ""}
+      ${searchForm(n.name)}
+      ${subs.map(collectionRow).join("")}
+      <div class="works">${works.map(k => `<a class="work-link" href="${nodeHref(k)}"><span class="work-link-title">${esc(k.name)}</span>
+        <span class="work-link-meta">${k.author && k.author !== "you" && n.kids.some(o => o.author !== k.author) ? esc(k.author) : ""}</span></a>`).join("")}</div>`
+  }
+  renderPop(n)
+}
+
+function renderPop(n) {
+  const pop = document.getElementById("shelfPop")
+  if (!pop) return
+  const rows = shelves.map(s => {
+    const st = standing(s, n)
+    if (st.via) return `<label class="pop-row through"><input type="checkbox" checked disabled>
+      <span><span class="name">${esc(s.name)}</span><span class="why">On it through ${esc(st.via.name)}</span></span></label>`
+    const why = st.on ? "" : st.below.length ? `Would take in ${esc(st.below.map(b => b.name).join(" and "))}, already on it` : ""
+    return `<label class="pop-row"><input type="checkbox" data-shelf="${s.id}" ${st.on ? "checked" : ""}>
+      <span><span class="name">${esc(s.name)}</span>${why ? `<span class="why">${why}</span>` : ""}</span></label>`
+  }).join("")
+  pop.innerHTML = `<div class="pop-head">Put ${esc(n.name)} on</div>
+    ${rows || `<p class="pop-foot">You have no shelves yet.</p>`}
+    <div id="popNew"><button class="pop-new-btn" type="button" data-new>New shelf…</button></div>
+    ${n.kind === "c" ? `<div class="pop-foot">Everything in ${esc(n.name)}, now and later.</div>` : ""}`
+  pop.dataset.node = n.key
+}
+
+// The editor (2): the shelf's name and description, what's on it, and the library tree.
+function renderEditor(shelf) {
+  const isNew = !shelf
+  if (!editing || editing.id !== (shelf?.id ?? "new")) {
+    const draft = shelf || { id: "new", name: "", desc: "", members: [] }
+    const open = new Set(TREE.map(n => n.key))
+    for (const m of members(draft)) ancestors(m).forEach(a => open.add(a.key))
+    editing = { id: draft.id, draft, open, find: "", confirm: false }
+  }
+  const s = editing.draft
+  const m = members(s)
+  page.innerHTML = `
+    <div class="page-head">${trail(isNew ? [["Library", "#library"]] : [["Library", "#library"], [s.name || "Untitled", `#shelf/${s.id}`]])}</div>
+    <input class="name-input" id="nameInput" value="${esc(s.name)}" placeholder="Name this shelf" aria-label="Shelf name" autocomplete="off">
+    <input class="desc-input" id="descInput" value="${esc(s.desc)}" placeholder="A line about it (optional)" aria-label="Description" autocomplete="off">
+    <div class="page-sub">On this shelf</div>
+    <div class="holding">${m.length ? m.map(n => `<span class="held${n.kind === "c" && !n.single ? " coll" : ""}">${esc(n.name)}<button type="button" data-unhold="${n.key}" aria-label="Take ${esc(n.name)} off">×</button></span>`).join("") : `<span class="empty">Nothing yet. Tick works or whole collections below.</span>`}</div>
+    <div class="page-sub">From the library</div>
+    <form class="search-form tree-find" onsubmit="return false"><input type="search" id="findInput" value="${esc(editing.find)}" placeholder="Find a work, collection or author" aria-label="Find in the library" autocomplete="off"></form>
+    <ul class="tree" id="tree">${treeRows(TREE, s)}</ul>
+    <div class="edit-foot">
+      ${isNew ? `<button class="btn-primary" type="button" id="doneBtn" ${s.name.trim() ? "" : "disabled"}>Make the shelf</button><a class="link-btn" href="#library">Cancel</a>`
+              : `<a class="btn-primary" href="#shelf/${s.id}" style="text-decoration:none">Done</a><button class="link-btn" type="button" id="deleteBtn">Delete this shelf</button>`}
+    </div>
+    ${editing.confirm ? `<div class="confirm"><p>Delete <b>${esc(s.name)}</b>? Only the shelf goes: the works stay in the library, and your notes and keeps stay where they are.</p>
+      <div class="row"><button class="chip" type="button" id="reallyDelete">Delete it</button><button class="chip" type="button" id="keepIt">Keep it</button></div></div>` : ""}`
+  document.querySelectorAll("#tree input[data-some]").forEach(i => { i.indeterminate = true })
+}
+
+function matches(n, q) { return n.name.toLowerCase().includes(q) || (n.author || "").toLowerCase().includes(q) }
+function shows(n, q) { return !q || matches(n, q) || (n.kids || []).some(k => shows(k, q)) }
+function highlight(text, q) {
+  if (!q) return esc(text)
+  const i = text.toLowerCase().indexOf(q)
+  return i < 0 ? esc(text) : esc(text.slice(0, i)) + `<mark>${esc(text.slice(i, i + q.length))}</mark>` + esc(text.slice(i + q.length))
+}
+function treeRows(nodes, s) {
+  const q = editing.find.trim().toLowerCase()
+  return nodes.filter(n => shows(n, q)).map(n => {
+    const st = standing(s, n)
+    const isColl = n.kind === "c"
+    const open = isColl && (editing.open.has(n.key) || (q && n.kids.some(k => shows(k, q))))
+    let meta = "", cls = ""
+    if (st.on) { cls = "on"; meta = isColl ? "all of it" : "" }
+    else if (st.via) { cls = "through"; meta = `through ${st.via.name}` }
+    else if (st.below.length) { cls = "some"; meta = `${st.below.length} on the shelf` }
+    else if (isColl) meta = n.single ? plural(leaves(n).length, "book") : plural(workCount(n), "work")
+    else if (n.author && n.author !== "you" && !(n.parent && n.parent.name.includes(n.author))) meta = n.author
+    const toggle = isColl ? `<button class="tree-toggle" type="button" data-toggle="${n.key}" aria-expanded="${open}" aria-label="${open ? "Fold" : "Open"} ${esc(n.name)}">▶</button>` : `<span class="tree-spacer"></span>`
+    return `<li><div class="tree-row ${isColl ? "coll" : ""} ${n.single ? "single" : ""} ${cls}">${toggle}
+        <label><input type="checkbox" data-key="${n.key}" ${st.on || st.via ? "checked" : ""} ${st.via ? "disabled" : ""} ${st.below?.length ? "data-some" : ""}>
+        <span class="tree-name">${highlight(n.name, q)}</span></label><span class="tree-meta">${esc(meta)}</span></div>
+      ${open ? `<ul>${treeRows(n.kids, s)}</ul>` : ""}</li>`
+  }).join("")
+}
+
+// ---------- the ⋯ menu: Random in this page's place, with the wider places and the shelves holding it under ▾ ----------
+const menuBtn = document.getElementById("menuBtn"), menuPanel = document.getElementById("menuPanel")
+function renderMenu(route) {
+  let here = null, others = [], onShelves = []
+  if (route.shelf) { here = route.shelf; others = [null] }
+  else if (route.node) {
+    const n = route.node
+    const chain = [n, ...ancestors(n).reverse()].filter(x => x.kind === "c" || x === n)
+    here = n.kind === "w" ? (n.parent || n) : n
+    others = [...chain.filter(x => x !== here), null]
+    onShelves = shelvesHolding(n)
+  } else { here = null; onShelves = shelves.filter(s => s.members.length) }
+  const label = p => p === null ? "Whole library" : p.name
+  const inWords = p => p === null ? "anywhere in the library" : `in ${p.name}`
+  const id = p => p === null ? "" : p.members ? `shelf:${p.id}` : p.key
+  const sub = [...others.map(p => `<button class="menu-item" type="button" data-roll="${id(p)}">Random ${esc(inWords(p))}</button>`),
+    ...(onShelves.length ? [`<div class="menu-label">Your shelves</div>`] : []),
+    ...onShelves.map(s => `<button class="menu-item" type="button" data-roll="shelf:${s.id}">Random in ${esc(s.name)}</button>`)].join("")
+  menuPanel.innerHTML = `
+    <a class="menu-item phone-only" href="#library" data-inert>Your focuses</a>
+    <a class="menu-item phone-only" href="#library">Library</a>
+    <a class="menu-item phone-only" href="#library" data-inert>Search<kbd>/</kbd></a>
+    <div class="menu-row"><button class="menu-item" type="button" data-roll="${id(here)}">Random<span class="menu-note">${esc(label(here))}</span></button>
+      ${sub ? `<button class="menu-more" type="button" id="moreBtn" aria-label="Other places to roll" aria-expanded="false" aria-controls="randomMore">▾</button>` : ""}</div>
+    ${sub ? `<div class="menu-sub" id="randomMore" hidden>${sub}</div>` : ""}
+    ${route.node ? `<button class="menu-item" type="button" id="menuPut">Put on a shelf…</button>` : ""}
+    <a class="menu-item phone-only" href="#library" data-inert>Kept</a>
+    <a class="menu-item" href="#c/your-texts">Your Texts</a>
+    <button class="menu-item" type="button" data-theme-toggle>Light / dark</button>`
+}
+function closeMenu() { menuPanel.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false") }
+menuBtn.addEventListener("click", e => {
+  e.stopPropagation()
+  const open = !menuPanel.classList.contains("open")
+  closePop()
+  menuPanel.classList.toggle("open", open); menuBtn.setAttribute("aria-expanded", open)
+})
+
+function openPop() {
+  const pop = document.getElementById("shelfPop"), btn = document.getElementById("putBtn")
+  if (!pop) return
+  closeMenu()
+  pop.classList.add("open"); btn.setAttribute("aria-expanded", "true")
+  document.getElementById("scrim").classList.add("open")
+  pop.querySelector("input:not(:disabled), button")?.focus()
+}
+function closePop() {
+  const pop = document.getElementById("shelfPop")
+  if (!pop?.classList.contains("open")) return
+  pop.classList.remove("open"); document.getElementById("putBtn")?.setAttribute("aria-expanded", "false")
+  document.getElementById("scrim").classList.remove("open")
+}
+
+// ---------- events ----------
+document.addEventListener("click", e => {
+  const t = e.target
+  if (t.closest("[data-inert]")) { e.preventDefault(); toast("Not part of this prototype."); return }
+  const go = t.closest("[data-go]"); if (go) { location.hash = go.dataset.go; return }
+  const rollBtn = t.closest("[data-roll]")
+  if (rollBtn) {
+    const v = rollBtn.dataset.roll
+    closeMenu()
+    if (!v) return toast("Random anywhere in the library", "This would open the reader there.")
+    return roll(v.startsWith("shelf:") ? shelfById(v.slice(6)) : NODES.get(v))
+  }
+  if (t.id === "moreBtn") {
+    const sub = document.getElementById("randomMore"), open = sub.hidden
+    sub.hidden = !open; t.setAttribute("aria-expanded", open); return
+  }
+  if (t.id === "menuPut") { openPop(); return }
+  if (t.closest("[data-theme-toggle]")) { setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"); closeMenu(); return }
+  if (t.id === "putBtn") { e.stopPropagation(); document.getElementById("shelfPop").classList.contains("open") ? closePop() : openPop(); return }
+  if (t.closest("[data-new]")) {
+    document.getElementById("popNew").innerHTML = `<form class="pop-new" id="newForm"><input id="newName" placeholder="Name the shelf" aria-label="New shelf name" autocomplete="off"><button class="chip" type="submit">Add</button></form>`
+    document.getElementById("newName").focus(); return
+  }
+  if (t.dataset.toggle) { const k = t.dataset.toggle; editing.open.has(k) ? editing.open.delete(k) : editing.open.add(k); renderEditor(editing.id === "new" ? null : editing.draft); focusSoon(`[data-toggle="${k}"]`); return }
+  if (t.dataset.unhold) { take(editing.draft, NODES.get(t.dataset.unhold)); rerenderEditor(); return }
+  if (t.id === "doneBtn") { const d = editing.draft; const s = newShelf(d.name); s.desc = d.desc; s.members = d.members; save(); editing = null; location.hash = `#shelf/${s.id}`; return }
+  if (t.id === "deleteBtn") { editing.confirm = true; rerenderEditor(); focusSoon("#keepIt"); return }
+  if (t.id === "keepIt") { editing.confirm = false; rerenderEditor(); return }
+  if (t.id === "reallyDelete") {
+    const name = editing.draft.name
+    shelves = shelves.filter(s => s !== editing.draft); save(); editing = null
+    location.hash = "#library"; toast(`Deleted ${esc(name)}.`, "Nothing else was touched."); return
+  }
+  if (!t.closest(".menu")) closeMenu()
+  if (!t.closest("#shelfPop") || t.id === "scrim") closePop()
+})
+
+document.addEventListener("change", e => {
+  const t = e.target
+  if (t.dataset.shelf) {
+    const shelf = shelfById(t.dataset.shelf), node = NODES.get(document.getElementById("shelfPop").dataset.node)
+    t.checked ? put(shelf, node) : take(shelf, node)
+    renderPop(node); renderMenu(currentRoute)
+    document.querySelector(`#shelfPop [data-shelf="${shelf.id}"]`)?.focus()
+  }
+  if (t.dataset.key) {
+    const node = NODES.get(t.dataset.key)
+    t.checked ? put(editing.draft, node) : take(editing.draft, node)
+    rerenderEditor(); focusSoon(`#tree [data-key="${node.key}"]`)
+  }
+})
+
+document.addEventListener("input", e => {
+  const t = e.target
+  if (t.id === "nameInput") {
+    editing.draft.name = t.value
+    if (editing.id !== "new") { save(); document.querySelector(".page-trail li:last-child a").textContent = t.value || "Untitled" }
+    const done = document.getElementById("doneBtn"); if (done) done.disabled = !t.value.trim()
+  }
+  if (t.id === "descInput") { editing.draft.desc = t.value; if (editing.id !== "new") save() }
+  if (t.id === "findInput") {
+    editing.find = t.value
+    const s = editing.draft
+    document.getElementById("tree").innerHTML = treeRows(TREE, s)
+    document.querySelectorAll("#tree input[data-some]").forEach(i => { i.indeterminate = true })
+  }
+})
+
+document.addEventListener("submit", e => {
+  e.preventDefault()
+  if (e.target.id === "newForm") {
+    const name = document.getElementById("newName").value.trim()
+    if (!name) return
+    const node = NODES.get(document.getElementById("shelfPop").dataset.node)
+    const s = newShelf(name, node)
+    renderPop(node); renderMenu(currentRoute)
+    toast(`Put ${esc(node.name)} on a new shelf, <a href="#shelf/${s.id}">${esc(s.name)}</a>.`)
+    return
+  }
+  const label = e.target.dataset.search
+  if (label) {
+    const shelf = currentRoute.shelf
+    toast(`Would find “${esc(e.target.querySelector("input").value)}” in ${esc(label)}`,
+      shelf ? `Every work on the shelf: ${plural(totalWorks(shelf), "work")} in all, in reading order.` : "As the search page does now.")
+  }
+})
+
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closeMenu(); closePop() } })
+
+function rerenderEditor() {
+  const y = scrollY
+  renderEditor(editing.id === "new" ? null : editing.draft)
+  scrollTo(0, y)
+}
+function focusSoon(sel) { requestAnimationFrame(() => document.querySelector(sel)?.focus()) }
+
+let toastTimer
+function toast(html, sub) {
+  const el = document.getElementById("toast")
+  el.innerHTML = html + (sub ? `<small>${sub}</small>` : "")
+  el.classList.add("show")
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 5000)
+}
+
+// ---------- routing ----------
+let currentRoute = {}
+function route() {
+  const h = location.hash || "#library"
+  closeMenu(); closePop()
+  let m
+  currentRoute = {}
+  if ((m = h.match(/^#shelf\/(.+)$/)) && shelfById(m[1])) { currentRoute.shelf = shelfById(m[1]); editing = null; renderShelf(currentRoute.shelf) }
+  else if ((m = h.match(/^#edit\/(.+)$/)) && shelfById(m[1])) renderEditor(shelfById(m[1]))
+  else if (h === "#new") { editing = null; renderEditor(null); focusSoon("#nameInput") }
+  else if ((m = h.match(/^#([cw]\/[^/]+)(\/put)?$/)) && NODES.get(m[1])) { currentRoute.node = NODES.get(m[1]); renderNode(currentRoute.node); if (m[2]) requestAnimationFrame(openPop) }
+  else { renderLibrary() }
+  document.getElementById("railLibrary").setAttribute("aria-current", h === "#library" || !location.hash ? "page" : "false")
+  document.querySelectorAll("[data-go]").forEach(b => b.setAttribute("aria-pressed", b.dataset.go === h))
+  renderMenu(currentRoute)
+  if (!h.startsWith("#edit") && h !== "#new") scrollTo(0, 0)
+}
+addEventListener("hashchange", route)
+
+function setTheme(t) {
+  if (t === "auto") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t
+  try { localStorage.setItem("shelves-proto-theme", t) } catch {}
+  document.querySelectorAll("[data-theme-set]").forEach(b => b.setAttribute("aria-pressed", b.dataset.themeSet === t))
+}
+document.querySelectorAll("[data-theme-set]").forEach(b => b.addEventListener("click", () => setTheme(b.dataset.themeSet)))
+let theme = "auto"; try { theme = localStorage.getItem("shelves-proto-theme") || "auto" } catch {}
+setTheme(theme)
+
+document.getElementById("reset").addEventListener("click", () => { shelves = SEED(); save(); editing = null; route(); toast("Shelves reset.") })
+route()
+</script>
+</body>
+</html>

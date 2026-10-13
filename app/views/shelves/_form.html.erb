@@ -1,0 +1,42 @@
+<%# The shelf editor: its name and a line about it, what's on it, and the library tree with a box beside every
+    collection and work (shelf_editor_controller.js keeps the greyed boxes, the partial ticks and "On this shelf" true
+    to what's ticked). shelf: the shelf, new or saved %>
+<%= form_with model: shelf, class: "shelf-form", data: { controller: "shelf-editor" } do |form| %>
+  <% if shelf.errors.any? %><p class="signin-alert" role="alert"><%= shelf.errors.full_messages.to_sentence %>.</p><% end %>
+  <%= form.text_field :name, class: "shelf-name-input", placeholder: "Name this shelf", required: true, maxlength: 80,
+        autocomplete: "off", autofocus: shelf.new_record?, aria: { label: "Shelf name" } %>
+  <%= form.text_field :description, class: "shelf-desc-input", placeholder: "A line about it (optional)", maxlength: 300,
+        autocomplete: "off", aria: { label: "A line about it" } %>
+
+  <h3 class="page-sub">On this shelf</h3>
+  <div class="shelf-holding" data-shelf-editor-target="holding" data-empty="Nothing yet. Tick works or whole collections below."></div>
+
+  <h3 class="page-sub">From the library</h3>
+  <input type="search" class="shelf-find" placeholder="Find a work, collection or author" aria-label="Find in the library"
+         autocomplete="off" data-shelf-editor-target="find" data-action="input->shelf-editor#find keydown.enter->shelf-editor#stay">
+  <%= hidden_field_tag "items[]", "", id: nil %>
+  <ul class="shelf-tree">
+    <% @collections_by_parent.fetch(nil, []).each do |collection| %>
+      <%= render "shelves/tree_node", thing: collection, shelf:, depth: 0 %>
+    <% end %>
+    <% @works_by_collection.fetch(nil, []).each do |work| %>
+      <%= render "shelves/tree_node", thing: work, shelf:, depth: 0 %>
+    <% end %>
+    <% if @texts.any? %>
+      <li data-find="your texts">
+        <div class="tree-row tree-group">
+          <button class="tree-toggle" type="button" aria-expanded="true" data-action="shelf-editor#toggle" aria-label="Fold Your Texts">▶</button>
+          <span class="tree-name">Your Texts</span><span class="tree-meta">only you can see these</span>
+        </div>
+        <ul>
+          <% @texts.each do |work| %><%= render "shelves/tree_node", thing: work, shelf:, depth: 1 %><% end %>
+        </ul>
+      </li>
+    <% end %>
+  </ul>
+
+  <div class="shelf-edit-foot">
+    <%= form.submit shelf.new_record? ? "Make the shelf" : "Save", class: "primary" %>
+    <%= link_to "Cancel", shelf.persisted? ? shelf_path(shelf) : library_path, class: "shelf-cancel" %>
+  </div>
+<% end %>

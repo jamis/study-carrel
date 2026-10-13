@@ -29,8 +29,9 @@ This is the index. Each line is the rule in force; the linked file has the detai
 | User texts | Private plain-text uploads (prose or poetry/lyrics), reviewed before publishing, revisable with loose matching; lost notes become detached notes. | [user-texts](docs/decisions/user-texts.md) |
 | History | Global per user, `visits` capped at 50; clock dropdown, `h`. | [history-and-keep](docs/decisions/history-and-keep.md) |
 | Keep | Per-user bookmark with optional remark; ribbon by the reference, `b`, Kept page laid out like a notes page (passages left, remarks and actions on a sheet at right). | [history-and-keep](docs/decisions/history-and-keep.md) |
-| Random | Scoped (innermost collection by default) and balanced across branches. | [random](docs/decisions/random.md) |
-| Search | FTS5 over unit text, every word required, reading order, a sentence at a time for prose; titles and notes not searched. | [search](docs/decisions/search.md) |
+| Shelves | A user's own private groups of works and whole collections (a collection brings everything under it, nothing twice), to roll Random and search in. Filled from "Put on a shelf…" under a work's or collection's title, or the shelf editor over the library tree. | [shelves](docs/decisions/shelves.md) |
+| Random | Scoped (innermost collection by default) and balanced across branches; a shelf is a scope too. | [random](docs/decisions/random.md) |
+| Search | FTS5 over unit text, every word required, reading order, a sentence at a time for prose; titles and notes not searched. Scoped to a work, collection, Your Texts or a shelf. | [search](docs/decisions/search.md) |
 
 **Exploratory, not decided:** [discovery](docs/decisions/discovery.md) holds brainstorm notes on helping new users find something to study (an exploring focus, curated lists, keeps in place of notes). Nothing in it is a rule.
 
