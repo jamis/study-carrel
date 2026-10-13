@@ -20,5 +20,6 @@
 - Tap to keep (a brief "Kept · Add a remark · Undo" line follows); tap a kept ribbon for a popover with the remark, Release and "See all kept"; `b` does the same as a tap.
 - Kept verses are marked in the verse grid and in the history list.
 - The **Kept page** (`/kept`, from the rail) lists passages newest first or in reading order, with the remark, and "Start a focus from this" opens the new-focus form with the passage shown and begins reading there.
+- The Kept page is laid out like a focus's notes page (decided 2026-10-12): "Kept" with the ribbon stands where the focus would, the passages run down the left, and each one's remark and its actions (Start a focus, Release) sit level with it on a sheet at right. The whole passage cell links into reading. A keep with no remark shows only its actions. On phones the remark and actions are a slip under the passage.
 - Not yet: a Random scope over kept passages.
 - Keeps on a revised or deleted user text: see Detached notes in [user-texts.md](user-texts.md).

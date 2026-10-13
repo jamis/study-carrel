@@ -571,22 +571,16 @@ lexxy-editor, .lexxy-content {
   .composer lexxy-toolbar { opacity: 1; visibility: visible; }
 }
 
-/* ---------- all-notes page ---------- */
-.all-notes-title { font-style: italic; color: var(--accent); line-height: 1.2; margin-bottom: 4px; }
+/* ---------- list pages ---------- */
 .page-lede { color: var(--ink-soft); font-family: var(--sans); font-size: 13px; margin: 0 0 28px; }
 a.fv-ref { text-decoration: none; }
 a.fv-ref:hover { text-decoration: underline; }
-.fv-note .lexxy-content > :first-child { margin-top: 0; }
-.fv-note .lexxy-content > :last-child { margin-bottom: 0; }
-.fv-quote.clamped { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.fv-more { border: 0; background: none; padding: 0 0 10px; color: var(--accent); font-family: var(--sans); font-size: 12px; cursor: pointer; }
-.fv-more:hover { text-decoration: underline; }
 .page-actions { display: flex; gap: 8px; }
 .page-actions .chip { white-space: nowrap; }
 @media (max-width: 599px) { .page-actions .wide-only { display: none; } }
 .fv-quote { white-space: pre-line; }
 
-/* ---------- a focus's notes page (notes/index) ---------- */
+/* ---------- sheet pages: a focus's notes (notes/index), Kept (keeps/index) ---------- */
 /* As in the reader: the passages down the left under the focus, the notes on a sheet of paper down the right that
    runs the length of the page, each note level with its passage. Passage and note never share a size or colour. */
 .notes-page { max-width: 1120px; }
@@ -615,7 +609,12 @@ a.fv-ref:hover { text-decoration: underline; }
 .nb-note + .nb-passage { border-top: 1px solid var(--rule); }
 .nb-note .lexxy-content > :first-child { margin-top: 0; }
 .nb-note .lexxy-content > :last-child { margin-bottom: 0; }
-.nb-note-actions { margin-top: 12px; }
+.nb-note-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; font-family: var(--sans); }
+.nb-note-actions:first-child { margin-top: 0; } /* a keep with no remark */
+.nb-remark { margin: 0; white-space: pre-line; }
+/* Kept stands where a focus would, with the ribbon for its mark, but it's a name, not a question: upright. */
+.kept-title { font-style: normal; }
+.kept-mark { flex: none; width: 17px; height: 17px; margin-top: .3em; fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round; }
 .nb-ref-row { display: flex; align-items: center; gap: 8px; }
 .nb-ref { font: 600 13px var(--sans); color: var(--accent); text-decoration: none; }
 .nb-quote { margin: 6px 0 0; font-size: 17px; line-height: 1.55; color: var(--ink-soft); white-space: pre-line; }
@@ -685,7 +684,6 @@ a.tick { display: inline-flex; align-items: center; justify-content: center; tex
 .section-list a:hover { color: var(--accent); }
 .noted-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: none; }
 .page-actions .chip.current { border-color: var(--accent); color: var(--accent); }
-.kept-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; font-family: var(--sans); }
 .start-from { margin-bottom: 18px; }
 
 /* ---------- search ---------- */

@@ -26,14 +26,14 @@
 
     <% @notes.each do |note|
       unit = note.unit %>
-      <%= render "row", citation: unit_ref(unit.section, unit), passage: unit.body, content: note.content,
+      <%= render "shared/sheet_row", citation: unit_ref(unit.section, unit), passage: unit.body, content: note.content,
             href: reading_path(unit.section.work.slug, unit.section.number, unit.number) %>
     <% end %>
 
     <% if @detached.any? %>
       <h2 class="nb-detached-head">From passages that changed or were removed</h2>
       <% @detached.each do |detached| %>
-        <%= render "row", citation: detached.citation, passage: detached.passage, content: detached.content, detached: detached %>
+        <%= render "shared/sheet_row", citation: detached.citation, passage: detached.passage, content: detached.content, detached: detached %>
       <% end %>
     <% end %>
   </div>

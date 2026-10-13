@@ -28,7 +28,7 @@ This is the index. Each line is the rule in force; the linked file has the detai
 | Prose by sentence | Prose is read a sentence at a time; split at build time (`sentences.py`), grouped by paragraph, ¶ view with `p`. | [prose-by-sentence](docs/decisions/prose-by-sentence.md) |
 | User texts | Private plain-text uploads (prose or poetry/lyrics), reviewed before publishing, revisable with loose matching; lost notes become detached notes. | [user-texts](docs/decisions/user-texts.md) |
 | History | Global per user, `visits` capped at 50; clock dropdown, `h`. | [history-and-keep](docs/decisions/history-and-keep.md) |
-| Keep | Per-user bookmark with optional remark; ribbon by the reference, `b`, Kept page. | [history-and-keep](docs/decisions/history-and-keep.md) |
+| Keep | Per-user bookmark with optional remark; ribbon by the reference, `b`, Kept page laid out like a notes page (passages left, remarks and actions on a sheet at right). | [history-and-keep](docs/decisions/history-and-keep.md) |
 | Random | Scoped (innermost collection by default) and balanced across branches. | [random](docs/decisions/random.md) |
 | Search | FTS5 over unit text, every word required, reading order, a sentence at a time for prose; titles and notes not searched. | [search](docs/decisions/search.md) |
 

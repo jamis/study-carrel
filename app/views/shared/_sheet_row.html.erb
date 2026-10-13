@@ -1,9 +1,12 @@
-<%# One row of a focus's notes page: the passage at left, its note level with it on the sheet at right.
-    citation, passage, content: the reference, the passage's text, the note
+<%# One row of a sheet page (a focus's notes, the Kept page): the passage at left, its note level with it on the sheet
+    at right.
+    citation, passage, content: the reference, the passage's text, the note (or kept remark; may be nil)
     href: where the passage is read; the whole passage cell links there (nil for a detached note, whose passage is gone)
+    actions: buttons under the note
     detached: the detached note, which says why it was set aside and can be discarded %>
 <% detached = local_assigns[:detached]
    href = local_assigns[:href]
+   actions = local_assigns[:actions]
    long = passage.length > 300 || passage.count("\n") > 3 %>
 <div class="nb-passage<%= " nb-linked" if href %><%= " nb-detached" if detached %>" <%= tag.attributes(id: (dom_id(detached) if detached), data: ({ controller: "expand" } if long)) %>>
   <div class="nb-ref-row">
@@ -22,10 +25,13 @@
 </div>
 <div class="nb-note">
   <%= content %>
-  <% if detached %>
+  <% if actions || detached %>
     <div class="nb-note-actions">
-      <%= button_to "Discard", detached_note_path(detached), method: :delete, class: "chip", form_class: "inline-form",
-            data: { turbo_confirm: "Discard this note? It can’t be brought back." } %>
+      <%= actions %>
+      <% if detached %>
+        <%= button_to "Discard", detached_note_path(detached), method: :delete, class: "chip", form_class: "inline-form",
+              data: { turbo_confirm: "Discard this #{detached.kept? ? "remark" : "note"}? It can’t be brought back." } %>
+      <% end %>
     </div>
   <% end %>
 </div>

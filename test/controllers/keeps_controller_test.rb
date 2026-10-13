@@ -66,17 +66,18 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
     @user.keeps.create!(unit: verse(20))
     get kept_path
     assert_response :success
-    assert_select ".fv-ref", 2
-    assert_select ".fv-ref:first-of-type", /Isaiah 40:20/
-    assert_select ".fv-note", "first one"
-    assert_select "a[href=?]", new_focus_path(unit_id: verse(3).id)
+    assert_equal [ "Isaiah 40:20", "Isaiah 40:3" ], css_select(".nb-ref").map(&:text)
+    assert_select ".nb-linked a.nb-ref[href=?]", reading_path("isaiah-kjv", 40, 3)
+    assert_select ".nb-note .nb-remark", "first one"
+    assert_select ".nb-note .nb-remark", 1, "no remark, nothing in its place"
+    assert_select ".nb-note a[href=?]", new_focus_path(unit_id: verse(3).id)
   end
 
   test "the Kept page can list in reading order" do
     @user.keeps.create!(unit: verse(20), created_at: 2.days.ago)
     @user.keeps.create!(unit: verse(3))
     get kept_path(order: "reading")
-    assert_equal [ "Isaiah 40:3", "Isaiah 40:20" ], css_select(".fv-ref").map(&:text)
+    assert_equal [ "Isaiah 40:3", "Isaiah 40:20" ], css_select(".nb-ref").map(&:text)
   end
 
   test "the Kept page is empty with a hint" do
@@ -87,7 +88,7 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
   test "the Kept page shows only the reader's own" do
     users(:two).keeps.create!(unit: verse(3), remark: "theirs")
     get kept_path
-    assert_select ".fv-item", 0
+    assert_select ".nb-passage", 0
   end
 
   test "the Kept page asks before starting a focus only when one is current" do
