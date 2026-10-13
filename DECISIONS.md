@@ -1,6 +1,6 @@
 # Study Carrel: Decisions
 
-Last updated: 2026-10-12
+Last updated: 2026-10-13
 
 A web app for reading text (scripture, poetry, prose) against a **focus**: a question, metaphor, or thesis ("What does it mean to be holy?" while reading Isaiah 40). The reader sees one passage at a time with the focus pinned above it and writes a note on it.
 
@@ -33,6 +33,6 @@ This is the index. Each line is the rule in force; the linked file has the detai
 | Random | Scoped (innermost collection by default) and balanced across branches; a shelf is a scope too. | [random](docs/decisions/random.md) |
 | Search | FTS5 over unit text, every word required, reading order, a sentence at a time for prose; titles and notes not searched. Scoped to a work, collection, Your Texts or a shelf. | [search](docs/decisions/search.md) |
 
-**Exploratory, not decided:** [discovery](docs/decisions/discovery.md) holds brainstorm notes on helping new users find something to study (an exploring focus, curated lists, keeps in place of notes). Nothing in it is a rule.
+**Exploratory, not decided:** [discovery](docs/decisions/discovery.md) holds brainstorm notes on helping new users find something to study (an exploring focus, curated lists, keeps in place of notes). Nothing in it is a rule. [synthesis](docs/decisions/synthesis.md) holds notes to experiment with on turning notes into writing (a reread with labels and a scratchpad, free notes on the whole focus, essays drawn from one or more focuses). Nothing in it is a rule either.
 
 The original brief (v1 scope, open questions, early design implications) is in [origins](docs/decisions/origins.md).

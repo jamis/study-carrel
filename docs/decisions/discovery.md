@@ -59,4 +59,4 @@ Claude's preference was "Commonplace" for the collection of keeps and "gleaning"
 
 ## Related, for later
 
-Synthesis ideas from the same brainstorm (rereading notes one at a time, the "current answer" document, closing a focus with open questions that seed discovery) are not captured here yet.
+Synthesis ideas (rereading notes one at a time, labels, free notes, essays, loose ends that seed new focuses) are in [synthesis.md](synthesis.md).
