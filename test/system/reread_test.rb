@@ -46,6 +46,30 @@ class RereadTest < ApplicationSystemTestCase
     assert_selector ".rr-row.here", text: "The incomparable"
   end
 
+  test "coming back to a note far down, it stands in view" do
+    (4..24).each { |n| @focus.notes.create!(unit: verse(n), content: "Note on verse #{n}") }
+    @focus.update!(reread_note_id: @second.id)
+    visit focus_notes_path(@focus)
+    find("a[href='#{focus_reread_path(@focus)}']").click # a Turbo visit, which scrolls the page after rendering it
+    assert_selector ".rr-row.here", text: "The incomparable"
+    sleep 0.3
+    assert page.evaluate_script(<<~JS)
+      (() => { const box = document.querySelector(".rr-row.here").getBoundingClientRect(); return box.top >= 0 && box.top < innerHeight })()
+    JS
+  end
+
+  test "opens again on a note on the whole focus, coming back from the focuses page" do
+    whole = @focus.notes.create!(content: "Across it all")
+    visit focus_reread_path(@focus)
+    find(".rr-row", text: "Across it all").click
+    assert_selector ".rr-row.here", text: "Across it all"
+    sleep 1 # past the position save's debounce
+    visit foci_path
+    find("a[href='#{focus_reread_path(@focus)}']", match: :first).click
+    assert_selector ".rr-row.here", text: "Across it all"
+    assert_equal whole.id, @focus.reload.reread_note_id
+  end
+
   test "the scratchpad saves as you write" do
     visit focus_reread_path(@focus)
     find(".reread-pad lexxy-editor [contenteditable]").send_keys "Compare Amos 5?"

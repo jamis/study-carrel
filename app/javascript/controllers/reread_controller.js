@@ -19,7 +19,10 @@ export default class extends Controller {
     try { view = localStorage.getItem(VIEW_KEY) || view } catch {}
     this.#setView(view)
     if (this.here) {
-      this.here.scrollIntoView({ block: "center" })
+      this.#centre()
+      // Turbo scrolls the page (to the top, or where it was) after it's rendered, so again once the visit is done.
+      this.centreOnLoad = () => this.#centre()
+      document.addEventListener("turbo:load", this.centreOnLoad, { once: true })
       this.#openEditor()
     }
     this.#mark()
@@ -27,7 +30,10 @@ export default class extends Controller {
 
   disconnect() {
     clearTimeout(this.saveTimer)
+    document.removeEventListener("turbo:load", this.centreOnLoad)
   }
+
+  #centre() { this.here?.scrollIntoView({ block: "center" }) }
 
   // A note's chips or the panel were redrawn (labelling replies with both).
   noteLabelsTargetConnected() { this.#mark() }
