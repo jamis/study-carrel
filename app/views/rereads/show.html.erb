@@ -61,12 +61,19 @@
       </template>
     </div>
 
-    <%# The label picker, under the + label of the note you're on: your labels, filtered as you type; Enter or a click
-        puts the note on one, or on a new label of what you typed. %>
+    <%# The label picker, by the + label of the note you're on: all your labels as a cloud, A–Z or most recently used
+        first, narrowed as you type. The footer says what Enter does: the closest match, or a new label of what you
+        typed when nothing matches. %>
     <div class="rr-picker" data-reread-target="picker" hidden>
-      <input type="text" maxlength="40" placeholder="Label this note" autocomplete="off" aria-label="Label" data-reread-target="pickerInput"
-             data-action="input->reread#filterPicker keydown->reread#pickerKey">
-      <div class="rr-picker-options" role="listbox" data-reread-target="pickerOptions"></div>
+      <div class="rr-picker-head">
+        <input type="text" maxlength="40" placeholder="Label this note" autocomplete="off" aria-label="Label" data-reread-target="pickerInput"
+               data-action="input->reread#filterPicker keydown->reread#pickerKey">
+        <span class="rr-picker-sort">
+          <button type="button" data-sort="alpha" data-action="reread#sortPicker">A–Z</button> · <button type="button" data-sort="recent" data-action="reread#sortPicker">Recent</button>
+        </span>
+      </div>
+      <div class="rr-picker-cloud" role="listbox" data-reread-target="pickerOptions"></div>
+      <div class="rr-picker-foot" data-reread-target="pickerFoot"></div>
     </div>
     <p class="rr-toast" role="status" data-reread-target="toast" hidden></p>
     <%= form_with url: focus_note_labels_path(@focus, 0), method: :post, class: "rr-label-form", data: { reread_target: "labelForm" } do %>

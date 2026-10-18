@@ -37,6 +37,39 @@ class RereadTest < ApplicationSystemTestCase
     assert_no_selector ".rr-labels-panel .rr-word", text: "set apart"
   end
 
+  test "the label picker: every label as a cloud, A–Z or recent, and Enter takes the closest match or a new label" do
+    %w[ glory grace holiness humility justice mercy peace sorrow wilderness zeal ].each { @second.label!(it) }
+    users(:one).foci.create!(title: "Rest", archived_at: 1.day.ago).notes.create!(unit: verse(31), content: "x").label!("hope")
+    visit focus_reread_path(@focus)
+
+    find("body").send_keys "l"
+    within(".rr-picker") do
+      assert_selector ".rr-pick", count: 12
+      assert_selector ".rr-pick.away[title='Under Rest']", text: "hope"
+      assert_selector ".rr-pick:first-child", text: "glory"
+      assert_no_selector ".rr-pick.chosen"
+      assert_text "Type to narrow"
+
+      find("input").send_keys "ho"
+      assert_selector ".rr-pick", count: 2
+      assert_selector ".rr-pick.chosen", text: "holiness" # starts with it, as hope does, and comes first
+      assert_selector ".rr-picker-foot", text: "↵ holiness"
+      assert_selector ".rr-pick-new", text: "New label “ho”"
+
+      find("input").send_keys :up, :enter # round from the first label to the new one
+    end
+    assert_selector ".rr-row.here .rr-chip", exact_text: "ho\n×"
+
+    find("body").send_keys "l"
+    within(".rr-picker") do
+      click_on "Recent"
+      assert_selector ".rr-pick:first-child", text: "hope"
+      find("input").send_keys "wild", :enter
+    end
+    assert_selector ".rr-row.here .rr-chip", text: "wilderness"
+    assert_equal %w[ ho wilderness ], @first.labels.reload.map(&:name).sort
+  end
+
   test "opens where it left off" do
     visit focus_reread_path(@focus)
     find("body").send_keys "j"

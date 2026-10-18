@@ -26,9 +26,21 @@ See [foci-and-notes.md](foci-and-notes.md) for what they are. Here is where they
 
 - They belong to the user, not the focus (`labels`, unique per user ignoring case, up to 40 characters), so one label can gather notes from several focuses. Another user's labels are a 404, as everything else is.
 - A label lasts only while some note carries it: taking off its last note (or deleting that note) drops it. Renaming and merging are not built yet.
-- On the lit note, chips with ×, and **+ label** (`l`), which opens a picker: your labels filtered as you type (those used only under other focuses say where), Enter or a click to choose, or a new label of what you typed. On the other notes, the labels are quiet names.
+- On the lit note, chips with ×, and **+ label** (`l`), which opens the picker (below). On the other notes, the labels are quiet names.
 - The notes page shows each note's labels quietly under it.
 - A note set aside as a detached note keeps its labels' names as text (`detached_notes.label_names`), shown under it on the notes page; they no longer count anywhere.
+
+## The label picker
+
+**Every label you have as a cloud, to browse as much as to search.** Decided 2026-10-18, after a prototype (not kept).
+
+- All one size, wrapped to fill a picker about 26em wide; the cloud scrolls when there are more than fit, the box and footer staying put. Nothing is cut off: you often browse for a fitting label, more so as they grow numerous.
+- **A–Z · Recent** beside the box, remembered in the browser. Recent is when a label was last put on a note (`Label.last_used`, from `note_labels.created_at`).
+- One list: labels used only under other focuses take their place in it, faint, dashed and italic as in the cloud panel, saying where on hover. (They were first a separate group after the rest.)
+- Typing narrows it to labels holding what you typed, underlined in each.
+- **What Enter does is always said** in a footer ("↵ holiness"), as the user couldn't tell whether Enter took the first match or made a new label of the part typed. Enter takes the closest match, lit in accent: starting with what you typed, then a word starting with it, then holding it, the first among equals; `↓`/`↑` or pointing move it. With nothing typed nothing is lit, and Enter does nothing. A new label of what you typed, unless it's one of yours already, waits in the footer ("+ New label “ho”"): a click, or `↑` round from the first label, and Enter takes it on its own when nothing matches.
+- **Placed to stay in sight:** under + label unless that leaves room for only a row or two of labels and there's more above (on phones the scratchpad's handle takes the foot of the screen); then over it, the box at its foot nearest the label. The cloud is cut to the room there is. + label scrolled out of sight is brought back to the middle first. (It used to open under + label regardless, often partly below the fold.)
+- An early fix showed only the 8 closest labels with "and N more"; dropped, as it stopped the browsing.
 
 ## The labels in use: cloud and tallies
 

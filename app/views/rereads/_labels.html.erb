@@ -4,6 +4,7 @@
     focus; notes: the focus's notes in reading order, with their labels %>
 <% counts = focus.label_counts
    elsewhere = focus.labels_elsewhere
+   used = focus.user.labels.last_used
    here, away = focus.user.labels.alphabetical.partition { counts.key?(it.id) }
    most = counts.values.max || 1 %>
 <div data-reread-target="labelsBody">
@@ -15,11 +16,11 @@
        n = counts[label.id]
        also = elsewhere[label.id] %>
     <button type="button" class="rr-word" style="font-size: <%= 15 + (17 * Math.sqrt(n.to_f / most)).round %>px"
-            data-label-id="<%= label.id %>" data-label-name="<%= label.name %>" data-action="reread#toggleLabel"
+            data-label-id="<%= label.id %>" data-label-name="<%= label.name %>" data-label-used="<%= used[label.id]&.then { (it.to_f * 1000).round } %>" data-action="reread#toggleLabel"
             title="<%= label.name %>: <%= pluralize(n, "note") %><%= "; also under #{also.to_sentence}" if also %>"><%= label.name %></button>
   <% end %>
   <% away.each do |label| %>
-    <button type="button" class="rr-word away" data-label-id="<%= label.id %>" data-label-name="<%= label.name %>" data-action="reread#toggleLabel"
+    <button type="button" class="rr-word away" data-label-id="<%= label.id %>" data-label-name="<%= label.name %>" data-label-used="<%= used[label.id]&.then { (it.to_f * 1000).round } %>" data-action="reread#toggleLabel"
             title="<%= label.name %>: under <%= elsewhere[label.id]&.to_sentence %>"><%= label.name %></button>
   <% end %>
 </div>

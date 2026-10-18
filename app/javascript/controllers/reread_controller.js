@@ -3,6 +3,8 @@ import { Turbo } from "@hotwired/turbo-rails"
 import { csrfToken, fillId } from "lib/request"
 
 const VIEW_KEY = "reread-labels-view"
+const SORT_KEY = "reread-picker-sort"
+const PICKER_LEAST = 150, PICKER_TALLEST = 340 // px of the picker's cloud
 
 // Rereading a focus's notes: one lit at a time down the column (j/k, the arrows, or a click), labelled with + label (l)
 // or from the labels panel (c), which shows the labels in use as a cloud or as tallies. Pointing at a label lights the
@@ -10,7 +12,7 @@ const VIEW_KEY = "reread-labels-view"
 // saved, so the reread opens there again. A new note on the whole focus (n) is written in a row of its own, and a
 // selection in the scratchpad can be made one ("Make a note of this").
 export default class extends Controller {
-  static targets = ["row", "newRow", "noteLabels", "labelsBody", "picker", "pickerInput", "pickerOptions", "labelForm", "pad", "labelsPanel",
+  static targets = ["row", "newRow", "noteLabels", "labelsBody", "picker", "pickerInput", "pickerOptions", "pickerFoot", "labelForm", "pad", "labelsPanel",
     "lift", "toast"]
   static values = { positionUrl: String, labelsUrlTemplate: String, liftUrl: String }
 
@@ -193,7 +195,7 @@ export default class extends Controller {
   get #labels() {
     const seen = new Map()
     this.labelsPanelTarget.querySelectorAll(".rr-cloud [data-label-name]").forEach(word => {
-      seen.set(word.dataset.labelName, { id: word.dataset.labelId, away: word.classList.contains("away"), title: word.title })
+      seen.set(word.dataset.labelName, { id: word.dataset.labelId, away: word.classList.contains("away"), title: word.title, used: Number(word.dataset.labelUsed) || 0 })
     })
     return seen
   }
@@ -231,61 +233,135 @@ export default class extends Controller {
     event?.stopPropagation()
     const add = this.here?.querySelector(".rr-add")
     if (!add) return
-    const picker = this.pickerTarget
-    const col = picker.offsetParent || picker.parentElement
-    const box = add.getBoundingClientRect(), colBox = col.getBoundingClientRect()
-    picker.style.left = `${box.left - colBox.left}px`
-    picker.style.top = `${box.bottom - colBox.top + col.scrollTop + 6}px`
-    picker.hidden = false
     this.pickerInputTarget.value = ""
-    this.choice = 0
+    this.choice = -1
+    this.#syncSort()
+    this.pickerTarget.hidden = false
     this.filterPicker()
-    this.pickerInputTarget.focus()
+    this.#placePicker(add)
+    this.pickerInputTarget.focus({ preventScroll: true })
   }
 
+  // Under + label, unless that leaves room for only a row or two of labels and there's more above; the cloud shortened
+  // to fit. On phones the scratchpad's handle takes the foot of the screen.
+  #placePicker(add) {
+    const picker = this.pickerTarget, cloud = this.pickerOptionsTarget
+    const col = picker.offsetParent || picker.parentElement
+    let floor = window.visualViewport?.height || window.innerHeight
+    if (matchMedia("(max-width: 899px)").matches) floor = Math.min(floor, this.padTarget.getBoundingClientRect().top)
+    // + label out of sight (l pressed with the lit note scrolled away): back into the middle first.
+    const seen = add.getBoundingClientRect()
+    if (seen.top < 0 || seen.bottom > floor) add.scrollIntoView({ block: "center" })
+    const box = add.getBoundingClientRect(), colBox = col.getBoundingClientRect()
+    const below = floor - box.bottom - 12, above = box.top - 12
+    cloud.style.maxHeight = ""
+    const chrome = picker.offsetHeight - cloud.offsetHeight
+    const up = picker.offsetHeight > below && below - chrome < PICKER_LEAST && above > below
+    cloud.style.maxHeight = `${Math.max(PICKER_LEAST, Math.min(PICKER_TALLEST, (up ? above : below) - chrome - 6))}px`
+    picker.style.left = `${Math.max(0, Math.min(box.left - colBox.left, col.clientWidth - picker.offsetWidth - 16))}px`
+    // Held by its foot when over + label, so it stays put as typing shortens the cloud.
+    picker.style.top = up ? "" : `${box.bottom - colBox.top + 6}px`
+    picker.style.bottom = up ? `${colBox.bottom - box.top + 6}px` : ""
+    picker.classList.toggle("up", up)
+  }
+
+  // Your labels not yet on the note, A–Z or most recently used first, those under other focuses only among them,
+  // narrowed to those holding what you typed. Enter takes the closest match (starting with it, then a word starting
+  // with it, then holding it; the first among equals) or the one moved to with the arrows; with nothing typed,
+  // nothing until you move. A new label of what you typed, unless it's one of yours already, waits in the footer, and
+  // is what Enter takes when nothing matches.
   filterPicker() {
     const typed = this.pickerInputTarget.value.trim().replace(/\s+/g, " ")
     const q = typed.toLowerCase()
     const on = this.#hereLabelIds
-    const options = [...this.#labels].filter(([name, { id }]) => !on.includes(id) && name.toLowerCase().includes(q))
-      .sort(([a, x], [b, y]) => x.away - y.away || a.localeCompare(b))
-      .map(([name, { away, title }]) => ({ name, note: away ? title.replace(/^[^:]*: /, "") : "" }))
-    if (typed && ![...this.#labels.keys()].some(name => name.toLowerCase() === q)) options.push({ name: typed, note: "new label" })
-    this.options = options
-    this.choice = Math.min(this.choice || 0, Math.max(0, options.length - 1))
-    this.pickerOptionsTarget.replaceChildren(...options.map((option, i) => {
-      const button = document.createElement("button")
-      button.type = "button"
-      button.className = "rr-option"
-      button.setAttribute("role", "option")
-      button.setAttribute("aria-selected", i === this.choice)
-      button.append(option.note === "new label" ? `New label “${option.name}”` : option.name)
-      if (option.note && option.note !== "new label") {
-        const small = document.createElement("small")
-        small.textContent = option.note
-        button.append(small)
-      }
-      button.addEventListener("click", () => this.#choose(option.name))
-      return button
-    }))
-    if (!options.length) this.pickerOptionsTarget.innerHTML = `<p class="rr-option-none">Type a name for a new label</p>`
+    const order = this.#sort === "recent" ? (a, b) => b.used - a.used || a.name.localeCompare(b.name) : (a, b) => a.name.localeCompare(b.name)
+    this.shown = [...this.#labels].map(([name, label]) => ({ name, ...label }))
+      .filter(label => !on.includes(label.id) && label.name.toLowerCase().includes(q)).sort(order)
+    this.fresh = typed && ![...this.#labels.keys()].some(name => name.toLowerCase() === q) ? typed : null
+
+    if (typed && this.shown.length) {
+      let best = 0
+      this.shown.forEach((label, i) => { if (closeness(label.name, q) < closeness(this.shown[best].name, q)) best = i })
+      this.choice = best
+    } else this.choice = typed ? -1 : Math.min(this.choice, this.shown.length - 1)
+
+    const words = this.shown.map((label, i) => {
+      const word = document.createElement("button")
+      word.type = "button"
+      word.className = label.away ? "rr-pick away" : "rr-pick"
+      word.setAttribute("role", "option")
+      if (label.away) word.title = upcaseFirst(label.title.slice(label.name.length + 2)) // "Under Grace"
+      const at = q ? label.name.toLowerCase().indexOf(q) : -1
+      if (at >= 0) word.append(label.name.slice(0, at), Object.assign(document.createElement("mark"), { textContent: label.name.slice(at, at + q.length) }), label.name.slice(at + q.length))
+      else word.textContent = label.name
+      word.addEventListener("click", () => this.#choose(label.name))
+      word.addEventListener("mouseenter", () => { this.choice = i; this.#markChoice() })
+      return word
+    })
+    if (!words.length) {
+      const none = document.createElement("p")
+      none.className = "rr-pick-none"
+      none.textContent = typed ? "No label holds that." : this.#labels.size ? "This note carries all your labels." : "No labels yet: type a name for one."
+      words.push(none)
+    }
+    this.pickerOptionsTarget.replaceChildren(...words)
+    this.#markChoice()
+  }
+
+  // The chosen label lit, and the footer saying what Enter does.
+  #markChoice() {
+    const words = this.pickerOptionsTarget.querySelectorAll(".rr-pick")
+    words.forEach((word, i) => word.classList.toggle("chosen", i === this.choice))
+    words[this.choice]?.scrollIntoView({ block: "nearest" })
+    const parts = []
+    if (this.choice >= 0) parts.push(`<span><kbd>↵</kbd> <b>${escapeHtml(this.shown[this.choice].name)}</b></span>`)
+    else if (this.fresh) parts.push("<span><kbd>↵</kbd></span>")
+    else parts.push("<span>Type to narrow, or <kbd>↓</kbd> to choose</span>")
+    if (this.fresh) parts.push(`<button type="button" class="rr-pick-new${this.choice < 0 ? " chosen" : ""}">+ New label “${escapeHtml(this.fresh)}”</button>`)
+    if (this.choice >= 0) parts.push("<span><kbd>↓</kbd><kbd>↑</kbd> to move</span>")
+    this.pickerFootTarget.innerHTML = parts.join("")
+    this.pickerFootTarget.querySelector(".rr-pick-new")?.addEventListener("click", () => this.#choose(this.fresh))
   }
 
   pickerKey(event) {
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault()
-      const n = this.options.length
+      const n = this.shown.length
       if (!n) return
-      this.choice = (this.choice + (event.key === "ArrowDown" ? 1 : -1) + n) % n
-      this.pickerOptionsTarget.querySelectorAll(".rr-option").forEach((b, i) => b.setAttribute("aria-selected", i === this.choice))
+      // After the last label, the new one (when there is one), then round again.
+      const stops = this.fresh ? n + 1 : n
+      let at = this.choice < 0 ? (this.fresh ? n : -1) : this.choice
+      at = event.key === "ArrowDown" ? (at + 1) % stops : (at - 1 + stops) % stops
+      this.choice = at === n ? -1 : at
+      this.#markChoice()
     } else if (event.key === "Enter") {
       event.preventDefault()
-      const option = this.options[this.choice]
-      if (option) this.#choose(option.name)
+      if (this.choice >= 0) this.#choose(this.shown[this.choice].name)
+      else if (this.fresh) this.#choose(this.fresh)
     } else if (event.key === "Escape") {
       event.stopPropagation()
       this.#closePicker()
     }
+  }
+
+  sortPicker(event) {
+    this.#sort = event.currentTarget.dataset.sort
+    this.#syncSort()
+    this.filterPicker()
+    this.pickerInputTarget.focus()
+  }
+
+  get #sort() {
+    try { return localStorage.getItem(SORT_KEY) || "alpha" } catch { return "alpha" }
+  }
+
+  set #sort(sort) {
+    try { localStorage.setItem(SORT_KEY, sort) } catch {}
+  }
+
+  #syncSort() {
+    const sort = this.#sort
+    this.pickerTarget.querySelectorAll("[data-sort]").forEach(button => button.setAttribute("aria-pressed", button.dataset.sort === sort))
   }
 
   #choose(name) {
@@ -364,6 +440,13 @@ export default class extends Controller {
   }
 }
 
+// How closely a label holds what's typed: starts with it, has a word starting with it, or only holds it.
+function closeness(name, q) {
+  const n = name.toLowerCase()
+  return n.startsWith(q) ? 0 : n.split(/[\s-]+/).some(word => word.startsWith(q)) ? 1 : 2
+}
+
+const upcaseFirst = text => text.charAt(0).toUpperCase() + text.slice(1)
 const escapeHtml = text => text.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c])
 
 // Into an editor with the caret after what's written, to add to it.

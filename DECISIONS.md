@@ -1,6 +1,6 @@
 # Study Carrel: Decisions
 
-Last updated: 2026-10-13
+Last updated: 2026-10-18
 
 A web app for reading text (scripture, poetry, prose) against a **focus**: a question, metaphor, or thesis ("What does it mean to be holy?" while reading Isaiah 40). The reader sees one passage at a time with the focus pinned above it and writes a note on it.
 
@@ -31,7 +31,7 @@ This is the index. Each line is the rule in force; the linked file has the detai
 | Keep | Per-user bookmark with optional remark; ribbon by the reference, `b`, Kept page laid out like a notes page (passages left, remarks and actions on a sheet at right). | [history-and-keep](docs/decisions/history-and-keep.md) |
 | Shelves | A user's own private groups of works and whole collections (a collection brings everything under it, nothing twice), to roll Random and search in. Filled from "Put on a shelf…" under a work's or collection's title, or the shelf editor over the library tree. | [shelves](docs/decisions/shelves.md) |
 | Random | Scoped (innermost collection by default) and balanced across branches; a shelf is a scope too. | [random](docs/decisions/random.md) |
-| Reread | A focus's notes one at a time (`/foci/:id/reread`, any focus): all in one column, the one you're on lit (`j`/`k`), with the focus's scratchpad docked at right; notes on the whole focus written there (New note, `n`, by the scratchpad; or "Make a note of this" from it). Labels are the user's own, across focuses, put on notes with + label (`l`); the labels in use as a cloud or tallies on a panel over the scratchpad (`c`). In from the notes page (`r`), each focus's card and the ⋯ menu. | [reread](docs/decisions/reread.md) |
+| Reread | A focus's notes one at a time (`/foci/:id/reread`, any focus): all in one column, the one you're on lit (`j`/`k`), with the focus's scratchpad docked at right; notes on the whole focus written there (New note, `n`, by the scratchpad; or "Make a note of this" from it). Labels are the user's own, across focuses, put on notes with + label (`l`), a picker showing them all as a cloud (A–Z or recent; the footer says what Enter does); the labels in use as a cloud or tallies on a panel over the scratchpad (`c`). In from the notes page (`r`), each focus's card and the ⋯ menu. | [reread](docs/decisions/reread.md) |
 | Search | FTS5 over unit text, every word required, reading order, a sentence at a time for prose; titles and notes not searched. Scoped to a work, collection, Your Texts or a shelf. | [search](docs/decisions/search.md) |
 
 **Exploratory, not decided:** [discovery](docs/decisions/discovery.md) holds brainstorm notes on helping new users find something to study (an exploring focus, curated lists, keeps in place of notes). Nothing in it is a rule. [synthesis](docs/decisions/synthesis.md) holds notes on turning notes into writing: the reread and notes on the whole focus are decided (above); essays drawn from one or more focuses are still exploratory.

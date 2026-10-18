@@ -11,4 +11,7 @@ class Label < ApplicationRecord
 
   scope :unused, -> { where.missing(:note_labels) }
   scope :alphabetical, -> { order(Arel.sql("name COLLATE NOCASE"), :id) }
+
+  # When each label was last put on a note, keyed by label id (the picker's Recent order).
+  def self.last_used = NoteLabel.where(label_id: select(:id)).group(:label_id).maximum(:created_at)
 end
