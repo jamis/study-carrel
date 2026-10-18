@@ -15,3 +15,6 @@
 !.env.example
 *.log
 __pycache__/
+
+# Prototypes are transient: made here, never committed.
+/prototype

@@ -8,7 +8,7 @@ This is the index. Each line is the rule in force; the linked file has the detai
 
 ## Always true
 
-- **Stack:** Rails + Hotwire + SQLite; Lexxy 1.0.0 on Action Text for notes. New features are prototyped as plain HTML in `prototype/` first.
+- **Stack:** Rails + Hotwire + SQLite; Lexxy 1.0.0 on Action Text for notes. New features are prototyped as plain HTML in `prototype/` first; prototypes aren't kept in the repo (those named in these docs are in git history up to d34f04e).
 - **Privacy:** nobody, admins included, can read another user's foci, notes, keeps or texts. User texts go through one visibility scope, and another user gets a 404 everywhere.
 - **Notes survive:** loading texts updates in place and never deletes rows notes hang off. Notes whose passage goes away become detached notes, never silently lost.
 - **Tone:** a quiet study desk, not a productivity tool. Serif, warm paper, dark mode, no gamification or streaks. Same features on phone and desktop.
