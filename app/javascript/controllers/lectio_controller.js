@@ -325,6 +325,8 @@ export default class extends Controller {
 
   key(event) {
     if (event.target.closest("input, textarea, [contenteditable]") || event.metaKey || event.ctrlKey || event.altKey) return
+    // One press is one step: holding a key down doesn't speed through the reading.
+    if (event.repeat && ["ArrowRight", "ArrowLeft", "j", "k", "J", "K"].includes(event.key)) return
     if (event.key === "ArrowRight" || event.key === "j") this.next()
     if (event.key === "ArrowLeft" || event.key === "k") this.previous()
     if (event.key === "J") this.stepUnit(1)

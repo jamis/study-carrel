@@ -424,8 +424,9 @@ export default class extends Controller {
     if (event.metaKey || event.ctrlKey || event.altKey) return
     if (event.key === "Escape" && this.padTarget.classList.contains("labels-open") && this.pickerTarget.hidden) return this.toggleLabels()
     if (event.target.closest("input, textarea, select, [contenteditable]")) return
-    if (event.key === "j" || event.key === "ArrowRight") { event.preventDefault(); this.next() }
-    else if (event.key === "k" || event.key === "ArrowLeft") { event.preventDefault(); this.previous() }
+    // One press is one step: holding a key down doesn't speed through the notes.
+    if (event.key === "j" || event.key === "ArrowRight") { event.preventDefault(); if (!event.repeat) this.next() }
+    else if (event.key === "k" || event.key === "ArrowLeft") { event.preventDefault(); if (!event.repeat) this.previous() }
     else if (event.key === "l") { event.preventDefault(); this.openPicker() }
     else if (event.key === "c") { event.preventDefault(); this.toggleLabels() }
     else if (event.key === "n") { event.preventDefault(); this.newNote() }

@@ -7,7 +7,7 @@ The first part of synthesis (see [synthesis.md](synthesis.md), still exploratory
 **`/foci/:id/reread`, for any focus**, the current one or a past one, without making a past one current. The rail stays the current focus's.
 
 - Every note on a passage in reading order down one column, as on the notes page (reference, passage, note), then the notes on the focus as a whole under "On the whole focus", each dated. The one you're on is lit and the rest dimmed in place, as clause by clause dims the rest of a passage. The passage is clamped to two lines except on the lit note.
-- `j`/`k` (or `←`/`→`) move, as does clicking a note. The lit note scrolls to the middle.
+- `j`/`k` (or `←`/`→`) move, as does clicking a note; a held key moves once, as in the reader. The lit note scrolls to the middle.
 - **Where you left off** is kept per focus (`foci.reread_note_id`, cleared if that note goes), so the reread opens there again.
 - The way up: Your focuses › Notes. The reference links into the reader, with "Open in the reader →" on the lit note.
 - `?label=` rereads only the notes carrying one label, chosen from "Rereading 8 notes ▾" over the run.

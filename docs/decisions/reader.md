@@ -27,7 +27,7 @@ Visual tone (ideas, not decisions): quiet study desk, not a productivity tool. S
 
 - Splitting is done in the browser (`lib/clauses.js`) and only for reading: notes, keeps, history, the reference and `n of N` stay with the whole passage.
 - **Off by default.** `;` (or the ; button after ¶) turns it on, and only that turns it on: clicking the text does not, since that surprised. It then stays on from passage to passage and chapter to chapter until turned off or the reader is left (sessionStorage, cleared by any page that isn't the reader).
-- While on, the arrows (and `j`/`k`, swipe) step a clause at a time and carry on into the next passage; stepping back lands on the previous passage's last clause. `J`/`K` skip a whole passage. Clicking a clause moves there.
+- While on, the arrows (and `j`/`k`, swipe) step a clause at a time and carry on into the next passage; stepping back lands on the previous passage's last clause. `J`/`K` skip a whole passage. Clicking a clause moves there. A held key steps once (auto-repeat ignored), since a quick keyboard repeat skipped clauses on a single press; holding shouldn't speed through the reading.
 - Breaks at `.` `?` `!` (a verse can hold several sentences, as Jonah 4:2 does; not after an abbreviation or an initial, though "I." still ends one), at `,` `;` `:` (each needing a space after, so 1,000 and 3:16 hold), after `—`, and around `( )` (off by default). A lone word joins the next clause; two words stand alone ("no invention, no hope"), since splitting too often beats too seldom.
 - A pip per clause after the ; shows where you are and opens **Break at**, where each mark can be turned off. That choice is kept in the browser (localStorage), not on the server.
 

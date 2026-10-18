@@ -58,6 +58,18 @@ class ClausesTest < ApplicationSystemTestCase
     assert_no_selector ".now.clauses"
   end
 
+  test "holding a key down steps once, not on through the clauses" do
+    visit reading_path("self-reliance", 1, 2)
+    find("body").send_keys ";"
+    assert_selector ".clause.current", text: "In the attempt his genius deserts him;"
+
+    execute_script(<<~JS)
+      for (const repeat of [false, true, true, true])
+        document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "j", repeat, bubbles: true }))
+    JS
+    assert_selector ".clause.current", text: "no muse befriends;"
+  end
+
   test "reading by clause carries into the next chapter, and ends on leaving the reader" do
     visit reading_path("self-reliance", 1, 2)
     find("body").send_keys ";"
