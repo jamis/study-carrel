@@ -7,8 +7,9 @@
          data-note-id="<%= note.id %>" data-editor-url="<%= editor_url %>" data-action="click->reread#pick">
   <div class="rr-head">
     <% if unit %>
-      <%= link_to unit_ref(unit.section, unit), reading_path(unit.section.work.slug, unit.section.number, unit.number), class: "rr-ref" %>
-      <span class="rr-open">Open in the reader →</span>
+      <%= link_to reading_path(unit.section.work.slug, unit.section.number, unit.number), class: "rr-ref" do %>
+        <span class="rr-cite"><%= unit_ref(unit.section, unit) %></span><span class="rr-open">Open in the reader →</span>
+      <% end %>
     <% else %>
       <span class="rr-ref rr-whole">Written <%= l note.created_at.to_date, format: :long %></span>
     <% end %>

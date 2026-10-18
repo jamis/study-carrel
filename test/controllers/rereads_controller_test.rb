@@ -12,7 +12,7 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
   test "every note, in reading order, the first one lit" do
     get focus_reread_path(@focus)
     assert_response :success
-    assert_select ".rr-row[data-note-id] .rr-ref" do |refs|
+    assert_select ".rr-row[data-note-id] .rr-cite" do |refs|
       assert_equal [ "Isaiah 40:3", "Isaiah 40:25" ], refs.map { it.text.strip }
     end
     assert_select ".rr-row.here", 1
@@ -39,7 +39,7 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     waiting = @late.label!("waiting")
     get focus_reread_path(@focus, label: waiting.id)
     assert_select ".rr-row[data-note-id]", 1
-    assert_select ".rr-row[data-note-id] .rr-ref", "Isaiah 40:25"
+    assert_select ".rr-row[data-note-id] .rr-cite", "Isaiah 40:25"
     assert_select ".rr-filter", /labelled “waiting”/
   end
 
