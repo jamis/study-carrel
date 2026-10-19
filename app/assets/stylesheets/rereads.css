@@ -203,6 +203,104 @@
 .rr-tally.on .rr-ticks i.on { background: var(--accent); }
 .rr-ticks i.here { height: 9px; margin-top: -2px; }
 
+/* An unnamed label, shown "like" one of its notes: the reference, and on the note you're on, the start of that note. */
+.lf-unnamed { font-style: italic; }
+.lf-like { font-style: normal; }
+.lf-snip { display: none; }
+.rr-row.here .rr-chip .lf-snip { display: inline; }
+.rr-row.here .rr-chip .lf { max-width: 26em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rr-tally-name .lf-unnamed { color: var(--ink-soft); }
+
+/* The way into finding what goes with the note you're on, beside + label. */
+.rr-find { display: none; }
+.rr-row.here:not(.rr-unsaved) .rr-find {
+  display: inline-block; min-height: 26px; padding: 2px 10px; border: 1px dashed var(--rule); border-radius: 999px; background: none; color: var(--accent);
+}
+.rr-row.here .rr-find:hover { border-color: var(--accent); }
+
+/* ---------- finding what goes with a note (the compare controller) ---------- */
+/* The note you're on held at the top of the column, its groups numbered; every other note under it, each with a button
+   per group and + for a new group of the two. */
+.rr-cmp-lede, .rr-cmp-acts { display: none; }
+.comparing .rr-cmp-lede { display: block; }
+.comparing .rr-lede:not(.rr-cmp-lede), .comparing .rr-new, .comparing .rr-row .rr-add, .comparing .rr-row .rr-find { display: none; }
+.comparing .rr-row.here { display: none; }
+.comparing .rr-row { opacity: 1; scroll-margin-top: var(--covered, 0px); scroll-margin-bottom: 12px; }
+.comparing .rr-row:hover { background: color-mix(in srgb, var(--paper) 60%, transparent); }
+.comparing .rr-row.cursor { background: var(--paper); box-shadow: inset 2px 0 0 var(--accent); }
+.comparing .rr-row:not(.cursor):not(.along) .rr-note { color: var(--ink-soft); }
+.comparing.cmp-lighting .rr-row:not(.cmp-lit) { opacity: .3; }
+.comparing .rr-cmp-acts { display: inline-flex; gap: 5px; margin-left: auto; align-self: center; }
+
+.cmp-put {
+  min-width: 28px; height: 28px; padding: 0 6px; border: 1px solid var(--rule); border-radius: 999px; background: none;
+  font: 600 12px var(--sans); color: var(--ink-faint); opacity: .55;
+}
+.rr-row:hover .cmp-put, .rr-row.cursor .cmp-put, .cmp-put.on { opacity: 1; }
+.cmp-put:hover { border-color: var(--c, var(--accent)); color: var(--c, var(--accent)); }
+.cmp-put.on { background: var(--c); border-color: var(--c); color: var(--paper); }
+.cmp-plus { border-style: dashed; font-weight: 400; font-size: 15px; }
+@media (hover: none) { .cmp-put { opacity: 1; } }
+
+.rr-cmp-card[hidden] { display: none; }
+.rr-cmp-card {
+  position: sticky; top: 0; z-index: 5; max-width: calc(36em + 24px); margin: 0 -12px 10px; padding: 14px 24px 16px;
+  background: var(--paper); border: 1px solid var(--rule); border-top: 0; border-radius: 0 0 12px 12px; box-shadow: 0 8px 18px rgba(0, 0, 0, .06);
+}
+.rr-cmp-card .rr-passage { display: block; font-size: 15px; }
+.rr-cmp-card .rr-note { font-size: 19px; }
+.cmp-step { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; font-family: var(--sans); font-size: 12.5px; color: var(--ink-faint); }
+.cmp-step button { border: 0; background: none; padding: 0 6px; font-size: 16px; color: var(--ink-soft); }
+.cmp-step button:hover { color: var(--accent); }
+.cmp-step-keys { margin-left: 8px; }
+.cmp-step kbd { font: inherit; color: var(--ink-soft); }
+.cmp-step .cmp-close { margin-left: auto; padding: 4px 6px; font-size: 22px; line-height: 1; color: var(--ink-faint); }
+.cmp-gw { margin: 14px 0 6px; font: 600 10px var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+.cmp-groups { list-style: none; margin: 0; padding: 0; }
+.cmp-group { display: flex; gap: 10px; align-items: baseline; margin: 0 -10px; padding: 7px 10px; border-radius: 8px; transition: background .15s; }
+.cmp-group + .cmp-group { border-top: 1px solid var(--rule); }
+.cmp-group.hot { background: color-mix(in srgb, var(--c) 16%, transparent); }
+.cmp-num {
+  flex: none; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--c); color: var(--paper); font: 600 11.5px var(--sans); transform: translateY(-1px);
+}
+.cmp-group.has .cmp-num { box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px var(--c); }
+.cmp-g-body { display: flex; flex-wrap: wrap; gap: 0 10px; align-items: baseline; min-width: 0; flex: 1; }
+.cmp-with, .cmp-g-acts { font-family: var(--sans); font-size: 12px; color: var(--ink-faint); }
+.cmp-group.has .cmp-with::after { content: " · " attr(data-has) " is in it"; color: var(--c); }
+.cmp-jump, .cmp-g-acts button { border: 0; background: none; padding: 0; color: var(--ink-faint); }
+.cmp-jump { text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; }
+.cmp-jump:hover, .cmp-g-acts button:hover { color: var(--accent); }
+.cmp-g-acts button:hover { text-decoration: underline; }
+.cmp-new { padding-top: 10px; border-top: 1px solid var(--rule); font-family: var(--sans); font-size: 12.5px; color: var(--ink-faint); }
+.cmp-new kbd { font: inherit; color: var(--ink-soft); }
+.cmp-name {
+  flex-basis: 100%; min-width: 0; max-width: 20em; padding: 3px 8px; border: 1px solid var(--accent); border-radius: 6px; background: var(--bg);
+  font: inherit; font-size: 16px; color: var(--ink); outline: none;
+}
+.cmp-name-error { flex-basis: 100%; font-family: var(--sans); font-size: 12.5px; color: var(--accent); }
+.cmp-name-error[hidden] { display: none; }
+
+/* Kept short: cut to a line (the passage, a face) or five (the note). What's cut off opens over what's below, the same
+   text whole, in a panel laid exactly over the cut one, so nothing under it moves. */
+.peek { position: relative; display: block; }
+.peek-cut > *, .peek-full > * { margin: 0; }
+.peek-passage { margin-top: 6px; }
+.peek-note { margin-top: 8px; }
+.peek-passage .peek-cut > *, .peek-face .peek-cut { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.peek-note .peek-cut > * { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.peek-full {
+  display: none; position: absolute; z-index: 20; top: -9px; left: -13px; right: -13px; padding: 8px 12px 10px;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow);
+}
+.peek.open .peek-full { display: block; }
+.peek.open .peek-cut { visibility: hidden; }
+.peek-face { flex-basis: 100%; font-size: 16.5px; line-height: 1.4; }
+.peek-face .peek-full { top: -7px; padding: 6px 12px 8px; }
+.peek-face .lf-snip { display: inline; }
+.peek-face .lf-like { font-family: var(--sans); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); margin-right: .2em; }
+.peek-face .lf-unnamed { color: var(--ink); }
+
 /* Phones: the column alone; the scratchpad a bottom sheet. With the sheet shut, the labels come up as their own short
    sheet resting on its handle. */
 @media (max-width: 899px) {
@@ -224,4 +322,8 @@
   }
   .rr-labels-panel { padding: 12px 16px 14px; }
   .rr-labels-hint { display: none; }
+  .rr-cmp-card { margin: 0 -8px 8px; padding: 12px 16px 14px; border-radius: 0; border-width: 0 0 1px; }
+  .rr-cmp-card .rr-note { font-size: 17px; }
+  .cmp-step-keys { display: none; }
+  .rr-cmp-lede { margin-left: 16px; }
 }

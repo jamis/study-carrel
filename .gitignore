@@ -18,3 +18,4 @@ __pycache__/
 
 # Prototypes are transient: made here, never committed.
 /prototype
+IDEAS.md

@@ -9,6 +9,8 @@
     --accent-soft: #f0dcc9;
     --hl: #f7e3a4;
     --shadow: 0 8px 30px rgba(60, 40, 20, .12);
+    /* A group of notes' own colour (label.hue), muted so several on screen stay quiet. */
+    --g0: #b07a2a; --g1: #5f7f55; --g2: #4f6c8f; --g3: #a25a5f; --g4: #7a5a8c; --g5: #3f8079;
     --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
@@ -16,12 +18,14 @@
     --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685; --ink-faint: #6e665a;
     --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d; --hl: #5a4a1e;
     --shadow: 0 8px 30px rgba(0, 0, 0, .5);
+    --g0: #d9a85a; --g1: #93b588; --g2: #8aa6c8; --g3: #d08e92; --g4: #b293c4; --g5: #7cbab2;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #17140f; --paper: #1e1a14; --ink: #e8dfcf; --ink-soft: #a09685; --ink-faint: #6e665a;
       --rule: #342d22; --accent: #e0a070; --accent-soft: #3a2a1d; --hl: #5a4a1e;
       --shadow: 0 8px 30px rgba(0, 0, 0, .5);
+      --g0: #d9a85a; --g1: #93b588; --g2: #8aa6c8; --g3: #d08e92; --g4: #b293c4; --g5: #7cbab2;
     }
   }
 

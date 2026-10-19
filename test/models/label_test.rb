@@ -85,6 +85,99 @@ class LabelTest < ActiveSupport::TestCase
     assert_equal [ shared ], @user.labels.reload.to_a
   end
 
+  test "a blank name is refused when labelling by name" do
+    assert_raises(ActiveRecord::RecordInvalid) { @note.label!("   ") }
+    assert_empty @user.labels
+  end
+
+  test "two notes found to go together make an unnamed label, known by the first" do
+    other = @focus.notes.create!(unit: verse(3), content: "Wilderness")
+    group = @note.group_with!(other)
+    assert_nil group.name
+    assert_not group.named?
+    assert_equal @note, group.example_note
+    assert_equal [ group ], @note.labels
+    assert_equal [ group ], other.labels
+  end
+
+  test "any number of unnamed labels, while names stay unique" do
+    a = @focus.notes.create!(unit: verse(3), content: "a")
+    b = @focus.notes.create!(unit: verse(4), content: "b")
+    @note.group_with!(a)
+    @note.group_with!(b)
+    assert_equal 2, @user.labels.count
+  end
+
+  test "an unnamed label is known by its example, or from the example itself, by the next of its notes" do
+    other = @focus.notes.create!(unit: verse(3), content: "Wilderness")
+    group = @note.group_with!(other)
+    assert_equal @note, group.face_note
+    assert_equal @note, group.face_note(from: other)
+    assert_equal other, group.face_note(from: @note)
+
+    alone = @focus.notes.create!(unit: verse(4), content: "Valleys")
+    group.update!(example_note: alone)
+    alone.join!(group)
+    assert_equal alone, group.face_note
+  end
+
+  test "taking its example off moves the example on; taking the last note off drops it" do
+    other = @focus.notes.create!(unit: verse(3), content: "Wilderness")
+    group = @note.group_with!(other)
+    @note.unlabel!(group)
+    assert_equal other, group.reload.example_note
+    other.unlabel!(group)
+    assert_not Label.exists?(group.id)
+  end
+
+  test "deleting its example moves the example on" do
+    other = @focus.notes.create!(unit: verse(3), content: "Wilderness")
+    group = @note.group_with!(other)
+    @note.destroy!
+    assert_equal other, group.reload.example_note
+  end
+
+  test "an unnamed label is named, renamed, and can lose its name again" do
+    other = @focus.notes.create!(unit: verse(3), content: "Wilderness")
+    group = @note.group_with!(other)
+    group.rename!("  set   apart ")
+    assert_equal "set apart", group.reload.name
+    group.rename!("")
+    assert_nil group.reload.name
+    assert_equal @note, group.example_note
+  end
+
+  test "a named label losing its name becomes known by its first note" do
+    label = @note.label!("waiting")
+    label.rename!(" ")
+    assert_nil label.reload.name
+    assert_equal @note, label.example_note
+  end
+
+  test "a name already given to another label is refused, not merged" do
+    @note.label!("waiting")
+    other = @focus.notes.create!(unit: verse(3), content: "Wilderness")
+    group = @note.group_with!(other)
+    assert_raises(ActiveRecord::RecordInvalid) { group.rename!("Waiting") }
+    assert_nil group.reload.name
+  end
+
+  test "unnamed labels sort after named ones, in the order they were made" do
+    other = @focus.notes.create!(unit: verse(3), content: "Wilderness")
+    first = @note.group_with!(other)
+    second = other.group_with!(@note)
+    zeal = @note.label!("zeal")
+    awe = @note.label!("awe")
+    assert_equal [ awe, zeal, first, second ], @user.labels.alphabetical.to_a
+  end
+
+  test "a note set aside keeps only its named labels' names" do
+    @note.label!("waiting")
+    @note.group_with!(@focus.notes.create!(unit: verse(3), content: "Way"))
+    DetachedNote.set_aside!(Unit.where(id: verse(25).id), reason: "revised")
+    assert_equal [ "waiting" ], @user.detached_notes.sole.label_names
+  end
+
   test "the scratchpad is the focus's own rich text" do
     @focus.update!(scratchpad: "<p>Compare Amos 5?</p>")
     assert_equal "Compare Amos 5?", @focus.reload.scratchpad.to_plain_text

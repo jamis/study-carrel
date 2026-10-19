@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_13_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -122,9 +122,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_180000) do
 
   create_table "labels", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.string "name", null: false, collation: "NOCASE"
+    t.string "name", collation: "NOCASE"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "example_note_id"
+    t.index ["example_note_id"], name: "index_labels_on_example_note_id"
     t.index ["user_id", "name"], name: "index_labels_on_user_id_and_name", unique: true
   end
 
@@ -252,6 +254,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_180000) do
   add_foreign_key "invitations", "users", column: "redeemed_by_id", on_delete: :nullify
   add_foreign_key "keeps", "units"
   add_foreign_key "keeps", "users"
+  add_foreign_key "labels", "notes", column: "example_note_id", on_delete: :nullify
   add_foreign_key "labels", "users"
   add_foreign_key "note_labels", "labels", on_delete: :cascade
   add_foreign_key "note_labels", "notes", on_delete: :cascade

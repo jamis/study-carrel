@@ -31,6 +31,8 @@ Rails.application.routes.draw do
     end
     # Rereading a focus's notes one at a time, labelling them, with its scratchpad: the page, and where it left off.
     resource :reread, only: %i[show update]
+    # Naming a label (or an unnamed group of notes), or renaming it, from the reread.
+    resources :labels, only: :update
     resource :scratchpad, only: :update
   end
   resources :units, only: [] do

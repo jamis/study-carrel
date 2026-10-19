@@ -16,11 +16,29 @@ class Note < ApplicationRecord
 
   def free? = unit_id.nil?
 
-  # Puts the note on its owner's label of that name (found ignoring case, or made), and returns the label.
+  # Puts the note on its owner's label of that name (found ignoring case, or made), and returns the label. A blank name
+  # is refused.
   def label!(name)
+    name = Label.normalize_value_for(:name, name)
     transaction do
-      label = focus.user.labels.find_or_create_by!(name: Label.normalize_value_for(:name, name))
+      label = name ? focus.user.labels.find_or_create_by!(name:) : focus.user.labels.create!(name:)
       note_labels.find_or_create_by!(label:)
+      label
+    end
+  end
+
+  # Puts the note on one of its owner's labels, named or not.
+  def join!(label)
+    note_labels.find_or_create_by!(label:)
+    label
+  end
+
+  # A new unnamed label holding this note and another found to go with it, known by this one.
+  def group_with!(other)
+    transaction do
+      label = focus.user.labels.create!(example_note: self)
+      note_labels.create!(label:)
+      other.note_labels.create!(label:)
       label
     end
   end

@@ -27,10 +27,10 @@ class Focus < ApplicationRecord
   end
 
   # Notes on the focus as a whole, in the order they were written. (notes_in_reading_order has only those on passages.)
-  def free_notes = notes.free.includes(:rich_text_content, :labels).chronological
+  def free_notes = notes.free.includes(:rich_text_content, labels: Label::FACE).chronological
 
   # The run the reread goes through: the notes on passages in reading order, then those on the focus as a whole.
-  def notes_for_reread = notes_in_reading_order.includes(:labels).to_a + free_notes.to_a
+  def notes_for_reread = notes_in_reading_order.includes(labels: Label::FACE).to_a + free_notes.to_a
 
   def notes_in_reading_order
     notes.includes(:rich_text_content, unit: { section: :work })

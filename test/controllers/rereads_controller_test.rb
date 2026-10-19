@@ -58,6 +58,22 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".rr-tallies .rr-tally:first-child .rr-ticks i.on", 2
   end
 
+  test "an unnamed label shows as like one of its notes: in the chips, the cloud, the tallies and the filter" do
+    group = @late.group_with!(@early)
+    get focus_reread_path(@focus)
+    assert_select "#reread_note_#{@early.id} .rr-chip .lf-like", "like Isaiah 40:25"
+    assert_select "#reread_note_#{@late.id} .rr-chip .lf-like", "like Isaiah 40:3"
+    assert_select ".rr-cloud .rr-word[data-label-id=?]:not([data-label-name])", group.id.to_s, text: /like Isaiah 40:25/
+    assert_select ".rr-tallies .rr-tally-name", /like Isaiah 40:25/
+    assert_select ".rr-filter-menu .menu-item", /like Isaiah 40:25/
+
+    get focus_reread_path(@focus, label: group.id)
+    assert_select ".rr-filter", /in the group like Isaiah 40:25/
+
+    get focus_notes_path(@focus)
+    assert_select ".nb-labels", "like Isaiah 40:25"
+  end
+
   test "the current focus's notes on passages get the reader's editor; a past focus's are only read" do
     get focus_reread_path(@focus)
     assert_select "#reread_note_#{@late.id}[data-editor-url=?]", unit_note_path(verse(25))
@@ -119,6 +135,88 @@ class NoteLabelsControllerTest < ActionDispatch::IntegrationTest
     users(:one).foci.start!(title: "Rest")
     post focus_note_labels_path(@focus, @note), params: { name: "waiting" }, as: :turbo_stream
     assert_response :success
+  end
+
+  test "a note found to go with another makes an unnamed label of the two, redrawing both notes' chips" do
+    other = @focus.notes.create!(unit: verse(3), content: "The wilderness")
+    post focus_note_labels_path(@focus, @note), params: { with_note_id: other.id }, as: :turbo_stream
+    assert_response :success
+    group = @note.labels.sole
+    assert_nil group.name
+    assert_equal [ group ], other.labels
+    assert_match %(target="#{ActionView::RecordIdentifier.dom_id(@note, :labels)}"), response.body
+    assert_match %(target="#{ActionView::RecordIdentifier.dom_id(other, :labels)}"), response.body
+    assert_match "like Isaiah 40:25", response.body
+  end
+
+  test "a note goes on an unnamed label by its id" do
+    a = @focus.notes.create!(unit: verse(3), content: "a")
+    b = @focus.notes.create!(unit: verse(4), content: "b")
+    group = a.group_with!(b)
+    post focus_note_labels_path(@focus, @note), params: { label_id: group.id }, as: :turbo_stream
+    assert_response :success
+    assert_equal [ group ], @note.labels
+  end
+
+  test "taking the last but one note off redraws the one left" do
+    other = @focus.notes.create!(unit: verse(3), content: "The wilderness")
+    group = @note.group_with!(other)
+    delete focus_note_label_path(@focus, other, group), as: :turbo_stream
+    assert_response :success
+    assert_match %(target="#{ActionView::RecordIdentifier.dom_id(@note, :labels)}"), response.body
+    assert_match "just this note, so far", response.body
+  end
+
+  test "a note can't be grouped with itself, or with another focus's note" do
+    post focus_note_labels_path(@focus, @note), params: { with_note_id: @note.id }, as: :turbo_stream
+    assert_response :unprocessable_entity
+    elsewhere = users(:one).foci.create!(title: "Rest", archived_at: 1.day.ago).notes.create!(unit: verse(31), content: "x")
+    post focus_note_labels_path(@focus, @note), params: { with_note_id: elsewhere.id }, as: :turbo_stream
+    assert_response :not_found
+  end
+
+  test "another user's labels, notes and focuses are a 404" do
+    theirs = users(:two).foci.start!(title: "Theirs").notes.create!(unit: verse(31), content: "Theirs")
+    their_label = theirs.label!("theirs")
+    post focus_note_labels_path(@focus, @note), params: { label_id: their_label.id }, as: :turbo_stream
+    assert_response :not_found
+    post focus_note_labels_path(@focus, @note), params: { with_note_id: theirs.id }, as: :turbo_stream
+    assert_response :not_found
+    patch focus_label_path(@focus, their_label), params: { name: "mine now" }, as: :turbo_stream
+    assert_response :not_found
+    patch focus_label_path(theirs.focus, @note.label!("mine")), params: { name: "x" }, as: :turbo_stream
+    assert_response :not_found
+    assert_equal "theirs", their_label.reload.name
+  end
+
+  test "naming an unnamed label redraws its notes' chips" do
+    other = @focus.notes.create!(unit: verse(3), content: "The wilderness")
+    group = @note.group_with!(other)
+    patch focus_label_path(@focus, group), params: { name: "Holy otherness" }, as: :turbo_stream
+    assert_response :success
+    assert_equal "Holy otherness", group.reload.name
+    assert_match %(target="#{ActionView::RecordIdentifier.dom_id(other, :labels)}"), response.body
+    assert_match %(target="reread_labels"), response.body
+  end
+
+  test "renaming, and taking the name away again" do
+    label = @note.label!("waiting")
+    patch focus_label_path(@focus, label), params: { name: "patience" }, as: :turbo_stream
+    assert_equal "patience", label.reload.name
+    patch focus_label_path(@focus, label), params: { name: " " }, as: :turbo_stream
+    assert_response :success
+    assert_nil label.reload.name
+    assert_equal @note, label.example_note
+  end
+
+  test "a name already taken is refused, saying so" do
+    @note.label!("waiting")
+    other = @focus.notes.create!(unit: verse(3), content: "The wilderness")
+    group = @note.group_with!(other)
+    patch focus_label_path(@focus, group), params: { name: "Waiting" }, as: :turbo_stream
+    assert_response :unprocessable_entity
+    assert_equal "You already have a label called “Waiting”.", response.body
+    assert_nil group.reload.name
   end
 end
 

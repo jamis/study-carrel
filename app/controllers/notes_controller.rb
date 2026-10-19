@@ -3,7 +3,7 @@ class NotesController < ApplicationController
   before_action :set_free_note, only: %i[show update]
 
   def index
-    @notes = @focus.notes_in_reading_order.includes(:labels)
+    @notes = @focus.notes_in_reading_order.includes(labels: Label::FACE)
     @free = @focus.free_notes
     @detached = @focus.detached_notes.includes(:rich_text_content)
   end

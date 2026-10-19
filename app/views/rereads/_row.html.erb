@@ -4,7 +4,8 @@
 <% unit = note.unit
    editor_url = note.free? ? focus_note_path(focus, note) : (unit_note_path(unit) if focus == Current.focus) %>
 <article class="rr-row<%= " here" if here %><%= " rr-free" if note.free? %>" id="<%= dom_id(note, :reread) %>" data-reread-target="row"
-         data-note-id="<%= note.id %>" data-editor-url="<%= editor_url %>" data-action="click->reread#pick">
+         data-note-id="<%= note.id %>" data-cite="<%= unit ? unit_ref(unit.section, unit) : "whole, #{note.created_at.strftime("%b %-d")}" %>"
+         data-editor-url="<%= editor_url %>" data-action="click->reread#pick">
   <div class="rr-head">
     <% if unit %>
       <%= link_to reading_path(unit.section.work.slug, unit.section.number, unit.number), class: "rr-ref" do %>

@@ -36,6 +36,10 @@ export default class extends Controller {
   }
 
   #centre() { this.here?.scrollIntoView({ block: "center" }) }
+  centre() { this.#centre() }
+
+  // While finding what goes with a note (the compare controller), the column is that controller's.
+  get #comparing() { return this.element.classList.contains("comparing") }
 
   // A note's chips or the panel were redrawn (labelling replies with both).
   noteLabelsTargetConnected() { this.#mark() }
@@ -50,9 +54,12 @@ export default class extends Controller {
 
   pick(event) {
     const row = event.currentTarget
-    if (row.classList.contains("here") || event.target.closest("a, button")) return
+    if (this.#comparing || row.classList.contains("here") || event.target.closest("a, button")) return
     this.#go(row)
   }
+
+  // Onto a note (from the compare controller).
+  goTo(row) { if (row && row !== this.here) this.#go(row) }
 
   #step(by) {
     const rows = this.rowTargets
@@ -422,6 +429,7 @@ export default class extends Controller {
 
   key(event) {
     if (event.metaKey || event.ctrlKey || event.altKey) return
+    if (this.#comparing && event.key !== "s" && event.key !== "c") return
     if (event.key === "Escape" && this.padTarget.classList.contains("labels-open") && this.pickerTarget.hidden) return this.toggleLabels()
     if (event.target.closest("input, textarea, select, [contenteditable]")) return
     // One press is one step: holding a key down doesn't speed through the notes.

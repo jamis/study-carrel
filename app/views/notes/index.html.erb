@@ -31,7 +31,7 @@
 
     <% @notes.each do |note|
       unit = note.unit %>
-      <%= render "shared/sheet_row", citation: unit_ref(unit.section, unit), passage: unit.body, content: note.content, labels: note.labels.map(&:name).sort_by(&:downcase),
+      <%= render "shared/sheet_row", citation: unit_ref(unit.section, unit), passage: unit.body, content: note.content, labels: note.labels.sort_by { [ it.named? ? 0 : 1, it.name.to_s.downcase, it.id ] }.map { label_title(it, from: note, snippet: false) },
             href: reading_path(unit.section.work.slug, unit.section.number, unit.number) %>
     <% end %>
 
@@ -39,7 +39,7 @@
       <h2 class="nb-detached-head">On the whole focus</h2>
       <% @free.each do |note| %>
         <%= render "shared/sheet_row", citation: "Written #{l note.created_at.to_date, format: :long}", content: note.content,
-              labels: note.labels.map(&:name).sort_by(&:downcase) %>
+              labels: note.labels.sort_by { [ it.named? ? 0 : 1, it.name.to_s.downcase, it.id ] }.map { label_title(it, from: note, snippet: false) } %>
       <% end %>
     <% end %>
 

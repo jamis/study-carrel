@@ -1,6 +1,6 @@
 # A note, or a kept passage's remark, set aside because its passage is gone: the user revised their own text and the
 # sentence no longer exists, or deleted the text. It keeps a frozen copy of the citation and the passage, its original
-# times, its focus (none for a kept remark, which belongs to no focus) and its labels' names. Nothing is lost when a
+# times, its focus (none for a kept remark, which belongs to no focus) and its named labels' names. Nothing is lost when a
 # text changes.
 class DetachedNote < ApplicationRecord
   REASONS = { "revised" => "the text was revised", "deleted" => "the text was deleted" }.freeze
@@ -23,7 +23,7 @@ class DetachedNote < ApplicationRecord
       label_ids = []
       Note.where(unit_id: units.keys).includes(:focus, :rich_text_content, :labels).find_each do |note|
         label_ids.concat(note.label_ids)
-        detached = create!(user: note.focus.user, focus: note.focus, label_names: note.labels.map(&:name).sort_by(&:downcase),
+        detached = create!(user: note.focus.user, focus: note.focus, label_names: note.labels.filter_map(&:name).sort_by(&:downcase),
                            **frozen(units[note.unit_id], reason, note))
         note.rich_text_content&.update_columns(record_type: name, record_id: detached.id)
         Note.where(id: note.id).delete_all # its labels go with it (on delete cascade)
