@@ -71,10 +71,10 @@ class FreeNotesControllerTest < ActionDispatch::IntegrationTest
     @focus.notes.create!(content: "Across them all")
     get focus_notes_path(@focus)
     assert_select "#reread_free .rr-free-head", "On the whole focus"
-    assert_select "#reread_free .rr-row .rr-ref", /\AWritten /
+    assert_select "#reread_free .rr-row .rr-ref", /\AFocus 1 · /
     assert_select "#reread_free .rr-row .rr-note", /Across them all/
     assert_select ".rr-new", "+ New note"
-    assert_select ".rr-pad-head button", /New note/
+    assert_select ".rr-pad-tools-phone button", "New note"
   end
 
   test "another reader's focus can't be written in" do

@@ -13,6 +13,18 @@ class FreeNoteTest < ActiveSupport::TestCase
     assert_equal [ first, second ], @focus.free_notes.to_a
   end
 
+  test "each is numbered on its focus, and a number isn't given again once its note is gone" do
+    first = @focus.notes.create!(content: "One")
+    second = @focus.notes.create!(content: "Two")
+    passage = @focus.notes.create!(unit: verse(3), content: "On a verse")
+    assert_equal [ 1, 2 ], [ first.number, second.number ]
+    assert_nil passage.number
+
+    second.destroy!
+    assert_equal 3, @focus.notes.create!(content: "Three").number
+    assert_equal 1, users(:one).foci.start!(title: "Another").notes.create!(content: "Elsewhere").number
+  end
+
   test "still one note per passage" do
     @focus.notes.create!(unit: verse(3), content: "a")
     assert_not @focus.notes.build(unit: verse(3), content: "b").valid?

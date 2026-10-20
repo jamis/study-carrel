@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_20_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -89,6 +89,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_120000) do
     t.integer "last_unit_id"
     t.integer "user_id", null: false
     t.integer "reread_note_id"
+    t.integer "free_notes_numbered", default: 0, null: false
     t.index ["last_unit_id"], name: "index_foci_on_last_unit_id"
     t.index ["reread_note_id"], name: "index_foci_on_reread_note_id"
     t.index ["user_id", "archived_at", "created_at"], name: "index_foci_on_user_id_and_archived_at_and_created_at"
@@ -144,6 +145,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_120000) do
     t.integer "focus_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "number"
+    t.index ["focus_id", "number"], name: "index_notes_on_focus_id_and_number", unique: true
     t.index ["focus_id", "unit_id"], name: "index_notes_on_focus_id_and_unit_id", unique: true
     t.index ["focus_id"], name: "index_notes_on_focus_id"
     t.index ["unit_id"], name: "index_notes_on_unit_id"

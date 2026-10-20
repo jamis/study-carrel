@@ -2,9 +2,10 @@
   <%# Made a note of from the scratchpad: a new row at the end of the reread's notes on the whole focus. %>
   <%= turbo_stream.append "reread_free", partial: "rereads/row", locals: { note: @note, focus: @focus, here: false } %>
 <% else %>
-  <%# The new note's editor made it: its row's labels, now it has an id to label, and its text, for when the editor
-      moves on. %>
+  <%# The new note's editor made it: its row's labels, now it has an id to label, its number, and its text, for when
+      the editor moves on. %>
   <%= turbo_stream.replace "new_note_labels", partial: "rereads/note_labels", locals: { note: @note } %>
+  <%= turbo_stream.replace "new_note_ref" do %><span class="rr-ref rr-whole"><span class="rr-cite">Focus <%= @note.number %></span> · <%= l @note.created_at.to_date, format: :long %></span><% end %>
   <%= turbo_stream.update dom_id(@note, :reread_text) do %><%= @note.content %><% end %>
 <% end %>
 <%= turbo_stream.update "reread_labels", partial: "rereads/labels", locals: { focus: @focus, notes: @focus.notes_for_reread } %>

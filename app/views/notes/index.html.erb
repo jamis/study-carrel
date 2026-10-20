@@ -1,18 +1,19 @@
 <% content_for :title, "Notes · #{@focus.title} · Study Carrel" %>
-<%# A focus's notes page (the current focus's or a past one's), where they're reread: those on passages in reading order down the column, then those on the focus as a whole,
-    the one you're on lit and the rest dimmed in place; the focus's scratchpad docked at right (a bottom sheet on
-    phones), and over its foot, when called up, the labels in use as a cloud or as tallies. Notes on the whole focus can
-    be written and edited here, and so can the current focus's notes on passages, as in the reader.
-    "Find what goes with this" (g) turns the column into a comparison: the note you're on held at the top, the rest
-    under it, each to put in one of its groups (labels, named or not) or a new group with it.
-    Detached notes, whose passages are gone, follow the run, only to read or discard. %>
-<main class="reader reread" data-controller="reread compare"
+<%# A focus's notes page (the current focus's or a past one's), where they're reread: those on passages in reading
+    order down the column, then those on the focus as a whole, the one you're on lit and the rest dimmed in place, each
+    note's labels as footnotes. The focus's scratchpad is put away behind a tab at the right edge (a bottom sheet on
+    phones); the labels in use, as a cloud or as tallies, come up over its foot, or on their own. Notes on the whole
+    focus can be written and edited here, and so can the current focus's notes on passages, as in the reader.
+    "Find what goes with this" (g) turns the column into a comparison: up to three notes held under tabs on a card at
+    the top, the rest under it, each to put in one of the held note's groups (labels, named or not) or a new group with
+    it. Detached notes, whose passages are gone, follow the run, only to read or discard. %>
+<main class="reader reread" data-controller="reread compare footnotes"
       data-reread-position-url-value="<%= focus_reread_path(@focus) %>"
       data-reread-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
       data-reread-lift-url-value="<%= focus_notes_path(@focus) %>"
       data-compare-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
       data-compare-rename-url-template-value="<%= focus_label_path(@focus, "{id}") %>"
-      data-action="keydown@document->compare#key keydown@document->reread#key mouseover->reread#light click@document->reread#away note:saved@window->reread#saved selectionchange@document->reread#selected">
+      data-action="keydown@document->footnotes#key keydown@document->compare#key keydown@document->reread#key mouseover->reread#light click@document->reread#away note:saved@window->reread#saved selectionchange@document->reread#selected">
   <%= render "shared/rail", focus: Current.focus %>
 
   <div class="reader-col reread-col">
@@ -40,13 +41,13 @@
         </span>
       </span>
       <% if @focus.archived? %>· <%= focus_span(@focus) %><% end %>
-      <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to find what goes with it, <kbd>c</kbd> for the labels, <kbd>n</kbd> for a new note</span>
+      <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to find what goes with it, <kbd>c</kbd> for the labels, <kbd>n</kbd> for a new note, <kbd>s</kbd> the scratchpad</span>
     </div>
-    <p class="rr-lede rr-cmp-lede">Finding what goes with the note you're on<span class="rr-keys"> · <kbd>j</kbd>/<kbd>k</kbd> through the others, <kbd>1</kbd>–<kbd>9</kbd> or <kbd>+</kbd> to group, <kbd>Enter</kbd> to move to one, <kbd>p</kbd>/<kbd>o</kbd> the whole passage or note, <kbd>g</kbd> or × to go back</span></p>
+    <p class="rr-lede rr-cmp-lede">Finding what goes with the note you're on<span class="rr-keys"> · <kbd>j</kbd>/<kbd>k</kbd> through the others, <kbd>1</kbd>–<kbd>9</kbd> or <kbd>+</kbd> to group, <kbd>Enter</kbd> to hold one under a tab, <kbd>[</kbd>/<kbd>]</kbd> from tab to tab, <kbd>x</kbd> to let one go, <kbd>p</kbd>/<kbd>o</kbd> the whole passage or note, <kbd>g</kbd> or × to go back</span></p>
 
-    <%# Finding what goes with a note: the note you're on, held at the top of the column, with its groups numbered for the
-        moment. Drawn from its row by the compare controller. %>
-    <section class="rr-cmp-card" aria-label="The note you're on" data-compare-target="card" hidden></section>
+    <%# Finding what goes with a note: the notes held under tabs at the top of the column, the one you're on with its
+        groups numbered for the moment. Drawn from the rows by the compare controller. %>
+    <section class="rr-cmp-card" aria-label="The notes you're holding" data-compare-target="card" hidden></section>
 
     <% if @notes.empty? %>
       <p class="page-empty"><%= @label ? "No notes here are #{label_phrase(@label)} any more." : "No notes yet. Open a verse and write what it says to your question." %></p>
@@ -55,14 +56,14 @@
     <div class="rr-run">
       <% passage_notes, free_notes = @notes.partition(&:unit_id) %>
       <% passage_notes.each do |note| %>
-        <%= render "rereads/row", note:, focus: @focus, here: note == @here %>
+        <%= render "rereads/row", note:, focus: @focus, here: note == @here, members: @members %>
       <% end %>
       <%# Notes on the focus as a whole: what you see across the passages, written here or made of a line in the
           scratchpad. New ones join the end. %>
       <section class="rr-free-notes" id="reread_free" aria-label="On the whole focus">
         <h2 class="rr-free-head">On the whole focus</h2>
         <% free_notes.each do |note| %>
-          <%= render "rereads/row", note:, focus: @focus, here: note == @here %>
+          <%= render "rereads/row", note:, focus: @focus, here: note == @here, members: @members %>
         <% end %>
       </section>
       <% unless @label %>
@@ -72,7 +73,7 @@
       <template data-reread-target="newRow">
         <article class="rr-row rr-free rr-unsaved" data-reread-target="row" data-editor-url="<%= new_focus_note_path(@focus) %>" data-action="click->reread#pick">
           <div class="rr-head"><span class="rr-ref rr-whole">New note</span></div>
-          <div class="rr-note"></div>
+          <div class="rr-text"><div class="rr-note"></div><span class="rr-marks"></span></div>
           <div class="rr-editor composer"></div>
           <div class="rr-labels" id="new_note_labels" data-label-ids=""></div>
         </article>
@@ -115,6 +116,8 @@
       <div class="rr-picker-foot" data-reread-target="pickerFoot"></div>
     </div>
     <p class="rr-toast" role="status" data-reread-target="toast" hidden></p>
+    <%# What a footnote opens: a label and its other notes, or one note. %>
+    <div class="fn-pop" data-footnotes-target="pop" hidden></div>
     <%= form_with url: focus_note_labels_path(@focus, 0), method: :post, class: "rr-label-form", data: { reread_target: "labelForm" } do %>
       <input type="hidden" name="name">
     <% end %>
@@ -128,18 +131,19 @@
       <span class="preview<%= " empty" if pad_text.blank? %>" data-sheet-target="preview"><%= pad_text.presence || "Half-thoughts, questions, things to compare…" %></span>
       <span class="go" data-sheet-target="label" aria-hidden="true">▴</span>
     </button>
-    <%# A new note on the whole focus, and the labels: always at hand, by the scratchpad they grow out of. On phones, on
-        its handle. %>
+    <%# On phones, a new note on the whole focus and the labels are on the scratchpad's handle. %>
     <span class="rr-pad-tools rr-pad-tools-phone">
       <% unless @label %><button class="rr-summon" type="button" data-action="reread#newNote">New note</button><% end %>
       <button class="rr-summon" type="button" aria-expanded="false" data-action="reread#toggleLabels">Labels</button>
     </span>
+    <%# Elsewhere, the scratchpad and the labels are each behind a tab at the right edge, which slides them in. %>
+    <span class="rr-edge">
+      <button class="rr-edge-tab" type="button" title="The scratchpad (s)" data-action="sheet#toggle">Scratchpad<kbd>s</kbd></button>
+      <button class="rr-edge-tab rr-summon" type="button" title="The labels on this focus (c)" aria-expanded="false" data-action="reread#toggleLabels">Labels<kbd>c</kbd></button>
+    </span>
     <div class="panel-head rr-pad-head">
       <span class="panel-label">Scratchpad</span>
-      <span class="rr-pad-tools">
-        <% unless @label %><button class="rr-summon" type="button" title="A note on the focus as a whole" data-action="reread#newNote">New note<kbd>n</kbd></button><% end %>
-        <button class="rr-summon" type="button" aria-expanded="false" data-action="reread#toggleLabels">Labels<kbd>c</kbd></button>
-      </span>
+      <button class="rr-close" type="button" aria-label="Put the scratchpad away" title="Put it away (Esc)" data-action="sheet#toggle">×</button>
     </div>
     <%# Select some of the scratchpad and this turns it into a note on the whole focus. %>
     <button class="rr-lift" type="button" data-reread-target="lift" data-action="mousedown->reread#keepSelection click->reread#lift" hidden>Make a note of this</button>

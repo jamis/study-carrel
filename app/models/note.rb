@@ -11,6 +11,8 @@ class Note < ApplicationRecord
   validates :content, presence: true
   validates :unit_id, uniqueness: { scope: :focus_id }, allow_nil: true
 
+  before_create :take_number, if: :free?
+
   scope :chronological, -> { order(:created_at, :id) }
   scope :free, -> { where(unit_id: nil) }
 
@@ -44,4 +46,12 @@ class Note < ApplicationRecord
   end
 
   def unlabel!(label) = note_labels.find_by(label:)&.destroy!
+
+  private
+
+  # A free note is spoken of by number ("focus 2"): the next its focus hands out, never one a deleted note had.
+  def take_number
+    Focus.where(id: focus_id).update_all("free_notes_numbered = free_notes_numbered + 1")
+    self.number = Focus.where(id: focus_id).pick(:free_notes_numbered)
+  end
 end

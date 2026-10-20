@@ -103,8 +103,10 @@ class RereadTest < ApplicationSystemTestCase
     assert_equal whole.id, @focus.reload.reread_note_id
   end
 
-  test "the scratchpad saves as you write" do
+  test "the scratchpad is put away behind its tab, and saves as you write" do
     visit focus_notes_path(@focus)
+    assert_no_selector ".reread-pad lexxy-editor [contenteditable]"
+    find(".rr-edge-tab", text: /scratchpad/i).click
     find(".reread-pad lexxy-editor [contenteditable]").send_keys "Compare Amos 5?"
     within(".reread-pad") { assert_text "Saved" }
     assert_equal "Compare Amos 5?", @focus.reload.scratchpad.to_plain_text.strip
@@ -119,7 +121,7 @@ class RereadTest < ApplicationSystemTestCase
 
   test "writing a note on the whole focus, labelling it, and leaving an empty one behind" do
     visit focus_notes_path(@focus)
-    within(".rr-pad-head") { click_on "New note" }
+    click_on "+ New note"
     within(".rr-row.here") { find("lexxy-editor [contenteditable]").send_keys "Holiness keeps stooping." }
     within(".rr-row.here") { assert_text "Saved" }
     note = @focus.free_notes.sole
@@ -148,6 +150,8 @@ class RereadTest < ApplicationSystemTestCase
   test "making a note of a line in the scratchpad" do
     @focus.update!(scratchpad: "<p>Compare Amos 5?</p>")
     visit focus_notes_path(@focus)
+    find("body").send_keys "s"
+    assert_selector ".reread-pad .lexxy-editor__content p", text: "Compare Amos 5?"
     execute_script <<~JS
       const line = document.querySelector(".reread-pad .lexxy-editor__content p")
       const range = document.createRange()

@@ -98,7 +98,7 @@ export default class extends Controller {
   newNote() {
     const section = this.element.querySelector("#reread_free")
     if (!section) return
-    // On a phone, out of the scratchpad's sheet and back to the notes, to write there.
+    // Out of the scratchpad (a phone's sheet, or the drawer at the right) and back to the notes, to write there.
     if (this.padTarget.classList.contains("open")) this.padTarget.querySelector(".panel-handle").click()
     const row = this.newRowTarget.content.firstElementChild.cloneNode(true)
     section.append(row)
@@ -126,11 +126,17 @@ export default class extends Controller {
     // Its editor loads from where it now saves, and its text shows in the row when you move on.
     row.dataset.editorUrl = element.action
     row.querySelector(".rr-note").id = `reread_text_note_${noteId}`
+    // A note on the whole focus has a number now (a new one, if it was cleared and written again): the reply puts it here.
+    row.querySelector(".rr-ref.rr-whole")?.setAttribute("id", "new_note_ref")
+    if (row.classList.contains("rr-free")) delete row.dataset.cite
+    const marks = row.querySelector(".rr-marks")
+    marks.id = `marks_note_${noteId}`
     if (fresh) {
       const labels = row.querySelector("[data-label-ids]")
       labels.id = `labels_note_${noteId}`
       labels.dataset.labelIds = ""
-      labels.querySelectorAll(".rr-chip").forEach(chip => chip.remove())
+      labels.querySelectorAll(".rr-chip, .rr-fns").forEach(el => el.remove())
+      marks.replaceChildren()
     }
     this.#mark()
   }
@@ -432,8 +438,8 @@ export default class extends Controller {
 
   key(event) {
     if (event.metaKey || event.ctrlKey || event.altKey) return
-    if (this.#comparing && event.key !== "s" && event.key !== "c") return
     if (event.key === "Escape" && this.padTarget.classList.contains("labels-open") && this.pickerTarget.hidden) return this.toggleLabels()
+    if (this.#comparing && event.key !== "s" && event.key !== "c") return
     if (event.target.closest("input, textarea, select, [contenteditable]")) return
     // One press is one step: holding a key down doesn't speed through the notes.
     if (event.key === "j" || event.key === "ArrowRight") { event.preventDefault(); if (!event.repeat) this.next() }
@@ -446,7 +452,8 @@ export default class extends Controller {
       const pad = this.padTarget.querySelector(".composer lexxy-editor [contenteditable]")
       if (!pad) return
       event.preventDefault()
-      if (!this.padTarget.classList.contains("open") && matchMedia("(max-width: 899px)").matches) this.padTarget.querySelector(".panel-handle").click()
+      // Put away (behind its tab, or a phone's sheet shut): out first.
+      if (!this.padTarget.classList.contains("open")) this.padTarget.querySelector(".panel-handle").click()
       focusAtEnd(pad)
     }
   }
