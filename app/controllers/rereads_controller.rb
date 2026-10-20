@@ -1,17 +1,12 @@
-# Rereading a focus's notes (the current focus's or a past one's): those on passages in reading order, then those on
-# the focus as a whole, one lit at a time, to label as you go, with the focus's scratchpad beside them. ?label= rereads
-# only the notes carrying one label.
+# Where a focus's reread (its notes page) left off, so it opens there next time. The reread used to be a page of its
+# own: its old address leads to the notes page.
 class RereadsController < ApplicationController
   before_action :set_focus
 
   def show
-    @label = Current.user.labels.find(params[:label]) if params[:label].present?
-    @all = @focus.notes_for_reread
-    @notes = @label ? @all.select { it.label_ids.include?(@label.id) } : @all
-    @here = @notes.find { it.id == @focus.reread_note_id } || @notes.first
+    redirect_to focus_notes_path(@focus, label: params[:label].presence)
   end
 
-  # Where the reread left off, so it opens there next time.
   def update
     @focus.update!(reread_note: @focus.notes.find(params[:note_id]))
     head :no_content

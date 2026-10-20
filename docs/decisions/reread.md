@@ -1,15 +1,17 @@
 # Reread
 
-The first part of synthesis (see [synthesis.md](synthesis.md), still exploratory for essays): going back over a focus's notes one at a time, labelling them as you go, with a scratchpad beside them for rough thoughts. Decided 2026-10-13 and built as a page of its own; it may later merge with the notes page if the two turn out to overlap too much.
+The first part of synthesis (see [synthesis.md](synthesis.md), still exploratory for essays): going back over a focus's notes one at a time, labelling them as you go, with a scratchpad beside them for rough thoughts. Decided 2026-10-13 and built as a page of its own; since 2026-10-19 it is the notes page (see [foci-and-notes.md](foci-and-notes.md)), the two having overlapped too much.
 
 ## The page
 
-**`/foci/:id/reread`, for any focus**, the current one or a past one, without making a past one current. The rail stays the current focus's.
+**`/foci/:id/notes`, for any focus** (it was `/foci/:id/reread`, which now redirects there), the current one or a past one, without making a past one current. The rail stays the current focus's.
 
 - Every note on a passage in reading order down one column, as on the notes page (reference, passage, note), then the notes on the focus as a whole under "On the whole focus", each dated. The one you're on is lit and the rest dimmed in place, as clause by clause dims the rest of a passage. The passage is clamped to two lines except on the lit note.
 - `j`/`k` (or `←`/`→`) move, as does clicking a note; a held key moves once, as in the reader. The lit note scrolls to the middle.
 - **Where you left off** is kept per focus (`foci.reread_note_id`, cleared if that note goes), so the reread opens there again.
-- The way up: Your focuses › Notes. The reference links into the reader; on the lit note it reads "Isaiah 40:25 Open in the reader →", all one link (the hint was once a separate span that lit up with the reference but did nothing when clicked).
+- The way up: Your focuses. Copy Markdown and Download `.md` at the right of that line. A past focus's dates follow the count.
+- Detached notes follow the run, out of it, to read or discard (see [foci-and-notes.md](foci-and-notes.md)).
+- The reference links into the reader; on the lit note it reads "Isaiah 40:25 Open in the reader →", all one link (the hint was once a separate span that lit up with the reference but did nothing when clicked).
 - `?label=` rereads only the notes carrying one label, chosen from "Rereading 8 notes ▾" over the run.
 - **Editing:** the current focus's lit note gets the reader's editor in place (`e` puts the cursor at its end). A past focus's notes on passages are only read here: the reader's note editor saves to the current focus, and editing them was a nice-to-have left out to keep this simple. Notes on the whole focus save to their own focus, so they can be edited on any focus.
 
@@ -29,8 +31,7 @@ See [foci-and-notes.md](foci-and-notes.md) for what they are. Here is where they
 - A label lasts only while some note carries it: taking off its last note (or deleting that note) drops it. Taking off its example moves the example on to its next note.
 - **Naming and renaming** from the note's groups in "Find what goes with this"; a blank name leaves it unnamed again. A name you already have for another label is refused, saying so ("You already have a label called “waiting”"): merging isn't built yet, so the way round is to move the notes over by hand.
 - On the lit note, chips with ×, **+ label** (`l`), which opens the picker (below), and **Find what goes with this** (`g`). On the other notes, the labels are quiet names. An unnamed label's chip on the lit note has the start of its note too.
-- The notes page shows each note's labels quietly under it (an unnamed one as "like Isaiah 40:6").
-- A note set aside as a detached note keeps its named labels' names as text (`detached_notes.label_names`), shown under it on the notes page; they no longer count anywhere. Unnamed ones aren't kept.
+- A note set aside as a detached note keeps its named labels' names as text (`detached_notes.label_names`), shown under it after the run; they no longer count anywhere. Unnamed ones aren't kept.
 
 ## The label picker
 
@@ -75,11 +76,7 @@ So you can see the shape of the synthesis forming. **A panel called up over the 
 
 ## Ways in
 
-- The notes page: **Reread** among its actions, `r`.
-- Each focus's card: "· Reread" after its notes line (above the card's button, so a past focus stays past).
-- The ⋯ menu: "Reread these notes", for the current focus.
-
-None show before a focus has notes. No prompt to reread from the reader: the app doesn't nudge.
+It's the notes page, so the ways in are the notes page's: "Notes on this focus" in the ⋯ menu and the count on each focus's card. (Until 2026-10-19 there were separate ones: Reread among the notes page's actions, `r`; "· Reread" on the cards; "Reread these notes" in the menu.) No prompt to reread from the reader: the app doesn't nudge.
 
 ## History
 

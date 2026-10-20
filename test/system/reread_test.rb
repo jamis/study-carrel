@@ -11,7 +11,7 @@ class RereadTest < ApplicationSystemTestCase
   end
 
   test "stepping through the notes, labelling one, and the cloud" do
-    visit focus_reread_path(@focus)
+    visit focus_notes_path(@focus)
     assert_selector ".rr-row.here", text: "The wilderness"
 
     find("body").send_keys "l"
@@ -40,7 +40,7 @@ class RereadTest < ApplicationSystemTestCase
   test "the label picker: every label as a cloud, A–Z or recent, and Enter takes the closest match or a new label" do
     %w[ glory grace holiness humility justice mercy peace sorrow wilderness zeal ].each { @second.label!(it) }
     users(:one).foci.create!(title: "Rest", archived_at: 1.day.ago).notes.create!(unit: verse(31), content: "x").label!("hope")
-    visit focus_reread_path(@focus)
+    visit focus_notes_path(@focus)
 
     find("body").send_keys "l"
     within(".rr-picker") do
@@ -71,19 +71,19 @@ class RereadTest < ApplicationSystemTestCase
   end
 
   test "opens where it left off" do
-    visit focus_reread_path(@focus)
+    visit focus_notes_path(@focus)
     find("body").send_keys "j"
     assert_selector ".rr-row.here", text: "The incomparable"
     sleep 1 # past the position save's debounce
-    visit focus_reread_path(@focus)
+    visit focus_notes_path(@focus)
     assert_selector ".rr-row.here", text: "The incomparable"
   end
 
   test "coming back to a note far down, it stands in view" do
     (4..24).each { |n| @focus.notes.create!(unit: verse(n), content: "Note on verse #{n}") }
     @focus.update!(reread_note_id: @second.id)
-    visit focus_notes_path(@focus)
-    find("a[href='#{focus_reread_path(@focus)}']").click # a Turbo visit, which scrolls the page after rendering it
+    visit foci_path
+    find(".card-notes a[href='#{focus_notes_path(@focus)}']").click # a Turbo visit, which scrolls the page after rendering it
     assert_selector ".rr-row.here", text: "The incomparable"
     sleep 0.3
     assert page.evaluate_script(<<~JS)
@@ -93,32 +93,32 @@ class RereadTest < ApplicationSystemTestCase
 
   test "opens again on a note on the whole focus, coming back from the focuses page" do
     whole = @focus.notes.create!(content: "Across it all")
-    visit focus_reread_path(@focus)
+    visit focus_notes_path(@focus)
     find(".rr-row", text: "Across it all").click
     assert_selector ".rr-row.here", text: "Across it all"
     sleep 1 # past the position save's debounce
     visit foci_path
-    find("a[href='#{focus_reread_path(@focus)}']", match: :first).click
+    find(".card-notes a[href='#{focus_notes_path(@focus)}']", match: :first).click
     assert_selector ".rr-row.here", text: "Across it all"
     assert_equal whole.id, @focus.reload.reread_note_id
   end
 
   test "the scratchpad saves as you write" do
-    visit focus_reread_path(@focus)
+    visit focus_notes_path(@focus)
     find(".reread-pad lexxy-editor [contenteditable]").send_keys "Compare Amos 5?"
     within(".reread-pad") { assert_text "Saved" }
     assert_equal "Compare Amos 5?", @focus.reload.scratchpad.to_plain_text.strip
   end
 
   test "the current focus's note can be edited where it stands" do
-    visit focus_reread_path(@focus)
+    visit focus_notes_path(@focus)
     within(".rr-row.here") { find("lexxy-editor [contenteditable]").send_keys :end, " Met there." }
     within(".rr-row.here") { assert_text "Saved" }
     assert_equal "The wilderness Met there.", @first.reload.content.to_plain_text.strip
   end
 
   test "writing a note on the whole focus, labelling it, and leaving an empty one behind" do
-    visit focus_reread_path(@focus)
+    visit focus_notes_path(@focus)
     within(".rr-pad-head") { click_on "New note" }
     within(".rr-row.here") { find("lexxy-editor [contenteditable]").send_keys "Holiness keeps stooping." }
     within(".rr-row.here") { assert_text "Saved" }
@@ -140,7 +140,7 @@ class RereadTest < ApplicationSystemTestCase
 
   test "making a note of a line in the scratchpad" do
     @focus.update!(scratchpad: "<p>Compare Amos 5?</p>")
-    visit focus_reread_path(@focus)
+    visit focus_notes_path(@focus)
     execute_script <<~JS
       const line = document.querySelector(".reread-pad .lexxy-editor__content p")
       const range = document.createRange()

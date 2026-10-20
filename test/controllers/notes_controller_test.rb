@@ -43,35 +43,48 @@ class AllNotesTest < ActionDispatch::IntegrationTest
     sign_in_as users(:one)
   end
 
-  test "lists notes in reading order, linking back" do
-    @focus.notes.create!(unit: verse(25), content: "late")
-    @focus.notes.create!(unit: verse(3), content: "early")
-    old = users(:one).foci.create!(title: "Old", archived_at: 1.day.ago)
-    old.notes.create!(unit: verse(1), content: "not mine")
-
-    get focus_notes_path(@focus)
+  test "a past focus's notes have their page too, with the rail still on the current focus" do
+    @focus.notes.create!(unit: verse(3), content: "from before")
+    now = users(:one).foci.start!(title: "Now")
+    get focus_notes_path(@focus.reload)
     assert_response :success
-    assert_select ".nb-ref", count: 2
-    assert_select ".nb-ref" do |refs|
-      assert_equal [ "Isaiah 40:3", "Isaiah 40:25" ], refs.map { |r| r.text.strip }
-    end
-    assert_select ".nb-note", 2
-    assert_select ".nb-linked a.nb-ref[href=?]", reading_path("isaiah-kjv", 40, 25)
-    assert_select ".nb-note", text: /not mine/, count: 0
+    assert_select ".nb-focus-title", "Holy"
+    assert_select ".rr-lede", /· #{@focus.created_at.strftime("%b %Y")}/
+    assert_select ".rr-row .rr-note", /from before/
+    assert_select "a.menu-item[href=?]", focus_notes_path(now)
+    assert_equal now, users(:one).foci.current_one, "reading them doesn't make it current"
   end
 
-  test "a detached note has its passage but nothing to open" do
+  test "detached notes follow the run, out of it, with their kept label names and Discard" do
+    @focus.notes.create!(unit: verse(3), content: "a")
+    detached = @focus.detached_notes.create!(user: users(:one), citation: "Morning 3", work_title: "Morning", passage: "Grey field.",
+                                             reason: "revised", noted_at: 1.day.ago, edited_at: 1.day.ago, content: "<p>set apart</p>",
+                                             label_names: [ "waiting" ])
+    get focus_notes_path(@focus)
+    assert_select ".rr-row[data-note-id]", 1
+    assert_select ".rr-detached .rr-gone", 1 do
+      assert_select ".rr-ref", "Morning 3"
+      assert_select "a", 0
+      assert_select ".rr-passage", "Grey field."
+      assert_select ".rr-note", /set apart/
+      assert_select ".rr-chip", "waiting"
+      assert_select "form[action=?]", detached_note_path(detached)
+    end
+    assert_select ".rr-gone[data-note-id], .rr-gone[data-reread-target]", 0
+  end
+
+  test "detached notes aren't shown when rereading one label" do
+    waiting = @focus.notes.create!(unit: verse(3), content: "a").label!("waiting")
     @focus.detached_notes.create!(user: users(:one), citation: "Morning 3", work_title: "Morning", passage: "Grey field.",
                                   reason: "revised", noted_at: 1.day.ago, edited_at: 1.day.ago, content: "<p>set apart</p>")
-    get focus_notes_path(@focus)
-    assert_select ".nb-detached .nb-ref", "Morning 3"
-    assert_select ".nb-detached a", 0
-    assert_select ".nb-detached + .nb-note", /set apart/
+    get focus_notes_path(@focus, label: waiting.id)
+    assert_select ".rr-gone", 0
   end
 
   test "empty state" do
     get focus_notes_path(@focus)
     assert_select ".page-empty"
+    assert_select ".page-actions", 0
   end
 
   test "the reading page links to it with a count" do
@@ -80,31 +93,9 @@ class AllNotesTest < ActionDispatch::IntegrationTest
     assert_select "a.menu-item[href=?]", focus_notes_path(@focus), text: "Notes on this focus (1)"
   end
 
-  test "a past focus's notes have their page too, with the rail still on the current focus" do
-    @focus.notes.create!(unit: verse(3), content: "from before")
-    now = users(:one).foci.start!(title: "Now")
-    get focus_notes_path(@focus.reload)
-    assert_response :success
-    assert_select ".nb-focus-title", "Holy"
-    assert_select ".nb-lede", /· #{@focus.created_at.strftime("%b %Y")}/
-    assert_select ".nb-note", /from before/
-    assert_select "a.menu-item[href=?]", focus_notes_path(now)
-    assert_equal now, users(:one).foci.current_one, "reading them doesn't make it current"
-  end
-
   test "the old address goes to the current focus's notes" do
     get "/notes"
     assert_redirected_to focus_notes_path(@focus)
-  end
-
-  test "long passages are clamped with a way to expand them" do
-    long = verse(3)
-    long.update!(body: "word " * 100)
-    @focus.notes.create!(unit: long, content: "x")
-    @focus.notes.create!(unit: verse(4), content: "y")
-    get focus_notes_path(@focus)
-    assert_select ".nb-quote.clamped", 1
-    assert_select ".nb-more", 1
   end
 end
 

@@ -10,7 +10,7 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "every note, in reading order, the first one lit" do
-    get focus_reread_path(@focus)
+    get focus_notes_path(@focus)
     assert_response :success
     assert_select ".rr-row[data-note-id] .rr-cite" do |refs|
       assert_equal [ "Isaiah 40:3", "Isaiah 40:25" ], refs.map { it.text.strip }
@@ -25,7 +25,7 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     assert_response :no_content
     assert_equal @late, @focus.reload.reread_note
 
-    get focus_reread_path(@focus)
+    get focus_notes_path(@focus)
     assert_select "#reread_note_#{@late.id}.here"
   end
 
@@ -37,7 +37,7 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
 
   test "rereads only the notes carrying one label" do
     waiting = @late.label!("waiting")
-    get focus_reread_path(@focus, label: waiting.id)
+    get focus_notes_path(@focus, label: waiting.id)
     assert_select ".rr-row[data-note-id]", 1
     assert_select ".rr-row[data-note-id] .rr-cite", "Isaiah 40:25"
     assert_select ".rr-filter", /labelled “waiting”/
@@ -49,7 +49,7 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     @early.label!("wilderness")
     users(:one).foci.create!(title: "Rest", archived_at: 1.day.ago).notes.create!(unit: verse(31), content: "x").label!("waiting")
 
-    get focus_reread_path(@focus)
+    get focus_notes_path(@focus)
     assert_select "#reread_note_#{@early.id} .rr-chip", 2
     assert_select ".rr-cloud .rr-word:not(.away)", 2
     assert_select ".rr-cloud .rr-word.away", "waiting"
@@ -60,26 +60,23 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
 
   test "an unnamed label shows as like one of its notes: in the chips, the cloud, the tallies and the filter" do
     group = @late.group_with!(@early)
-    get focus_reread_path(@focus)
+    get focus_notes_path(@focus)
     assert_select "#reread_note_#{@early.id} .rr-chip .lf-like", "like Isaiah 40:25"
     assert_select "#reread_note_#{@late.id} .rr-chip .lf-like", "like Isaiah 40:3"
     assert_select ".rr-cloud .rr-word[data-label-id=?]:not([data-label-name])", group.id.to_s, text: /like Isaiah 40:25/
     assert_select ".rr-tallies .rr-tally-name", /like Isaiah 40:25/
     assert_select ".rr-filter-menu .menu-item", /like Isaiah 40:25/
 
-    get focus_reread_path(@focus, label: group.id)
+    get focus_notes_path(@focus, label: group.id)
     assert_select ".rr-filter", /in the group like Isaiah 40:25/
-
-    get focus_notes_path(@focus)
-    assert_select ".nb-labels", "like Isaiah 40:25"
   end
 
   test "the current focus's notes on passages get the reader's editor; a past focus's are only read" do
-    get focus_reread_path(@focus)
+    get focus_notes_path(@focus)
     assert_select "#reread_note_#{@late.id}[data-editor-url=?]", unit_note_path(verse(25))
 
     users(:one).foci.start!(title: "Rest")
-    get focus_reread_path(@focus)
+    get focus_notes_path(@focus)
     assert_response :success
     assert_select "#reread_note_#{@late.id}[data-editor-url=?]", ""
   end
@@ -92,7 +89,7 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     users(:one).foci.start!(title: "Rest")
     put focus_scratchpad_path(@focus), params: { scratchpad: { content: "<p>Later</p>" } }, as: :json
     assert_equal "Later", @focus.reload.scratchpad.to_plain_text
-    get focus_reread_path(@focus)
+    get focus_notes_path(@focus)
     assert_select ".reread-pad .preview", "Later"
   end
 
@@ -227,32 +224,18 @@ class RereadWaysInTest < ActionDispatch::IntegrationTest
     sign_in_as users(:one)
   end
 
-  test "no way in until the focus has notes" do
-    get focus_notes_path(@focus)
-    assert_select "a[href=?]", focus_reread_path(@focus), 0
-    get foci_path
-    assert_select "a[href=?]", focus_reread_path(@focus), 0
+  test "the reread is the notes page: its old address goes there, keeping the label" do
+    waiting = @focus.notes.create!(unit: verse(3), content: "a").label!("waiting")
+    get focus_reread_path(@focus)
+    assert_redirected_to focus_notes_path(@focus)
+    get focus_reread_path(@focus, label: waiting.id)
+    assert_redirected_to focus_notes_path(@focus, label: waiting.id)
   end
 
-  test "from the notes page, the focus's card, and the menu" do
+  test "no separate way in from the card or the menu" do
     @focus.notes.create!(unit: verse(3), content: "a")
-    past = users(:one).foci.create!(title: "Old", archived_at: 1.day.ago)
-    past.notes.create!(unit: verse(4), content: "b")
-
-    get focus_notes_path(@focus)
-    assert_select ".page-actions a[href=?]", focus_reread_path(@focus), "Reread"
-    assert_select ".menu-item[href=?]", focus_reread_path(@focus), "Reread these notes"
     get foci_path
-    assert_select ".card-current .card-notes a[href=?]", focus_reread_path(@focus), "Reread"
-    assert_select ".card-past .card-notes a[href=?]", focus_reread_path(past), "Reread"
-  end
-
-  test "the notes page shows each note's labels, and a detached note's kept names" do
-    @focus.notes.create!(unit: verse(3), content: "a").label!("wilderness")
-    @focus.detached_notes.create!(user: users(:one), citation: "Journal 1:1", work_title: "Journal", passage: "Gone.",
-                                  reason: "revised", noted_at: Time.current, edited_at: Time.current, content: "Kept", label_names: [ "waiting" ])
-    get focus_notes_path(@focus)
-    assert_select ".nb-labels", "wilderness"
-    assert_select ".nb-labels", "waiting"
+    assert_select "a[href=?]", focus_reread_path(@focus), 0
+    assert_select ".card-notes a[href=?]", focus_notes_path(@focus)
   end
 end

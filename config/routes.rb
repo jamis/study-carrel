@@ -23,13 +23,14 @@ Rails.application.routes.draw do
     member do
       patch :restore
     end
-    # Every focus has its notes page, the current one's or a past one's. Notes on the focus as a whole (free notes)
-    # are written in its reread: new and show are their editors, create and update their autosave.
+    # Every focus has its notes page, the current one's or a past one's, where they're reread one at a time. Notes on
+    # the focus as a whole (free notes) are written there: new and show are their editors, create and update their
+    # autosave.
     resources :notes, only: %i[index new create show update] do
       get :export, on: :collection
       resources :labels, only: %i[create destroy], controller: "note_labels"
     end
-    # Rereading a focus's notes one at a time, labelling them, with its scratchpad: the page, and where it left off.
+    # Where the reread of its notes left off (show is the old address of the notes page).
     resource :reread, only: %i[show update]
     # Naming a label (or an unnamed group of notes), or renaming it, from the reread.
     resources :labels, only: :update

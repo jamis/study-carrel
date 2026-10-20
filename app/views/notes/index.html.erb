@@ -1,53 +1,169 @@
 <% content_for :title, "Notes · #{@focus.title} · Study Carrel" %>
-<%# One focus's notes, the current focus's or a past one's (the rail is still the current focus's). Laid out as in the
-    reader: the passages down the left under the focus, the notes on a sheet down the right, each level with its
-    passage. The passage side is the way back into reading. %>
-<%= render "shared/rail", focus: Current.focus %>
-<main class="page notes-page">
-  <%= page_head [ [ "Your focuses", foci_path ], [ "Notes", focus_notes_path(@focus) ] ] do %>
-    <% if @notes.any? || @free.any? || @detached.any? %>
-      <span class="page-actions" data-controller="clipboard" data-clipboard-url-value="<%= export_focus_notes_path(@focus) %>">
-        <% if @notes.any? || @free.any? %>
-          <%= link_to focus_reread_path(@focus), class: "chip", title: "Reread these notes one at a time (r)",
-                data: { controller: "key-link", key_link_key_value: "r", action: "keydown@window->key-link#key" } do %>Reread<% end %>
-        <% end %>
-        <button class="chip" type="button" data-action="clipboard#copy" data-clipboard-target="button">Copy<span class="wide-only"> Markdown</span></button>
-        <%= link_to safe_join(["Download", tag.span(" .md", class: "wide-only")]), export_focus_notes_path(@focus), class: "chip", data: { turbo: false } %>
-      </span>
-    <% end %>
-  <% end %>
+<%# A focus's notes page (the current focus's or a past one's), where they're reread: those on passages in reading order down the column, then those on the focus as a whole,
+    the one you're on lit and the rest dimmed in place; the focus's scratchpad docked at right (a bottom sheet on
+    phones), and over its foot, when called up, the labels in use as a cloud or as tallies. Notes on the whole focus can
+    be written and edited here, and so can the current focus's notes on passages, as in the reader.
+    "Find what goes with this" (g) turns the column into a comparison: the note you're on held at the top, the rest
+    under it, each to put in one of its groups (labels, named or not) or a new group with it.
+    Detached notes, whose passages are gone, follow the run, only to read or discard. %>
+<main class="reader reread" data-controller="reread compare"
+      data-reread-position-url-value="<%= focus_reread_path(@focus) %>"
+      data-reread-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
+      data-reread-lift-url-value="<%= focus_notes_path(@focus) %>"
+      data-compare-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
+      data-compare-rename-url-template-value="<%= focus_label_path(@focus, "{id}") %>"
+      data-action="keydown@document->compare#key keydown@document->reread#key mouseover->reread#light click@document->reread#away note:saved@window->reread#saved selectionchange@document->reread#selected">
+  <%= render "shared/rail", focus: Current.focus %>
 
-  <% none = @notes.empty? && @free.empty? && @detached.empty? %>
-  <div class="nb-sheet<%= " nb-empty" if none %>">
-    <header class="nb-focus">
+  <div class="reader-col reread-col">
+    <%= page_head [ [ "Your focuses", foci_path ], [ "Notes" ] ] do %>
+      <% if @all.any? || @detached&.any? %>
+        <span class="page-actions" data-controller="clipboard" data-clipboard-url-value="<%= export_focus_notes_path(@focus) %>">
+          <button class="chip" type="button" data-action="clipboard#copy" data-clipboard-target="button">Copy<span class="wide-only"> Markdown</span></button>
+          <%= link_to safe_join(["Download", tag.span(" .md", class: "wide-only")]), export_focus_notes_path(@focus), class: "chip", data: { turbo: false } %>
+        </span>
+      <% end %>
+    <% end %>
+    <header class="rr-focus">
       <div class="nb-focus-head"><%= render "foci/mark" %><h1 class="nb-focus-title"><%= @focus.title %></h1></div>
-      <% if @focus.description.present? %><p class="nb-focus-desc"><%= @focus.description %></p><% end %>
     </header>
-    <p class="nb-lede"><%= pluralize(@notes.size, "note") %>, in reading order<% if @free.any? %>, and <%= @free.size %> on the whole<% end %><% if @focus.archived? %> · <%= focus_span(@focus) %><% end %></p>
 
-    <% if none %>
-      <p class="page-empty">No notes yet. Open a verse and write what it says to your question.</p>
+    <div class="rr-lede">
+      <span class="menu" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
+        Rereading
+        <button class="rr-filter" type="button" aria-expanded="false" data-menu-target="button" data-action="menu#toggle"><%= @label ? "the #{pluralize(@notes.size, "note")} #{label_phrase(@label)}" : pluralize(@notes.size, "note") %> ▾</button>
+        <span class="menu-panel rr-filter-menu" data-menu-target="panel">
+          <%= link_to focus_reread_path(@focus), class: "menu-item", aria: { current: ("page" unless @label) } do %>All notes<small><%= @all.size %></small><% end %>
+          <% @all.flat_map(&:labels).uniq.sort_by { [ it.named? ? 0 : 1, it.name.to_s.downcase, it.id ] }.each do |label| %>
+            <%= link_to focus_reread_path(@focus, label: label.id), class: "menu-item", aria: { current: ("page" if label == @label) } do %><%= label_title(label, snippet: false) %><small><%= @all.count { it.label_ids.include?(label.id) } %></small><% end %>
+          <% end %>
+        </span>
+      </span>
+      <% if @focus.archived? %>· <%= focus_span(@focus) %><% end %>
+      <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to find what goes with it, <kbd>c</kbd> for the labels, <kbd>n</kbd> for a new note</span>
+    </div>
+    <p class="rr-lede rr-cmp-lede">Finding what goes with the note you're on<span class="rr-keys"> · <kbd>j</kbd>/<kbd>k</kbd> through the others, <kbd>1</kbd>–<kbd>9</kbd> or <kbd>+</kbd> to group, <kbd>Enter</kbd> to move to one, <kbd>p</kbd>/<kbd>o</kbd> the whole passage or note, <kbd>g</kbd> or × to go back</span></p>
+
+    <%# Finding what goes with a note: the note you're on, held at the top of the column, with its groups numbered for the
+        moment. Drawn from its row by the compare controller. %>
+    <section class="rr-cmp-card" aria-label="The note you're on" data-compare-target="card" hidden></section>
+
+    <% if @notes.empty? %>
+      <p class="page-empty"><%= @label ? "No notes here are #{label_phrase(@label)} any more." : "No notes yet. Open a verse and write what it says to your question." %></p>
     <% end %>
 
-    <% @notes.each do |note|
-      unit = note.unit %>
-      <%= render "shared/sheet_row", citation: unit_ref(unit.section, unit), passage: unit.body, content: note.content, labels: note.labels.sort_by { [ it.named? ? 0 : 1, it.name.to_s.downcase, it.id ] }.map { label_title(it, from: note, snippet: false) },
-            href: reading_path(unit.section.work.slug, unit.section.number, unit.number) %>
-    <% end %>
-
-    <% if @free.any? %>
-      <h2 class="nb-detached-head">On the whole focus</h2>
-      <% @free.each do |note| %>
-        <%= render "shared/sheet_row", citation: "Written #{l note.created_at.to_date, format: :long}", content: note.content,
-              labels: note.labels.sort_by { [ it.named? ? 0 : 1, it.name.to_s.downcase, it.id ] }.map { label_title(it, from: note, snippet: false) } %>
+    <div class="rr-run">
+      <% passage_notes, free_notes = @notes.partition(&:unit_id) %>
+      <% passage_notes.each do |note| %>
+        <%= render "rereads/row", note:, focus: @focus, here: note == @here %>
       <% end %>
-    <% end %>
-
-    <% if @detached.any? %>
-      <h2 class="nb-detached-head">From passages that changed or were removed</h2>
-      <% @detached.each do |detached| %>
-        <%= render "shared/sheet_row", citation: detached.citation, passage: detached.passage, content: detached.content, detached: detached %>
+      <%# Notes on the focus as a whole: what you see across the passages, written here or made of a line in the
+          scratchpad. New ones join the end. %>
+      <section class="rr-free-notes" id="reread_free" aria-label="On the whole focus">
+        <h2 class="rr-free-head">On the whole focus</h2>
+        <% free_notes.each do |note| %>
+          <%= render "rereads/row", note:, focus: @focus, here: note == @here %>
+        <% end %>
+      </section>
+      <% unless @label %>
+        <button class="rr-new" type="button" data-action="reread#newNote" title="A note on the focus as a whole (n)">+ New note</button>
       <% end %>
+      <%# A new note on the whole focus, before its first save makes it (removed again if you move on with it empty). %>
+      <template data-reread-target="newRow">
+        <article class="rr-row rr-free rr-unsaved" data-reread-target="row" data-editor-url="<%= new_focus_note_path(@focus) %>" data-action="click->reread#pick">
+          <div class="rr-head"><span class="rr-ref rr-whole">New note</span></div>
+          <div class="rr-note"></div>
+          <div class="rr-editor composer"></div>
+          <div class="rr-labels" id="new_note_labels" data-label-ids=""></div>
+        </article>
+      </template>
+
+      <%# Notes set aside when their passages changed or went: no longer notes to label or group, only to read or
+          discard. Out of the run. %>
+      <% if @detached&.any? %>
+        <section class="rr-detached" aria-label="From passages that changed or were removed">
+          <h2 class="rr-free-head">From passages that changed or were removed</h2>
+          <% @detached.each do |detached| %>
+            <article class="rr-gone" id="<%= dom_id(detached) %>">
+              <div class="rr-head"><span class="rr-ref rr-whole"><%= detached.citation %></span></div>
+              <p class="rr-why">set aside <%= l detached.created_at.to_date, format: :long %>, when <%= detached.why %></p>
+              <% if detached.passage.present? %><p class="rr-passage"><%= detached.passage %></p><% end %>
+              <div class="rr-note"><%= detached.content %></div>
+              <div class="rr-labels">
+                <% detached.label_names.to_a.each do |name| %><span class="rr-chip"><%= name %></span><% end %>
+                <%= button_to "Discard", detached_note_path(detached), method: :delete, class: "chip", form_class: "inline-form rr-discard",
+                      data: { turbo_confirm: "Discard this note? It can’t be brought back." } %>
+              </div>
+            </article>
+          <% end %>
+        </section>
+      <% end %>
+    </div>
+
+    <%# The label picker, by the + label of the note you're on: all your labels as a cloud, A–Z or most recently used
+        first, narrowed as you type. The footer says what Enter does: the closest match, or a new label of what you
+        typed when nothing matches. %>
+    <div class="rr-picker" data-reread-target="picker" hidden>
+      <div class="rr-picker-head">
+        <input type="text" maxlength="40" placeholder="Label this note" autocomplete="off" aria-label="Label" data-reread-target="pickerInput"
+               data-action="input->reread#filterPicker keydown->reread#pickerKey">
+        <span class="rr-picker-sort">
+          <button type="button" data-sort="alpha" data-action="reread#sortPicker">A–Z</button> · <button type="button" data-sort="recent" data-action="reread#sortPicker">Recent</button>
+        </span>
+      </div>
+      <div class="rr-picker-cloud" role="listbox" data-reread-target="pickerOptions"></div>
+      <div class="rr-picker-foot" data-reread-target="pickerFoot"></div>
+    </div>
+    <p class="rr-toast" role="status" data-reread-target="toast" hidden></p>
+    <%= form_with url: focus_note_labels_path(@focus, 0), method: :post, class: "rr-label-form", data: { reread_target: "labelForm" } do %>
+      <input type="hidden" name="name">
     <% end %>
   </div>
+
+  <aside class="panel reread-pad" data-controller="sheet" data-reread-target="pad"
+         data-action="keydown.esc@window->sheet#escape scratchpad:text@window->sheet#preview">
+    <button class="panel-handle" type="button" aria-expanded="false" data-sheet-target="handle" data-action="sheet#toggle">
+      <span class="panel-label">Scratchpad</span>
+      <% pad_text = @focus.scratchpad&.to_plain_text.to_s.squish.truncate(200) %>
+      <span class="preview<%= " empty" if pad_text.blank? %>" data-sheet-target="preview"><%= pad_text.presence || "Half-thoughts, questions, things to compare…" %></span>
+      <span class="go" data-sheet-target="label" aria-hidden="true">▴</span>
+    </button>
+    <%# A new note on the whole focus, and the labels: always at hand, by the scratchpad they grow out of. On phones, on
+        its handle. %>
+    <span class="rr-pad-tools rr-pad-tools-phone">
+      <% unless @label %><button class="rr-summon" type="button" data-action="reread#newNote">New note</button><% end %>
+      <button class="rr-summon" type="button" aria-expanded="false" data-action="reread#toggleLabels">Labels</button>
+    </span>
+    <div class="panel-head rr-pad-head">
+      <span class="panel-label">Scratchpad</span>
+      <span class="rr-pad-tools">
+        <% unless @label %><button class="rr-summon" type="button" title="A note on the focus as a whole" data-action="reread#newNote">New note<kbd>n</kbd></button><% end %>
+        <button class="rr-summon" type="button" aria-expanded="false" data-action="reread#toggleLabels">Labels<kbd>c</kbd></button>
+      </span>
+    </div>
+    <%# Select some of the scratchpad and this turns it into a note on the whole focus. %>
+    <button class="rr-lift" type="button" data-reread-target="lift" data-action="mousedown->reread#keepSelection click->reread#lift" hidden>Make a note of this</button>
+    <div class="composer">
+      <%= form_with model: @focus, url: focus_scratchpad_path(@focus), method: :put,
+            data: { controller: "autosave", autosave_focus_id_value: @focus.id, autosave_param_value: "scratchpad", action: "submit->autosave#prevent" } do |form| %>
+        <%= form.rich_textarea :scratchpad, preset: "notes", rows: 8, placeholder: "Half-thoughts, questions, things to compare…",
+              aria: { label: "Scratchpad" },
+              data: { autosave_target: "editor", action: "lexxy:initialize->autosave#ready lexxy:change->autosave#changed lexxy:blur->autosave#save" } %>
+        <p class="autosave-status" aria-live="polite" data-autosave-target="status">&nbsp;</p>
+      <% end %>
+    </div>
+
+    <%# The labels in use, called up over the foot of the scratchpad (Labels, or c) and put away again (×, Esc, c). %>
+    <section class="rr-labels-panel" aria-label="Labels" data-reread-target="labelsPanel">
+      <div class="rr-labels-head">
+        <span class="panel-label">Labels on this focus</span>
+        <span class="rr-views">
+          <button type="button" data-view="cloud" data-action="reread#view">Cloud</button><button type="button" data-view="tallies" data-action="reread#view">Tallies</button>
+        </span>
+        <button class="rr-close" type="button" aria-label="Put the labels away" data-action="reread#toggleLabels">×</button>
+      </div>
+      <div class="rr-labels-body" id="reread_labels"><%= render "rereads/labels", focus: @focus, notes: @all %></div>
+      <p class="rr-labels-hint">Point at a label to light its notes; tap it to put the note you're on on it, or take it off.</p>
+    </section>
+  </aside>
 </main>

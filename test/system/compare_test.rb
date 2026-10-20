@@ -17,7 +17,7 @@ class CompareTest < ApplicationSystemTestCase
   def keys(*keys) = page.driver.browser.action.send_keys(*keys).perform
 
   test "finding what goes with a note: into a group of its, a new group of two, naming one, and back" do
-    visit focus_reread_path(@focus)
+    visit focus_notes_path(@focus)
     assert_selector ".rr-row.here", text: "The withering"
 
     keys "g"
@@ -70,7 +70,7 @@ class CompareTest < ApplicationSystemTestCase
   end
 
   test "the card keeps its passage to a line, opening it with p; Esc closes it, then goes back" do
-    visit focus_reread_path(@focus)
+    visit focus_notes_path(@focus)
     click_on "Find what goes with this"
     assert_selector ".rr-cmp-card .peek-passage:not(.fits)"
     keys "p"

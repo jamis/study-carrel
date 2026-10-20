@@ -25,7 +25,7 @@
           <%= link_to continue_path, class: "card-continue" do %><span class="card-continue-go">Choose where to begin →</span><% end %>
         <% end %>
         <div class="card-foot">
-          <span class="card-notes"><%= notes_line(@note_counts.fetch(focus.id, 0), @works_read.fetch(focus.id, []), link: focus_notes_path(focus)) %><%= reread_link(focus) if @note_counts.fetch(focus.id, 0).positive? %></span>
+          <span class="card-notes"><%= notes_line(@note_counts.fetch(focus.id, 0), @works_read.fetch(focus.id, []), link: focus_notes_path(focus)) %></span>
         </div>
       </article>
     <% end %>
@@ -39,7 +39,7 @@
         <h2 class="card-title"><%= focus.title %></h2>
         <% if focus.description.present? %><p class="card-desc card-clamp"><%= focus.description %></p><% end %>
         <div class="card-foot">
-          <span class="card-notes"><%= notes_line(@note_counts.fetch(focus.id, 0), @works_read.fetch(focus.id, []), link: focus_notes_path(focus)) %><%= reread_link(focus) if @note_counts.fetch(focus.id, 0).positive? %></span>
+          <span class="card-notes"><%= notes_line(@note_counts.fetch(focus.id, 0), @works_read.fetch(focus.id, []), link: focus_notes_path(focus)) %></span>
         </div>
       </article>
     <% end %>

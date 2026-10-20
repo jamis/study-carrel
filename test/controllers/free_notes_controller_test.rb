@@ -67,19 +67,14 @@ class FreeNotesControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "the reread lists them after the notes on passages; the notes page and export show them" do
+  test "the notes page lists them after the notes on passages" do
     @focus.notes.create!(content: "Across them all")
-    get focus_reread_path(@focus)
+    get focus_notes_path(@focus)
     assert_select "#reread_free .rr-free-head", "On the whole focus"
     assert_select "#reread_free .rr-row .rr-ref", /\AWritten /
     assert_select "#reread_free .rr-row .rr-note", /Across them all/
     assert_select ".rr-new", "+ New note"
     assert_select ".rr-pad-head button", /New note/
-
-    get focus_notes_path(@focus)
-    assert_select ".nb-lede", /1 note, in reading order, and 1 on the whole/
-    assert_select ".nb-detached-head", "On the whole focus"
-    assert_select ".nb-note", /Across them all/
   end
 
   test "another reader's focus can't be written in" do

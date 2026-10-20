@@ -35,7 +35,7 @@ History: a thin bar felt lost and a large hero banner too big; a filled pill wit
 
 **One note per verse per focus** (decided 2026-10-03), enforced by a unique index on `(focus_id, unit_id)`.
 
-**Notes on the focus as a whole** (decided 2026-10-13): what you notice across passages rather than on one. They have no unit (`notes.unit_id` is empty; the index still holds one note per passage, as SQLite treats each NULL as distinct), any number per focus, labelled like any note. They're written in the reread (see [reread.md](reread.md)), not in the reader, and saved to their own focus, so a past focus's can be written and changed too. On the notes page they follow the notes on passages under "On the whole focus", each dated where a passage would be, and the count reads "8 notes, in reading order, and 2 on the whole"; in the export, a "## On the whole focus" section. They count on the focus's card but name no work.
+**Notes on the focus as a whole** (decided 2026-10-13): what you notice across passages rather than on one. They have no unit (`notes.unit_id` is empty; the index still holds one note per passage, as SQLite treats each NULL as distinct), any number per focus, labelled like any note. They're written on the notes page, the reread (see [reread.md](reread.md)), not in the reader, and saved to their own focus, so a past focus's can be written and changed too. They follow the notes on passages under "On the whole focus", each dated where a passage would be; in the export, a "## On the whole focus" section. They count on the focus's card but name no work.
 
 - An always-open Lexxy editor, docked as a full-height page down the right (a bottom sheet on phones, whose handle shows the note's first line).
 - **Autosaves** as you type (and on leaving the verse); clearing it deletes the note. There is no add/expand step.
@@ -47,19 +47,18 @@ Notes that lose their unit (a revised or deleted user text) become detached note
 
 ## Notes pages
 
-**Every focus has its own notes page**, `/foci/:id/notes` (decided 2026-10-12; it was one "All notes" page at `/notes`, which showed only the current focus's notes despite the name). The page is titled with the focus, under "Your focuses", and lists its notes in reading order with their passages, then its detached notes; Copy Markdown and Download `.md` export the same. A past focus's page adds its dates to the count line. The rail stays the current focus's.
+**Every focus has its own notes page**, `/foci/:id/notes` (decided 2026-10-12; it was one "All notes" page at `/notes`, which showed only the current focus's notes despite the name). The rail stays the current focus's.
 
-**Laid out beside the text, as in the reader** (decided 2026-10-12): the passages down the left under the focus, the notes on a sheet of paper down the right that runs the length of the page, each note level with its passage. On phones, one column: each passage, then its note on a slip of paper under it.
+**The notes page is the reread** (decided 2026-10-19): the notes one at a time down one column with the scratchpad beside them, as described in [reread.md](reread.md). The reread began as a page of its own beside the notes page, which then felt redundant: everything it showed, the reread showed too.
 
-- The focus is set as it stands over the passage in the reader (thought bubble, soft italic, 19–22px, its description faint below, a rule under it), well clear of the page head. It used to be a 36px accent heading crowded against the top, and the passage, italic, looked too much like the note under it, especially for long verses and stanzas.
-- The count, "9 notes, in reading order", heads the sheet.
-- Passage and note never share a colour or a side: the passage in soft ink on the desk, the note in full ink on paper. Passages over 300 characters or four lines clamp to four lines, with "Show full passage".
-- **The passage cell is the way back into reading**, to that passage with its note open. The reference is set as a link, with the Continue reading icon and "Open" at the end of its line, and the link stretches over the whole cell. Pointing anywhere on it washes the cell, underlines the reference and draws an accent rule down its note, so you see which passage and note you'd open. On phones "Open" always shows. "Show full passage" stays its own button. The note itself isn't a link, so it can be selected and copied; the passage text can't be selected here.
-- Detached notes follow under "From passages that changed or were removed", in the same two columns: the reference grey and not a link (there's nothing to open), why it was set aside, and Discard under the note.
-
-Prototyped against the old single column with the passage stepped back (an epigraph), notes as index cards, and a commonplace book with each passage folded to its first words in the margin; the prototypes were discarded.
-
-- The ⋯ menu's item is "Notes on this focus (12)", for the current focus. The cards link each focus's count to its page.
-- `/notes` still works: it redirects to the current focus's page.
+- Under "Your focuses", titled with the focus. A past focus's dates follow "Rereading 8 notes ▾".
+- **Copy Markdown** and **Download `.md`** in the page head, exporting the notes, those on the whole focus and the detached notes.
+- **Detached notes** follow the run under "From passages that changed or were removed": the reference grey and not a link (there's nothing to open), why it was set aside, the passage, the note, its named labels' names kept as text, and Discard. They're out of the run (no `j`/`k`, labels or grouping), being no longer notes, and faint until pointed at. Not shown under `?label=`. Turning one back into a note on the whole focus was considered, to bring it into the run, and left for later: they should be rare.
+- The ⋯ menu's item is "Notes on this focus (12)", for the current focus. The cards link each focus's count to its page. There is no separate "Reread" link any more.
+- `/notes` still works: it redirects to the current focus's page. `/foci/:id/reread` redirects to the focus's notes page, keeping `?label=`.
 - No page of every note across focuses: a note makes sense only beside the question it answers, and the focuses page already serves as the index across them.
 - Another user's focus is a 404, as everywhere.
+
+### Before the reread
+
+From 2026-10-12 to 2026-10-19 the notes page was laid out beside the text, as in the reader: the passages down the left under the focus, the notes on a sheet of paper down the right, each level with its passage (one column on phones, the note on a slip under its passage). The whole passage cell linked back into reading, long passages clamped to four lines with "Show full passage". The Kept page keeps that layout. It was prototyped against the old single column with the passage stepped back (an epigraph), notes as index cards, and a commonplace book with each passage folded to its first words in the margin; the prototypes were discarded.

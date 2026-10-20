@@ -1,4 +1,4 @@
-/* ---------- rereading a focus's notes (rereads/show) ---------- */
+/* ---------- a focus's notes, reread one at a time (notes/index) ---------- */
 /* The reader's frame (the rail | the column | the panel docked at right), with every note down the column in reading
    order: the one you're on lit, the rest dimmed in place. The panel is the focus's scratchpad; over its foot, when
    called up, the labels in use, as a cloud or as tallies. */
@@ -84,6 +84,16 @@
 }
 .rr-new:hover { border-color: var(--accent); color: var(--accent); }
 .rr-unsaved .rr-note { display: none; }
+
+/* Detached notes, after the run: read-only, never lit, so set apart rather than dimmed. */
+.rr-gone { padding: 18px 20px 18px 24px; color: var(--ink-soft); opacity: .55; transition: opacity .25s; }
+.rr-gone:is(:hover, :focus-within) { opacity: 1; }
+.rr-gone + .rr-gone { border-top: 1px solid var(--rule); }
+.rr-gone .rr-ref { color: var(--ink-faint); }
+.rr-why { margin: 2px 0 0; font: 12px var(--sans); color: var(--ink-faint); }
+.rr-gone .rr-passage { -webkit-line-clamp: 4; }
+.rr-gone .rr-chip + .rr-chip::before { content: "·"; margin-right: 6px; }
+.rr-discard { margin-left: auto; }
 
 /* "Make a note of this", over a selection in the scratchpad; and the word that it's done. */
 .rr-lift {
@@ -311,7 +321,7 @@
   .rr-lede, .reread .page-empty, .rr-free-head { margin-left: 16px; }
   .rr-toast { bottom: 76px; max-width: calc(100vw - 32px); }
   .rr-keys { display: none; }
-  .rr-row { padding: 14px 12px 14px 16px; }
+  .rr-row, .rr-gone { padding: 14px 12px 14px 16px; }
   .rr-pad-tools-phone { display: flex; position: absolute; top: 15px; right: 44px; z-index: 2; }
   .reread-pad .panel-handle .preview { margin-right: 120px; }
   .reread-pad { overflow: visible; }
