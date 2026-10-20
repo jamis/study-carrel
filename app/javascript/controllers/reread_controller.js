@@ -38,7 +38,7 @@ export default class extends Controller {
   #centre() { this.here?.scrollIntoView({ block: "center" }) }
   centre() { this.#centre() }
 
-  // While finding what goes with a note (the compare controller), the column is that controller's.
+  // While gathering what goes with a note (the compare controller), the column is that controller's.
   get #comparing() { return this.element.classList.contains("comparing") }
 
   // A note's chips or the panel were redrawn (labelling replies with both).

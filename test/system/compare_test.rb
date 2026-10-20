@@ -16,7 +16,7 @@ class CompareTest < ApplicationSystemTestCase
   # Keys to the page, not to an element (which Selenium may click first).
   def keys(*keys) = page.driver.browser.action.send_keys(*keys).perform
 
-  test "finding what goes with a note: into a group of its, a new group of two, naming one, and back" do
+  test "gathering what goes with a note: into a group of its, a new group of two, naming one, and back" do
     visit focus_notes_path(@focus)
     assert_selector ".rr-row.here", text: "The withering"
 
@@ -73,7 +73,7 @@ class CompareTest < ApplicationSystemTestCase
     measured = @focus.notes.create!(unit: verse(12), content: "The scale is the point")
     @focus.update!(reread_note: measured)
     visit focus_notes_path(@focus)
-    click_on "Find what goes with this"
+    click_on "Gather"
     assert_selector ".rr-cmp-card .peek-passage:not(.fits)"
     keys "p"
     assert_selector ".rr-cmp-card .peek-passage.open .peek-full", text: "weighed the mountains in scales"

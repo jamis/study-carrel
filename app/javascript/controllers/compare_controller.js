@@ -5,9 +5,9 @@ import { citeOf, shortCite, condensedCite, labelIdsOf, escapeHtml } from "lib/no
 
 const MAX_TABS = 3
 
-// Finding what goes with a note, on the reread page (alongside the reread and footnotes controllers): g, or "Find what
-// goes with this" on the note you're on. The note you're on is held on a card at the top of the column, its groups
-// (its labels, named or not) numbered for the moment and each shown by its face; every other note of the focus is
+// Gathering what goes with a note, on the reread page (alongside the reread and footnotes controllers): g, or "Gather"
+// on the note you're on. The note you're on is held on a card at the top of the column, its groups (its labels, named
+// or not) numbered for the moment and each shown by its face; every other note of the focus is
 // listed under it, each with a button per group and + for a new group of the two. A note is always grouped from the
 // held note's side: you choose among its groups, never the other note's, so a note already in several just gains one.
 //

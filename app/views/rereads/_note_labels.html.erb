@@ -1,7 +1,7 @@
 <%# A note's labels on the reread page. Every note has them as footnotes: a line naming, for each label, the label (if
     it has a name) and its other notes on this focus, each reference showing that note when pointed at. The note you're
-    on also has them as chips you can take off, with + label and "Find what goes with this". An unnamed label's chip
-    shows it "like" another of its notes. The ids are on the element, to light the note when its label is pointed at.
+    on also has them as chips you can take off, with + label and "Gather". An unnamed label's chip shows it "like"
+    another of its notes. The ids are on the element, to light the note when its label is pointed at.
     note; members: each label's notes on this focus, by label id (label_members) %>
 <% members = local_assigns.fetch(:members, {}) %>
 <div class="rr-labels" id="<%= dom_id(note, :labels) %>" data-reread-target="noteLabels" data-compare-target="noteLabels" data-label-ids="<%= note.label_ids.join(" ") %>">
@@ -22,6 +22,6 @@
       <span class="rr-chip" title="<%= label_title(label, from: note) unless label.named? %>"><%= label_face(label, from: note) %><button class="rr-chip-x" type="button" aria-label="Take off “<%= label_title(label, from: note, snippet: false) %>”" data-label-id="<%= label.id %>" data-action="reread#unlabel">×</button></span>
     <% end %>
     <button class="rr-add" type="button" data-action="reread#openPicker" title="Label this note (l)">+ label</button>
-    <button class="rr-find" type="button" data-action="compare#enter" title="Go through the other notes for those that go with this one (g)">Find what goes with this</button>
+    <button class="rr-find" type="button" data-action="compare#enter" title="Gather the notes that go with this one (g)">Gather</button>
   </div>
 </div>

@@ -4,7 +4,7 @@
     note's labels as footnotes. The focus's scratchpad is put away behind a tab at the right edge (a bottom sheet on
     phones); the labels in use, as a cloud or as tallies, come up over its foot, or on their own. Notes on the whole
     focus can be written and edited here, and so can the current focus's notes on passages, as in the reader.
-    "Find what goes with this" (g) turns the column into a comparison: up to three notes held under tabs on a card at
+    "Gather" (g) turns the column into a comparison: up to three notes held under tabs on a card at
     the top, the rest under it, each to put in one of the held note's groups (labels, named or not) or a new group with
     it. Detached notes, whose passages are gone, follow the run, only to read or discard. %>
 <main class="reader reread" data-controller="reread compare footnotes"
@@ -41,11 +41,11 @@
         </span>
       </span>
       <% if @focus.archived? %>· <%= focus_span(@focus) %><% end %>
-      <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to find what goes with it, <kbd>c</kbd> for the labels, <kbd>n</kbd> for a new note, <kbd>s</kbd> the scratchpad</span>
+      <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to gather, <kbd>c</kbd> for the labels, <kbd>n</kbd> for a new note, <kbd>s</kbd> the scratchpad</span>
     </div>
-    <p class="rr-lede rr-cmp-lede">Finding what goes with the note you're on<span class="rr-keys"> · <kbd>j</kbd>/<kbd>k</kbd> through the others, <kbd>1</kbd>–<kbd>9</kbd> or <kbd>+</kbd> to group, <kbd>Enter</kbd> to hold one under a tab, <kbd>[</kbd>/<kbd>]</kbd> from tab to tab, <kbd>x</kbd> to let one go, <kbd>p</kbd>/<kbd>o</kbd> the whole passage or note, <kbd>g</kbd> or × to go back</span></p>
+    <p class="rr-lede rr-cmp-lede">Gathering what goes with the note you're on<span class="rr-keys"> · <kbd>j</kbd>/<kbd>k</kbd> through the others, <kbd>1</kbd>–<kbd>9</kbd> or <kbd>+</kbd> to group, <kbd>Enter</kbd> to hold one under a tab, <kbd>[</kbd>/<kbd>]</kbd> from tab to tab, <kbd>x</kbd> to let one go, <kbd>p</kbd>/<kbd>o</kbd> the whole passage or note, <kbd>g</kbd> or × to go back</span></p>
 
-    <%# Finding what goes with a note: the notes held under tabs at the top of the column, the one you're on with its
+    <%# Gathering what goes with a note: the notes held under tabs at the top of the column, the one you're on with its
         groups numbered for the moment. Drawn from the rows by the compare controller. %>
     <section class="rr-cmp-card" aria-label="The notes you're holding" data-compare-target="card" hidden></section>
 

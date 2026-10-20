@@ -9,7 +9,7 @@
    here, away = focus.user.labels.alphabetical.includes(Label::FACE).partition { counts.key?(it.id) }
    most = counts.values.max || 1 %>
 <div data-reread-target="labelsBody">
-<%# For "Find what goes with this": each label on this focus's notes, its colour, and its face seen from anywhere but
+<%# For "Gather": each label on this focus's notes, its colour, and its face seen from anywhere but
     its example, and from its example (where it shows by its next note). %>
 <script type="application/json" data-compare-target="labels"><%= raw here.map { |label|
   { id: label.id, hue: label.hue, named: label.named?, example: label.example_note_id,
