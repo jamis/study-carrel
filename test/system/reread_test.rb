@@ -126,6 +126,13 @@ class RereadTest < ApplicationSystemTestCase
     assert_equal "Holiness keeps stooping.", note.content.to_plain_text.strip
     assert_selector ".rr-row.here#reread_note_#{note.id}"
 
+    # Moving on shows its text in the row, and coming back opens its editor on it, not on a new note.
+    find("body").send_keys :escape, "k"
+    assert_selector "#reread_note_#{note.id}:not(.here) .rr-note", text: "Holiness keeps stooping."
+    find("body").send_keys "j"
+    within(".rr-row.here#reread_note_#{note.id}") { assert_selector "lexxy-editor [contenteditable]", text: "Holiness keeps stooping." }
+    assert_equal 1, @focus.free_notes.count
+
     find("body").send_keys :escape, "l"
     find(".rr-picker input").send_keys "the poor", :enter
     assert_selector ".rr-row.here .rr-chip", text: "the poor"

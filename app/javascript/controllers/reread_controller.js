@@ -123,6 +123,9 @@ export default class extends Controller {
     row.classList.remove("rr-unsaved")
     row.dataset.noteId = noteId
     row.id = `reread_note_${noteId}`
+    // Its editor loads from where it now saves, and its text shows in the row when you move on.
+    row.dataset.editorUrl = element.action
+    row.querySelector(".rr-note").id = `reread_text_note_${noteId}`
     if (fresh) {
       const labels = row.querySelector("[data-label-ids]")
       labels.id = `labels_note_${noteId}`
