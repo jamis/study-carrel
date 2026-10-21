@@ -3,10 +3,14 @@
   <%= turbo_stream.append "reread_free", partial: "rereads/row", locals: { note: @note, focus: @focus, here: false } %>
 <% else %>
   <%# The new note's editor made it: its row's labels, now it has an id to label, its number, and its text, for when
-      the editor moves on. %>
+      the editor moves on. In the reader's note sheet, its head (its number, no longer "new") and its text. %>
   <%= turbo_stream.replace "new_note_labels", partial: "rereads/note_labels", locals: { note: @note } %>
   <%= turbo_stream.replace "new_note_ref" do %><span class="rr-ref rr-whole"><span class="rr-cite">Focus <%= @note.number %></span> · <%= l @note.created_at.to_date, format: :long %></span><% end %>
   <%= turbo_stream.update dom_id(@note, :reread_text) do %><%= @note.content %><% end %>
+  <%= turbo_stream.replace "new_focus_note_head", partial: "readings/focus_note_head",
+        locals: { id: dom_id(@note, :focus_sheet_head), number: @note.number, date: @note.created_at.to_date, fresh: false } %>
+  <%= turbo_stream.update dom_id(@note, :focus_sheet_text) do %><%= @note.content.to_plain_text %><% end %>
 <% end %>
 <%= turbo_stream.update "reread_labels", partial: "rereads/labels", locals: { focus: @focus, notes: @focus.notes_for_reread } %>
 <%= turbo_stream.replace "focus_notes_link", partial: "notes/menu_link", locals: { focus: @focus } if @focus == Current.focus %>
+<%= turbo_stream.replace "focus_sheet_all", partial: "readings/focus_all", locals: { focus: @focus } %>

@@ -35,11 +35,34 @@ class ReadingsControllerTest < ActionDispatch::IntegrationTest
 
   test "the phone sheet's handle shows the start of the note, or invites one" do
     get reading_path("isaiah-kjv", 40, 25)
-    assert_select ".panel-handle .preview.empty", "Write a note"
+    assert_select ".panel-handle .handle-unit .preview.empty", "Write a note"
 
     @focus.notes.create!(unit: verse(25), content: "<p>The holy as the <em>incomparable</em>.</p>")
     get reading_path("isaiah-kjv", 40, 25)
-    assert_select ".panel-handle .preview:not(.empty)", "The holy as the incomparable."
+    assert_select ".panel-handle .handle-unit .preview:not(.empty)", "The holy as the incomparable."
+  end
+
+  test "the note sheet's focus tab lists the notes on the whole focus, newest first, under a slip for a new one" do
+    get reading_path("isaiah-kjv", 40, 25)
+    assert_select "#sheet_tab_focus .tab-count", ""
+    assert_select "#sheet_pane_focus .fs-new", /New note/
+    assert_select "#sheet_pane_focus .fs-empty", /Focus 1, Focus 2/
+    assert_select ".handle-focus .preview", "No notes on the focus yet"
+    assert_select "#sheet_pane_focus template .fs-num", "Focus 1"
+
+    @focus.notes.create!(unit: verse(3), content: "On a passage")
+    first = @focus.notes.create!(content: "Holiness keeps arriving as comparison", created_at: 2.days.ago)
+    second = @focus.notes.create!(content: "<p>Off the scale entirely</p>")
+    get reading_path("isaiah-kjv", 40, 25)
+    assert_select "#sheet_tab_focus .tab-count", "(2)"
+    assert_select "#sheet_pane_focus .fs-notes .fs-note", 2
+    assert_select "#sheet_pane_focus .fs-notes .fs-note:first-child[data-editor-url=?] .fs-num", focus_note_path(@focus, second), "Focus 2"
+    assert_select "#sheet_pane_focus .fs-notes .fs-note:last-child[data-editor-url=?] .fs-num", focus_note_path(@focus, first), "Focus 1"
+    assert_select "##{ActionView::RecordIdentifier.dom_id(second, :focus_sheet_text)}", "Off the scale entirely"
+    assert_select "#sheet_pane_focus template .fs-num", "Focus 3"
+    assert_select ".handle-focus .preview", "2 notes on the whole focus"
+    assert_select "#focus_sheet_all[href=?]", focus_notes_path(@focus), text: "All 3 notes on this focus →"
+    assert_select "#sheet_pane_focus lexxy-editor", 0 # nothing open until asked
   end
 
   test "Random rolls in the innermost collection, with the wider scopes behind a disclosure" do

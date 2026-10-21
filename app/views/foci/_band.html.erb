@@ -1,21 +1,20 @@
 <%# The focus, standing directly over the passage: a thought bubble in the keep ribbon's slot (so the focus lines up with
-    the reference below), the focus itself with a chevron at the end of its last line, and a rule across the column. %>
-<section class="focus" data-controller="focus" data-action="click@document->focus#closeOutside keydown.esc@window->focus#escape">
-  <button class="focus-head" type="button" aria-expanded="false" title="About this focus" data-focus-target="head" data-action="focus#toggle">
-    <%= render "foci/mark" %>
-    <span class="focus-line"><h1 class="focus-title"><%= focus.title %></h1><span class="focus-caret"><svg viewBox="0 0 13 8" aria-hidden="true"><path d="M1.5 1.5 6.5 6.5 11.5 1.5"/></svg></span></span>
-  </button>
-  <div class="focus-body"><div class="focus-body-in">
-    <% if focus.description.present? %>
-      <%= simple_format(h(focus.description)) %>
-    <% else %>
-      <p><em>No description yet. <%= link_to "Add one", edit_focus_path(focus) %>.</em></p>
-    <% end %>
-    <div class="focus-actions">
-      <%= link_to "Edit focus", edit_focus_path(focus), class: "chip" %>
-      <%= link_to "New focus", new_focus_path, class: "chip",
-            data: { turbo_confirm: "Start a new focus? This one will be archived; you can bring it back from All focuses." } %>
-      <%= link_to "All focuses", foci_path, class: "chip" %>
+    the reference below), the focus itself and a rule across the column. With a description, a chevron at the end of
+    its last line drops the description, and nothing else: editing the focus is done from the cards and its notes page.
+    Without one, the focus is only read. %>
+<% if focus.description.present? %>
+  <section class="focus" data-controller="focus" data-action="click@document->focus#closeOutside keydown.esc@window->focus#escape">
+    <button class="focus-head" type="button" aria-expanded="false" title="About this focus" data-focus-target="head" data-action="focus#toggle">
+      <%= render "foci/mark" %>
+      <span class="focus-line"><h1 class="focus-title"><%= focus.title %></h1><span class="focus-caret"><svg viewBox="0 0 13 8" aria-hidden="true"><path d="M1.5 1.5 6.5 6.5 11.5 1.5"/></svg></span></span>
+    </button>
+    <div class="focus-body"><div class="focus-body-in"><%= simple_format(h(focus.description)) %></div></div>
+  </section>
+<% else %>
+  <section class="focus">
+    <div class="focus-head">
+      <%= render "foci/mark" %>
+      <span class="focus-line"><h1 class="focus-title"><%= focus.title %></h1></span>
     </div>
-  </div></div>
-</section>
+  </section>
+<% end %>

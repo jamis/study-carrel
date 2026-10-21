@@ -21,6 +21,18 @@ Visual tone (ideas, not decisions): quiet study desk, not a productivity tool. S
 - Prose is read a sentence at a time; see [prose-by-sentence.md](prose-by-sentence.md).
 - Full-chapter reading view deferred as a possible future option.
 
+### The note sheet
+
+**The note sheet has two tabs** (decided 2026-10-20; prototype `prototype/reader/focus-sheet.html`, transient): "Note · Isaiah 40:25", the passage's note as before, and "The focus (3)", with the thought bubble and the count of notes on the whole focus. Before, the sheet held only the passage's note, and the reader had no way to write what you notice across passages.
+
+- **The tab stays where you put it**: changing verse doesn't switch back, and it's kept for the sitting (sessionStorage), so the next chapter opens on it too. A new tab or window starts on the passage. The passage tab's label follows the verse you're on.
+- `f` turns between the tabs; `n` on the focus tab starts a note (both ignored while typing).
+- **The focus tab is a list, not an open editor** (an open editor read as a scratchpad, and would quietly number a stray thought): a dashed "+ New note" slip at the top, then the notes on the whole focus newest first ("Focus 3 · Oct 18", up to three lines), and "All 12 notes on this focus →" at the foot, to the notes page. None yet: one faint line under the slip, "What you notice across passages rather than in one. Each is numbered on the focus: Focus 1, Focus 2…"
+- **+ New note** turns the slip into an editor headed "Focus 4 · Oct 20 · new"; the number is handed out at the first save. Esc, or leaving it while still empty, puts the slip back.
+- **Clicking a note** opens it as an editor in place, the caret at the end. One open at a time: opening another closes it. A note with text stays open when you click away, until Esc or another is opened (revisit if it bothers). Cleared, it's deleted, its number not reused; writing again makes a new note with the next number.
+- No labels here: labelling is the reread's business.
+- **Phones**: the bottom sheet's handle shows the tab it's on: the reference and the note's first line, or "Focus" and the open note's first line, "3 notes on the whole focus", or "No notes on the focus yet". No `n` hint on the slip.
+
 ### Clause by clause
 
 **A long passage can be read a clause at a time** (decided 2026-10-12, in every text, not only prose). Prototype: `prototype/reader/clauses.html`. Of its four looks (Spotlight dimming the rest, Lines setting a clause to a line, Magnify shrinking the rest, Marker highlighting) **Marker with Spotlight's dimming** was chosen: the current clause on a soft highlight, the rest of the passage dimmed in place, nothing reflowed.

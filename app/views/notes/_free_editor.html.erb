@@ -1,12 +1,13 @@
 <%# The editor for a note on the focus as a whole (note: nil for a new one, whose first save makes it). It saves to its
-    own focus, the current one or a past one. %>
-<%= turbo_frame_tag "note_editor" do %>
+    own focus, the current one or a past one. frame: the reread's note_editor, or the reader's focus_note_editor (whose
+    passage's editor is note_editor). %>
+<%= turbo_frame_tag local_assigns.fetch(:frame, "note_editor") do %>
   <%= form_with model: (note || Note.new), url: (note ? focus_note_path(focus, note) : focus_notes_path(focus)), method: (note ? :put : :post),
         data: { controller: "autosave", autosave_focus_id_value: focus.id, autosave_key_value: (note ? "free-#{note.id}" : "free-new-#{focus.id}"),
                 action: "submit->autosave#prevent" } do |form| %>
     <%= form.rich_textarea :content, preset: "notes", rows: 4, placeholder: "What do you see across these passages?",
           aria: { label: "Note on the whole focus" },
           data: { autosave_target: "editor", action: "lexxy:initialize->autosave#ready lexxy:change->autosave#changed lexxy:blur->autosave#save" } %>
-    <p class="autosave-status" aria-live="polite" data-autosave-target="status">&nbsp;</p>
+    <p class="autosave-status" aria-live="polite" data-autosave-target="status"></p>
   <% end %>
 <% end %>

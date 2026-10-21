@@ -23,6 +23,29 @@ class FreeNotesControllerTest < ActionDispatch::IntegrationTest
     assert_match %(target="new_note_labels"), response.body
   end
 
+  test "the reader's note sheet opens them in a frame of its own, and the saves reply to it too" do
+    get new_focus_note_path(@focus), headers: { "Turbo-Frame" => "focus_note_editor" }
+    assert_select "turbo-frame#focus_note_editor form[action=?]", focus_notes_path(@focus)
+    assert_select "turbo-frame#note_editor", 0
+
+    post focus_notes_path(@focus), params: { note: { content: "<p>Holiness keeps stooping.</p>" } }, as: :turbo_stream
+    note = @focus.free_notes.sole
+    assert_match %(target="new_focus_note_head"), response.body
+    assert_match %(id="#{ActionView::RecordIdentifier.dom_id(note, :focus_sheet_head)}"), response.body
+    assert_match %(target="#{ActionView::RecordIdentifier.dom_id(note, :focus_sheet_text)}"), response.body
+    assert_match %(target="focus_sheet_all"), response.body
+    assert_match "All 2 notes on this focus", response.body
+
+    put focus_note_path(@focus, note), params: { note: { content: "<p>Stooping, still.</p>" } }, as: :turbo_stream
+    assert_match %(target="#{ActionView::RecordIdentifier.dom_id(note, :focus_sheet_text)}"), response.body
+
+    # Cleared: its head becomes a new note's again, with the next number (its own isn't reused).
+    put focus_note_path(@focus, note), params: { note: { content: "" } }, as: :turbo_stream
+    assert_match %(target="#{ActionView::RecordIdentifier.dom_id(note, :focus_sheet_head)}"), response.body
+    assert_match %(id="new_focus_note_head"), response.body
+    assert_match "Focus 2", response.body
+  end
+
   test "an empty first save makes nothing" do
     assert_no_difference -> { Note.count } do
       post focus_notes_path(@focus), params: { note: { content: "" } }, as: :turbo_stream

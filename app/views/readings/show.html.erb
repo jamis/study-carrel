@@ -83,19 +83,39 @@
     </article>
   </div>
 
-  <aside class="panel" data-controller="sheet" data-action="keydown.esc@window->sheet#escape note:text@window->sheet#preview">
+  <%# The note sheet, turned between two tabs: the passage's note, and the focus (its notes on the whole focus). The tab
+      stays put as the verse changes; f turns it. On phones, a bottom sheet whose handle shows the tab it's on. %>
+  <% free_count = @free_notes.size %>
+  <aside class="panel" data-controller="sheet focus-sheet"
+         data-focus-sheet-next-value="<%= @focus.free_notes_numbered + 1 %>"
+         data-focus-sheet-new-url-value="<%= new_focus_note_path(@focus) %>"
+         data-action="keydown.esc@window->focus-sheet#escape keydown.esc@window->sheet#escape keydown@document->focus-sheet#key note:text@window->focus-sheet#text note:saved@window->focus-sheet#saved">
     <button class="panel-handle" type="button" aria-expanded="false" data-sheet-target="handle" data-action="sheet#toggle">
-      <span class="panel-label">Note</span>
-      <span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span>
-      <span class="preview<%= " empty" if note_text.blank? %>" data-sheet-target="preview"><%= note_text.presence || "Write a note" %></span>
+      <span class="handle-tab handle-unit">
+        <span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span>
+        <span class="preview<%= " empty" if note_text.blank? %>" data-focus-sheet-target="unitPreview"><%= note_text.presence || "Write a note" %></span>
+      </span>
+      <span class="handle-tab handle-focus">
+        <span class="panel-label">Focus</span>
+        <span class="preview empty" data-focus-sheet-target="focusPreview"><%= free_count.zero? ? "No notes on the focus yet" : "#{pluralize(free_count, "note")} on the whole focus" %></span>
+      </span>
       <span class="go" data-sheet-target="label" aria-hidden="true">▴</span>
     </button>
-    <div class="panel-head">
-      <span class="panel-label">Note</span>
-      <span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span>
+    <div class="tabs" role="tablist" aria-label="Notes">
+      <button class="tab tab-unit" type="button" role="tab" id="sheet_tab_unit" aria-controls="sheet_pane_unit" aria-selected="true"
+              data-focus-sheet-target="tab" data-tab="unit" data-action="focus-sheet#pick">
+        <span class="tab-name">Note ·</span><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span>
+      </button>
+      <button class="tab" type="button" role="tab" id="sheet_tab_focus" aria-controls="sheet_pane_focus" aria-selected="false" title="Notes on the whole focus (f)"
+              data-focus-sheet-target="tab" data-tab="focus" data-action="focus-sheet#pick">
+        <%= render "foci/mark" %>The focus<span class="tab-count" data-focus-sheet-target="count"><%= "(#{free_count})" if free_count.positive? %></span><kbd class="key">f</kbd>
+      </button>
     </div>
-    <div class="composer">
-      <%= render "unit_notes/editor", unit: @current, note: @notes_by_unit[@current.id], focus: @focus %>
-    </div>
+    <section class="pane" id="sheet_pane_unit" role="tabpanel" aria-labelledby="sheet_tab_unit" data-focus-sheet-target="pane" data-tab="unit">
+      <div class="composer">
+        <%= render "unit_notes/editor", unit: @current, note: @notes_by_unit[@current.id], focus: @focus %>
+      </div>
+    </section>
+    <%= render "readings/focus_pane", focus: @focus, notes: @free_notes %>
   </aside>
 </main>

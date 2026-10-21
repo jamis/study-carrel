@@ -15,7 +15,8 @@ One focus at a time. No parallel foci in v1. The focus is the app's current stat
 - A dashed "A new question" card starts a new focus. No totals or tallies across focuses.
 - No focuses yet: you go to the new-focus form.
 - "Continue reading" (in the rail off the reader, and the current focus's card) is `/continue`, which resumes the current focus where it left off.
-- After **starting** a focus you go straight to reading. After **editing** one or **making one current** you come back to the cards, as does Cancel on either form.
+- Every card has an **Edit** (decided 2026-10-20; editing used to be a chip in the reader's description dropdown), above a past card's button like its notes link. The notes page has "Edit focus" in its head.
+- After **starting** a focus you go straight to reading. After **editing** one or **making one current** you come back to the cards, as does Cancel on either form; editing from the notes page comes back to the notes page (`?back=notes`).
 - The UI says "focuses", never "foci" (the code keeps `Focus`/`foci`).
 
 ## Focus presentation
@@ -24,7 +25,8 @@ One focus at a time. No parallel foci in v1. The focus is the app's current stat
 
 - No label. The focus in soft-ink italic, 19–22px, accent on hover; a statement (a thesis, a metaphor) mustn't pass for the passage's title, and the soft italic reads as an epigraph, not a heading.
 - A small thought bubble before it, in the faint ink of the keep ribbon and in the ribbon's slot, so the focus lines up with the reference below; wrapped lines stay clear of it. (The drawing is a stand-in, to be replaced with a better one.)
-- A chevron at the end of its last line opens the description as a dropdown.
+- With a description, a chevron at the end of its last line drops it, and **only the description** (decided 2026-10-20): no buttons or links in it. "Edit focus", "New focus" and "All focuses" went: editing is done from the cards and the notes page, a new focus is the dashed card, and All focuses is the rail's "Your focuses". It closes on a second click, a click outside, or Esc, and never touches the note sheet.
+- **Without a description**, no chevron and nothing to click: the focus isn't a button, takes no hover colour and has no title. (It used to drop "No description yet. Add one.")
 - A hairline rule across the whole column sets it off from the passage.
 - Not sticky: it scrolls away with the top of a long passage, and the reference row sticks to the top instead. On phones it starts level with the ⋯ and keeps clear of it.
 - Left-aligned (decided 2026-10-03), flush with the body text.
@@ -35,7 +37,7 @@ History: a thin bar felt lost and a large hero banner too big; a filled pill wit
 
 **One note per verse per focus** (decided 2026-10-03), enforced by a unique index on `(focus_id, unit_id)`.
 
-**Notes on the focus as a whole** (decided 2026-10-13): what you notice across passages rather than on one. They have no unit (`notes.unit_id` is empty; the index still holds one note per passage, as SQLite treats each NULL as distinct), any number per focus, labelled like any note. They're written on the notes page, the reread (see [reread.md](reread.md)), not in the reader, and saved to their own focus, so a past focus's can be written and changed too. They follow the notes on passages under "On the whole focus", each headed by its number and date ("Focus 2 · October 14") where a passage would be; in the export, a "## On the whole focus" section. They count on the focus's card but name no work.
+**Notes on the focus as a whole** (decided 2026-10-13): what you notice across passages rather than on one. They have no unit (`notes.unit_id` is empty; the index still holds one note per passage, as SQLite treats each NULL as distinct), any number per focus, labelled like any note. They're written on the notes page, the reread (see [reread.md](reread.md)), and in the reader from the note sheet's focus tab (decided 2026-10-20; see [reader.md](reader.md)), always by an explicit "+ New note", never an open editor that would number a stray thought. They're saved to their own focus, so a past focus's can be written and changed too. They follow the notes on passages under "On the whole focus", each headed by its number and date ("Focus 2 · October 14") where a passage would be; in the export, a "## On the whole focus" section. They count on the focus's card but name no work.
 
 - **Numbered on their focus** (decided 2026-10-20): "focus 2" is how one is referred to wherever a passage's note would be "40:12" (footnotes, a group's notes, the held notes' tabs, "like focus 2"). A scripture reference says little about what's in the note either, and a pop-up shows the note itself. "whole, Oct 14" was tried first: "whole" read badly, and two notes written the same day couldn't be told apart. The number is stored (`notes.number`) and never reused: the focus counts what it has handed out (`foci.free_notes_numbered`), so a deleted note leaves a gap, as a missing verse would, rather than a reference quietly coming to mean another note. A note cleared and written again is a new note, with the next number.
 

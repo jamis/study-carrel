@@ -1,0 +1,24 @@
+<%# The note sheet's focus tab: a list, not an open editor. A blank slip starts a note on the focus as a whole, then
+    the notes on the whole focus, newest first; the one you open becomes its editor in place (focus_sheet_controller). %>
+<section class="pane" id="sheet_pane_focus" role="tabpanel" aria-labelledby="sheet_tab_focus" data-focus-sheet-target="pane" data-tab="focus" hidden>
+  <div class="fs-list" data-action="focusout->focus-sheet#left">
+    <button class="fs-new" type="button" title="A note on the focus as a whole (n)" data-focus-sheet-target="slip" data-action="focus-sheet#newNote">+ New note<kbd>n</kbd></button>
+    <p class="fs-empty">What you notice across passages rather than in one. Each is numbered on the focus: Focus 1, Focus 2…</p>
+    <div class="fs-notes" data-focus-sheet-target="notes">
+      <% notes.each do |note| %>
+        <%= render "readings/focus_note", note:, focus: %>
+      <% end %>
+    </div>
+  </div>
+  <p class="fs-foot"><%= render "readings/focus_all", focus: %></p>
+
+  <%# A new note, before its first save makes it (and gives it its number). %>
+  <template data-focus-sheet-target="newRow">
+    <article class="fs-note fs-unsaved" data-focus-sheet-target="row" data-editor-url="<%= new_focus_note_path(focus) %>">
+      <button class="fs-open" type="button" aria-label="Open this note" data-action="focus-sheet#open"></button>
+      <%= render "readings/focus_note_head", id: "new_focus_note_head", number: focus.free_notes_numbered + 1, date: Date.current, fresh: true %>
+      <div class="fs-text"></div>
+      <div class="fs-editor composer"></div>
+    </article>
+  </template>
+</section>

@@ -1,0 +1,6 @@
+<%# The head of a note on the whole focus, on the reader's note sheet: its number and date. Before its first save hands
+    the number out it's marked new, and the number shown is the one it will likely get (data-number only once it's
+    its own). %>
+<%= tag.div id:, class: "fs-meta", data: { focus_sheet_target: "head", number: (number unless fresh) } do %>
+  <span><span class="fs-num">Focus <%= number %></span> · <%= date.strftime("%b %-d") %></span><% if fresh %><span class="fs-fresh">new</span><% end %>
+<% end %>

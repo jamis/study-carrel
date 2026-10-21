@@ -84,7 +84,9 @@ class AllNotesTest < ActionDispatch::IntegrationTest
   test "empty state" do
     get focus_notes_path(@focus)
     assert_select ".page-empty"
-    assert_select ".page-actions", 0
+    assert_select ".page-actions a", text: /Edit/
+    assert_select ".page-actions button", 0
+    assert_select ".page-actions a[href=?]", export_focus_notes_path(@focus), 0
   end
 
   test "the reading page links to it with a count" do

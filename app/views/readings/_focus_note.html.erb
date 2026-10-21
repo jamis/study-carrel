@@ -1,0 +1,9 @@
+<%# A note on the whole focus, in the note sheet's list: its head and the first lines of its text, the whole row a
+    button that opens its editor in place. %>
+<article class="fs-note" id="<%= dom_id(note, :focus_sheet) %>" data-focus-sheet-target="row" data-note-id="<%= note.id %>"
+         data-editor-url="<%= focus_note_path(focus, note) %>">
+  <button class="fs-open" type="button" aria-label="Open this note" data-action="focus-sheet#open"></button>
+  <%= render "readings/focus_note_head", id: dom_id(note, :focus_sheet_head), number: note.number, date: note.created_at.to_date, fresh: false %>
+  <div class="fs-text" id="<%= dom_id(note, :focus_sheet_text) %>"><%= note.content.to_plain_text %></div>
+  <div class="fs-editor composer"></div>
+</article>

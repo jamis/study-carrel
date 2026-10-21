@@ -1,0 +1,2 @@
+<% count = focus.notes.count %>
+<%= link_to (count > 1 ? "All #{count} notes on this focus →" : "Notes on this focus →"), focus_notes_path(focus), id: "focus_sheet_all" %>

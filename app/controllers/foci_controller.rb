@@ -32,7 +32,7 @@ class FociController < ApplicationController
 
   def update
     if @focus.update(focus_params)
-      redirect_to foci_path
+      redirect_to back_path
     else
       render :edit, status: :unprocessable_entity
     end
@@ -48,6 +48,10 @@ class FociController < ApplicationController
   private
 
   def foci = Current.user.foci
+
+  # Editing from a focus's notes page goes back there (?back=notes), as does Cancel; from its card, back to the cards.
+  def back_path = params[:back] == "notes" ? focus_notes_path(@focus) : foci_path
+  helper_method :back_path
 
   def set_focus = @focus = foci.find(params[:id])
 

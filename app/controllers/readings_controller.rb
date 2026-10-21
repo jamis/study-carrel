@@ -10,6 +10,7 @@ class ReadingsController < ApplicationController
     @previous_section = @section.previous_section
     @next_section = @section.next_section
     @notes_by_unit = @focus.notes.where(unit: @units).index_by(&:unit_id)
+    @free_notes = @focus.notes.free.includes(:rich_text_content).order(created_at: :desc, id: :desc).to_a
     @kept = Current.user.keeps.where(unit: @units).pluck(:unit_id, :remark).to_h { |id, remark| [ id, remark.to_s ] }
   end
 

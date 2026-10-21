@@ -146,10 +146,10 @@ export default class extends Controller {
     } catch {}
   }
 
-  // The plain text, for the phone sheet's handle (sheet_controller.js).
+  // The plain text, for the phone sheet's handle (sheet_controller.js, focus_sheet_controller.js).
   #announceText() {
     const text = new DOMParser().parseFromString(this.editorTarget.value, "text/html").body.textContent.replace(/\s+/g, " ").trim()
-    window.dispatchEvent(new CustomEvent(`${this.paramValue}:text`, { detail: { text } }))
+    window.dispatchEvent(new CustomEvent(`${this.paramValue}:text`, { detail: { text, element: this.element } }))
   }
 
   #status(text) {

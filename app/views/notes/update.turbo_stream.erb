@@ -1,3 +1,11 @@
 <%# On the reread page, the note's text in its row, for when the editor moves on (empty if it was cleared). %>
 <%= turbo_stream.update dom_id(@note, :reread_text) do %><%= @note.content if @note.persisted? %><% end %>
+<%# In the reader's note sheet, likewise; cleared, it was deleted, and writing again makes a new note with the next number. %>
+<% if @note.persisted? %>
+  <%= turbo_stream.update dom_id(@note, :focus_sheet_text) do %><%= @note.content.to_plain_text %><% end %>
+<% else %>
+  <%= turbo_stream.replace dom_id(@note, :focus_sheet_head), partial: "readings/focus_note_head",
+        locals: { id: "new_focus_note_head", number: @focus.free_notes_numbered + 1, date: Date.current, fresh: true } %>
+<% end %>
 <%= turbo_stream.replace "focus_notes_link", partial: "notes/menu_link", locals: { focus: @focus } if @focus == Current.focus %>
+<%= turbo_stream.replace "focus_sheet_all", partial: "readings/focus_all", locals: { focus: @focus } %>

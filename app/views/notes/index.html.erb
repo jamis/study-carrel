@@ -18,12 +18,13 @@
 
   <div class="reader-col reread-col">
     <%= page_head [ [ "Your focuses", foci_path ], [ "Notes" ] ] do %>
-      <% if @all.any? || @detached&.any? %>
-        <span class="page-actions" data-controller="clipboard" data-clipboard-url-value="<%= export_focus_notes_path(@focus) %>">
+      <span class="page-actions" data-controller="clipboard" data-clipboard-url-value="<%= export_focus_notes_path(@focus) %>">
+        <%= link_to safe_join(["Edit", tag.span(" focus", class: "wide-only")]), edit_focus_path(@focus, back: "notes"), class: "chip" %>
+        <% if @all.any? || @detached&.any? %>
           <button class="chip" type="button" data-action="clipboard#copy" data-clipboard-target="button">Copy<span class="wide-only"> Markdown</span></button>
           <%= link_to safe_join(["Download", tag.span(" .md", class: "wide-only")]), export_focus_notes_path(@focus), class: "chip", data: { turbo: false } %>
-        </span>
-      <% end %>
+        <% end %>
+      </span>
     <% end %>
     <header class="rr-focus">
       <div class="nb-focus-head"><%= render "foci/mark" %><h1 class="nb-focus-title"><%= @focus.title %></h1></div>

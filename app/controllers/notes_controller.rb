@@ -16,8 +16,8 @@ class NotesController < ApplicationController
 
   # The editor for a new note on the focus as a whole, and for one already written. Any focus's, past ones too: unlike
   # a passage's note, which the reader saves under the current focus, these are saved to their own focus.
-  def new = render(partial: "notes/free_editor", locals: { focus: @focus, note: nil })
-  def show = render(partial: "notes/free_editor", locals: { focus: @focus, note: @note })
+  def new = render(partial: "notes/free_editor", locals: { focus: @focus, note: nil, frame: editor_frame })
+  def show = render(partial: "notes/free_editor", locals: { focus: @focus, note: @note, frame: editor_frame })
 
   # A new free note: its editor's first save, or text made a note of from the scratchpad (lift). The reply says where
   # the editor saves from now on.
@@ -56,6 +56,9 @@ class NotesController < ApplicationController
   # Only the reader's own focuses: anyone else's is a 404.
   def set_focus = @focus = Current.user.foci.find(params[:focus_id])
   def set_free_note = @note = @focus.notes.free.find(params[:id])
+
+  # The reader's note sheet opens these editors in a frame of their own, beside the passage's (note_editor).
+  def editor_frame = request.headers["Turbo-Frame"] == "focus_note_editor" ? "focus_note_editor" : "note_editor"
 
   def saved_to(url, method)
     response.set_header "X-Noted", @note.persisted?.to_s

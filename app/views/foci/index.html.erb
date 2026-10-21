@@ -26,13 +26,14 @@
         <% end %>
         <div class="card-foot">
           <span class="card-notes"><%= notes_line(@note_counts.fetch(focus.id, 0), @works_read.fetch(focus.id, []), link: focus_notes_path(focus)) %></span>
+          <%= link_to "Edit", edit_focus_path(focus), class: "card-edit", aria: { label: "Edit “#{focus.title}”" } %>
         </div>
       </article>
     <% end %>
     <% @past.each do |focus| %>
       <article class="card card-past" style="view-transition-name: focus-<%= focus.id %>">
-        <%# The whole card is the button: it's stretched over the card, under everything but the notes link, which only
-            reads the focus's notes and leaves it in the past. %>
+        <%# The whole card is the button: it's stretched over the card, under everything but the notes link and Edit,
+            which leave it in the past. %>
         <%= button_to restore_focus_path(focus), method: :patch, class: "card-pick", form_class: "inline-form",
               title: "Make this focus current", aria: { label: "Make “#{focus.title}” current" } do %><% end %>
         <div class="card-label"><%= focus_span(focus) %></div>
@@ -40,6 +41,7 @@
         <% if focus.description.present? %><p class="card-desc card-clamp"><%= focus.description %></p><% end %>
         <div class="card-foot">
           <span class="card-notes"><%= notes_line(@note_counts.fetch(focus.id, 0), @works_read.fetch(focus.id, []), link: focus_notes_path(focus)) %></span>
+          <%= link_to "Edit", edit_focus_path(focus), class: "card-edit", aria: { label: "Edit “#{focus.title}”" } %>
         </div>
       </article>
     <% end %>

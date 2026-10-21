@@ -60,8 +60,10 @@
   .focus::after { content: ""; display: block; height: 1px; margin-top: 14px; background: var(--rule); }
   .focus-head {
     display: flex; align-items: flex-start; gap: 7px;
-    width: 100%; padding: 0; border: 0; background: none; text-align: left; cursor: pointer;
+    width: 100%; padding: 0; border: 0; background: none; text-align: left;
   }
+  /* Only a focus with a description is a button (it drops the description); one without is only read. */
+  button.focus-head { cursor: pointer; }
   /* A thought bubble in the keep ribbon's slot, so the focus lines up with the reference below; wrapped lines stay clear of it. */
   .focus-mark { flex: none; width: 17px; height: 16px; margin-top: .4em; fill: none; stroke: var(--ink-faint); stroke-width: 1.3; }
   .focus-title {
@@ -71,8 +73,8 @@
   /* The chevron rides at the end of the focus's last line. */
   .focus-caret { display: inline-block; margin-left: 6px; vertical-align: .12em; line-height: 0; transition: transform .2s; }
   .focus-caret svg { width: 13px; height: 8px; fill: none; stroke: var(--ink-faint); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-  .focus-head:hover .focus-title { color: var(--accent); }
-  .focus-head:hover .focus-mark, .focus-head:hover .focus-caret svg { stroke: var(--accent); }
+  button.focus-head:hover .focus-title { color: var(--accent); }
+  button.focus-head:hover .focus-mark, button.focus-head:hover .focus-caret svg { stroke: var(--accent); }
   .focus.open .focus-caret { transform: rotate(180deg); }
   .focus-body {
     display: none; position: absolute; left: -16px; top: calc(100% + 8px); z-index: 25; width: min(560px, calc(100vw - 16px));
@@ -80,10 +82,10 @@
     background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--shadow);
   }
   .focus.open .focus-body { display: block; }
-  .focus-body-in { padding: 14px 16px 18px; color: var(--ink-soft); font-size: 17px; }
+  .focus-body-in { padding: 14px 16px 16px; color: var(--ink-soft); font-size: 17px; }
   .focus-body-in > p { max-width: 60ch; }
   .focus-body p { margin: 0 0 10px; }
-  .focus-actions { display: flex; gap: 8px; align-items: center; font-family: var(--sans); }
+  .focus-body p:last-child { margin-bottom: 0; }
   @media (max-width: 599px) {
     .focus-body { left: -8px; }
   }
@@ -382,6 +384,64 @@
   .panel .ref-section { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .panel .ref-unit { flex: none; white-space: pre; }
 
+  /* The reader's sheet turns between two tabs, small caps like a label: the passage's note and the focus. */
+  .tabs { flex: none; display: flex; gap: 2px; margin: -6px -10px 14px; font-family: var(--sans); }
+  .tab {
+    position: relative; display: flex; align-items: center; gap: 7px; min-width: 0; padding: 7px 10px 9px; border: 0; border-radius: 8px 8px 0 0;
+    background: none; cursor: pointer; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); white-space: nowrap;
+  }
+  .tab:hover { color: var(--ink-soft); }
+  .tab[aria-selected="true"] { color: var(--ink); }
+  .tab[aria-selected="true"]::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 2px; height: 2px; border-radius: 1px; background: var(--accent); }
+  .tab-unit { flex: 0 1 auto; }
+  .tab-name { flex: none; }
+  .tab .ref { color: inherit; }
+  .tab .focus-mark { width: 13px; height: 12px; margin: 0; stroke: currentColor; }
+  .tab-count { letter-spacing: 0; font-variant-numeric: tabular-nums; color: var(--ink-faint); }
+  .tab .key { margin-left: 2px; font: 10px var(--sans); color: var(--ink-faint); opacity: 0; transition: opacity .15s; }
+  .tabs:hover .key { opacity: 1; }
+  .pane { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .pane[hidden] { display: none; }
+
+  /* The focus tab: a list, not an open editor. A blank slip to start a note on the whole focus, then those notes,
+     newest first; the one you open becomes its editor in place. */
+  .fs-list { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -10px; padding: 0 10px 12px; }
+  .fs-new {
+    display: block; width: 100%; margin: 0 0 8px; padding: 12px 14px; border: 1px dashed var(--rule); border-radius: 10px; background: none;
+    text-align: left; cursor: pointer; font-family: var(--serif); font-size: 16px; font-style: italic; color: var(--ink-faint);
+  }
+  .fs-new[hidden] { display: none; }
+  .fs-new:hover { border-color: var(--accent); color: var(--accent); }
+  .fs-new kbd { float: right; font: 12px var(--sans); color: var(--ink-faint); }
+  .fs-empty { margin: 4px 2px 0; font-size: 14px; line-height: 1.5; font-style: italic; color: var(--ink-faint); }
+  .fs-list:has(.fs-note) .fs-empty { display: none; }
+  .fs-note { position: relative; padding: 12px 4px; border-bottom: 1px solid var(--rule); }
+  .fs-open { position: absolute; inset: 0; z-index: 1; width: 100%; padding: 0; border: 0; border-radius: inherit; background: none; cursor: pointer; }
+  .fs-note:not(.open):hover .fs-text { color: var(--ink); }
+  .fs-note:not(.open):hover .fs-num { color: var(--accent); }
+  .fs-meta { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 4px; font-family: var(--sans); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-faint); }
+  .fs-num { color: var(--ink-soft); }
+  .fs-fresh { letter-spacing: .1em; color: var(--accent); }
+  .fs-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: 15.5px; line-height: 1.5; color: var(--ink-soft); white-space: pre-line; }
+  .fs-editor { display: none; }
+  .fs-note.open { margin: 8px 0; padding: 12px 14px 4px; border: 1px solid var(--rule); border-radius: 10px; background: var(--bg); }
+  /* Open, the card stands on its own, not under the rule of the note above it. */
+  .fs-note:has(+ .fs-note.open) { border-bottom-color: transparent; }
+  .fs-note.open :is(.fs-open, .fs-text) { display: none; }
+  .fs-note.open .fs-num { color: var(--accent); }
+  .fs-note.open .fs-editor { display: flex; flex: none; }
+  .fs-note .fs-editor :is(turbo-frame, form, lexxy-editor) { flex: none; }
+  .fs-note .fs-editor lexxy-editor { --lexxy-color-canvas: var(--bg); --lexxy-editor-rows: 2lh; }
+  .fs-note .fs-editor .lexxy-editor__content { flex: none; min-height: 2lh; overflow: visible; }
+  .fs-note .fs-editor lexxy-toolbar { margin-top: 4px; padding-top: 4px; }
+  /* The status rides the meta line, top right, rather than taking a row of its own under the toolbar; on a new note it
+     covers "new" while it has something to say. */
+  .fs-note .fs-editor .autosave-status { position: absolute; top: 12px; right: 14px; margin: 0; padding-left: 8px; min-height: 0; font-size: 11px; line-height: 15px; background: var(--bg); }
+  .fs-note .fs-editor .autosave-status:empty { display: none; }
+  .fs-foot { flex: none; margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--rule); font-family: var(--sans); font-size: 13px; }
+  .fs-foot a { color: var(--ink-soft); text-decoration: none; }
+  .fs-foot a:hover { color: var(--accent); }
+
   /* The editor takes whatever height the panel has left; long notes scroll inside it. */
   .composer { flex: 1; min-height: 0; display: flex; flex-direction: column; font-family: var(--sans); }
   .composer turbo-frame, .composer form { flex: 1; min-height: 0; display: flex; flex-direction: column; }
@@ -410,16 +470,21 @@
     .panel > :not(.panel-handle) { transition: visibility 0s .28s; }
     .panel:not(.open) > :not(.panel-handle) { visibility: hidden; }
     .panel.open > :not(.panel-handle) { transition-delay: 0s; }
-    /* Closed, the handle shows the note's first line; open, the passage it belongs to. */
+    /* Closed, the handle shows the tab it's on: the passage and its note's first line, or the focus and the open
+       note's first line (or how many there are). Open, the tabs show under it. */
     .panel-handle {
       display: flex; align-items: center; gap: 10px; position: relative; flex: none;
       width: 100%; height: 52px; padding: 0; border: 0; background: none; text-align: left; cursor: pointer;
       font-family: var(--sans);
     }
     .panel-handle::before { content: ""; position: absolute; top: 6px; left: 50%; width: 38px; height: 4px; margin-left: -19px; border-radius: 2px; background: var(--rule); }
-    .panel-handle .ref { display: none; flex: 1; }
-    .panel.open .panel-handle .ref { display: flex; }
+    .handle-tab { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; }
+    .panel:not(.on-focus) .handle-focus, .panel.on-focus .handle-unit { display: none; }
+    .panel.open .handle-tab { visibility: hidden; }
+    .panel-handle .ref { flex: 0 1 auto; max-width: 55%; }
     .panel.open .panel-handle .preview { display: none; }
+    .tabs { margin-top: 0; }
+    .tab .key, .fs-new kbd { display: none; }
     .preview { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--serif); font-size: 15px; color: var(--ink-soft); }
     .preview.empty { font-style: italic; color: var(--ink-faint); }
     .panel-handle .go { flex: none; color: var(--ink-faint); }
@@ -492,12 +557,16 @@ a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu
 .card-notes { font-family: var(--sans); font-size: 13px; color: var(--ink-soft); }
 .card-foot .chip { flex: none; white-space: nowrap; }
 
+/* Editing a focus is done from its card (and its notes page), not the reader. */
+.card-edit { flex: none; font-family: var(--sans); font-size: 13px; color: var(--ink-faint); text-decoration: none; }
+.card-edit:hover { color: var(--accent); }
+
 /* A past card is one big button that makes it current. */
 .card-pick { position: absolute; inset: 0; z-index: 1; width: 100%; padding: 0; border: 0; border-radius: inherit; background: none; cursor: pointer; }
-.card-past .card-notes a { position: relative; z-index: 2; }
-/* (not while pointing at its notes link, which doesn't make it current) */
-.card-past:hover:not(:has(.card-notes a:hover)) { border-color: var(--accent); }
-.card-past:hover:not(:has(.card-notes a:hover)) .card-title { color: var(--accent); }
+.card-past :is(.card-notes a, .card-edit) { position: relative; z-index: 2; }
+/* (not while pointing at its notes link or Edit, which don't make it current) */
+.card-past:hover:not(:has(.card-notes a:hover, .card-edit:hover)) { border-color: var(--accent); }
+.card-past:hover:not(:has(.card-notes a:hover, .card-edit:hover)) .card-title { color: var(--accent); }
 
 /* the current focus: twice as wide, a ribbon, and the way back into reading */
 .card-current { grid-column: span 2; border-color: var(--accent); }

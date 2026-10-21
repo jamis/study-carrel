@@ -86,11 +86,38 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     assert_select ".card-arrived", false
   end
 
-  test "the band offers edit, new focus and all foci" do
+  test "the band drops the description, and nothing else" do
     get reading_path("isaiah-kjv", 40)
-    assert_select ".focus-actions a[href=?]", edit_focus_path(@focus)
-    assert_select ".focus-actions a[href=?]", new_focus_path, text: "New focus"
-    assert_select ".focus-actions a[href=?]", foci_path
+    assert_select ".focus[data-controller=focus] button.focus-head .focus-caret"
+    assert_select ".focus-body", /Set apart\?/
+    assert_select ".focus-body a, .focus-body button", 0
+  end
+
+  test "without a description, the focus is only read: no chevron, nothing to click" do
+    @focus.update!(description: "")
+    get reading_path("isaiah-kjv", 40)
+    assert_select ".focus .focus-title", "Holy"
+    assert_select ".focus[data-controller], .focus button, .focus-caret, .focus-body", 0
+  end
+
+  test "each card has an Edit, which comes back to the cards" do
+    @focus.archive!
+    users(:one).foci.start!(title: "Light")
+    get foci_path
+    assert_select ".card-current a.card-edit[href=?]", edit_focus_path(Focus.find_by!(title: "Light"))
+    assert_select ".card-past a.card-edit[href=?]", edit_focus_path(@focus), text: "Edit"
+    get edit_focus_path(@focus)
+    assert_select "a[href=?]", foci_path, text: "Cancel"
+  end
+
+  test "edited from its notes page, a focus goes back there" do
+    get focus_notes_path(@focus)
+    assert_select ".page-actions a[href=?]", edit_focus_path(@focus, back: "notes")
+    get edit_focus_path(@focus, back: "notes")
+    assert_select "input[type=hidden][name=back][value=notes]"
+    assert_select "a[href=?]", focus_notes_path(@focus), text: "Cancel"
+    patch focus_path(@focus), params: { back: "notes", focus: { title: "Holy, again" } }
+    assert_redirected_to focus_notes_path(@focus)
   end
 
   test "the current card links to where its reading left off" do

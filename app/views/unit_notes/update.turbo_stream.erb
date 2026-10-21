@@ -1,3 +1,5 @@
 <%= turbo_stream.replace "focus_notes_link", partial: "notes/menu_link", locals: { focus: @focus } %>
 <%# On the reread page, the note's text in its row, for when the editor moves on (empty if the note was cleared). %>
 <%= turbo_stream.update dom_id(@unit, :reread_text) do %><%= @note.content if @note.persisted? %><% end %>
+<%# In the reader's note sheet, the focus tab's count of all its notes. %>
+<%= turbo_stream.replace "focus_sheet_all", partial: "readings/focus_all", locals: { focus: @focus } %>

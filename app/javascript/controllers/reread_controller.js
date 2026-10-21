@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 import { csrfToken, fillId } from "lib/request"
+import { focusAtEnd } from "lib/caret"
 
 const VIEW_KEY = "reread-labels-view"
 const SORT_KEY = "reread-picker-sort"
@@ -467,14 +468,3 @@ function closeness(name, q) {
 
 const upcaseFirst = text => text.charAt(0).toUpperCase() + text.slice(1)
 const escapeHtml = text => text.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c])
-
-// Into an editor with the caret after what's written, to add to it.
-function focusAtEnd(editable) {
-  editable.focus({ preventScroll: true })
-  const range = document.createRange()
-  range.selectNodeContents(editable)
-  range.collapse(false)
-  const selection = getSelection()
-  selection.removeAllRanges()
-  selection.addRange(range)
-}
