@@ -2,7 +2,7 @@
 
 ## Foci
 
-One focus at a time. No parallel foci in v1. The focus is the app's current state: no switcher or lenses. Deleting a focus is not supported yet (detaching its notes, as for a deleted text, may be the way; see [user-texts.md](user-texts.md)).
+One focus at a time. No parallel foci in v1. The focus is the app's current state: no switcher or lenses. You read under one focus, but a passage's note can be written under any of your other focuses from the reader without making it current (decided 2026-10-21; see [Notes under another focus](#notes-under-another-focus)). Deleting a focus is not supported yet (detaching its notes, as for a deleted text, may be the way; see [user-texts.md](user-texts.md)).
 
 ## Home: the focuses page
 
@@ -25,8 +25,8 @@ One focus at a time. No parallel foci in v1. The focus is the app's current stat
 
 - No label. The focus in soft-ink italic, 19–22px, accent on hover; a statement (a thesis, a metaphor) mustn't pass for the passage's title, and the soft italic reads as an epigraph, not a heading.
 - A small thought bubble before it, in the faint ink of the keep ribbon and in the ribbon's slot, so the focus lines up with the reference below; wrapped lines stay clear of it. (The drawing is a stand-in, to be replaced with a better one.)
-- With a description, a chevron at the end of its last line drops it, and **only the description** (decided 2026-10-20): no buttons or links in it. "Edit focus", "New focus" and "All focuses" went: editing is done from the cards and the notes page, a new focus is the dashed card, and All focuses is the rail's "Your focuses". It closes on a second click, a click outside, or Esc, and never touches the note sheet.
-- **Without a description**, no chevron and nothing to click: the focus isn't a button, takes no hover colour and has no title. (It used to drop "No description yet. Add one.")
+- A chevron at the end of its last line drops the description, and under it **your other focuses**, to note this passage under one of them (decided 2026-10-21; see [Notes under another focus](#notes-under-another-focus)). Nothing else: "Edit focus", "New focus" and "All focuses" went on 2026-10-20 (editing is done from the cards and the notes page, a new focus is the dashed card, and All focuses is the rail's "Your focuses"). It closes on a second click, a click outside, or Esc, and never touches the note sheet.
+- **With neither a description nor another focus**, no chevron and nothing to click: the focus isn't a button, takes no hover colour and has no title. (It used to drop "No description yet. Add one.") Without a description but with other focuses, it drops the list alone.
 - A hairline rule across the whole column sets it off from the passage.
 - Not sticky: it scrolls away with the top of a long passage, and the reference row sticks to the top instead. On phones it starts level with the ⋯ and keeps clear of it.
 - Left-aligned (decided 2026-10-03), flush with the body text.
@@ -48,6 +48,17 @@ History: a thin bar felt lost and a large hero banner too big; a filled pill wit
 Trade-off accepted: no per-note timeline of when each thought arrived (only the last-updated time), and last save wins across tabs.
 
 Notes that lose their unit (a revised or deleted user text) become detached notes; see [user-texts.md](user-texts.md).
+
+### Notes under another focus
+
+**A passage's note can be written under another of your focuses from the reader** (decided 2026-10-21), without making that focus current. Reading under one question you often see that a passage answers another; before, that meant going to the cards, making the other current, finding the passage again in the history, writing, and going back the same way. Prototype: `prototype/reader/other-focus.html` (transient).
+
+- **Where:** the focus over the passage drops your other focuses under its description (`o` opens it). One line each, as a focus stands over the passage (the bubble, soft italic, cut short with an ellipsis; its dates as a tooltip). Those with a note on this passage come first, marked "noted", then the rest, most recently current first. Five show (more if more are noted) until "All 12 focuses…". Past seven, a "Find a focus…" field: typing narrows the list, Enter takes the first. 1–9 and ↑/↓ choose.
+- **Writing:** choosing one opens its note on this passage in the sheet's editor (the passage tab, opened on phones), on a tinted slip headed by that focus, with "← Back to *the current focus*" (Esc). A dot on the passage's tab, and on phones the reference in the handle in the accent colour, say the note is going elsewhere. It autosaves and clears like any passage's note, to that focus (`/foci/:id/units/:unit_id/note`); the current focus, your place and your history are untouched, and the verse grid's dots stay the current focus's.
+- **Back:** "Back to…", Esc, or moving to another passage: a new verse always opens under the current focus.
+- **Also noted under:** under the current focus's note, a faint line names your other focuses with a note on this passage, each opening that note in place. It's how you find what you wrote elsewhere, without leaving the reader.
+- Any of your focuses can be written under (they're all past ones; none is deleted). Another user's focus is a 404.
+- Considered: a picker in the sheet itself, at the foot of the passage's note ("Note this under another focus…"), the prototype's A. The list under the focus was preferred: it sits with the focus it's an alternative to. A switcher that kept your place was rejected: you'd still have to switch back, and could forget.
 
 ## Notes pages
 

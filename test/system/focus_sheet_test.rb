@@ -86,4 +86,56 @@ class FocusSheetTest < ApplicationSystemTestCase
     assert_selector "#sheet_tab_unit[aria-selected=true]"
     assert_selector "#sheet_pane_unit lexxy-editor"
   end
+
+  test "noting a passage under another focus from the reader, and back" do
+    past = @focus
+    past.notes.create!(unit: verse(26), content: "Called by name")
+    current = users(:one).foci.start!(title: "Waiting")
+    current.notes.create!(unit: verse(25), content: "Mine, under Waiting")
+    visit reading_path("isaiah-kjv", 40, 25)
+    assert_selector "#sheet_pane_unit .lexxy-editor__content", text: "Mine, under Waiting"
+    assert_no_selector ".note-also"
+
+    # o drops the focus with the others under it; 1 chooses the first.
+    find("body").send_keys "o"
+    within(".focus-others") { assert_selector ".pick-title", text: "Holy" }
+    find("body").send_keys "1"
+    assert_no_selector ".focus.open"
+    within("#sheet_pane_unit") do
+      assert_selector ".note-under-title", text: "Holy"
+      editor = find("lexxy-editor [contenteditable]")
+      assert_equal "", editor.text
+      editor.send_keys "To whom then: a question, not a wall."
+      assert_text "Saved"
+    end
+    assert_equal "To whom then: a question, not a wall.", past.notes.find_by(unit: verse(25)).content.to_plain_text.strip
+    assert_equal "Mine, under Waiting", current.notes.find_by(unit: verse(25)).content.to_plain_text.strip
+    assert_equal current, users(:one).foci.current_one
+
+    # Esc goes back to the current focus's note, which now names the other.
+    find("#sheet_pane_unit lexxy-editor [contenteditable]").send_keys :escape
+    within("#sheet_pane_unit") do
+      assert_no_selector ".note-under"
+      assert_selector ".lexxy-editor__content", text: "Mine, under Waiting"
+      assert_selector ".note-also", text: "Also noted under Holy"
+    end
+
+    # A new verse goes back too; "also under" opens that note here.
+    find("body").send_keys :right
+    within("#sheet_pane_unit") do
+      click_on "Holy"
+      assert_selector ".note-under-title", text: "Holy"
+      assert_selector ".lexxy-editor__content", text: "Called by name"
+    end
+    find("body").send_keys :right
+    assert_no_selector ".note-under"
+  end
+
+  test "with another focus, the focus drops even without a description" do
+    users(:one).foci.start!(title: "Bare")
+    visit reading_path("isaiah-kjv", 40, 25)
+    find(".focus-head").click
+    assert_selector ".focus-others .pick-title", text: "Holy"
+    assert_no_selector ".focus-body-in"
+  end
 end

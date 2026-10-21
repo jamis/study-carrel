@@ -61,6 +61,21 @@ class IsolationTest < ActionDispatch::IntegrationTest
     assert_match "Owner's private thought", @owner_note.reload.content.to_plain_text
   end
 
+  test "another reader's focus can't be noted under from the reader, or listed to" do
+    @other.foci.start!(title: "Other's focus")
+    sign_in_as @other
+    get focus_unit_note_path(@owner_focus, verse(3))
+    assert_response :not_found
+    assert_no_difference -> { Note.count } do
+      put focus_unit_note_path(@owner_focus, verse(3)), params: { note: { content: "" } }, as: :turbo_stream
+    end
+    assert_response :not_found
+    get unit_foci_path(verse(3))
+    assert_no_match "Owner's focus", response.body
+    get unit_note_path(verse(3))
+    assert_no_match "Owner's focus", response.body
+  end
+
   test "another reader's focus can't be edited or restored" do
     sign_in_as @other
     get edit_focus_path(@owner_focus)

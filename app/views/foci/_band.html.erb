@@ -1,14 +1,24 @@
 <%# The focus, standing directly over the passage: a thought bubble in the keep ribbon's slot (so the focus lines up with
-    the reference below), the focus itself and a rule across the column. With a description, a chevron at the end of
-    its last line drops the description, and nothing else: editing the focus is done from the cards and its notes page.
-    Without one, the focus is only read. %>
-<% if focus.description.present? %>
-  <section class="focus" data-controller="focus" data-action="click@document->focus#closeOutside keydown.esc@window->focus#escape">
-    <button class="focus-head" type="button" aria-expanded="false" title="About this focus" data-focus-target="head" data-action="focus#toggle">
+    the reference below), the focus itself and a rule across the column. A chevron at the end of its last line drops
+    the description, and under it the reader's other focuses (o), to write this passage's note under one of them
+    without leaving the reader (unit_foci/index, loaded as it opens). Editing the focus is done from the cards and its
+    notes page. With neither a description nor another focus, the focus is only read. %>
+<% if focus.description.present? || others %>
+  <section class="focus" data-controller="focus" data-lectio-target="band" data-focus-url-value="<%= unit_foci_path(unit) %>"
+           data-action="click@document->focus#closeOutside keydown.esc@window->focus#escape keydown@document->focus#key">
+    <button class="focus-head" type="button" aria-expanded="false" title="<%= focus.description.present? ? "About this focus" : "Note this under another focus" %>"
+            data-focus-target="head" data-action="focus#toggle">
       <%= render "foci/mark" %>
       <span class="focus-line"><h1 class="focus-title"><%= focus.title %></h1><span class="focus-caret"><svg viewBox="0 0 13 8" aria-hidden="true"><path d="M1.5 1.5 6.5 6.5 11.5 1.5"/></svg></span></span>
     </button>
-    <div class="focus-body"><div class="focus-body-in"><%= simple_format(h(focus.description)) %></div></div>
+    <div class="focus-body">
+      <% if focus.description.present? %>
+        <div class="focus-body-in"><%= simple_format(h(focus.description)) %></div>
+      <% end %>
+      <% if others %>
+        <%= turbo_frame_tag "other_foci", class: "focus-others", data: { focus_target: "frame" } %>
+      <% end %>
+    </div>
   </section>
 <% else %>
   <section class="focus">

@@ -1,9 +1,25 @@
+<%# The passage's note. Under the current focus, with the reader's other focuses that have a note on this passage named
+    under it ("Also noted under …"), each opening that note here. Under another focus (chosen from the picker under the
+    focus), that focus heads it on a slip, with the way back (Esc); a new verse goes back too. %>
+<% under = focus != Current.focus %>
 <%= turbo_frame_tag "note_editor", data: { lectio_target: "editor" } do %>
-  <%= form_with model: (note || Note.new), url: unit_note_path(unit), method: :put,
+  <% if under %>
+    <div class="note-under">
+      <p class="note-under-focus"><%= render "foci/mark" %><span class="note-under-title"><%= focus.title %></span></p>
+      <%= link_to unit_note_path(unit), class: "note-under-back", data: { focus_sheet_target: "back" } do %>← Back to <i><%= Current.focus.title %></i><kbd>Esc</kbd><% end %>
+    </div>
+  <% end %>
+  <%= form_with model: (note || Note.new), url: (under ? focus_unit_note_path(focus, unit) : unit_note_path(unit)), method: :put,
         data: { controller: "autosave", autosave_unit_id_value: unit.id, autosave_focus_id_value: focus.id, action: "submit->autosave#prevent" } do |form| %>
-    <%= form.rich_textarea :content, preset: "notes", rows: 8, placeholder: "What comes to mind?",
-          aria: { label: "Note" },
+    <%= form.rich_textarea :content, preset: "notes", rows: 8, placeholder: (under ? "What does this passage say to that question?" : "What comes to mind?"),
+          aria: { label: under ? "Note under #{focus.title}" : "Note" },
           data: { autosave_target: "editor", action: "lexxy:initialize->autosave#ready lexxy:change->autosave#changed lexxy:blur->autosave#save" } %>
     <p class="autosave-status" aria-live="polite" data-autosave-target="status">&nbsp;</p>
+  <% end %>
+  <% unless under %>
+    <% also = Current.user.foci.past.where(id: Note.where(unit: unit).select(:focus_id)) %>
+    <% if also.any? %>
+      <p class="note-also">Also noted under <%= to_sentence(also.map { |f| link_to f.title, focus_unit_note_path(f, unit), class: "note-also-focus" }) %></p>
+    <% end %>
   <% end %>
 <% end %>

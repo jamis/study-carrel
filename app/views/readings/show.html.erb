@@ -4,6 +4,8 @@
       data-lectio-current-value="<%= @current.number %>"
       data-lectio-position-url-value="<%= position_path %>"
       data-lectio-note-url-template-value="<%= unit_note_path("{id}") %>"
+      data-lectio-others-url-template-value="<%= unit_foci_path("{id}") %>"
+      data-lectio-focus-id-value="<%= @focus.id %>"
       data-action="note:saved@window->lectio#noteSaved keep:changed@window->lectio#keepChanged"
       data-lectio-base-value="<%= reading_path(@section.work.slug, @section.number) %>"
       data-lectio-ref-template-value="<%= @section.reference_template %>"
@@ -27,7 +29,7 @@
   <% prev_unit = (@units[at - 1] if at.positive?) %>
   <% next_unit = @units[at + 1] %>
   <div class="reader-col">
-    <%= render "foci/band", focus: @focus %>
+    <%= render "foci/band", focus: @focus, unit: @current, others: @other_foci %>
     <article class="lectio" data-action="touchstart->lectio#touchStart touchend->lectio#touchEnd keydown@document->lectio#key">
       <div class="now <%= unit_size_class(@current.body) %>" aria-live="polite" data-lectio-target="now"><div class="now-head"><%= render "keeps/ribbon", unit: @current, kept: @kept %><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span></div><span class="pilcrow" aria-hidden="true" data-lectio-target="pilcrow" <%= "hidden" unless @current.sentence == 1 %>>¶</span><span data-lectio-target="body" data-action="click->lectio#pickClause"><%= @current.body %></span></div>
 
@@ -89,7 +91,7 @@
   <aside class="panel" data-controller="sheet focus-sheet"
          data-focus-sheet-next-value="<%= @focus.free_notes_numbered + 1 %>"
          data-focus-sheet-new-url-value="<%= new_focus_note_path(@focus) %>"
-         data-action="keydown.esc@window->focus-sheet#escape keydown.esc@window->sheet#escape keydown@document->focus-sheet#key note:text@window->focus-sheet#text note:saved@window->focus-sheet#saved">
+         data-action="keydown.esc@window->focus-sheet#escape keydown.esc@window->sheet#escape keydown@document->focus-sheet#key note:text@window->focus-sheet#text note:saved@window->focus-sheet#saved focus:chose@window->focus-sheet#chose">
     <button class="panel-handle" type="button" aria-expanded="false" data-sheet-target="handle" data-action="sheet#toggle">
       <span class="handle-tab handle-unit">
         <span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span>
@@ -104,7 +106,7 @@
     <div class="tabs" role="tablist" aria-label="Notes">
       <button class="tab tab-unit" type="button" role="tab" id="sheet_tab_unit" aria-controls="sheet_pane_unit" aria-selected="true"
               data-focus-sheet-target="tab" data-tab="unit" data-action="focus-sheet#pick">
-        <span class="tab-name">Note ·</span><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span>
+        <span class="tab-name">Note ·</span><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span><span class="tab-under" title="Under another focus"></span>
       </button>
       <button class="tab" type="button" role="tab" id="sheet_tab_focus" aria-controls="sheet_pane_focus" aria-selected="false" title="Notes on the whole focus (f)"
               data-focus-sheet-target="tab" data-tab="focus" data-action="focus-sheet#pick">

@@ -84,4 +84,67 @@ class UnitNotesControllerTest < ActionDispatch::IntegrationTest
     put unit_note_path(@unit), params: { note: { content: "Mine" } }, as: :turbo_stream
     assert_equal "Private", theirs.reload.content.to_plain_text
   end
+
+  # ---------- under another focus, written from the reader ----------
+
+  test "a passage's note can be saved under a past focus without making it current" do
+    past = users(:one).foci.start!(title: "Comfort")
+    @focus = users(:one).foci.start!(title: "Holy, again")
+    @focus.update!(last_unit: verse(3))
+    assert_difference -> { past.notes.count }, 1 do
+      put focus_unit_note_path(past, @unit), params: { focus_id: past.id, note: { content: "Even the question comforts." } }, as: :turbo_stream
+    end
+    assert_response :success
+    assert_equal "true", response.headers["X-Noted"]
+    assert_equal @unit, past.notes.last.unit
+    assert_equal @focus, users(:one).foci.current_one
+    assert_equal verse(3), @focus.reload.last_unit
+    # Nothing of the current focus's on the page changes.
+    assert_no_match "focus_notes_link", response.body
+    assert_no_match "focus_sheet_all", response.body
+  end
+
+  test "clearing a note under a past focus deletes it" do
+    past = @focus
+    users(:one).foci.start!(title: "Newer")
+    past.notes.create!(unit: @unit, content: "x")
+    assert_difference -> { past.notes.count }, -1 do
+      put focus_unit_note_path(past, @unit), params: { note: { content: "" } }, as: :turbo_stream
+    end
+    assert_equal "false", response.headers["X-Noted"]
+  end
+
+  test "under a past focus, the editor is headed by it with the way back, and saves to it" do
+    past = @focus
+    users(:one).foci.start!(title: "Newer")
+    past.notes.create!(unit: @unit, content: "Under Holy")
+    get focus_unit_note_path(past, @unit), headers: { "Turbo-Frame" => "note_editor" }
+    assert_response :success
+    assert_select "turbo-frame#note_editor .note-under-title", "Holy"
+    assert_select "turbo-frame#note_editor a.note-under-back[href=?]", unit_note_path(@unit), text: /Back to Newer/
+    assert_select "turbo-frame#note_editor form[action=?]", focus_unit_note_path(past, @unit)
+    assert_match "Under Holy", response.body
+    assert_select ".note-also", false
+  end
+
+  test "under the current focus, the editor names the past focuses with a note on the passage" do
+    past = @focus
+    past.notes.create!(unit: @unit, content: "x")
+    users(:one).foci.start!(title: "Bare").notes.create!(unit: verse(3), content: "y")
+    users(:one).foci.start!(title: "Newer")
+    get unit_note_path(@unit), headers: { "Turbo-Frame" => "note_editor" }
+    assert_select ".note-under", false
+    assert_select ".note-also a.note-also-focus[href=?]", focus_unit_note_path(past, @unit), text: "Holy"
+    assert_select ".note-also a", count: 1
+  end
+
+  test "another user's focus is a 404" do
+    theirs = users(:two).foci.start!(title: "Theirs")
+    get focus_unit_note_path(theirs, @unit)
+    assert_response :not_found
+    assert_no_difference "Note.count" do
+      put focus_unit_note_path(theirs, @unit), params: { note: { content: "Mine" } }, as: :turbo_stream
+    end
+    assert_response :not_found
+  end
 end

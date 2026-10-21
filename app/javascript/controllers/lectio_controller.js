@@ -8,10 +8,10 @@ import { splitClauses, savedBreaks, saveBreaks, clauseMode } from "lib/clauses"
 // one tap (or p) away. A long passage can also be read a clause at a time (; turns it on and off): the arrows then
 // step through its clauses, marked in place with the rest dimmed, and on into the next passage.
 export default class extends Controller {
-  static targets = ["unit", "now", "body", "pilcrow", "prevButton", "nextButton", "position", "ref", "refUnit", "grid", "tick", "editor",
+  static targets = ["unit", "now", "body", "pilcrow", "prevButton", "nextButton", "position", "ref", "refUnit", "grid", "tick", "editor", "band",
     "whole", "wholeButton", "clausesButton", "clauseMenu", "pips", "breaks", "mark"]
   static values = { current: Number, base: String, refTemplate: String, refUnitTemplate: String, positionUrl: String, unitName: String,
-    groupName: String, noteUrlTemplate: String, prevUrl: String, prevLabel: String, nextUrl: String, nextLabel: String }
+    groupName: String, noteUrlTemplate: String, othersUrlTemplate: String, focusId: Number, prevUrl: String, prevLabel: String, nextUrl: String, nextLabel: String }
 
   connect() {
     this.bodies = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.textContent.trim()]))
@@ -128,6 +128,8 @@ export default class extends Controller {
 
     // Swapping the frame replaces the editor; the old one saves itself as it goes.
     this.editorTarget.src = fillId(this.noteUrlTemplateValue, this.unitIds.get(n))
+    // The focus's list of other focuses to note this passage under (loaded as it opens).
+    if (this.hasBandTarget) this.bandTarget.dataset.focusUrlValue = fillId(this.othersUrlTemplateValue, this.unitIds.get(n))
     this.announce()
   }
 
@@ -276,7 +278,9 @@ export default class extends Controller {
     tick.focus({ preventScroll: true })
   }
 
-  noteSaved({ detail: { unitId, noted } }) {
+  // A note saved under another focus (from the picker under the focus) isn't this focus's to mark.
+  noteSaved({ detail: { unitId, focusId, noted } }) {
+    if (focusId && focusId !== this.focusIdValue) return
     const number = [...this.unitIds].find(([, id]) => id === unitId)?.[0]
     if (number === undefined) return
     if (noted) this.noted.add(number); else this.noted.delete(number)

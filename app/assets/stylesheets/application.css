@@ -62,7 +62,7 @@
     display: flex; align-items: flex-start; gap: 7px;
     width: 100%; padding: 0; border: 0; background: none; text-align: left;
   }
-  /* Only a focus with a description is a button (it drops the description); one without is only read. */
+  /* A focus with a description or other focuses to note under is a button (it drops them); one without is only read. */
   button.focus-head { cursor: pointer; }
   /* A thought bubble in the keep ribbon's slot, so the focus lines up with the reference below; wrapped lines stay clear of it. */
   .focus-mark { flex: none; width: 17px; height: 16px; margin-top: .4em; fill: none; stroke: var(--ink-faint); stroke-width: 1.3; }
@@ -86,6 +86,30 @@
   .focus-body-in > p { max-width: 60ch; }
   .focus-body p { margin: 0 0 10px; }
   .focus-body p:last-child { margin-bottom: 0; }
+  /* Under the description, the other focuses to note this passage under: one line each, as they stand over the passage. */
+  .focus-others { display: block; padding: 12px 16px 14px; font-family: var(--serif); }
+  .focus-others:empty { display: none; }
+  .focus-body-in + .focus-others:not(:empty) { margin: 0 16px; padding: 12px 0 14px; border-top: 1px solid var(--rule); }
+  .pick-head { margin: 0 0 8px; font-family: var(--sans); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+  .pick-filter {
+    display: block; width: 100%; margin: 0 0 6px; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 8px;
+    background: var(--bg); color: var(--ink); font: italic 15px var(--serif);
+  }
+  .pick-filter::placeholder { color: var(--ink-faint); }
+  .pick-filter:focus { outline: none; border-color: var(--accent); }
+  .pick-list { list-style: none; margin: 0 -10px; padding: 0; }
+  .pick-list li[hidden] { display: none; }
+  .pick { display: flex; align-items: baseline; gap: 8px; padding: 6px 10px; border-radius: 8px; text-decoration: none; }
+  .pick .focus-mark { width: 14px; height: 13px; margin-top: 0; align-self: center; }
+  .pick-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16.5px; font-style: italic; color: var(--ink-soft); }
+  .pick-noted { flex: none; font: 11px var(--sans); letter-spacing: .04em; color: var(--accent); }
+  .pick-num { flex: none; min-width: 1ch; text-align: right; font: 11px var(--sans); color: var(--ink-faint); }
+  .pick:is(:hover, :focus-visible) { outline: none; background: var(--accent-soft); }
+  .pick:is(:hover, :focus-visible) .pick-title { color: var(--ink); }
+  .pick:is(:hover, :focus-visible) .focus-mark { stroke: var(--accent); }
+  .pick-all { display: block; margin: 6px 0 0 22px; padding: 0; border: 0; background: none; cursor: pointer; font-family: var(--sans); font-size: 12.5px; color: var(--ink-soft); }
+  .pick-all:is(:hover, :focus-visible) { color: var(--accent); }
+  .pick-all[hidden] { display: none; }
   @media (max-width: 599px) {
     .focus-body { left: -8px; }
   }
@@ -397,6 +421,9 @@
   .tab-name { flex: none; }
   .tab .ref { color: inherit; }
   .tab .focus-mark { width: 13px; height: 12px; margin: 0; stroke: currentColor; }
+  /* A dot on the passage's tab while its note is being written under another focus. */
+  .tab-under { display: none; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .panel:has(.note-under) .tab-under { display: inline-block; }
   .tab-count { letter-spacing: 0; font-variant-numeric: tabular-nums; color: var(--ink-faint); }
   .tab .key { margin-left: 2px; font: 10px var(--sans); color: var(--ink-faint); opacity: 0; transition: opacity .15s; }
   .tabs:hover .key { opacity: 1; }
@@ -442,6 +469,19 @@
   .fs-foot a { color: var(--ink-soft); text-decoration: none; }
   .fs-foot a:hover { color: var(--accent); }
 
+  /* The passage's note under another focus: that focus heads it, on a slip of its own colour, with the way back. */
+  .note-under { flex: none; margin: -4px -12px 14px; padding: 10px 12px; border-radius: 10px; background: var(--accent-soft); }
+  .note-under-focus { display: flex; align-items: flex-start; gap: 7px; margin: 0; font-family: var(--serif); font-size: 17px; line-height: 1.35; }
+  .note-under-focus .focus-mark { width: 14px; height: 13px; margin-top: .3em; stroke: var(--accent); }
+  .note-under-title { font-style: italic; color: var(--ink); }
+  .note-under-back { display: inline-block; margin: 8px 0 0 21px; font-size: 12.5px; color: var(--ink-soft); text-decoration: none; }
+  .note-under-back:hover { color: var(--accent); }
+  .note-under-back kbd { margin-left: 6px; font: 11px var(--sans); color: var(--ink-faint); }
+  /* Under the current focus's note: the other focuses with a note on this passage, each opening it here. */
+  .note-also { flex: none; margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--ink-faint); }
+  .note-also-focus { font-family: var(--serif); font-size: 14.5px; font-style: italic; color: var(--ink-soft); text-decoration: none; }
+  .note-also-focus:hover { color: var(--accent); }
+
   /* The editor takes whatever height the panel has left; long notes scroll inside it. */
   .composer { flex: 1; min-height: 0; display: flex; flex-direction: column; font-family: var(--sans); }
   .composer turbo-frame, .composer form { flex: 1; min-height: 0; display: flex; flex-direction: column; }
@@ -484,7 +524,8 @@
     .panel-handle .ref { flex: 0 1 auto; max-width: 55%; }
     .panel.open .panel-handle .preview { display: none; }
     .tabs { margin-top: 0; }
-    .tab .key, .fs-new kbd { display: none; }
+    .tab .key, .fs-new kbd, .pick-num, .note-under-back kbd { display: none; }
+    .panel:has(.note-under) .handle-unit .ref { color: var(--accent); }
     .preview { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--serif); font-size: 15px; color: var(--ink-soft); }
     .preview.empty { font-style: italic; color: var(--ink-faint); }
     .panel-handle .go { flex: none; color: var(--ink-faint); }
@@ -519,7 +560,7 @@
 .invite-form { max-width: none; margin: 0 0 8px; }
 
 /* ---------- foci pages ---------- */
-a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a):not(.rail a):not(.whole-group a):not(.card-new) { color: var(--accent); }
+a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a):not(.rail a):not(.whole-group a):not(.card-new):not(.note-under-back):not(.note-also-focus) { color: var(--accent); }
 .inline-form { display: inline; margin: 0; }
 .page { max-width: 40em; margin: 0 auto; padding: 22px 16px 80px; }
 /* Above the title: the way up (helpers page_head), quietly, and the page's actions at the right. */

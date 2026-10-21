@@ -113,7 +113,7 @@ export default class extends Controller {
       }
       const noted = response.headers.get("X-Noted") === "true"
       const noteId = response.headers.get("X-Note-Id")
-      window.dispatchEvent(new CustomEvent(`${this.paramValue}:saved`, { detail: { unitId: this.unitIdValue, noteId, noted, element: this.element } }))
+      window.dispatchEvent(new CustomEvent(`${this.paramValue}:saved`, { detail: { unitId: this.unitIdValue, focusId: this.focusIdValue, noteId, noted, element: this.element } }))
       Turbo.renderStreamMessage(await response.text())
       this.#status(this.restored ? "Saved changes that hadn't saved before" : "Saved")
       this.restored = false

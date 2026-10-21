@@ -9,7 +9,7 @@ const TAB_KEY = "reader-sheet-tab"
 // Esc or another is opened; a new one left empty goes. A new note is made, and handed its number, by its first save
 // (the reply puts its number in its head). On phones the sheet's handle shows the tab it's on.
 export default class extends Controller {
-  static targets = ["tab", "pane", "slip", "notes", "row", "newRow", "head", "count", "unitPreview", "focusPreview"]
+  static targets = ["tab", "pane", "slip", "notes", "row", "newRow", "head", "count", "unitPreview", "focusPreview", "back"]
   static values = { next: Number, newUrl: String }
 
   connect() {
@@ -35,8 +35,16 @@ export default class extends Controller {
     else if (event.key === "n" && this.tab === "focus") { event.preventDefault(); this.newNote() }
   }
 
-  // Esc while writing a note on the focus puts it away (before the phone's sheet would close).
+  // Esc while writing a note on the focus puts it away (before the phone's sheet would close). On the passage's note
+  // under another focus, it goes back to the current focus's.
   escape(event) {
+    if (this.tab === "unit" && this.hasBackTarget) {
+      event.stopImmediatePropagation()
+      const writing = !!event.target.closest?.("#note_editor [contenteditable]")
+      this.backTarget.click()
+      if (writing) this.#focusEditor()
+      return
+    }
     const row = this.openRow
     if (!row?.contains(event.target)) return
     event.stopImmediatePropagation()
@@ -45,12 +53,34 @@ export default class extends Controller {
     ;(row.isConnected && !fresh ? row.querySelector(".fs-open") : this.slipTarget).focus()
   }
 
+  // ---------- the passage's note under another focus ----------
+
+  // Chosen from the list under the focus (focus:chose): its note is on its way into the editor's frame.
+  chose() {
+    this.#show("unit")
+    this.#openOnPhone()
+    this.#focusEditor()
+  }
+
+  // Once the passage's editor has loaded, the caret at the end of it.
+  #focusEditor() {
+    const frame = document.getElementById("note_editor")
+    frame?.addEventListener("turbo:frame-load", () => setTimeout(() => {
+      const editor = frame.querySelector("lexxy-editor [contenteditable]")
+      if (editor) focusAtEnd(editor)
+    }), { once: true })
+  }
+
+  #openOnPhone() {
+    const handle = this.element.querySelector(".panel-handle")
+    if (handle.offsetParent && !this.element.classList.contains("open")) handle.click()
+  }
+
   // ---------- the notes on the whole focus ----------
 
   // A new note in the slip's place, headed with the number it will likely be given.
   newNote() {
-    const handle = this.element.querySelector(".panel-handle")
-    if (handle.offsetParent && !this.element.classList.contains("open")) handle.click()
+    this.#openOnPhone()
     const row = this.newRowTarget.content.firstElementChild.cloneNode(true)
     row.querySelector(".fs-num").textContent = `Focus ${this.nextValue}`
     this.notesTarget.prepend(row)

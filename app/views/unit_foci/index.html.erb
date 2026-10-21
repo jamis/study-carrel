@@ -1,0 +1,26 @@
+<%# Under the focus's description in the reader: the reader's other focuses, one line each, those noted on this passage
+    first. Five show (more if more are noted) until "All N focuses…"; past seven, a filter (focus_controller.js). Each
+    opens that focus's note on the passage in the sheet's editor. %>
+<%= turbo_frame_tag "other_foci" do %>
+  <% if @foci.any? %>
+    <% short = [ 5, @noted.size ].max %>
+    <p class="pick-head">Note this <%= unit_noun(@unit.section).downcase %> under another focus</p>
+    <% if @foci.size > 7 %>
+      <input type="search" class="pick-filter" placeholder="Find a focus (<%= @foci.size %>)…" autocomplete="off" aria-label="Find a focus"
+             data-focus-target="filter" data-action="input->focus#filter keydown->focus#filterKey">
+    <% end %>
+    <ul class="pick-list" data-focus-target="list">
+      <% @foci.each_with_index do |focus, i| %>
+        <li <%= "hidden" if i >= short %> data-focus-target="item" data-title="<%= focus.title.downcase %>">
+          <%= link_to focus_unit_note_path(focus, @unit), class: "pick", title: "#{focus.title} (#{focus_span(focus)})",
+                data: { turbo_frame: "note_editor", action: "focus#chose" } do %>
+            <%= render "foci/mark" %><span class="pick-title"><%= focus.title %></span><% if @noted.include?(focus.id) %><span class="pick-noted">noted</span><% end %><kbd class="pick-num"></kbd>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+    <% if @foci.size > short %>
+      <button type="button" class="pick-all" data-focus-target="all" data-action="focus#all">All <%= @foci.size %> focuses…</button>
+    <% end %>
+  <% end %>
+<% end %>

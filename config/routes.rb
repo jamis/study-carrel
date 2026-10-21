@@ -35,9 +35,15 @@ Rails.application.routes.draw do
     # Naming a label (or an unnamed group of notes), or renaming it, from the reread.
     resources :labels, only: :update
     resource :scratchpad, only: :update
+    # A passage's note under this focus, written from the reader while another focus is current.
+    resources :units, only: [] do
+      resource :note, only: %i[show update], controller: "unit_notes"
+    end
   end
   resources :units, only: [] do
     resource :note, only: %i[show update], controller: "unit_notes"
+    # The reader's picker of other focuses to note this passage under.
+    resources :foci, only: :index, controller: "unit_foci"
     resource :keep, only: %i[create update destroy]
   end
   get "notes", to: "notes#current" # the old address of the current focus's notes

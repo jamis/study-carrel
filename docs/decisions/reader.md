@@ -31,6 +31,7 @@ Visual tone (ideas, not decisions): quiet study desk, not a productivity tool. S
 - **+ New note** turns the slip into an editor headed "Focus 4 · Oct 20 · new"; the number is handed out at the first save. Esc, or leaving it while still empty, puts the slip back.
 - **Clicking a note** opens it as an editor in place, the caret at the end. One open at a time: opening another closes it. A note with text stays open when you click away, until Esc or another is opened (revisit if it bothers). Cleared, it's deleted, its number not reused; writing again makes a new note with the next number.
 - No labels here: labelling is the reread's business.
+- **The passage's note under another focus** (decided 2026-10-21): chosen from the list under the focus (`o`), it opens on the passage tab under a tinted slip naming that focus, with "← Back to…" (Esc); a new verse goes back. Under the current focus's note, "Also noted under …" names your other focuses with a note on the passage, each opening it there. See [foci-and-notes.md](foci-and-notes.md#notes-under-another-focus).
 - **Phones**: the bottom sheet's handle shows the tab it's on: the reference and the note's first line, or "Focus" and the open note's first line, "3 notes on the whole focus", or "No notes on the focus yet". No `n` hint on the slip.
 
 ### Clause by clause
