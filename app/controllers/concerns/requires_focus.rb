@@ -10,6 +10,6 @@ module RequiresFocus
   private
 
   def require_focus
-    @focus = Current.focus or (request.get? ? redirect_to(new_focus_path) : head(:conflict))
+    @focus = Current.focus or (request.get? || request.head? ? redirect_to(new_focus_path) : head(:conflict))
   end
 end
