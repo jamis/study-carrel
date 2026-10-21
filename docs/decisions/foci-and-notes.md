@@ -2,7 +2,7 @@
 
 ## Foci
 
-One focus at a time. No parallel foci in v1. The focus is the app's current state: no switcher or lenses. You read under one focus, but a passage's note can be written under any of your other focuses from the reader without making it current (decided 2026-10-21; see [Notes under another focus](#notes-under-another-focus)). Deleting a focus is not supported yet (detaching its notes, as for a deleted text, may be the way; see [user-texts.md](user-texts.md)); archiving one puts it away (see [Archiving](#archiving)).
+One focus at a time. No parallel foci in v1. The focus is the app's current state: no switcher or lenses. You read under one focus, but a passage's note can be written under any of your other focuses from the reader without making it current (decided 2026-10-21; see [Notes under another focus](#notes-under-another-focus)). Archiving one puts it away (see [Archiving](#archiving)); deleting one throws it away, with everything written under it (see [Deleting](#deleting)).
 
 **Every focus not archived is in use; one is just current** (decided 2026-10-21). Choosing another doesn't retire the old one. Each focus stores when it was last made current (`foci.made_current_at`), and the latest is the current one; making one current stamps it and touches nothing else. Until then `archived_at` had meant "not current", stamped on the old focus whenever another was started or chosen, so every focus but one read as finished.
 
@@ -17,7 +17,7 @@ One focus at a time. No parallel foci in v1. The focus is the app's current stat
 - A dashed "A new question" card starts a new focus. No totals or tallies across focuses.
 - No focuses yet: you go to the new-focus form. With every focus archived, the page shows only "A new question" and the way to the archive.
 - "Continue reading" (in the rail off the reader, and the current focus's card) is `/continue`, which resumes the current focus where it left off.
-- Every card has an **Edit** (decided 2026-10-20; editing used to be a chip in the reader's description dropdown) and an **Archive** (decided 2026-10-21), faint at the foot until pointed at, above a past card's button like its notes link. The notes page has "Edit focus" in its head.
+- Every card has an **Edit** (decided 2026-10-20; editing used to be a chip in the reader's description dropdown), an **Archive** and a **Delete** (both decided 2026-10-21), faint at the foot until pointed at, above a past card's button like its notes link. The notes page has "Edit focus" in its head.
 - Under the cards, a quiet "Archived focuses 3 →", only when something is archived.
 - **No focus current** (the current one was archived): the wide slot says "No focus is current. Choose one of your focuses to read under, or start a new question." Pages that need a current focus (the reader, Continue reading) bring you here, or to the new-focus form if every focus is archived.
 - After **starting** a focus you go straight to reading. After **editing** one or **making one current** you come back to the cards, as does Cancel on either form; editing from the notes page comes back to the notes page (`?back=notes`).
@@ -34,6 +34,19 @@ One focus at a time. No parallel foci in v1. The focus is the app's current stat
 - **Its notes page** keeps the run, `j`/`k`, the footnotes, the labels panel to point at (tapping a label does nothing) and the scratchpad's text behind its tab; it drops Edit focus, "+ New note", the chips, + label and Gather. "Unarchive" in the line under the title brings it back, staying on the page.
 - **Elsewhere:** archived focuses aren't offered to note a passage under; "Also noted under" still names them (read-only). Labels used under them still count in the label picker and "also under …".
 - The UI's word is "archive"; the code's `archived_at` means only that.
+
+## Deleting
+
+**A focus can be deleted** (decided 2026-10-21): for one made as a test, or a question you've changed your mind about studying. Archiving is for one you're done with; deleting is for one you don't want at all. Prototype: `prototype/home/delete.html` (transient).
+
+- **Delete** is at the foot of every card, after Archive (after Unarchive on an archived card), faint like them, rose when pointed at. It's a link, not a button: it only asks.
+- **It asks on a page of its own** (`/foci/:id/delete`), not a browser dialog, so it can show exactly which focus and what goes with it: "Delete this focus?", the focus as its card laid flat (dates, title, whole description, notes line), then "**12 notes** go with it:" listing the notes on passages (and the works they're in), those on the whole focus, any detached notes ("3 more set aside earlier, from passages that changed") and its scratchpad, each only if there is any; with none, "It has no notes." Then "This can't be undone.", and for the current focus, which will be current instead.
+- **With notes**, a quiet box offers the ways to keep them: "To put it away and keep its notes, archive it instead" (not for an archived focus, already put away), and "download its notes (.md) first". Then **Delete this focus** (rose, the only button) and Cancel.
+- From the archive, the trail, Cancel and the delete all go back to the archive (`?back=archived`); otherwise to the cards. After deleting, "Deleted "…"" at the foot of the page, **no Undo**.
+- **Everything written under it goes:** its notes (on passages and on the whole focus), its detached notes and its scratchpad. Labels go with their last note, as always (a label lasts only while some note carries it); those also on another focus's notes stay.
+- **Its notes aren't set aside as detached notes**, as a deleted text's are: detached notes are shown under their focus, and with it gone they'd have nowhere to be. "Notes survive" is about loading texts losing notes unasked; this is asked for, after being told what goes.
+- **Deleting the current focus makes the next most recent current**, as if it had never been (unlike archiving it, which leaves none current). The page names the one that will be: "It's your current focus, so "…" will be current instead." With no other focus in use, none is.
+- An archived focus can be deleted: read-only stops writing under it, not throwing it away. Another user's focus is a 404.
 
 ## Focus presentation
 

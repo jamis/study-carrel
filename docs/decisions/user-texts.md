@@ -60,7 +60,7 @@ A note whose unit is gone (after a revision, or when a work is deleted) moves to
 - A keep with a remark always becomes a detached note of its own, never merged into a note, since keeps belong to no focus: its focus is blank, and it is shown as a special case at the foot of the Kept page under the same heading (no focus, so not in any focus's export).
 - A keep without a remark is dropped, as are visits.
 - Deleting a text sets aside everything on it first (the confirmation says how much).
-- This could later replace the bundled loader's keeping of leftover rows, and could be how deleting a focus works (not yet supported).
+- This could later replace the bundled loader's keeping of leftover rows. (Deleting a focus doesn't use it: with the focus gone its detached notes would have nowhere to be shown; see [foci-and-notes.md](foci-and-notes.md#deleting).)
 
 ## Poetry and song lyrics
 

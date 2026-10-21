@@ -601,16 +601,17 @@ a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu
 .card-notes { font-family: var(--sans); font-size: 13px; color: var(--ink-soft); }
 .card-foot .chip { flex: none; white-space: nowrap; }
 
-/* Editing and archiving a focus are done from its card (editing from its notes page too), not the reader. Both faint
-   until pointed at. */
+/* Editing, archiving and deleting a focus are done from its card (editing from its notes page too), not the reader.
+   All faint until pointed at; Delete only asks (a page of its own), so it needn't stand apart. */
 .card-acts { display: flex; align-items: baseline; gap: 14px; flex: none; }
 .card-act { padding: 0; border: 0; background: none; font-family: var(--sans); font-size: 13px; line-height: inherit; color: var(--ink-faint); text-decoration: none; }
 .card-act:hover { color: var(--accent); }
+.card-act-delete:hover { color: var(--g3); }
 
 /* A past card is one big button that makes it current. */
 .card-pick { position: absolute; inset: 0; z-index: 1; width: 100%; padding: 0; border: 0; border-radius: inherit; background: none; cursor: pointer; }
 .card-past :is(.card-notes a, .card-acts) { position: relative; z-index: 2; }
-/* (not while pointing at its notes link, Edit or Archive, which don't make it current) */
+/* (not while pointing at its notes link, Edit, Archive or Delete, which don't make it current) */
 .card-past:hover:not(:has(.card-notes a:hover, .card-act:hover)) { border-color: var(--accent); }
 .card-past:hover:not(:has(.card-notes a:hover, .card-act:hover)) .card-title { color: var(--accent); }
 
@@ -664,6 +665,23 @@ a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu
 .card-archived { min-height: 150px; background: transparent; box-shadow: none; }
 .card-archived .card-title { color: var(--ink-soft); }
 .card-archived .card-desc { color: var(--ink-faint); }
+
+/* Before deleting a focus: one column, the focus as its card laid flat, what goes with it, the ways to keep its notes,
+   then the one button, in the rose of the label palette (there's no red here). */
+.delete-page { max-width: 620px; margin: 0 auto; padding: 22px 16px 80px; }
+.delete-page .page-title { margin-bottom: 18px; }
+.delete-card { min-height: 0; margin-bottom: 26px; background: transparent; box-shadow: none; }
+.delete-card .card-notes { color: var(--ink-faint); }
+.delete-what { margin: 0 0 12px; font-size: 18px; line-height: 1.55; }
+.delete-what ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 16px; color: var(--ink-soft); }
+.delete-what li { margin: 2px 0; }
+.delete-final { margin: 0 0 22px; font-size: 16px; font-style: italic; color: var(--ink-soft); }
+.delete-keep { display: grid; gap: 6px; margin: 0 0 26px; padding: 12px 16px; border-left: 2px solid var(--rule); font-family: var(--sans); font-size: 14px; color: var(--ink-soft); }
+.delete-keep button { padding: 0; border: 0; background: none; font: inherit; color: var(--accent); }
+.delete-keep :is(button, a):hover { text-decoration: underline; }
+.delete-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; font-family: var(--sans); font-size: 14px; }
+.delete-go { padding: 8px 16px; border: 0; border-radius: 6px; background: var(--g3); color: var(--paper); font: inherit; font-weight: 600; }
+.delete-go:hover { filter: brightness(1.08); }
 
 /* Just archived or unarchived: a word of it at the foot of the page, with Undo, going after a while. */
 .focus-toast {

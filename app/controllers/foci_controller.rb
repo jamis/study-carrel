@@ -1,5 +1,5 @@
 class FociController < ApplicationController
-  before_action :set_focus, only: %i[edit update make_current archive unarchive]
+  before_action :set_focus, only: %i[edit update make_current archive unarchive delete destroy]
   before_action :refuse_archived_focus, only: %i[edit update make_current]
 
   # Home for a signed-in reader: every focus as a card, the current one first. Archived ones are on a page of their own.
@@ -66,12 +66,29 @@ class FociController < ApplicationController
     redirect_to back_path, flash: (params[:undo] ? {} : { unarchived: @focus.id })
   end
 
+  # Deleting asks first on a page of its own: which focus it is, and what goes with it. An archived focus can be
+  # deleted too; being read-only stops writing under it, not throwing it away.
+  def delete
+    @passage_notes = @focus.notes.where.not(unit_id: nil).count
+    @whole_notes = @focus.notes.free.count
+    @works = foci.where(id: @focus.id).works_read.fetch(@focus.id, [])
+    @current = @focus == foci.current_one
+    @successor = foci.others.first if @current
+  end
+
+  # No Undo: a word of it at the foot of the page it was asked from (flash[:deleted], its title, since it's gone).
+  # Deleting the current focus makes the next most recent current, as if it had never been.
+  def destroy
+    @focus.destroy!
+    redirect_to back_path, flash: { deleted: @focus.title }
+  end
+
   private
 
   def foci = Current.user.foci
 
   # Editing from a focus's notes page goes back there (?back=notes), as does Cancel; from its card, back to the cards.
-  # Unarchiving from the archive goes back to it (?back=archived).
+  # Unarchiving or deleting from the archive goes back to it (?back=archived).
   def back_path
     case params[:back]
     when "notes" then focus_notes_path(@focus)

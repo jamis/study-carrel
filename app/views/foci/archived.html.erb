@@ -1,7 +1,7 @@
 <% content_for :title, "Archived focuses · Study Carrel" %>
 <%= render "shared/rail", focus: Current.focus, here: :foci %>
 <%# The foci put away, newest first: cards laid flat, not buttons (an archived focus can't be made current), each with
-    its notes (read-only, to read and export) and Unarchive. %>
+    its notes (read-only, to read and export), Unarchive and Delete. %>
 <main class="cards-page">
   <%= page_head [ [ "Your focuses", foci_path ], [ "Archived" ] ] %>
   <h1 class="page-title">Archived focuses</h1>
@@ -20,6 +20,7 @@
           <span class="card-acts">
             <%= button_to "Unarchive", unarchive_focus_path(focus, back: "archived"), method: :patch, class: "card-act", form_class: "inline-form",
                   aria: { label: "Unarchive “#{focus.title}”" } %>
+            <%= link_to "Delete", delete_focus_path(focus), class: "card-act card-act-delete", aria: { label: "Delete “#{focus.title}”" } %>
           </span>
         </div>
       </article>

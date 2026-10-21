@@ -1,7 +1,9 @@
 class Focus < ApplicationRecord
   belongs_to :user
   has_many :notes, dependent: :destroy
-  has_many :detached_notes, -> { ordered }, dependent: :nullify
+  # Deleting a focus deletes everything written under it. Its notes take their labels with them where no other note
+  # carries them (a label lasts only while some note does).
+  has_many :detached_notes, -> { ordered }, dependent: :destroy
   belongs_to :last_unit, class_name: "Unit", optional: true
   belongs_to :reread_note, class_name: "Note", optional: true
 

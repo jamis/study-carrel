@@ -1,0 +1,53 @@
+<% content_for :title, "Delete focus · Study Carrel" %>
+<%= render "shared/rail", focus: Current.focus, here: :foci %>
+<%# Before deleting a focus: the focus as its card, laid flat, so it's plain which one; what goes with it; the way to
+    keep its notes instead (archive it, or download them); then the one button. From the archive, everything comes
+    back to the archive (?back=archived). %>
+<% back = "archived" if @focus.archived?
+   notes = @passage_notes + @whole_notes
+   detached = @focus.detached_notes.count
+   scratchpad = @focus.scratchpad.present? %>
+<main class="delete-page">
+  <%= page_head [ [ "Your focuses", foci_path ], *([ [ "Archived", archived_foci_path ] ] if back), [ "Delete" ] ] %>
+  <h1 class="page-title">Delete this focus?</h1>
+
+  <article class="card delete-card">
+    <div class="card-label"><%= "Current · " if @current %><%= focus_span(@focus) %></div>
+    <h2 class="card-title"><%= @focus.title %></h2>
+    <% if @focus.description.present? %><p class="card-desc"><%= @focus.description %></p><% end %>
+    <div class="card-foot"><span class="card-notes"><%= notes_line(notes, @works) %></span></div>
+  </article>
+
+  <% if notes.zero? && detached.zero? && !scratchpad %>
+    <p class="delete-what">It has no notes.</p>
+  <% else %>
+    <div class="delete-what">
+      <% if notes.positive? %><strong><%= pluralize(notes, "note") %></strong> <%= notes == 1 ? "goes" : "go" %> with it:<% else %>These go with it:<% end %>
+      <ul>
+        <% if @passage_notes.positive? %><li><%= pluralize(@passage_notes, "note") %> on passages<%= " in #{@works.to_sentence}" if @works.any? %></li><% end %>
+        <% if @whole_notes.positive? %><li><%= pluralize(@whole_notes, "note") %> on the whole focus</li><% end %>
+        <% if detached.positive? %><li><%= detached %> more set aside earlier, from passages that changed</li><% end %>
+        <% if scratchpad %><li>its scratchpad</li><% end %>
+      </ul>
+    </div>
+  <% end %>
+  <p class="delete-final">This can’t be undone.<% if @successor %> It’s your current focus, so “<%= @successor.title %>” will be current instead.<% end %></p>
+
+  <% if notes.positive? || detached.positive? %>
+    <div class="delete-keep">
+      <% unless @focus.archived? %>
+        <div>To put it away and keep its notes, <%= button_to "archive it instead", archive_focus_path(@focus), method: :patch, form_class: "inline-form" %>.</div>
+      <% end %>
+      <% if @focus.archived? %>
+        <div><%= link_to "Download its notes (.md)", export_focus_notes_path(@focus), data: { turbo: false } %> first.</div>
+      <% else %>
+        <div>Or <%= link_to "download its notes (.md)", export_focus_notes_path(@focus), data: { turbo: false } %> first.</div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="delete-actions">
+    <%= button_to "Delete this focus", focus_path(@focus, back:), method: :delete, class: "delete-go", form_class: "inline-form" %>
+    <%= link_to "Cancel", back ? archived_foci_path : foci_path, class: "delete-cancel" %>
+  </div>
+</main>

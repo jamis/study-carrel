@@ -19,12 +19,13 @@ Rails.application.routes.draw do
 
   patch "position", to: "positions#update"
   get "continue", to: "continuations#show"
-  resources :foci, only: %i[index new create edit update] do
+  resources :foci, only: %i[index new create edit update destroy] do
     get :archived, on: :collection
     member do
       patch :make_current
       patch :archive
       patch :unarchive
+      get :delete # a page saying which focus is about to be deleted and what goes with it, before it is
     end
     # Every focus has its notes page, the current one's or a past one's, where they're reread one at a time. Notes on
     # the focus as a whole (free notes) are written there: new and show are their editors, create and update their

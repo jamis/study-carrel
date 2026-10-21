@@ -1,9 +1,12 @@
-<%# Just archived or unarchived a focus: a word of it at the foot of the page, with Undo, fading after a while.
+<%# Just archived or unarchived a focus: a word of it at the foot of the page, with Undo, fading after a while. Just
+    deleted one: a word of it, without Undo (flash[:deleted] is its title, since it's gone).
     back: the page it was done from, where Undo comes back to (nil for the cards, "archived", "notes"). %>
 <% back = local_assigns[:back]
    archived = flash[:archived] && Current.user.foci.find_by(id: flash[:archived])
    unarchived = flash[:unarchived] && Current.user.foci.find_by(id: flash[:unarchived]) %>
-<% if archived || unarchived %>
+<% if flash[:deleted] %>
+  <div class="focus-toast" role="status"><span>Deleted “<%= flash[:deleted].truncate(48) %>”</span></div>
+<% elsif archived || unarchived %>
   <div class="focus-toast" role="status">
     <% if archived %>
       <span>Archived “<%= archived.title.truncate(48) %>”</span>
