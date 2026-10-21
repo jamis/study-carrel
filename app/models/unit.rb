@@ -27,6 +27,6 @@ class Unit < ApplicationRecord
 
   # Drops units from the full-text index before they are deleted.
   def self.unindex_search(ids)
-    connection.exec_delete(sanitize_sql_array(["DELETE FROM unit_search WHERE rowid IN (?)", ids.map(&:to_i)])) if ids.any?
+    connection.exec_delete(sanitize_sql_array([ "DELETE FROM unit_search WHERE rowid IN (?)", ids.map(&:to_i) ])) if ids.any?
   end
 end
