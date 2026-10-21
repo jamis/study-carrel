@@ -3,8 +3,9 @@
     made current travels into the current slot, and the old current card goes back among the rest. %>
 <% content_for :head do %><meta name="view-transition" content="same-origin"><% end %>
 <%= render "shared/rail", focus: @current, here: :foci %>
-<%# Home for a signed-in reader: every focus as an index card. The current one is wide, ribboned, and the way back
-    into reading; clicking a past one makes it current again. %>
+<%# Home for a signed-in reader: every focus not archived as an index card. The current one is wide, ribboned, and the
+    way back into reading; clicking another makes it current. With none current (it was archived), the wide slot asks
+    you to choose. Archived foci are on a page of their own, linked under the cards. %>
 <main class="cards-page">
   <h1 class="page-title">Your focuses</h1>
   <div class="cards">
@@ -24,29 +25,32 @@
         <% else %>
           <%= link_to continue_path, class: "card-continue" do %><span class="card-continue-go">Choose where to begin →</span><% end %>
         <% end %>
-        <div class="card-foot">
-          <span class="card-notes"><%= notes_line(@note_counts.fetch(focus.id, 0), @works_read.fetch(focus.id, []), link: focus_notes_path(focus)) %></span>
-          <%= link_to "Edit", edit_focus_path(focus), class: "card-edit", aria: { label: "Edit “#{focus.title}”" } %>
-        </div>
+        <%= render "foci/card_foot", focus: %>
+      </article>
+    <% elsif @others.any? %>
+      <article class="card card-none">
+        <h2 class="card-title">No focus is current.</h2>
+        <p>Choose one of your focuses to read under, or start a new question.</p>
       </article>
     <% end %>
-    <% @past.each do |focus| %>
+    <% @others.each do |focus| %>
       <article class="card card-past" style="view-transition-name: focus-<%= focus.id %>">
-        <%# The whole card is the button: it's stretched over the card, under everything but the notes link and Edit,
-            which leave it in the past. %>
-        <%= button_to restore_focus_path(focus), method: :patch, class: "card-pick", form_class: "inline-form",
+        <%# The whole card is the button: it's stretched over the card, under everything but the notes link, Edit and
+            Archive, which leave it as it is. %>
+        <%= button_to make_current_focus_path(focus), method: :patch, class: "card-pick", form_class: "inline-form",
               title: "Make this focus current", aria: { label: "Make “#{focus.title}” current" } do %><% end %>
         <div class="card-label"><%= focus_span(focus) %></div>
         <h2 class="card-title"><%= focus.title %></h2>
         <% if focus.description.present? %><p class="card-desc card-clamp"><%= focus.description %></p><% end %>
-        <div class="card-foot">
-          <span class="card-notes"><%= notes_line(@note_counts.fetch(focus.id, 0), @works_read.fetch(focus.id, []), link: focus_notes_path(focus)) %></span>
-          <%= link_to "Edit", edit_focus_path(focus), class: "card-edit", aria: { label: "Edit “#{focus.title}”" } %>
-        </div>
+        <%= render "foci/card_foot", focus: %>
       </article>
     <% end %>
     <%= link_to new_focus_path, class: "card card-new" do %>
       <span class="card-new-plus">+</span>A new question
     <% end %>
   </div>
+  <% if @archived_count.positive? %>
+    <p class="cards-more"><%= link_to archived_foci_path do %>Archived focuses <small><%= @archived_count %></small> →<% end %></p>
+  <% end %>
+  <%= render "foci/toast" %>
 </main>

@@ -1,0 +1,9 @@
+<%# The foot of a focus's card on the focuses page: its notes (the count linking to its notes page), Edit and Archive. %>
+<div class="card-foot">
+  <span class="card-notes"><%= notes_line(@note_counts.fetch(focus.id, 0), @works_read.fetch(focus.id, []), link: focus_notes_path(focus)) %></span>
+  <span class="card-acts">
+    <%= link_to "Edit", edit_focus_path(focus), class: "card-act", aria: { label: "Edit “#{focus.title}”" } %>
+    <%= button_to "Archive", archive_focus_path(focus), method: :patch, class: "card-act", form_class: "inline-form",
+          aria: { label: "Archive “#{focus.title}”" } %>
+  </span>
+</div>

@@ -1,0 +1,16 @@
+<%# Just archived or unarchived a focus: a word of it at the foot of the page, with Undo, fading after a while.
+    back: the page it was done from, where Undo comes back to (nil for the cards, "archived", "notes"). %>
+<% back = local_assigns[:back]
+   archived = flash[:archived] && Current.user.foci.find_by(id: flash[:archived])
+   unarchived = flash[:unarchived] && Current.user.foci.find_by(id: flash[:unarchived]) %>
+<% if archived || unarchived %>
+  <div class="focus-toast" role="status">
+    <% if archived %>
+      <span>Archived “<%= archived.title.truncate(48) %>”</span>
+      <%= button_to "Undo", unarchive_focus_path(archived, back:, undo: 1), method: :patch, form_class: "inline-form" %>
+    <% else %>
+      <span>“<%= unarchived.title.truncate(48) %>” is back among your focuses</span>
+      <%= button_to "Undo", archive_focus_path(unarchived, back:, undo: 1), method: :patch, form_class: "inline-form" %>
+    <% end %>
+  </div>
+<% end %>

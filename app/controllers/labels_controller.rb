@@ -2,8 +2,9 @@
 # (leaving it known by its example). A name the user already has for another label is refused, with why; the two
 # aren't merged. The labels on the focus's page are redrawn from the reply.
 class LabelsController < ApplicationController
+  before_action :set_focus, :refuse_archived_focus
+
   def update
-    @focus = Current.user.foci.find(params[:focus_id])
     label = Current.user.labels.find(params[:id])
     label.rename!(params[:name].to_s)
     @notes = @focus.notes.where(id: label.note_labels.select(:note_id)).includes(labels: Label::FACE)
@@ -13,6 +14,8 @@ class LabelsController < ApplicationController
   end
 
   private
+
+  def set_focus = @focus = Current.user.foci.find(params[:focus_id])
 
   def refusal(label)
     if label.errors.of_kind?(:name, :taken) then "You already have a label called “#{label.name}”."

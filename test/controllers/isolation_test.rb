@@ -20,10 +20,9 @@ class IsolationTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_focus_path
   end
 
-  test "each reader has their own current focus; starting one doesn't archive the other's" do
+  test "each reader has their own current focus; starting one doesn't touch the other's" do
     sign_in_as @other
     post foci_path, params: { focus: { title: "Other's focus" } }
-    assert_nil @owner_focus.reload.archived_at
     assert_equal "Other's focus", @other.foci.current_one.title
     assert_equal "Owner's focus", @owner.foci.current_one.title
   end
@@ -76,14 +75,23 @@ class IsolationTest < ActionDispatch::IntegrationTest
     assert_no_match "Owner's focus", response.body
   end
 
-  test "another reader's focus can't be edited or restored" do
+  test "another reader's focus can't be edited, made current, archived or unarchived" do
     sign_in_as @other
     get edit_focus_path(@owner_focus)
     assert_response :not_found
     patch focus_path(@owner_focus), params: { focus: { title: "Hijacked" } }
     assert_response :not_found
-    patch restore_focus_path(@owner_focus)
+    patch make_current_focus_path(@owner_focus)
     assert_response :not_found
+    patch archive_focus_path(@owner_focus)
+    assert_response :not_found
+    assert_not @owner_focus.reload.archived?
+    @owner_focus.archive!
+    patch unarchive_focus_path(@owner_focus)
+    assert_response :not_found
+    assert @owner_focus.reload.archived?
+    get archived_foci_path
+    assert_no_match "Owner's focus", response.body
     assert_equal "Owner's focus", @owner_focus.reload.title
   end
 

@@ -1,6 +1,7 @@
 class NotesController < ApplicationController
   before_action :set_focus, except: :current
   before_action :set_free_note, only: %i[show update]
+  before_action :refuse_archived_focus, only: %i[new show create update]
 
   # A focus's notes, reread one at a time (the current focus's or a past one's): those on passages in reading order,
   # then those on the focus as a whole, one lit at a time, to label as you go, with the focus's scratchpad beside them.
@@ -14,7 +15,8 @@ class NotesController < ApplicationController
     @detached = @focus.detached_notes.includes(:rich_text_content) unless @label
   end
 
-  # The editor for a new note on the focus as a whole, and for one already written. Any focus's, past ones too: unlike
+  # The editor for a new note on the focus as a whole, and for one already written. Any focus's, not only the current
+  # one's (though not an archived one's, which is read-only): unlike
   # a passage's note, which the reader saves under the current focus, these are saved to their own focus.
   def new = render(partial: "notes/free_editor", locals: { focus: @focus, note: nil, frame: editor_frame })
   def show = render(partial: "notes/free_editor", locals: { focus: @focus, note: @note, frame: editor_frame })
@@ -48,7 +50,7 @@ class NotesController < ApplicationController
   end
 
   def current
-    redirect_to Current.focus ? focus_notes_path(Current.focus) : new_focus_path
+    redirect_to Current.focus ? focus_notes_path(Current.focus) : foci_path
   end
 
   private

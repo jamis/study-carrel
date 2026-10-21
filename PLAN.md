@@ -13,6 +13,7 @@ History, Keep, Random extended, Library search, Prose by sentence, User texts (p
 - **Accounts.** Invitations are done. Not yet: password reset, removing users or revoking access, emailing invitations.
 - **More works.** Religious texts, as well as more classics and poetry. Candidates: Upanishads, Analects, Zhuangzi, Apocrypha, Augustine, Thomas à Kempis, Whitman, Blake, Shakespeare's sonnets.
 - **Doctrine and Covenants and Pearl of Great Price.** Deferred: no clean public-domain text exists online. The Wikisource D&C is the modern copyrighted text. Options are OCR of the 1908 Deseret News D&C (archive.org `thedoctrineandco00smituoft`) cross-checked against two other pre-1923 scans, and the 1913 Pearl of Great Price on Wikisource. Label both as older public-domain editions; D&C 138 and the Official Declarations would be missing.
+- **A limit on active focuses**, if accounts move to a subscription. Archiving (done) is how one would stay under it.
 - **Deleting foci.** Not supported yet. Detaching its notes (as for a deleted text) may be the way to do it, so nothing written is lost by accident.
 - **Random over kept passages.**
 - **Search, extended.** Matching work/section titles and references ("Psalm 23"); searching your own notes.

@@ -2,7 +2,8 @@
 # Clearing the editor deletes the note.
 #
 # The note is the current focus's (/units/:unit_id/note), or, written from the reader without changing which focus is
-# current, another of the reader's focuses' (/foci/:focus_id/units/:unit_id/note).
+# current, another of the reader's focuses' (/foci/:focus_id/units/:unit_id/note). An archived focus's note is only
+# shown ("Also noted under …"), read-only.
 class UnitNotesController < ApplicationController
   include RequiresFocus
 
@@ -10,6 +11,7 @@ class UnitNotesController < ApplicationController
   before_action :set_focus_elsewhere, if: :elsewhere?
   before_action :set_unit
   before_action :set_note
+  before_action :refuse_archived_focus, only: :update
 
   def show
   end

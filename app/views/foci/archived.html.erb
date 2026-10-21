@@ -1,0 +1,29 @@
+<% content_for :title, "Archived focuses · Study Carrel" %>
+<%= render "shared/rail", focus: Current.focus, here: :foci %>
+<%# The foci put away, newest first: cards laid flat, not buttons (an archived focus can't be made current), each with
+    its notes (read-only, to read and export) and Unarchive. %>
+<main class="cards-page">
+  <%= page_head [ [ "Your focuses", foci_path ], [ "Archived" ] ] %>
+  <h1 class="page-title">Archived focuses</h1>
+  <p class="archive-lede">Put away when you were done with them. Their notes are kept as they were, to read and export; unarchive one to write in it again.</p>
+  <% if @archived.empty? %>
+    <p class="page-empty">Nothing archived.</p>
+  <% end %>
+  <div class="cards">
+    <% @archived.each do |focus| %>
+      <article class="card card-archived">
+        <div class="card-label"><%= focus_span(focus) %></div>
+        <h2 class="card-title"><%= focus.title %></h2>
+        <% if focus.description.present? %><p class="card-desc card-clamp"><%= focus.description %></p><% end %>
+        <div class="card-foot">
+          <span class="card-notes"><%= notes_line(@note_counts.fetch(focus.id, 0), @works_read.fetch(focus.id, []), link: focus_notes_path(focus)) %></span>
+          <span class="card-acts">
+            <%= button_to "Unarchive", unarchive_focus_path(focus, back: "archived"), method: :patch, class: "card-act", form_class: "inline-form",
+                  aria: { label: "Unarchive “#{focus.title}”" } %>
+          </span>
+        </div>
+      </article>
+    <% end %>
+  </div>
+  <%= render "foci/toast", back: "archived" %>
+</main>

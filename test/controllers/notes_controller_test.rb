@@ -49,7 +49,7 @@ class AllNotesTest < ActionDispatch::IntegrationTest
     get focus_notes_path(@focus.reload)
     assert_response :success
     assert_select ".nb-focus-title", "Holy"
-    assert_select ".rr-lede", /· #{@focus.created_at.strftime("%b %Y")}/
+    assert_select ".rr-archived", 0
     assert_select ".rr-row .rr-note", /from before/
     assert_select "a.menu-item[href=?]", focus_notes_path(now)
     assert_equal now, users(:one).foci.current_one, "reading them doesn't make it current"

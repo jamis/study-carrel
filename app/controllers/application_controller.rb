@@ -8,6 +8,11 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # An archived focus is read-only: nothing is written, labelled or grouped under it until it's unarchived.
+  def refuse_archived_focus
+    head :forbidden if @focus&.archived?
+  end
+
   # Admin-only pages look like they don't exist to everyone else.
   def require_admin
     head :not_found unless Current.user&.admin?

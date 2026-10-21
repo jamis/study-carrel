@@ -34,7 +34,7 @@ class MarkdownExportTest < ActiveSupport::TestCase
   end
 
   test "other foci's notes are not included" do
-    old = users(:one).foci.create!(title: "Old", archived_at: 1.day.ago)
+    old = users(:one).foci.create!(title: "Old", made_current_at: 1.day.ago)
     old.notes.create!(unit: verse(1), content: "<p>not mine</p>")
     refute_includes MarkdownExport.new(@focus).to_s, "not mine"
   end

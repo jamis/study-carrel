@@ -39,7 +39,7 @@ class RereadTest < ApplicationSystemTestCase
 
   test "the label picker: every label as a cloud, A–Z or recent, and Enter takes the closest match or a new label" do
     %w[ glory grace holiness humility justice mercy peace sorrow wilderness zeal ].each { @second.label!(it) }
-    users(:one).foci.create!(title: "Rest", archived_at: 1.day.ago).notes.create!(unit: verse(31), content: "x").label!("hope")
+    users(:one).foci.create!(title: "Rest", made_current_at: 1.day.ago).notes.create!(unit: verse(31), content: "x").label!("hope")
     visit focus_notes_path(@focus)
 
     find("body").send_keys "l"

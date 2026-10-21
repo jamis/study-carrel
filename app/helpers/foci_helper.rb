@@ -1,5 +1,6 @@
 module FociHelper
-  # "since September 14, 2026" for the current focus; "Jun – Sep 2026" or "Nov 2025 – Jan 2026" for a past one.
+  # "since September 14, 2026" for a focus in use; "Jun – Sep 2026" or "Nov 2025 – Jan 2026" for an archived one, from
+  # when it was begun to when it was archived.
   def focus_span(focus)
     return "since #{l focus.created_at.to_date, format: :long}" unless focus.archived?
 

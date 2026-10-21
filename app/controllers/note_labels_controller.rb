@@ -4,6 +4,7 @@
 # tallies) are redrawn from the reply.
 class NoteLabelsController < ApplicationController
   before_action :set_note
+  before_action :refuse_archived_focus
 
   def create
     touching(@note) do

@@ -34,7 +34,7 @@ class TextRevisionTest < ActiveSupport::TestCase
     @user = users(:one)
     @work = UserText.new(title: "Journal", source: BEFORE).publish!(@user)
     @wait = @user.foci.start!(title: "What does it mean to wait?")
-    @grief = @user.foci.create!(title: "What is grief for?", archived_at: 1.day.ago)
+    @grief = @user.foci.create!(title: "What is grief for?", made_current_at: 1.day.ago)
   end
 
   def unit(text) = Unit.joins(:section).where(sections: { work_id: @work.id }).find_by!(body: text)

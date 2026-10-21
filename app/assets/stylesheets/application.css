@@ -478,6 +478,9 @@
   .note-under-back:hover { color: var(--accent); }
   .note-under-back kbd { margin-left: 6px; font: 11px var(--sans); color: var(--ink-faint); }
   /* Under the current focus's note: the other focuses with a note on this passage, each opening it here. */
+  .note-under-archived { margin: 4px 0 0 21px; font: 12.5px var(--sans); color: var(--ink-faint); }
+  .note-read { flex: 1; min-height: 0; font-size: 17px; overflow-y: auto; }
+  .note-read .lexxy-content > :first-child { margin-top: 0; }
   .note-also { flex: none; margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--ink-faint); }
   .note-also-focus { font-family: var(--serif); font-size: 14.5px; font-style: italic; color: var(--ink-soft); text-decoration: none; }
   .note-also-focus:hover { color: var(--accent); }
@@ -560,7 +563,7 @@
 .invite-form { max-width: none; margin: 0 0 8px; }
 
 /* ---------- foci pages ---------- */
-a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a):not(.rail a):not(.whole-group a):not(.card-new):not(.note-under-back):not(.note-also-focus) { color: var(--accent); }
+a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a):not(.rail a):not(.whole-group a):not(.card-new):not(.note-under-back):not(.note-also-focus):not(.card-act):not(.cards-more a) { color: var(--accent); }
 .inline-form { display: inline; margin: 0; }
 .page { max-width: 40em; margin: 0 auto; padding: 22px 16px 80px; }
 /* Above the title: the way up (helpers page_head), quietly, and the page's actions at the right. */
@@ -598,16 +601,18 @@ a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu
 .card-notes { font-family: var(--sans); font-size: 13px; color: var(--ink-soft); }
 .card-foot .chip { flex: none; white-space: nowrap; }
 
-/* Editing a focus is done from its card (and its notes page), not the reader. */
-.card-edit { flex: none; font-family: var(--sans); font-size: 13px; color: var(--ink-faint); text-decoration: none; }
-.card-edit:hover { color: var(--accent); }
+/* Editing and archiving a focus are done from its card (editing from its notes page too), not the reader. Both faint
+   until pointed at. */
+.card-acts { display: flex; align-items: baseline; gap: 14px; flex: none; }
+.card-act { padding: 0; border: 0; background: none; font-family: var(--sans); font-size: 13px; line-height: inherit; color: var(--ink-faint); text-decoration: none; }
+.card-act:hover { color: var(--accent); }
 
 /* A past card is one big button that makes it current. */
 .card-pick { position: absolute; inset: 0; z-index: 1; width: 100%; padding: 0; border: 0; border-radius: inherit; background: none; cursor: pointer; }
-.card-past :is(.card-notes a, .card-edit) { position: relative; z-index: 2; }
-/* (not while pointing at its notes link or Edit, which don't make it current) */
-.card-past:hover:not(:has(.card-notes a:hover, .card-edit:hover)) { border-color: var(--accent); }
-.card-past:hover:not(:has(.card-notes a:hover, .card-edit:hover)) .card-title { color: var(--accent); }
+.card-past :is(.card-notes a, .card-acts) { position: relative; z-index: 2; }
+/* (not while pointing at its notes link, Edit or Archive, which don't make it current) */
+.card-past:hover:not(:has(.card-notes a:hover, .card-act:hover)) { border-color: var(--accent); }
+.card-past:hover:not(:has(.card-notes a:hover, .card-act:hover)) .card-title { color: var(--accent); }
 
 /* the current focus: twice as wide, a ribbon, and the way back into reading */
 .card-current { grid-column: span 2; border-color: var(--accent); }
@@ -641,7 +646,35 @@ a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu
   border-style: dashed; color: var(--ink-soft); text-decoration: none; font-style: italic; }
 .card-new:hover { border-color: var(--accent); color: var(--accent); }
 .card-new-plus { font-size: 28px; font-style: normal; line-height: 1; }
-@media (max-width: 600px) { .card-current { grid-column: auto; } .card-new { min-height: 120px; } }
+@media (max-width: 600px) { .card-current, .card-none { grid-column: auto; } .card-new { min-height: 120px; } }
+
+/* No focus current (it was archived): the wide slot asks you to choose one. */
+.card-none { grid-column: span 2; justify-content: center; gap: 10px; background: transparent; box-shadow: none; }
+.card-none .card-title { color: var(--ink-soft); }
+.card-none p { margin: 0; font-family: var(--sans); font-size: 14px; color: var(--ink-faint); }
+
+/* The way to the archive, under the cards: quiet, and only when something is in it. */
+.cards-more { margin: 26px 2px 0; font-family: var(--sans); font-size: 14px; }
+.cards-more a { color: var(--ink-soft); text-decoration: none; }
+.cards-more a:hover { color: var(--accent); }
+.cards-more small { margin-left: 4px; font-size: inherit; color: var(--ink-faint); }
+
+/* The archive: cards laid flat, no shadow, the title in soft ink. Not buttons. */
+.archive-lede { max-width: 40em; margin: -10px 0 22px; font-family: var(--sans); font-size: 14px; color: var(--ink-faint); }
+.card-archived { min-height: 150px; background: transparent; box-shadow: none; }
+.card-archived .card-title { color: var(--ink-soft); }
+.card-archived .card-desc { color: var(--ink-faint); }
+
+/* Just archived or unarchived: a word of it at the foot of the page, with Undo, going after a while. */
+.focus-toast {
+  position: fixed; left: 50%; bottom: 24px; z-index: 50; display: flex; align-items: center; gap: 14px; max-width: calc(100vw - 32px);
+  padding: 9px 16px; border-radius: 8px; background: var(--ink); color: var(--paper); box-shadow: var(--shadow);
+  font-family: var(--sans); font-size: 14px; transform: translateX(-50%); animation: toast-go .4s 8s both;
+}
+.focus-toast span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.focus-toast button { flex: none; padding: 0; border: 0; background: none; color: var(--accent-soft); font-size: 14px; text-decoration: underline; }
+.focus-toast:hover, .focus-toast:focus-within { animation-play-state: paused; }
+@keyframes toast-go { to { opacity: 0; visibility: hidden; } }
 
 /* ---------- notes ---------- */
 

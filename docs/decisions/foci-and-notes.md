@@ -2,22 +2,38 @@
 
 ## Foci
 
-One focus at a time. No parallel foci in v1. The focus is the app's current state: no switcher or lenses. You read under one focus, but a passage's note can be written under any of your other focuses from the reader without making it current (decided 2026-10-21; see [Notes under another focus](#notes-under-another-focus)). Deleting a focus is not supported yet (detaching its notes, as for a deleted text, may be the way; see [user-texts.md](user-texts.md)).
+One focus at a time. No parallel foci in v1. The focus is the app's current state: no switcher or lenses. You read under one focus, but a passage's note can be written under any of your other focuses from the reader without making it current (decided 2026-10-21; see [Notes under another focus](#notes-under-another-focus)). Deleting a focus is not supported yet (detaching its notes, as for a deleted text, may be the way; see [user-texts.md](user-texts.md)); archiving one puts it away (see [Archiving](#archiving)).
+
+**Every focus not archived is in use; one is just current** (decided 2026-10-21). Choosing another doesn't retire the old one. Each focus stores when it was last made current (`foci.made_current_at`), and the latest is the current one; making one current stamps it and touches nothing else. Until then `archived_at` had meant "not current", stamped on the old focus whenever another was started or chosen, so every focus but one read as finished.
 
 ## Home: the focuses page
 
 **Signed in, `/` is the focuses page** (decided 2026-10-12; it used to drop you straight back into reading). Every focus you've had is an index card, so home shows what you've been asking, not only where you stopped. Design reference: `prototype/home/b.html`, chosen over a one-column list (A), a table of contents (C), a list-and-detail split (D) and four other card treatments (B1 to B4).
 
 - The **current** card is double width with a ribbon: its dates, title, description, and a panel, "Continue at Isaiah 40:25 →" with the passage (or "Choose where to begin" before any reading), set apart so it's easy to find. Under it, quieter, "or find something new in the library →" (only once there's a place to continue from).
-- **Past** cards show their dates, title and description (three lines at most). The whole card is a button: clicking it makes that focus current (decided 2026-10-12; it was a "Make current" chip). Back on the cards, that card moves into the current slot as the old current card goes back among the rest (a view transition, .3s, the cards crossfading at their own size rather than stretching), then its ribbon unrolls. Prototyped against the card simply rising in place; the prototype was discarded.
+- **Past** cards (the other focuses in use; the code says "others") show when they were begun ("since October 2, 2026"), title and description (three lines at most). They used to show a span ("Jun – Sep 2026"), ending when another focus was made current, which made them look finished. The whole card is a button: clicking it makes that focus current (decided 2026-10-12; it was a "Make current" chip). Back on the cards, that card moves into the current slot as the old current card goes back among the rest (a view transition, .3s, the cards crossfading at their own size rather than stretching), then its ribbon unrolls. Prototyped against the card simply rising in place; the prototype was discarded.
 - Every card ends with "12 notes in Ruth, Leviticus and Deuteronomy" (or "No notes yet"): the count and the works those notes are in, one line, so the works aren't mistaken for a citation. The count links to that focus's notes page, on past cards too (above the card's button, so reading a past focus's notes doesn't make it current, and pointing at the link doesn't light up the card).
 - No note is quoted on the cards (tried 2026-10-12): out of its passage a note lacks context, and the works line under it read as its source.
 - A dashed "A new question" card starts a new focus. No totals or tallies across focuses.
-- No focuses yet: you go to the new-focus form.
+- No focuses yet: you go to the new-focus form. With every focus archived, the page shows only "A new question" and the way to the archive.
 - "Continue reading" (in the rail off the reader, and the current focus's card) is `/continue`, which resumes the current focus where it left off.
-- Every card has an **Edit** (decided 2026-10-20; editing used to be a chip in the reader's description dropdown), above a past card's button like its notes link. The notes page has "Edit focus" in its head.
+- Every card has an **Edit** (decided 2026-10-20; editing used to be a chip in the reader's description dropdown) and an **Archive** (decided 2026-10-21), faint at the foot until pointed at, above a past card's button like its notes link. The notes page has "Edit focus" in its head.
+- Under the cards, a quiet "Archived focuses 3 →", only when something is archived.
+- **No focus current** (the current one was archived): the wide slot says "No focus is current. Choose one of your focuses to read under, or start a new question." Pages that need a current focus (the reader, Continue reading) bring you here, or to the new-focus form if every focus is archived.
 - After **starting** a focus you go straight to reading. After **editing** one or **making one current** you come back to the cards, as does Cancel on either form; editing from the notes page comes back to the notes page (`?back=notes`).
 - The UI says "focuses", never "foci" (the code keeps `Focus`/`foci`).
+
+## Archiving
+
+**A focus can be archived** (decided 2026-10-21): put away when a timeboxed study is done, so the focuses page stays the ones you're using. Long-lived focuses stay as they are; archiving is for the short ones. Prototype: `prototype/home/archive.html` (transient). If accounts are ever limited to a number of active focuses (a subscription), archiving is how you'd stay under it; for now there's no limit.
+
+- **Archive** is at the foot of every card, the current one included. No confirmation, as it's easily undone: the card goes, and a word at the foot of the page says "Archived "…" · Undo" (fading after eight seconds, held while pointed at).
+- **Archiving the current focus** leaves none current until you choose one on the cards (rather than quietly making the most recent other one current). Undone straight away, it's current again. In general an unarchived focus is current again only if no other was made current since; otherwise it goes back among the others.
+- **The archive** (`/foci/archived`, "Archived focuses →" under the cards): the archived focuses newest first, as flatter cards (no shadow, the title in soft ink) showing their span, begun to archived ("Feb – Apr 2026"), the notes line linking to the notes page, and **Unarchive** (with Undo). The cards aren't buttons: an archived focus can't be made current without unarchiving it.
+- **Read-only:** nothing is written, labelled or grouped under an archived focus, enforced on the server (403): no notes on passages or on the whole focus, new or changed; no labels put on or taken off, no Gather, no naming groups from its page; no scratchpad changes; no Discard for its detached notes; no Edit, and it can't be made current. Where its reread is up to still moves, and Copy Markdown / Download `.md` still work.
+- **Its notes page** keeps the run, `j`/`k`, the footnotes, the labels panel to point at (tapping a label does nothing) and the scratchpad's text behind its tab; it drops Edit focus, "+ New note", the chips, + label and Gather. "Unarchive" in the line under the title brings it back, staying on the page.
+- **Elsewhere:** archived focuses aren't offered to note a passage under; "Also noted under" still names them (read-only). Labels used under them still count in the label picker and "also under …".
+- The UI's word is "archive"; the code's `archived_at` means only that.
 
 ## Focus presentation
 
@@ -37,7 +53,7 @@ History: a thin bar felt lost and a large hero banner too big; a filled pill wit
 
 **One note per verse per focus** (decided 2026-10-03), enforced by a unique index on `(focus_id, unit_id)`.
 
-**Notes on the focus as a whole** (decided 2026-10-13): what you notice across passages rather than on one. They have no unit (`notes.unit_id` is empty; the index still holds one note per passage, as SQLite treats each NULL as distinct), any number per focus, labelled like any note. They're written on the notes page, the reread (see [reread.md](reread.md)), and in the reader from the note sheet's focus tab (decided 2026-10-20; see [reader.md](reader.md)), always by an explicit "+ New note", never an open editor that would number a stray thought. They're saved to their own focus, so a past focus's can be written and changed too. They follow the notes on passages under "On the whole focus", each headed by its number and date ("Focus 2 · October 14") where a passage would be; in the export, a "## On the whole focus" section. They count on the focus's card but name no work.
+**Notes on the focus as a whole** (decided 2026-10-13): what you notice across passages rather than on one. They have no unit (`notes.unit_id` is empty; the index still holds one note per passage, as SQLite treats each NULL as distinct), any number per focus, labelled like any note. They're written on the notes page, the reread (see [reread.md](reread.md)), and in the reader from the note sheet's focus tab (decided 2026-10-20; see [reader.md](reader.md)), always by an explicit "+ New note", never an open editor that would number a stray thought. They're saved to their own focus, so a past focus's can be written and changed too (not an archived one's). They follow the notes on passages under "On the whole focus", each headed by its number and date ("Focus 2 · October 14") where a passage would be; in the export, a "## On the whole focus" section. They count on the focus's card but name no work.
 
 - **Numbered on their focus** (decided 2026-10-20): "focus 2" is how one is referred to wherever a passage's note would be "40:12" (footnotes, a group's notes, the held notes' tabs, "like focus 2"). A scripture reference says little about what's in the note either, and a pop-up shows the note itself. "whole, Oct 14" was tried first: "whole" read badly, and two notes written the same day couldn't be told apart. The number is stored (`notes.number`) and never reused: the focus counts what it has handed out (`foci.free_notes_numbered`), so a deleted note leaves a gap, as a missing verse would, rather than a reference quietly coming to mean another note. A note cleared and written again is a new note, with the next number.
 
@@ -57,7 +73,8 @@ Notes that lose their unit (a revised or deleted user text) become detached note
 - **Writing:** choosing one opens its note on this passage in the sheet's editor (the passage tab, opened on phones), on a tinted slip headed by that focus, with "← Back to *the current focus*" (Esc). A dot on the passage's tab, and on phones the reference in the handle in the accent colour, say the note is going elsewhere. It autosaves and clears like any passage's note, to that focus (`/foci/:id/units/:unit_id/note`); the current focus, your place and your history are untouched, and the verse grid's dots stay the current focus's.
 - **Back:** "Back to…", Esc, or moving to another passage: a new verse always opens under the current focus.
 - **Also noted under:** under the current focus's note, a faint line names your other focuses with a note on this passage, each opening that note in place. It's how you find what you wrote elsewhere, without leaving the reader.
-- Any of your focuses can be written under (they're all past ones; none is deleted). Another user's focus is a 404.
+- Any of your focuses not archived can be written under; archived ones aren't in the list. Another user's focus is a 404.
+- An archived focus's note on the passage is still named under "Also noted under", and opens read-only: its text, no editor, the slip saying "Archived, so only to read".
 - Considered: a picker in the sheet itself, at the foot of the passage's note ("Note this under another focus…"), the prototype's A. The list under the focus was preferred: it sits with the focus it's an alternative to. A switcher that kept your place was rejected: you'd still have to switch back, and could forget.
 
 ## Notes pages
@@ -66,7 +83,7 @@ Notes that lose their unit (a revised or deleted user text) become detached note
 
 **The notes page is the reread** (decided 2026-10-19): the notes one at a time down one column with the scratchpad beside them, as described in [reread.md](reread.md). The reread began as a page of its own beside the notes page, which then felt redundant: everything it showed, the reread showed too.
 
-- Under "Your focuses", titled with the focus. A past focus's dates follow "Rereading 8 notes ▾".
+- Under "Your focuses", titled with the focus (Your focuses › Archived for an archived one, with "Archived October 21, 2026 · Unarchive" after "Rereading 8 notes ▾").
 - **Copy Markdown** and **Download `.md`** in the page head, exporting the notes, those on the whole focus and the detached notes.
 - **Detached notes** follow the run under "From passages that changed or were removed": the reference grey and not a link (there's nothing to open), why it was set aside, the passage, the note, its named labels' names kept as text, and Discard. They're out of the run (no `j`/`k`, labels or grouping), being no longer notes, and faint until pointed at. Not shown under `?label=`. Turning one back into a note on the whole focus was considered, to bring it into the run, and left for later: they should be rare.
 - The ⋯ menu's item is "Notes on this focus (12)", for the current focus. The cards link each focus's count to its page. There is no separate "Reread" link any more.

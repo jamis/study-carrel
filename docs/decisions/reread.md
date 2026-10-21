@@ -4,13 +4,13 @@ The first part of synthesis (see [synthesis.md](synthesis.md), still exploratory
 
 ## The page
 
-**`/foci/:id/notes`, for any focus** (it was `/foci/:id/reread`, which now redirects there), the current one or a past one, without making a past one current. The rail stays the current focus's.
+**`/foci/:id/notes`, for any focus** (it was `/foci/:id/reread`, which now redirects there), the current one, a past one or an archived one, without making it current. An archived focus's is read-only (see [Archiving](foci-and-notes.md#archiving)). The rail stays the current focus's.
 
 - Every note on a passage in reading order down one column, as on the notes page (reference, passage, note), then the notes on the focus as a whole under "On the whole focus", each by its number and date ("Focus 2 · October 14"). Each note's labels are footnotes (below). The one you're on is lit and the rest dimmed in place, as clause by clause dims the rest of a passage. The passage is clamped to two lines except on the lit note.
 - **The column is about 48em wide** on a wide screen (decided 2026-10-20), wider than the reader's 34em measure: with the scratchpad put away there's nothing beside it, and comparing notes wants the room (the card's tabs were crowded at 36em, the width it had beside the docked scratchpad). Keeping the notes' text to about 40em inside a wider row was the alternative, if the full width reads too long.
 - `j`/`k` (or `←`/`→`) move, as does clicking a note; a held key moves once, as in the reader. The lit note scrolls to the middle.
 - **Where you left off** is kept per focus (`foci.reread_note_id`, cleared if that note goes), so the reread opens there again.
-- The way up: Your focuses. Copy Markdown and Download `.md` at the right of that line. A past focus's dates follow the count.
+- The way up: Your focuses (› Archived, for an archived focus). Copy Markdown and Download `.md` at the right of that line. An archived focus's "Archived October 21, 2026 · Unarchive" follows the count.
 - Detached notes follow the run, out of it, to read or discard (see [foci-and-notes.md](foci-and-notes.md)).
 - The reference links into the reader; on the lit note it reads "Isaiah 40:25 Open in the reader →", all one link (the hint was once a separate span that lit up with the reference but did nothing when clicked).
 - `?label=` rereads only the notes carrying one label, chosen from "Rereading 8 notes ▾" over the run.

@@ -1,12 +1,21 @@
 class FociController < ApplicationController
-  before_action :set_focus, only: %i[edit update restore]
+  before_action :set_focus, only: %i[edit update make_current archive unarchive]
+  before_action :refuse_archived_focus, only: %i[edit update make_current]
 
-  # Home for a signed-in reader: every focus as a card, the current one first.
+  # Home for a signed-in reader: every focus as a card, the current one first. Archived ones are on a page of their own.
   def index
-    @current = foci.current_one
-    @past = foci.past.to_a
-    return redirect_to new_focus_path if @current.nil? && @past.empty?
+    return redirect_to new_focus_path unless foci.exists?
 
+    @current = foci.current_one
+    @others = foci.others.to_a
+    @archived_count = foci.archived.count
+    @note_counts = foci.note_counts
+    @works_read = foci.works_read
+  end
+
+  # The foci put away, newest first: their notes to read and export, and Unarchive.
+  def archived
+    @archived = foci.archived.to_a
     @note_counts = foci.note_counts
     @works_read = foci.works_read
   end
@@ -40,9 +49,21 @@ class FociController < ApplicationController
 
   # Back to the cards, where the card moves into the current slot (a view transition) and its ribbon unrolls
   # (flash[:made_current]).
-  def restore
-    @focus.restore!
+  def make_current
+    @focus.make_current!
     redirect_to foci_path, flash: { made_current: true }
+  end
+
+  # Archiving and unarchiving go back where they were done from (the cards, the archive, the notes page), with a word
+  # of what happened and the way to undo it (flash[:archived] / flash[:unarchived], the focus's id). Undoing says nothing.
+  def archive
+    @focus.archive!
+    redirect_to back_path, flash: (params[:undo] ? {} : { archived: @focus.id })
+  end
+
+  def unarchive
+    @focus.unarchive!
+    redirect_to back_path, flash: (params[:undo] ? {} : { unarchived: @focus.id })
   end
 
   private
@@ -50,7 +71,14 @@ class FociController < ApplicationController
   def foci = Current.user.foci
 
   # Editing from a focus's notes page goes back there (?back=notes), as does Cancel; from its card, back to the cards.
-  def back_path = params[:back] == "notes" ? focus_notes_path(@focus) : foci_path
+  # Unarchiving from the archive goes back to it (?back=archived).
+  def back_path
+    case params[:back]
+    when "notes" then focus_notes_path(@focus)
+    when "archived" then archived_foci_path
+    else foci_path
+    end
+  end
   helper_method :back_path
 
   def set_focus = @focus = foci.find(params[:id])

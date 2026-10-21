@@ -6,20 +6,26 @@
     focus can be written and edited here, and so can the current focus's notes on passages, as in the reader.
     "Gather" (g) turns the column into a comparison: up to three notes held under tabs on a card at
     the top, the rest under it, each to put in one of the held note's groups (labels, named or not) or a new group with
-    it. Detached notes, whose passages are gone, follow the run, only to read or discard. %>
-<main class="reader reread" data-controller="reread compare footnotes"
+    it. Detached notes, whose passages are gone, follow the run, only to read or discard.
+    An archived focus's page is read-only: its notes, footnotes and scratchpad to read, nothing to write, label or
+    gather, and Unarchive in the lede. %>
+<% archived = @focus.archived? %>
+<main class="reader reread" data-controller="reread footnotes<%= " compare" unless archived %>"
       data-reread-position-url-value="<%= focus_reread_path(@focus) %>"
+      data-reread-read-only-value="<%= archived %>"
       data-reread-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
       data-reread-lift-url-value="<%= focus_notes_path(@focus) %>"
       data-compare-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
       data-compare-rename-url-template-value="<%= focus_label_path(@focus, "{id}") %>"
-      data-action="keydown@document->footnotes#key keydown@document->compare#key keydown@document->reread#key mouseover->reread#light click@document->reread#away note:saved@window->reread#saved selectionchange@document->reread#selected">
+      data-action="keydown@document->footnotes#key <%= "keydown@document->compare#key " unless archived %>keydown@document->reread#key mouseover->reread#light click@document->reread#away note:saved@window->reread#saved selectionchange@document->reread#selected">
   <%= render "shared/rail", focus: Current.focus %>
 
   <div class="reader-col reread-col">
-    <%= page_head [ [ "Your focuses", foci_path ], [ "Notes" ] ] do %>
+    <%= page_head [ [ "Your focuses", foci_path ], *([ [ "Archived", archived_foci_path ] ] if archived), [ "Notes" ] ] do %>
       <span class="page-actions" data-controller="clipboard" data-clipboard-url-value="<%= export_focus_notes_path(@focus) %>">
-        <%= link_to safe_join(["Edit", tag.span(" focus", class: "wide-only")]), edit_focus_path(@focus, back: "notes"), class: "chip" %>
+        <% unless archived %>
+          <%= link_to safe_join(["Edit", tag.span(" focus", class: "wide-only")]), edit_focus_path(@focus, back: "notes"), class: "chip" %>
+        <% end %>
         <% if @all.any? || @detached&.any? %>
           <button class="chip" type="button" data-action="clipboard#copy" data-clipboard-target="button">Copy<span class="wide-only"> Markdown</span></button>
           <%= link_to safe_join(["Download", tag.span(" .md", class: "wide-only")]), export_focus_notes_path(@focus), class: "chip", data: { turbo: false } %>
@@ -41,17 +47,24 @@
           <% end %>
         </span>
       </span>
-      <% if @focus.archived? %>· <%= focus_span(@focus) %><% end %>
-      <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to gather, <kbd>c</kbd> for the labels, <kbd>n</kbd> for a new note, <kbd>s</kbd> the scratchpad</span>
+      <% if archived %>
+        <span class="rr-archived">· Archived <%= l @focus.archived_at.to_date, format: :long %> ·
+          <%= button_to "Unarchive", unarchive_focus_path(@focus, back: "notes"), method: :patch, form_class: "inline-form" %></span>
+        <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>c</kbd> for the labels, <kbd>s</kbd> the scratchpad</span>
+      <% else %>
+        <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to gather, <kbd>c</kbd> for the labels, <kbd>n</kbd> for a new note, <kbd>s</kbd> the scratchpad</span>
+      <% end %>
     </div>
+    <% unless archived %>
     <p class="rr-lede rr-cmp-lede">Gathering what goes with the note you're on<span class="rr-keys"> · <kbd>j</kbd>/<kbd>k</kbd> through the others, <kbd>1</kbd>–<kbd>9</kbd> or <kbd>+</kbd> to group, <kbd>Enter</kbd> to hold one under a tab, <kbd>[</kbd>/<kbd>]</kbd> from tab to tab, <kbd>x</kbd> to let one go, <kbd>p</kbd>/<kbd>o</kbd> the whole passage or note, <kbd>g</kbd> or × to go back</span></p>
 
     <%# Gathering what goes with a note: the notes held under tabs at the top of the column, the one you're on with its
         groups numbered for the moment. Drawn from the rows by the compare controller. %>
     <section class="rr-cmp-card" aria-label="The notes you're holding" data-compare-target="card" hidden></section>
+    <% end %>
 
     <% if @notes.empty? %>
-      <p class="page-empty"><%= @label ? "No notes here are #{label_phrase(@label)} any more." : "No notes yet. Open a verse and write what it says to your question." %></p>
+      <p class="page-empty"><%= @label ? "No notes here are #{label_phrase(@label)} any more." : archived ? "No notes." : "No notes yet. Open a verse and write what it says to your question." %></p>
     <% end %>
 
     <div class="rr-run">
@@ -67,10 +80,11 @@
           <%= render "rereads/row", note:, focus: @focus, here: note == @here, members: @members %>
         <% end %>
       </section>
-      <% unless @label %>
+      <% unless @label || archived %>
         <button class="rr-new" type="button" data-action="reread#newNote" title="A note on the focus as a whole (n)">+ New note</button>
       <% end %>
       <%# A new note on the whole focus, before its first save makes it (removed again if you move on with it empty). %>
+      <% unless archived %>
       <template data-reread-target="newRow">
         <article class="rr-row rr-free rr-unsaved" data-reread-target="row" data-editor-url="<%= new_focus_note_path(@focus) %>" data-action="click->reread#pick">
           <div class="rr-head"><span class="rr-ref rr-whole">New note</span></div>
@@ -79,6 +93,7 @@
           <div class="rr-labels" id="new_note_labels" data-label-ids=""></div>
         </article>
       </template>
+      <% end %>
 
       <%# Notes set aside when their passages changed or went: no longer notes to label or group, only to read or
           discard. Out of the run. %>
@@ -93,8 +108,10 @@
               <div class="rr-note"><%= detached.content %></div>
               <div class="rr-labels">
                 <% detached.label_names.to_a.each do |name| %><span class="rr-chip"><%= name %></span><% end %>
-                <%= button_to "Discard", detached_note_path(detached), method: :delete, class: "chip", form_class: "inline-form rr-discard",
-                      data: { turbo_confirm: "Discard this note? It can’t be brought back." } %>
+                <% unless archived %>
+                  <%= button_to "Discard", detached_note_path(detached), method: :delete, class: "chip", form_class: "inline-form rr-discard",
+                        data: { turbo_confirm: "Discard this note? It can’t be brought back." } %>
+                <% end %>
               </div>
             </article>
           <% end %>
@@ -134,7 +151,7 @@
     </button>
     <%# On phones, a new note on the whole focus and the labels are on the scratchpad's handle. %>
     <span class="rr-pad-tools rr-pad-tools-phone">
-      <% unless @label %><button class="rr-summon" type="button" data-action="reread#newNote">New note</button><% end %>
+      <% unless @label || archived %><button class="rr-summon" type="button" data-action="reread#newNote">New note</button><% end %>
       <button class="rr-summon" type="button" aria-expanded="false" data-action="reread#toggleLabels">Labels</button>
     </span>
     <%# Elsewhere, the scratchpad and the labels are each behind a tab at the right edge, which slides them in. %>
@@ -146,6 +163,9 @@
       <span class="panel-label">Scratchpad</span>
       <button class="rr-close" type="button" aria-label="Put the scratchpad away" title="Put it away (Esc)" data-action="sheet#toggle">×</button>
     </div>
+    <% if archived %>
+      <div class="rr-pad-read"><%= @focus.scratchpad.presence || tag.p("Nothing in the scratchpad.", class: "empty") %></div>
+    <% else %>
     <%# Select some of the scratchpad and this turns it into a note on the whole focus. %>
     <button class="rr-lift" type="button" data-reread-target="lift" data-action="mousedown->reread#keepSelection click->reread#lift" hidden>Make a note of this</button>
     <div class="composer">
@@ -157,6 +177,7 @@
         <p class="autosave-status" aria-live="polite" data-autosave-target="status">&nbsp;</p>
       <% end %>
     </div>
+    <% end %>
 
     <%# The labels in use, called up over the foot of the scratchpad (Labels, or c) and put away again (×, Esc, c). %>
     <section class="rr-labels-panel" aria-label="Labels" data-reread-target="labelsPanel">
@@ -168,7 +189,8 @@
         <button class="rr-close" type="button" aria-label="Put the labels away" data-action="reread#toggleLabels">×</button>
       </div>
       <div class="rr-labels-body" id="reread_labels"><%= render "rereads/labels", focus: @focus, notes: @all %></div>
-      <p class="rr-labels-hint">Point at a label to light its notes; tap it to put the note you're on on it, or take it off.</p>
+      <p class="rr-labels-hint">Point at a label to light its notes<%= "; tap it to put the note you're on on it, or take it off" unless archived %>.</p>
     </section>
   </aside>
+  <%= render "foci/toast", back: "notes" %>
 </main>

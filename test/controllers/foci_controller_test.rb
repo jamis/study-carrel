@@ -33,12 +33,12 @@ class FociControllerTest < ActionDispatch::IntegrationTest
     assert_equal 0, Focus.count
   end
 
-  test "a new focus archives the previous one" do
+  test "a new focus is current, and the old one stays among the others" do
     users(:one).foci.start!(title: "Old")
     post foci_path, params: { focus: { title: "New" } }
     assert_equal "New", users(:one).foci.current_one.title
-    assert_equal 1, Focus.current.count
-    assert_equal 2, Focus.count
+    assert_equal [ "Old" ], users(:one).foci.others.map(&:title)
+    assert_equal 0, Focus.archived.count
   end
 end
 
@@ -62,19 +62,17 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "past foci list shows archived foci and can restore one" do
-    @focus.archive!
+  test "the other foci are cards, and clicking one makes it current" do
     other = users(:one).foci.start!(title: "Light")
     get foci_path
     assert_select ".card-current .card-title", "Light"
     assert_select ".card:not(.card-current) .card-title", "Holy"
-    assert_select ".card-past form[action=?] button.card-pick[aria-label=?]", restore_focus_path(@focus), "Make “Holy” current"
+    assert_select ".card-past form[action=?] button.card-pick[aria-label=?]", make_current_focus_path(@focus), "Make “Holy” current"
 
-    patch restore_focus_path(@focus)
+    patch make_current_focus_path(@focus)
     assert_redirected_to foci_path
     assert_equal "Holy", users(:one).foci.current_one.title
-    assert other.reload.archived?
-    assert_equal 1, Focus.current.count
+    assert_equal [ other ], users(:one).foci.others.to_a
 
     follow_redirect!
     assert_select ".card-current.card-arrived .card-title", "Holy"
@@ -101,11 +99,10 @@ class FociManagementTest < ActionDispatch::IntegrationTest
   end
 
   test "each card has an Edit, which comes back to the cards" do
-    @focus.archive!
     users(:one).foci.start!(title: "Light")
     get foci_path
-    assert_select ".card-current a.card-edit[href=?]", edit_focus_path(Focus.find_by!(title: "Light"))
-    assert_select ".card-past a.card-edit[href=?]", edit_focus_path(@focus), text: "Edit"
+    assert_select ".card-current a.card-act[href=?]", edit_focus_path(Focus.find_by!(title: "Light"))
+    assert_select ".card-past a.card-act[href=?]", edit_focus_path(@focus), text: "Edit"
     get edit_focus_path(@focus)
     assert_select "a[href=?]", foci_path, text: "Cancel"
   end
@@ -136,7 +133,6 @@ class FociManagementTest < ActionDispatch::IntegrationTest
   test "each card says how many notes it has and which works they're in" do
     @focus.notes.create!(unit: verse(3), content: "A thought")
     @focus.notes.create!(unit: verse(8), content: "Another")
-    @focus.archive!
     light = users(:one).foci.start!(title: "Light")
 
     get foci_path

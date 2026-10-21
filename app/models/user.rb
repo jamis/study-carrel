@@ -3,15 +3,14 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :foci, dependent: :destroy do
     # Defined on the association, not on Focus, so they can only ever see this user's foci.
-    def current_one = current.order(:created_at).last
+    # The focus most recently made current, unless it has been archived since: then none is.
+    def current_one = by_recency.first&.then { it unless it.archived? }
 
-    # Only one focus is current at a time: starting one archives the old one.
-    def start!(attrs)
-      transaction do
-        proxy_association.owner.foci.current.update_all(archived_at: Time.current)
-        create!(attrs)
-      end
-    end
+    # Every focus not archived but the current one, most recently current first.
+    def others = active.by_recency.where.not(id: current_one&.id)
+
+    # A new focus is current; the old one stays among the others.
+    def start!(attrs) = create!(attrs)
   end
   has_many :visits, dependent: :delete_all
   has_many :keeps, dependent: :delete_all

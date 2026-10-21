@@ -10,10 +10,14 @@ class Focus < ApplicationRecord
 
   validates :title, presence: true
 
-  # user.foci.current_one and user.foci.start! are defined on the association in User.
-  scope :current, -> { where(archived_at: nil) }
+  # The latest of a user's is the current focus (user.foci.current_one, with start! and the others, is defined on the
+  # association in User). Making one current stamps it; nothing else changes.
+  attribute :made_current_at, default: -> { Time.current }
 
-  scope :past, -> { where.not(archived_at: nil).order(archived_at: :desc) }
+  # Archived foci are put away: off the focuses page, their notes read-only.
+  scope :active, -> { where(archived_at: nil) }
+  scope :archived, -> { where.not(archived_at: nil).order(archived_at: :desc, id: :desc) }
+  scope :by_recency, -> { order(made_current_at: :desc, id: :desc) }
 
   # For the focuses page, called on a set of foci (user.foci): a query apiece, keyed by focus id.
   def self.note_counts = Note.where(focus_id: select(:id)).group(:focus_id).count
@@ -48,14 +52,11 @@ class Focus < ApplicationRecord
              .group_by(&:first).transform_values { |pairs| pairs.map(&:last) }
   end
 
+  def make_current! = update!(made_current_at: Time.current)
+
+  # Archiving the current focus leaves none current until another is chosen. Unarchived, a focus is current again only
+  # if none was made current since (so undoing the archiving of the current focus puts it back as it was).
   def archived? = archived_at.present?
   def archive! = update!(archived_at: Time.current)
-
-  # Bring a past focus back; whatever else is current for this user moves to the archive.
-  def restore!
-    self.class.transaction do
-      user.foci.current.where.not(id: id).update_all(archived_at: Time.current)
-      update!(archived_at: nil)
-    end
-  end
+  def unarchive! = update!(archived_at: nil)
 end

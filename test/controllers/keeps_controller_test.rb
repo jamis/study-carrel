@@ -91,12 +91,8 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".nb-passage", 0
   end
 
-  test "the Kept page asks before starting a focus only when one is current" do
+  test "the Kept page starts a focus without asking: the current one stays among the others" do
     @user.keeps.create!(unit: verse(3))
-    get kept_path
-    assert_select "a[href=?][data-turbo-confirm]", new_focus_path(unit_id: verse(3).id)
-
-    @user.foci.current_one.archive!
     get kept_path
     assert_select "a[href=?]:not([data-turbo-confirm])", new_focus_path(unit_id: verse(3).id)
   end

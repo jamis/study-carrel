@@ -11,11 +11,12 @@ const PICKER_LEAST = 150, PICKER_TALLEST = 340 // px of the picker's cloud
 // or from the labels panel (c), which shows the labels in use as a cloud or as tallies. Pointing at a label lights the
 // notes that carry it. The note you're on gets its editor, if it has one here (data-editor-url); where you are is
 // saved, so the reread opens there again. A new note on the whole focus (n) is written in a row of its own, and a
-// selection in the scratchpad can be made one ("Make a note of this").
+// selection in the scratchpad can be made one ("Make a note of this"). An archived focus's page is read-only
+// (readOnly): moving, the footnotes, the labels panel and the scratchpad to read, nothing written or labelled.
 export default class extends Controller {
   static targets = ["row", "newRow", "noteLabels", "labelsBody", "picker", "pickerInput", "pickerOptions", "pickerFoot", "labelForm", "pad", "labelsPanel",
     "lift", "toast"]
-  static values = { positionUrl: String, labelsUrlTemplate: String, liftUrl: String }
+  static values = { positionUrl: String, labelsUrlTemplate: String, liftUrl: String, readOnly: Boolean }
 
   connect() {
     let view = "cloud"
@@ -97,6 +98,7 @@ export default class extends Controller {
   // ---------- notes on the whole focus ----------
 
   newNote() {
+    if (this.readOnlyValue) return
     const section = this.element.querySelector("#reread_free")
     if (!section) return
     // Out of the scratchpad (a phone's sheet, or the drawer at the right) and back to the notes, to write there.
@@ -144,6 +146,7 @@ export default class extends Controller {
 
   // Selecting some of the scratchpad offers "Make a note of this", just over the selection.
   selected() {
+    if (this.readOnlyValue) return
     const selection = getSelection()
     const range = selection.rangeCount && !selection.isCollapsed ? selection.getRangeAt(0) : null
     const inPad = range && this.padTarget.querySelector(".composer lexxy-editor")?.contains(range.commonAncestorContainer)
@@ -222,6 +225,7 @@ export default class extends Controller {
   }
 
   toggleLabel(event) {
+    if (this.readOnlyValue) return
     const id = event.currentTarget.dataset.labelId
     if (!this.here) return
     if (this.#hereLabelIds.includes(id)) this.#submit("delete", id)
@@ -451,6 +455,8 @@ export default class extends Controller {
     else if (event.key === "e") { const editor = this.here?.querySelector("lexxy-editor [contenteditable]"); if (editor) { event.preventDefault(); focusAtEnd(editor) } }
     else if (event.key === "s") {
       const pad = this.padTarget.querySelector(".composer lexxy-editor [contenteditable]")
+      // Read-only, there's no editor to go into: it only comes out (or goes away again).
+      if (this.readOnlyValue) { event.preventDefault(); return this.padTarget.querySelector(".panel-handle").click() }
       if (!pad) return
       event.preventDefault()
       // Put away (behind its tab, or a phone's sheet shut): out first.

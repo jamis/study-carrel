@@ -47,7 +47,7 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     @late.label!("set apart")
     @early.label!("set apart")
     @early.label!("wilderness")
-    users(:one).foci.create!(title: "Rest", archived_at: 1.day.ago).notes.create!(unit: verse(31), content: "x").label!("waiting")
+    users(:one).foci.create!(title: "Rest", made_current_at: 1.day.ago).notes.create!(unit: verse(31), content: "x").label!("waiting")
 
     get focus_notes_path(@focus)
     assert_select "#reread_note_#{@early.id} .rr-chip", 2
@@ -167,7 +167,7 @@ class NoteLabelsControllerTest < ActionDispatch::IntegrationTest
   test "a note can't be grouped with itself, or with another focus's note" do
     post focus_note_labels_path(@focus, @note), params: { with_note_id: @note.id }, as: :turbo_stream
     assert_response :unprocessable_entity
-    elsewhere = users(:one).foci.create!(title: "Rest", archived_at: 1.day.ago).notes.create!(unit: verse(31), content: "x")
+    elsewhere = users(:one).foci.create!(title: "Rest", made_current_at: 1.day.ago).notes.create!(unit: verse(31), content: "x")
     post focus_note_labels_path(@focus, @note), params: { with_note_id: elsewhere.id }, as: :turbo_stream
     assert_response :not_found
   end
