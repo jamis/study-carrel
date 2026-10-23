@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class ArchivingTest < ApplicationSystemTestCase
+class ArchivingSystemTest < ApplicationSystemTestCase
   setup do
     load_isaiah
     @old = users(:one).foci.start!(title: "Rest")
