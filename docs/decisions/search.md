@@ -24,4 +24,8 @@ Results come in **reading order, not relevance**, 50 to a page, with highlighted
 - User texts are included for their owner (see [user-texts.md](user-texts.md)).
 - A shelf has its own box and scope (`?shelf=`, 2026-10-12), searching every work on it and under its collections (see [shelves.md](shelves.md)).
 
+## Coming back
+
+**Search remembers the last search for the sitting** (decided 2026-10-22). Opening a result to read or note it, then wanting the rest of the results, used to mean the browser's Back, which stops short once the reader has moved on to another chapter, and isn't there at all in a home-screen app. Now the results page you were on, and the result you opened from it (`#r-<unit id>`), are kept in sessionStorage, and the rail's and menu's Search (and `/` off the search page) go back there: the same query and page, scrolled to that result, marked with a rule at its left. A new search replaces it; a new tab starts empty. A "← Back to results" slip in the reader was considered and left out, to keep the reader's column as it is.
+
 Left out for now: matching titles and references, and searching notes.

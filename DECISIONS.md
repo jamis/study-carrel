@@ -1,6 +1,6 @@
 # Study Carrel: Decisions
 
-Last updated: 2026-10-21
+Last updated: 2026-10-22
 
 A web app for reading text (scripture, poetry, prose) against a **focus**: a question, metaphor, or thesis ("What does it mean to be holy?" while reading Isaiah 40). The reader sees one passage at a time with the focus pinned above it and writes a note on it.
 
@@ -32,7 +32,7 @@ This is the index. Each line is the rule in force; the linked file has the detai
 | Shelves | A user's own private groups of works and whole collections (a collection brings everything under it, nothing twice), to roll Random and search in. Filled from "Put on a shelf…" under a work's or collection's title, or the shelf editor over the library tree. | [shelves](docs/decisions/shelves.md) |
 | Random | Scoped (innermost collection by default) and balanced across branches; a shelf is a scope too. | [random](docs/decisions/random.md) |
 | Reread | The notes page: a focus's notes one at a time (`/foci/:id/notes`, any focus; `/reread` redirects there): all in one column, the one you're on lit (`j`/`k`), each note's labels as footnotes (a numbered mark per label after its text, its other notes named under it, each shown when pointed at); the scratchpad put away behind a tab at the right edge (`s`). Notes on the whole focus written there (`n`, the "+ New note" slip; or "Make a note of this" from the scratchpad). Labels are the user's own, across focuses, put on notes with + label (`l`), a picker showing them all as a cloud (A–Z or recent; the footer says what Enter does); the labels in use as a cloud or tallies on a panel behind the Labels tab (`c`). A label's name is optional: **Gather** (`g`) holds the lit note on a small card over the column and lists the focus's other notes, each to put in one of its groups (labels, named or not) or a new group of the two; up to three notes held at once under tabs on the card, "Hold this" (Enter) holding another without the list moving; named, renamed (no duplicates, no merging yet) from the card. | [reread](docs/decisions/reread.md) |
-| Search | FTS5 over unit text, every word required, reading order, a sentence at a time for prose; titles and notes not searched. Scoped to a work, collection, Your Texts or a shelf. | [search](docs/decisions/search.md) |
+| Search | FTS5 over unit text, every word required, reading order, a sentence at a time for prose; titles and notes not searched. Scoped to a work, collection, Your Texts or a shelf. Search in the rail goes back to the sitting's last search, at the result you opened. | [search](docs/decisions/search.md) |
 
 **Exploratory, not decided:** [discovery](docs/decisions/discovery.md) holds brainstorm notes on helping new users find something to study (an exploring focus, curated lists, keeps in place of notes). Nothing in it is a rule. [synthesis](docs/decisions/synthesis.md) holds notes on turning notes into writing: the reread and notes on the whole focus are decided (above); essays drawn from one or more focuses are still exploratory.
 

@@ -1,6 +1,6 @@
 <% content_for :title, "#{"#{@search.query} · " if @search.searching?}Search · Study Carrel" %>
 <%= render "shared/rail", random: (RandomScope.chain_for(@place) if @place), focus: Current.focus, here: :search %>
-<main class="page">
+<main class="page" data-controller="search-results">
   <%= page_head [ [ "Library", library_path ], [ "Search", search_path ] ] %>
   <h2 class="page-title">Search</h2>
   <%= render "shared/search_form", place: @place, query: @search.query, autofocus: !@search.searching? %>
@@ -38,8 +38,8 @@
 
     <% @units.each do |unit|
       section = unit.section %>
-      <section class="fv-item">
-        <%= link_to reading_path(section.work.slug, section.number, unit.number), class: "fv-ref" do %><%= unit.reference %><% if section.work.short_byline %><span class="search-by"> · <%= section.work.short_byline %></span><% end %><% end %>
+      <section class="fv-item search-result" id="r-<%= unit.id %>">
+        <%= link_to reading_path(section.work.slug, section.number, unit.number), class: "fv-ref", data: { action: "search-results#open" } do %><%= unit.reference %><% if section.work.short_byline %><span class="search-by"> · <%= section.work.short_byline %></span><% end %><% end %>
         <p class="fv-quote search-excerpt"><%= search_excerpt(unit.excerpt) %></p>
       </section>
     <% end %>
