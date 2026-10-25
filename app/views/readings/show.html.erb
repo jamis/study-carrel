@@ -108,7 +108,7 @@
               data-focus-sheet-target="tab" data-tab="unit" data-action="focus-sheet#pick">
         <span class="tab-name">Note ·</span><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span><span class="tab-under" title="Under another focus"></span>
       </button>
-      <button class="tab" type="button" role="tab" id="sheet_tab_focus" aria-controls="sheet_pane_focus" aria-selected="false" title="Notes on the whole focus (f)"
+      <button class="tab tab-focus" type="button" role="tab" id="sheet_tab_focus" aria-controls="sheet_pane_focus" aria-selected="false" title="Notes on the whole focus (f)"
               data-focus-sheet-target="tab" data-tab="focus" data-action="focus-sheet#pick">
         <%= render "foci/mark" %>The focus<span class="tab-count" data-focus-sheet-target="count"><%= "(#{free_count})" if free_count.positive? %></span><kbd class="key">f</kbd>
       </button>

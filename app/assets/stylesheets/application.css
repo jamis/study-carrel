@@ -417,7 +417,9 @@
   .tab:hover { color: var(--ink-soft); }
   .tab[aria-selected="true"] { color: var(--ink); }
   .tab[aria-selected="true"]::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 2px; height: 2px; border-radius: 1px; background: var(--accent); }
+  /* Only the passage's tab gives up room (its reference shortens); the focus tab keeps its width. */
   .tab-unit { flex: 0 1 auto; }
+  .tab-focus { flex: none; }
   .tab-name { flex: none; }
   .tab .ref { color: inherit; }
   .tab .focus-mark { width: 13px; height: 12px; margin: 0; stroke: currentColor; }
