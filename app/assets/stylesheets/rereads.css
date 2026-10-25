@@ -44,6 +44,10 @@
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .rr-row.here .rr-passage { display: block; font-size: 16.5px; }
+/* In the run the passage is set as a quotation, so it reads as the text and the note as yours. */
+:is(.rr-row, .rr-gone) .rr-passage { margin: 8px 0 0 2px; padding-left: 14px; border-left: 2px solid var(--rule); }
+:is(.rr-row, .rr-gone) .rr-passage + :is(.rr-text, .rr-note) { margin-top: 12px; }
+.rr-row.here .rr-passage ~ .rr-editor:has(turbo-frame[complete]) { margin-top: 12px; }
 .rr-text { margin-top: 8px; font-size: 18px; line-height: 1.5; }
 .rr-row.here .rr-text { font-size: 21px; }
 .rr-note { margin-top: 8px; font-size: 18px; line-height: 1.5; }
