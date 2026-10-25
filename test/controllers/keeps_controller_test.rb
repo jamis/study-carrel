@@ -71,6 +71,7 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".nb-note .nb-remark", "first one"
     assert_select ".nb-note .nb-remark", 1, "no remark, nothing in its place"
     assert_select ".nb-note a[href=?]", new_focus_path(unit_id: verse(3).id)
+    assert_select ".kept-desc", /apart from any focus/
   end
 
   test "the Kept page can list in reading order" do
@@ -83,6 +84,7 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
   test "the Kept page is empty with a hint" do
     get kept_path
     assert_select ".page-empty"
+    assert_select ".kept-desc", 0, "the hint says it already"
   end
 
   test "the Kept page shows only the reader's own" do

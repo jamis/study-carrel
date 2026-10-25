@@ -15,6 +15,9 @@
   <div class="nb-sheet<%= " nb-empty" if @keeps.empty? && @detached.empty? %>">
     <header class="nb-focus">
       <div class="nb-focus-head"><svg class="kept-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z"/></svg><h1 class="nb-focus-title kept-title">Kept</h1></div>
+      <% if @keeps.any? %>
+        <p class="nb-focus-desc kept-desc">Passages that stayed with you, kept apart from any focus. Keep one with the ribbon beside a passage’s reference<span class="kept-key"> (<kbd>b</kbd>)</span>. Open one here to read on from it, or start a focus from it.</p>
+      <% end %>
     </header>
     <p class="nb-lede"><%= pluralize(@keeps.size, "passage") %> you wanted to come back to</p>
 

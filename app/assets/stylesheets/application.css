@@ -824,6 +824,9 @@ a.fv-ref:hover { text-decoration: underline; }
 .nb-labels { margin: 10px 0 0; font-family: var(--sans); font-size: 12px; color: var(--ink-faint); }
 /* Kept stands where a focus would, with the ribbon for its mark, but it's a name, not a question: upright. */
 .kept-title { font-style: normal; }
+.kept-desc { margin-left: 0; font-style: normal; white-space: normal; max-width: 34em; text-wrap: pretty; }
+.kept-desc kbd { font: inherit; }
+@media (hover: none) { .kept-key { display: none; } }
 .kept-mark { flex: none; width: 17px; height: 17px; margin-top: .3em; fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round; }
 .nb-ref-row { display: flex; align-items: center; gap: 8px; }
 .nb-ref { font: 600 13px var(--sans); color: var(--accent); text-decoration: none; }
