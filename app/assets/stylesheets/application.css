@@ -394,7 +394,7 @@
   .now.clauses .clause { cursor: pointer; }
   .now.clauses .clause:not(.current) { color: color-mix(in srgb, var(--ink) 26%, var(--bg)); }
   .now.clauses .clause:not(.current):hover { color: color-mix(in srgb, var(--ink) 50%, var(--bg)); background: color-mix(in srgb, var(--accent-soft) 45%, transparent); }
-  .now.clauses .clause.current { background: var(--accent-soft); box-shadow: 0 0 0 .1em var(--accent-soft); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .now.clauses .clause.current { background: var(--accent-soft); box-shadow: 0 0 0 .1em var(--accent-soft); }
   @media (prefers-reduced-motion: reduce) { .now .clause { transition: none; } }
   .step-clauses { min-width: 34px; font-family: var(--serif); font-weight: 700; }
   .step-clauses[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); }
