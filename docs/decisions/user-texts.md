@@ -36,7 +36,7 @@ The upload is saved directly by `UserText#publish!` (not through `TextLoader`, w
 
 ## Where they appear
 
-- A per-user "Your Texts" at the top of the library (and in the ⋯ menu).
+- A per-user "Your Texts" at the top of the library (and in the phone menu).
 - The Your Texts page has its own search box and Random scope (`OwnTexts`; `?texts=yours`, `/texts/random`).
 - In the reader, Random defaults to Your Texts. User texts are included in search and are one more branch for Random.
 - Revise is on Your Texts and on the work page.

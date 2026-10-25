@@ -99,7 +99,7 @@ Notes that lose their unit (a revised or deleted user text) become detached note
 - Under "Your focuses", titled with the focus (Your focuses › Archived for an archived one, with "Archived October 21, 2026 · Unarchive" after "Rereading 8 notes ▾").
 - **Copy Markdown** and **Download `.md`** in the page head, exporting the notes, those on the whole focus and the detached notes.
 - **Detached notes** follow the run under "From passages that changed or were removed": the reference grey and not a link (there's nothing to open), why it was set aside, the passage, the note, its named labels' names kept as text, and Discard. They're out of the run (no `j`/`k`, labels or grouping), being no longer notes, and faint until pointed at. Not shown under `?label=`. Turning one back into a note on the whole focus was considered, to bring it into the run, and left for later: they should be rare.
-- The ⋯ menu's item is "Notes on this focus (12)", for the current focus. The cards link each focus's count to its page. There is no separate "Reread" link any more.
+- The rail's "Notes on this focus", with its count (12), is for the current focus; the count is kept up to date as notes are written (`.focus-notes-count`). The cards link each focus's count to its page. There is no separate "Reread" link any more.
 - `/notes` still works: it redirects to the current focus's page. `/foci/:id/reread` redirects to the focus's notes page, keeping `?label=`.
 - No page of every note across focuses: a note makes sense only beside the question it answers, and the focuses page already serves as the index across them.
 - Another user's focus is a 404, as everywhere.

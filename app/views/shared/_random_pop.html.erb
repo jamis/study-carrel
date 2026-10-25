@@ -1,0 +1,19 @@
+<%# The rail's Random: a popover of the places to pick a passage from, the default first, then the wider places and
+    the user's shelves holding this page's work or collection (every shelf, from the library). Its label's second line
+    names the default.
+    scopes: RandomScope places, innermost first; default: the one listed first %>
+<% others = scopes - [ default ]
+   shelves = shelf_scopes(scopes) - [ default ] %>
+<div class="rail-item rail-only rail-random" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
+  <button class="icon-btn rail-btn" type="button" aria-label="Random, <%= default.in_words %>" aria-expanded="false" aria-controls="rail-random"
+          data-menu-target="button" data-action="menu#toggle"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r=".6" fill="currentColor"/><circle cx="15" cy="15" r=".6" fill="currentColor"/><circle cx="12" cy="12" r=".6" fill="currentColor"/></svg><span class="rail-label rail-label-2">Random<span class="rail-dest"><%= default.in_words %></span></span></button>
+  <div class="menu-panel rail-pop" id="rail-random" data-menu-target="panel">
+    <div class="menu-label">Pick randomly from</div>
+    <%= link_to default.label, random_scope_path(default), class: "menu-item menu-default" %>
+    <% others.each do |scope| %><%= link_to scope.label, random_scope_path(scope), class: "menu-item" %><% end %>
+    <% if shelves.any? %>
+      <div class="menu-label">Your shelves</div>
+      <% shelves.each do |scope| %><%= link_to scope.label, random_scope_path(scope), class: "menu-item" %><% end %>
+    <% end %>
+  </div>
+</div>

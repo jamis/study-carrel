@@ -1,16 +1,18 @@
-<%# The ⋯ menu's items, in the rail (shared/_rail). Those the rail has its own icons for (.menu-foci, .menu-library,
-    .menu-continue, .menu-search, .menu-kept, and Recent places) show only on phones, where the rail is just the ⋯.
+<%# The phone menu (the ⋯, in shared/_rail): the rail's tools under Study, then the account's under your name.
     focus: the current focus (nil if none); reading: on the reading view (no "Continue reading");
-    random / random_default: as for shared/_rail %>
-<%= render "notes/menu_link", focus: focus if focus %>
-<%= link_to "Your focuses", foci_path, class: "menu-item menu-foci" %>
-<% unless reading %><%= link_to "Library", library_path, class: "menu-item menu-library" %><% end %>
-<button class="menu-item menu-history" type="button" data-history-open data-action="menu#close">Recent places<kbd>h</kbd></button>
-<% if focus && !reading %><%= link_to "Continue reading", continue_path, class: "menu-item menu-continue" %><% end %>
-<%= link_to search_path, class: "menu-item menu-search", data: { controller: "search-key", action: "keydown@window->search-key#key" } do %>Search<kbd>/</kbd><% end %>
+    random / random_default: as for shared/_rail; me: the name the account goes by %>
+<div class="menu-label">Study</div>
+<%= link_to "Your focuses", foci_path, class: "menu-item" %>
+<% if focus %>
+  <%= link_to focus_notes_path(focus), class: "menu-item" do %>Notes on this focus<span class="menu-note focus-notes-count"><%= focus.notes.count.nonzero? %></span><% end %>
+  <% unless reading %><%= link_to "Continue reading", continue_path, class: "menu-item" %><% end %>
+<% end %>
+<% unless reading %><%= link_to "Library", library_path, class: "menu-item" %><% end %>
+<button class="menu-item" type="button" data-history-open data-action="menu#close">Recent places<kbd>h</kbd></button>
+<%= link_to search_path, class: "menu-item", data: { controller: "search-key", action: "keydown@window->search-key#key" } do %>Search<kbd>/</kbd><% end %>
 <%= render "shared/random_menu", scopes: random, default: random_default %>
-<%= link_to "Kept", kept_path, class: "menu-item menu-kept" %>
+<%= link_to "Kept", kept_path, class: "menu-item" %>
 <%= link_to "Your Texts", texts_path, class: "menu-item" %>
-<button class="menu-item" type="button" data-action="theme#toggle">Light / dark</button>
-<% if Current.user.admin? %><%= link_to "Invitations", admin_invitations_path, class: "menu-item" %><% end %>
-<%= button_to "Sign out", session_path, method: :delete, class: "menu-item", form_class: "signout" %>
+<div class="menu-rule"></div>
+<div class="menu-label"><%= me %></div>
+<%= render "shared/me_items" %>

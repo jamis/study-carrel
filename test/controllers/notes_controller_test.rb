@@ -92,7 +92,8 @@ class AllNotesTest < ActionDispatch::IntegrationTest
   test "the reading page links to it with a count" do
     @focus.notes.create!(unit: verse(3), content: "x")
     get reading_path("isaiah-kjv", 40)
-    assert_select "a.menu-item[href=?]", focus_notes_path(@focus), text: "Notes on this focus (1)"
+    assert_select ".rail a.rail-btn[href=?] .focus-notes-count", focus_notes_path(@focus), text: "1"
+    assert_select "#nav-menu a.menu-item[href=?] .focus-notes-count", focus_notes_path(@focus), text: "1"
   end
 
   test "the old address goes to the current focus's notes" do

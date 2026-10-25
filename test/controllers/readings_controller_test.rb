@@ -70,6 +70,10 @@ class ReadingsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".menu-row a.menu-item[href=?]", random_collection_path("old-testament"), text: /Old Testament/
     assert_select ".menu-sub a.menu-item[href=?]", random_work_path("isaiah-kjv")
     assert_select ".menu-sub a.menu-item[href=?]", random_path
+    assert_select "#rail-random .menu-item" do |items|
+      assert_equal [ "Old Testament", "Isaiah", "Bible", "Sacred Texts", "Whole library" ], items.map { it.text.strip }
+    end
+    assert_select ".rail-random .rail-dest", "in Old Testament"
   end
 
   test "unknown verse is a 404" do
@@ -110,13 +114,17 @@ class ReadingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#rail-up .trail-sides a[href=?]", reading_path("isaiah-kjv", 41), text: /Isaiah 41/
   end
 
-  test "the rail has your focuses, recent places, search, kept and the menu, but not continue reading" do
+  test "the rail has your focuses, recent places, search, random, kept and the account, but not continue reading" do
     get reading_path("isaiah-kjv", 40, 25)
     assert_select ".rail a.rail-btn[href=?]", foci_path, text: "Your focuses"
     assert_select ".rail .history-btn[aria-label=?]", "Recent places"
     assert_select ".rail a.rail-btn[href=?]", search_path
     assert_select ".rail a.rail-btn[href=?]", kept_path
-    assert_select ".rail #nav-menu a.menu-item[href=?]", foci_path
+    assert_select ".rail a.rail-btn[href=?]", focus_notes_path(@focus)
+    assert_select ".rail #rail-random"
+    assert_select ".rail #rail-me button.menu-item", "Light / dark"
+    assert_select ".rail #rail-me form[action=?]", session_path
+    assert_select ".rail #nav-menu a.menu-item[href=?]", foci_path # the ⋯, for phones
     assert_select ".rail a[href=?]", continue_path, count: 0
     assert_select ".rail a.rail-btn[href=?]", library_path, count: 0
   end

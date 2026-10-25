@@ -28,11 +28,11 @@ Deleting a shelf (from the editor, with a confirmation) takes nothing else: work
 
 - **Library:** a "Your shelves" row under Your Texts, each shelf with what's on it, and New shelf.
 - **The shelf page** (`/shelves/:slug`): like a collection page, with "Your shelf · 12 works in all · only you can see it · Edit shelf", its own search box, and its members.
-- **Random:** a shelf is a scope of its own (`/shelves/:slug/random`), balanced evenly among what's on it, then inside a collection as everywhere else (see [random](random.md)). The ⋯ menu's ▾ lists, under "Your shelves", the shelves holding the page's work or collection (every shelf, from the library).
+- **Random:** a shelf is a scope of its own (`/shelves/:slug/random`), balanced evenly among what's on it, then inside a collection as everywhere else (see [random](random.md)). Random's popover in the rail lists, under "Your shelves", the shelves holding the page's work or collection (every shelf, from the library).
 - **Search:** `?shelf=slug` searches every work on the shelf; the search page offers the shelf and the whole library as chips (see [search](search.md)).
 
 ## Open
 
 - Whether the reader's Random should keep a shelf's scope after rolling from it (today it falls back to the innermost collection, with the shelf a step away under ▾).
-- "Put on a shelf…" in the reader's ⋯ menu.
+- "Put on a shelf…" in the reader (it had been an idea for the ⋯ menu, which the desktop rail no longer has).
 - Starter shelves an admin defines and a user copies (a link to discovery's curated lists).

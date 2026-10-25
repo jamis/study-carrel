@@ -68,7 +68,8 @@ class ShelvesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".list-row-title", "Your shelves"
     assert_select "a[href=?]", shelf_path(shelf), text: "Light"
     assert_select ".shelf-holds", "Bible · Walden"
-    assert_select ".menu-sub a[href=?]", random_shelf_path(shelf), text: "Random in Light"
+    assert_select ".menu-sub a[href=?]", random_shelf_path(shelf), text: "Light"
+    assert_select "#rail-random a[href=?]", random_shelf_path(shelf), text: "Light"
   end
 
   test "a work's page offers Random in the shelves holding it, and its picker shows where it stands" do

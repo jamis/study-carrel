@@ -48,7 +48,9 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
       get path
       assert_select ".rail a.rail-btn[href=?]", library_path, text: "Library"
       assert_select ".rail .history-btn"
-      assert_select ".rail .menu-btn"
+      assert_select ".rail .menu-btn" # the ⋯, for phones
+      assert_select ".rail #rail-random"
+      assert_select ".rail #rail-me"
       assert_select ".rail a.rail-continue[href=?]", continue_path
       assert_select ".rail #rail-up", 0
     end
@@ -57,9 +59,11 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
     assert_select ".page-trail li:last-child a", "Old Testament"
     assert_select ".page-trail a", text: "Genesis", count: 0
     assert_select ".menu-row a[href=?]", random_work_path("genesis-kjv"), text: /Random\s*Genesis/
+    assert_select "#rail-random a.menu-default[href=?]", random_work_path("genesis-kjv"), text: "Genesis"
     get library_path
     assert_select ".menu-row a[href=?]", random_path
     assert_select ".menu-more", 0
+    assert_select "#rail-random a.menu-item", 1
   end
 
   test "the rail's Continue reading names where it goes, in parts the label can shorten" do
@@ -75,7 +79,8 @@ class LibraryControllerTest < ActionDispatch::IntegrationTest
     users(:one).foci.current_one.archive!
     get library_path
     assert_select ".rail-continue", 0
-    assert_select ".menu-continue", 0
+    assert_select "#nav-menu a[href=?]", continue_path, 0
+    assert_select ".rail-slot" # Notes on this focus's place, kept
   end
 
   test "a collection lists its books in order" do

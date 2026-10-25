@@ -7,5 +7,5 @@
   <%= turbo_stream.replace dom_id(@note, :focus_sheet_head), partial: "readings/focus_note_head",
         locals: { id: "new_focus_note_head", number: @focus.free_notes_numbered + 1, date: Date.current, fresh: true } %>
 <% end %>
-<%= turbo_stream.replace "focus_notes_link", partial: "notes/menu_link", locals: { focus: @focus } if @focus == Current.focus %>
+<%= turbo_stream.update_all ".focus-notes-count", @focus.notes.count.nonzero?.to_s if @focus == Current.focus %>
 <%= turbo_stream.replace "focus_sheet_all", partial: "readings/focus_all", locals: { focus: @focus } %>

@@ -212,6 +212,7 @@
   .menu-more[aria-expanded="true"] { transform: rotate(180deg); }
   .menu-sub { margin: 0 0 4px 12px; padding-left: 6px; border-left: 1px solid var(--rule); }
   .menu-sub .menu-item { font-size: 14px; }
+  .menu-rule { height: 1px; margin: 4px 6px; background: var(--rule); }
   @media (max-width: 719px) {
     .menu-panel .menu-item, .menu-panel .signout button { min-height: 44px; }
   }
@@ -226,18 +227,28 @@
   }
   .rail-item, .rail .history { position: relative; display: flex; }
   .rail-gap { flex: none; height: 10px; }
+  /* Notes on this focus's place, kept with no current focus so the icons below don't move. */
+  .rail-slot { flex: none; height: 36px; }
+  .rail-foot { margin-top: auto; }
+  .rail .phone-only { display: none; }
   .rail-btn {
     display: inline-flex; align-items: center; gap: 12px; min-width: 36px; height: 36px; min-height: 0; padding: 0 9px;
-    color: var(--ink-faint); text-decoration: none;
+    color: var(--ink-faint); text-align: left; text-decoration: none; /* Random and the account are buttons */
   }
   .rail .rail-btn:hover, .rail .rail-btn[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
   .rail .rail-btn[aria-current="page"] { color: var(--accent); }
   .rail-btn svg { flex: none; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-  .rail .menu-btn { display: inline-flex; min-width: 36px; font-size: 19px; color: var(--ink-soft); }
-  .rail-dots { flex: none; width: 18px; text-align: center; }
   .rail .menu-panel, .rail .history-panel { left: calc(100% + 8px); right: auto; top: 0; font-family: var(--sans); font-size: 14px; }
-  /* The rail has its own icons for these; the menu repeats them only on phones. */
-  .rail .menu-panel :is(.menu-foci, .menu-library, .menu-continue, .menu-search, .menu-kept, .menu-history), .rail .menu-trail { display: none; }
+  /* The account's popover opens upward from the foot of the rail. */
+  .rail .rail-foot .menu-panel { top: auto; bottom: 0; }
+  .rail-count { margin-left: 8px; font-size: 12px; color: var(--ink-faint); }
+  /* Random's popover: the places alone, under "Pick randomly from"; the default first. */
+  .rail-random .menu-default { font-weight: 600; }
+  /* The account: its initial in a ring, in place of an icon (you, not a tool). */
+  .rail-me {
+    flex: none; display: grid; place-items: center; width: 20px; height: 20px; margin: 0 -1px;
+    border: 1.5px solid currentColor; border-radius: 50%; font: 600 11px var(--sans);
+  }
 
   /* The labels: pointing at the rail (or tabbing into it) widens it over the page at once, each icon's name beside it,
      so the icons can be learned without waiting on tooltips. Its column stays 52px, so nothing beneath moves; an open
@@ -254,27 +265,28 @@
     .rail:is(:hover, :has(:focus-visible)):not(:has(.open)) :is(.rail-btn, .rail-item, .history) { width: 100%; }
     .rail:is(:hover, :has(:focus-visible)):not(:has(.open)) .rail-btn { padding-right: 14px; }
   }
+  /* Two-line labels (Continue reading, Random) fit in the folded button's 36px, so opening the rail moves nothing. */
+  .rail-label-2 { flex-direction: column; min-width: 0; line-height: 1.15; }
   /* Continue reading names where it goes on a second line that adds nothing to the rail's width (contain): the work
      title goes first when it won't fit (.tight, rail_controller.js), then the section name ellipsizes; the number stays. */
-  .rail-continue { height: auto; min-height: 36px; padding-top: 5px; padding-bottom: 5px; }
-  .rail-label-2 { flex-direction: column; min-width: 0; line-height: 1.3; }
   .rail-dest { display: flex; contain: inline-size; font-size: 12px; color: var(--ink-faint); }
   .rail-dest .ref-work, .rail-dest .ref-unit { flex: none; white-space: pre; }
   .rail-dest .ref-section { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .rail-dest.tight .ref-work { display: none; }
+  /* Random's default is short enough to widen the rail a little rather than be cut to the width of "Random". */
+  .rail-random .rail-dest { display: block; contain: none; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  /* Phones: the ⋯ alone, floating top right; its menu takes in the rest. */
+  /* Phones: the ⋯ alone, floating top right; its menu takes in the rest, the tools under Study and then the account. */
   @media (max-width: 899px) {
     body:has(> .rail) { display: block; }
     .rail { position: fixed; top: 8px; right: 6px; height: auto; padding: 0; flex-direction: row; }
     .rail .rail-only, .rail .history-btn { display: none; }
+    .rail .phone-only { display: flex; }
     /* It drops from 48px down and must end above the reader's note sheet (52px handle); a long menu scrolls inside. */
     .rail .menu .menu-panel {
       left: auto; right: 0; top: calc(100% + 4px); overflow-y: auto; overscroll-behavior: contain;
       max-height: calc(100dvh - 48px - 52px - 8px - env(safe-area-inset-bottom));
     }
-    .rail .menu-trail { display: block; }
-    .rail .menu-panel :is(.menu-foci, .menu-library, .menu-continue, .menu-search, .menu-kept, .menu-history) { display: flex; }
     .rail .history-panel { position: fixed; left: 12px; right: 12px; top: 52px; width: auto; }
     /* A page's first line keeps clear of the ⋯. */
     :is(.page, .cards-page, .texts-page) > :first-child { padding-right: 44px; }

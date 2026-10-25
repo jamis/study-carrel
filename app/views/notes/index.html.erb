@@ -18,7 +18,7 @@
       data-compare-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
       data-compare-rename-url-template-value="<%= focus_label_path(@focus, "{id}") %>"
       data-action="keydown@document->footnotes#key <%= "keydown@document->compare#key " unless archived %>keydown@document->reread#key mouseover->reread#light click@document->reread#away note:saved@window->reread#saved selectionchange@document->reread#selected">
-  <%= render "shared/rail", focus: Current.focus %>
+  <%= render "shared/rail", focus: Current.focus, here: (:notes if @focus == Current.focus) %>
 
   <div class="reader-col reread-col">
     <%= page_head [ [ "Your focuses", foci_path ], *([ [ "Archived", archived_foci_path ] ] if archived), [ "Notes" ] ] do %>

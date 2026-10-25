@@ -1,4 +1,4 @@
-<%# The ⋯ menu's Random item, rolling in the default scope, with a disclosure for the wider scopes and then the user's
+<%# The phone menu's Random item, rolling in the default scope, with a disclosure for the wider scopes and then the user's
     shelves holding this page's work or collection (every shelf, from the library).
     scopes: RandomScope places, innermost first; default: the one the item rolls in %>
 <% others = scopes - [ default ]
@@ -14,11 +14,11 @@
   <% if others.any? || shelves.any? %>
     <div class="menu-sub" id="random-more" hidden data-disclosure-target="panel">
       <% others.each do |scope| %>
-        <%= link_to "Random #{scope.in_words}", random_scope_path(scope), class: "menu-item" %>
+        <%= link_to scope.label, random_scope_path(scope), class: "menu-item" %>
       <% end %>
       <% if shelves.any? %>
         <div class="menu-label">Your shelves</div>
-        <% shelves.each do |scope| %><%= link_to "Random #{scope.in_words}", random_scope_path(scope), class: "menu-item" %><% end %>
+        <% shelves.each do |scope| %><%= link_to scope.label, random_scope_path(scope), class: "menu-item" %><% end %>
       <% end %>
     </div>
   <% end %>

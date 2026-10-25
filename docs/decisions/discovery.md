@@ -15,7 +15,7 @@ A meta focus such as "What should I study?" or "What speaks to me right now?" is
 Ideas floated:
 
 - **Two ways in on the first screen:** "I have a question" (today's form) or "I want to look around" (creates an exploring focus such as "What speaks to me right now?" and opens the library). At the least, the form's examples should include a meta question.
-- **Flipping as the main action.** Random moves from the ⋯ menu to beside the arrows ("Turn to another"). The "Another" chip was dropped on 2026-10-05 because its meaning was unclear; under an exploring focus it's plain. Random flips, the arrows settle in to read around a passage. Narrowing the scope (the existing ▾) deserves a more visible place.
+- **Flipping as the main action.** Random moves from the rail to beside the arrows ("Turn to another"). The "Another" chip was dropped on 2026-10-05 because its meaning was unclear; under an exploring focus it's plain. Random flips, the arrows settle in to read around a passage. Narrowing the scope (the existing ▾) deserves a more visible place.
 - **Notes hidden entirely while exploring** (the user's idea), replaced by a prominent keep section in the right-hand page or bottom sheet:
   - top: Keep for this passage, then the remark ("What caught you?");
   - below: what you've kept while exploring, newest first, each with "Start a focus from this".

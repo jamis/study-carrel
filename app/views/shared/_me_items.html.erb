@@ -1,0 +1,4 @@
+<%# The account's items: in the rail's popover at its foot, and under your name in the phone menu. %>
+<button class="menu-item" type="button" data-action="theme#toggle">Light / dark</button>
+<% if Current.user.admin? %><%= link_to "Invitations", admin_invitations_path, class: "menu-item" %><% end %>
+<%= button_to "Sign out", session_path, method: :delete, class: "menu-item", form_class: "signout" %>

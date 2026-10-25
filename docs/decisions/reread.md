@@ -94,7 +94,7 @@ So you can see the shape of the synthesis forming. **A panel called up over the 
 
 ## Ways in
 
-It's the notes page, so the ways in are the notes page's: "Notes on this focus" in the ⋯ menu and the count on each focus's card. (Until 2026-10-19 there were separate ones: Reread among the notes page's actions, `r`; "· Reread" on the cards; "Reread these notes" in the menu.) No prompt to reread from the reader: the app doesn't nudge.
+It's the notes page, so the ways in are the notes page's: "Notes on this focus" in the rail and the count on each focus's card. (Until 2026-10-19 there were separate ones: Reread among the notes page's actions, `r`; "· Reread" on the cards; "Reread these notes" in the menu.) No prompt to reread from the reader: the app doesn't nudge.
 
 ## History
 

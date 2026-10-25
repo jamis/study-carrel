@@ -15,7 +15,9 @@ class UnitNotesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "true", response.headers["X-Noted"]
     assert_equal [ @focus, @unit ], [ Note.last.focus, Note.last.unit ]
-    assert_match "Notes on this focus (1)", response.body
+    assert_select "turbo-stream[action=update][targets=?]", ".focus-notes-count" do
+      assert_select "template", "1"
+    end
   end
 
   test "a save from an editor opened under another focus is refused" do
@@ -100,7 +102,7 @@ class UnitNotesControllerTest < ActionDispatch::IntegrationTest
     assert_equal @focus, users(:one).foci.current_one
     assert_equal verse(3), @focus.reload.last_unit
     # Nothing of the current focus's on the page changes.
-    assert_no_match "focus_notes_link", response.body
+    assert_no_match "focus-notes-count", response.body
     assert_no_match "focus_sheet_all", response.body
   end
 
