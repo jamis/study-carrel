@@ -897,7 +897,9 @@ a.tick { display: inline-flex; align-items: center; justify-content: center; tex
 .search-counts span { color: var(--ink-soft); }
 .search-by { text-transform: none; letter-spacing: 0; color: var(--ink-soft); }
 .search-excerpt { font-style: normal; color: var(--ink); }
-/* The result you opened, when Search brings you back to it. */
-.search-result.returned { margin-left: -14px; padding-left: 11px; border-left: 3px solid var(--accent-soft); }
+/* The result you opened, when Search brings you back to it: on a card tinted like the reader's band back to it, the
+   text kept in line with the others'. Edge to edge on phones. */
+.search-result.returned { margin-left: -14px; margin-right: -14px; padding: 10px 14px 1px; background: var(--accent-soft); border-radius: 8px; }
+@media (max-width: 599px) { .search-result.returned { margin-left: -16px; margin-right: -16px; padding: 10px 16px 1px; border-radius: 0; } }
 .search-excerpt mark { background: var(--hl); color: inherit; border-radius: 2px; padding: 0 1px; }
 .search-pages { display: flex; align-items: center; justify-content: center; gap: 14px; font-family: var(--sans); font-size: 13px; color: var(--ink-soft); margin-top: 8px; }
