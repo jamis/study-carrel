@@ -174,15 +174,26 @@
   }
   .keep-toast[hidden], .keep-pop[hidden] { display: none; }
   .keep-toast { display: flex; align-items: center; gap: 12px; padding: 8px 14px; white-space: nowrap; }
-  .keep-toast button, .keep-pop-actions button { border: 0; background: none; padding: 4px 0; color: var(--accent); font-size: 13px; text-decoration: underline; }
+  .keep-toast button, .keep-pop-quiet button { border: 0; background: none; padding: 4px 0; color: var(--accent); font-size: 13px; text-decoration: underline; }
+  .keep-toast [hidden] { display: none; }
+  /* After a save, the toast shows the remark in the passage's own type. */
+  .keep-toast-remark { max-width: 22em; overflow: hidden; text-overflow: ellipsis; font-family: var(--serif); font-style: italic; font-size: 14px; color: var(--ink-soft); }
+  .keep-toast-remark.cleared { font-family: inherit; font-style: normal; font-size: inherit; }
   .keep-pop { width: min(320px, calc(100vw - 32px)); padding: 12px 14px; }
   .keep-pop label { display: block; margin-bottom: 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
   .keep-pop input {
     width: 100%; font: inherit; font-size: 15px; color: var(--ink); background: var(--paper);
     border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px;
   }
-  .keep-pop-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
-  .keep-pop-actions a { font-size: 13px; }
+  .keep-pop-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+  /* Release and See all kept step back; Save is the way out. */
+  .keep-pop-quiet { display: flex; align-items: center; gap: 14px; }
+  .keep-pop-quiet :is(button, a) { font-size: 12px; color: var(--ink-soft); }
+  .keep-pop-quiet :is(button, a):hover { color: var(--accent); }
+  .keep-save { border: 0; border-radius: 999px; padding: 5px 16px; background: var(--accent); color: var(--bg); font-family: var(--sans); font-size: 13px; font-weight: 600; }
+  .keep-save:hover { filter: brightness(1.08); }
+  .keep-pop-hint { margin: 6px 0 0; font-size: 11px; color: var(--ink-faint); }
+  @media (hover: none) { .keep-pop-hint { display: none; } }
 
   /* The menu holds everything that isn't reading: one dropdown at every width. */
   .menu { position: relative; display: flex; align-items: center; }

@@ -2,10 +2,11 @@ import { Controller } from "@hotwired/stimulus"
 import { csrfToken, fillId } from "lib/request"
 
 // The Keep ribbon. Tapping the empty ribbon keeps the verse on screen (and offers Undo / Add a remark for a few
-// seconds); tapping a kept ribbon opens a small popover for the remark, or to release it. The reader announces
-// each verse it shows with lectio:changed, and this announces keeps and releases with keep:changed.
+// seconds); tapping a kept ribbon opens a small popover for the remark, or to release it. Save, Enter or a tap
+// elsewhere saves the remark and the toast comes back with it; Esc leaves it as it was. The reader announces each verse
+// it shows with lectio:changed, and this announces keeps and releases with keep:changed.
 export default class extends Controller {
-  static targets = ["button", "toast", "pop", "remark"]
+  static targets = ["button", "toast", "toastRemark", "toastKept", "toastSaved", "pop", "remark"]
   static values = { kept: Object, unitId: Number, urlTemplate: String }
 
   connect() {
@@ -13,9 +14,14 @@ export default class extends Controller {
     this.render()
   }
 
-  disconnect() { clearTimeout(this.toastTimer) }
+  disconnect() {
+    this.commitRemark()
+    clearTimeout(this.toastTimer)
+  }
 
+  // A remark being written when the verse changes is saved to the verse it was written on.
   sync({ detail: { unitId } }) {
+    this.commitRemark()
     this.unitIdValue = unitId
     this.hideToast()
     this.closePop()
@@ -48,11 +54,25 @@ export default class extends Controller {
     this.send("DELETE")
   }
 
-  saveRemark() {
+  save() {
+    const saved = this.commitRemark()
+    this.close()
+    if (saved) this.showToast(this.kept.get(this.unitIdValue))
+  }
+
+  // Esc: put the popover away and leave the remark as it was.
+  cancel() { this.close() }
+
+  // Send the remark in the open popover if it changed; true if it did.
+  commitRemark() {
+    if (!this.hasPopTarget || this.popTarget.hidden || !this.isKept) return false
     const remark = this.remarkTarget.value.trim()
     const previous = this.kept.get(this.unitIdValue) ?? ""
+    if (remark === previous) return false
     this.kept.set(this.unitIdValue, remark)
+    this.render()
     this.send("PATCH", { keep: { remark } }, previous)
+    return true
   }
 
   openRemark() {
@@ -60,7 +80,7 @@ export default class extends Controller {
     this.openPop()
   }
 
-  togglePop() { this.popTarget.hidden ? this.openPop() : this.closePop() }
+  togglePop() { this.popTarget.hidden ? this.openPop() : this.save() }
 
   openPop() {
     this.remarkTarget.value = this.kept.get(this.unitIdValue) ?? ""
@@ -68,21 +88,30 @@ export default class extends Controller {
     this.remarkTarget.focus()
   }
 
-  // Closing by Enter or by a tap elsewhere both blur the field first, so the remark has already been saved.
   close() { this.closePop(); this.buttonTarget.focus() }
   closePop() { this.popTarget.hidden = true }
 
   escape() {
     if (this.popTarget.hidden && this.toastTarget.hidden) return
     this.hideToast()
-    this.close()
+    if (!this.popTarget.hidden) this.cancel()
   }
 
+  // A tap elsewhere saves an open popover (and the toast says so), or puts the toast away.
   away(event) {
-    if (!this.element.contains(event.target)) { this.closePop(); this.hideToast() }
+    if (this.element.contains(event.target)) return
+    this.popTarget.hidden ? this.hideToast() : this.save()
   }
 
-  showToast() {
+  // Without a remark, the toast just kept offers one and Undo; with one, it shows what was saved
+  // ("" when a remark was cleared).
+  showToast(remark) {
+    const saved = remark !== undefined
+    this.toastRemarkTarget.hidden = !saved
+    this.toastRemarkTarget.classList.toggle("cleared", remark === "")
+    this.toastRemarkTarget.textContent = remark ? `“${remark}”` : "· remark cleared"
+    this.toastKeptTargets.forEach(button => button.hidden = saved)
+    this.toastSavedTarget.hidden = !saved || !remark
     this.toastTarget.hidden = false
     clearTimeout(this.toastTimer)
     this.toastTimer = setTimeout(() => this.hideToast(), 6000)
@@ -95,10 +124,19 @@ export default class extends Controller {
 
   render() {
     const kept = this.isKept
+    const remark = this.kept.get(this.unitIdValue)
     this.buttonTarget.classList.toggle("kept", kept)
     this.buttonTarget.setAttribute("aria-pressed", kept)
-    this.buttonTarget.setAttribute("aria-label", kept ? "Kept. Add a remark or release" : "Keep this passage")
-    this.buttonTarget.title = kept ? "Kept: add a remark or release (b)" : "Keep this passage (b)"
+    if (!kept) {
+      this.buttonTarget.setAttribute("aria-label", "Keep this passage")
+      this.buttonTarget.title = "Keep this passage (b)"
+    } else if (remark) {
+      this.buttonTarget.setAttribute("aria-label", `Kept: “${remark}”. Edit the remark or release`)
+      this.buttonTarget.title = `Kept: “${remark}” (b)`
+    } else {
+      this.buttonTarget.setAttribute("aria-label", "Kept. Add a remark or release")
+      this.buttonTarget.title = "Kept: add a remark or release (b)"
+    }
   }
 
   announce(kept) {
@@ -121,6 +159,7 @@ export default class extends Controller {
       if (method === "PATCH") {
         // Unless it was released meanwhile, in which case there's no remark to restore.
         if (this.kept.has(unitId)) this.kept.set(unitId, previousRemark)
+        if (unitId === this.unitIdValue) { this.render(); this.hideToast() }
         alert("Couldn't save your remark. Check your connection and try again.")
         return
       }
