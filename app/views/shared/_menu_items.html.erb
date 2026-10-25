@@ -7,7 +7,7 @@
 <% unless reading %><%= link_to "Library", library_path, class: "menu-item menu-library" %><% end %>
 <button class="menu-item menu-history" type="button" data-history-open data-action="menu#close">Recent places<kbd>h</kbd></button>
 <% if focus && !reading %><%= link_to "Continue reading", continue_path, class: "menu-item menu-continue" %><% end %>
-<%= link_to search_path, class: "menu-item menu-search", data: { controller: "search-key last-search", action: "keydown@window->search-key#key" } do %>Search<kbd>/</kbd><% end %>
+<%= link_to search_path, class: "menu-item menu-search", data: { controller: "search-key", action: "keydown@window->search-key#key" } do %>Search<kbd>/</kbd><% end %>
 <%= render "shared/random_menu", scopes: random, default: random_default %>
 <%= link_to "Kept", kept_path, class: "menu-item menu-kept" %>
 <%= link_to "Your Texts", texts_path, class: "menu-item" %>

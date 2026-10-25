@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { lastSearch } from "lib/last_search"
 
 // A page of search results: remembered as the last search (see lib/last_search), and, when a result is opened, with
-// that result, so coming back by Search lands on it, lit.
+// that result, so coming back by the reader's slip lands on it, lit.
 export default class extends Controller {
   connect() {
     lastSearch.set(location.pathname + location.search + location.hash)
@@ -16,5 +16,6 @@ export default class extends Controller {
   open(event) {
     const result = event.currentTarget.closest("[id]")
     lastSearch.set(`${location.pathname}${location.search}#${result.id}`)
+    lastSearch.slip = true
   }
 }

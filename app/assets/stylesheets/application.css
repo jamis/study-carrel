@@ -58,6 +58,22 @@
   /* ---------- focus: stands directly over the passage, in soft italic, set off from it by a rule across the column ---------- */
   .focus { position: relative; max-width: 34em; margin: calc(22px + 5vh) 0 14px; }
   .focus::after { content: ""; display: block; height: 1px; margin-top: 14px; background: var(--rule); }
+  /* The way back to the search a result was opened from: a tinted band over the focus, pushing it down. Put away, it
+     closes up and the focus rises to its usual place. */
+  .back-slip {
+    display: flex; align-items: center; gap: 8px; max-width: 34em; margin-top: 12px; padding: 7px 6px 7px 12px; overflow: hidden;
+    border-radius: 8px; background: var(--accent-soft); font-family: var(--sans); font-size: 13px;
+    transition: height .2s, margin-top .2s, padding .2s, opacity .2s;
+  }
+  .back-slip.closing { margin-top: 0; padding-top: 0; padding-bottom: 0; opacity: 0; }
+  .back-slip[hidden] { display: none; }
+  .back-slip a { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); text-decoration: none; }
+  .back-slip a:hover { color: var(--accent); }
+  .back-slip q { font-style: italic; }
+  .back-slip-x { flex: none; border: 0; background: none; padding: 2px 6px; border-radius: 6px; color: var(--ink-soft); font-size: 15px; line-height: 1; }
+  .back-slip-x:hover { color: var(--accent); background: var(--paper); }
+  .back-slip + .focus { transition: margin-top .2s; }
+  .back-slip:not([hidden], .closing) + .focus { margin-top: calc(10px + 5vh); }
   .focus-head {
     display: flex; align-items: flex-start; gap: 7px;
     width: 100%; padding: 0; border: 0; background: none; text-align: left;
@@ -499,6 +515,8 @@
     .reader-col { padding: 0 16px 140px; }
     /* The focus starts level with the ⋯ and keeps clear of it; its rule still runs the column's width. */
     .focus { margin-top: 18px; padding-right: 44px; }
+    .back-slip { margin-right: 40px; }
+    .back-slip:not([hidden], .closing) + .focus { margin-top: 10px; }
     .focus::after { margin-right: -44px; }
     .pilcrow { position: static; transform: none; margin-right: .2em; }
 
@@ -565,7 +583,7 @@
 .invite-form { max-width: none; margin: 0 0 8px; }
 
 /* ---------- foci pages ---------- */
-a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a):not(.rail a):not(.whole-group a):not(.card-new):not(.note-under-back):not(.note-also-focus):not(.card-act):not(.cards-more a) { color: var(--accent); }
+a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a):not(.rail a):not(.whole-group a):not(.card-new):not(.note-under-back):not(.note-also-focus):not(.card-act):not(.cards-more a):not(.back-slip a) { color: var(--accent); }
 .inline-form { display: inline; margin: 0; }
 .page { max-width: 40em; margin: 0 auto; padding: 22px 16px 80px; }
 /* Above the title: the way up (helpers page_head), quietly, and the page's actions at the right. */
@@ -866,6 +884,9 @@ a.tick { display: inline-flex; align-items: center; justify-content: center; tex
 .search-scopes { display: flex; flex-wrap: wrap; gap: 8px; margin: -12px 0 22px; }
 .search-scopes .chip.current { border-color: var(--accent); color: var(--accent); }
 .search-hint { color: var(--ink-soft); font-family: var(--sans); font-size: 13px; }
+/* On the empty search page, the way back to the last search. */
+.search-last { margin: -12px 0 24px; color: var(--ink-soft); font-family: var(--sans); font-size: 13px; }
+.search-last q { font-style: italic; }
 .search-summary { margin-bottom: 10px; }
 .search-works { margin: 0 0 28px; font-family: var(--sans); font-size: 13px; }
 .search-works summary { cursor: pointer; color: var(--ink-soft); width: max-content; margin-bottom: 8px; }

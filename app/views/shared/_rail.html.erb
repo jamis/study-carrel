@@ -33,7 +33,7 @@
     <%= link_to library_path, class: "icon-btn rail-btn rail-only", aria: { label: "Library", current: ("page" if here == :library) } do %><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg><span class="rail-label">Library</span><% end %>
   <% end %>
   <%= render "shared/history" %>
-  <%= link_to search_path, class: "icon-btn rail-btn rail-only", aria: { label: "Search", current: ("page" if here == :search) }, data: { controller: "last-search" } do %><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg><span class="rail-label">Search<kbd>/</kbd></span><% end %>
+  <%= link_to search_path, class: "icon-btn rail-btn rail-only", aria: { label: "Search", current: ("page" if here == :search) } do %><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg><span class="rail-label">Search<kbd>/</kbd></span><% end %>
   <%= link_to kept_path, class: "icon-btn rail-btn rail-only", aria: { label: "Kept", current: ("page" if here == :kept) } do %><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z"/></svg><span class="rail-label">Kept</span><% end %>
   <% if focus && !section %>
     <%# Below the rest, so the icons above keep their places on every page. Where it goes is on a second line, shortened
