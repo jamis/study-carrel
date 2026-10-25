@@ -24,7 +24,7 @@
     <div class="delete-what">
       <% if notes.positive? %><strong><%= pluralize(notes, "note") %></strong> <%= notes == 1 ? "goes" : "go" %> with it:<% else %>These go with it:<% end %>
       <ul>
-        <% if @passage_notes.positive? %><li><%= pluralize(@passage_notes, "note") %> on passages<%= " in #{@works.to_sentence}" if @works.any? %></li><% end %>
+        <% if @passage_notes.positive? %><li><%= pluralize(@passage_notes, "note") %> on passages<%= " in #{works_sentence(@works)}" if @works.any? %></li><% end %>
         <% if @whole_notes.positive? %><li><%= pluralize(@whole_notes, "note") %> on the whole focus</li><% end %>
         <% if detached.positive? %><li><%= detached %> more set aside earlier, from passages that changed</li><% end %>
         <% if scratchpad %><li>its scratchpad</li><% end %>

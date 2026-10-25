@@ -24,12 +24,12 @@ class Focus < ApplicationRecord
   # For the focuses page, called on a set of foci (user.foci): a query apiece, keyed by focus id.
   def self.note_counts = Note.where(focus_id: select(:id)).group(:focus_id).count
 
-  # The titles of the works each focus has notes in, in library order.
+  # The works each focus has notes in, in library order, as [title, how many notes] pairs.
   def self.works_read
     Work.joins(sections: { units: :notes }).where(notes: { focus_id: select(:id) })
         .group("notes.focus_id", "works.id").order("works.position", "works.id")
-        .pluck("notes.focus_id", "works.title")
-        .group_by(&:first).transform_values { |pairs| pairs.map(&:last) }
+        .pluck("notes.focus_id", "works.title", Arel.sql("COUNT(notes.id)"))
+        .group_by(&:first).transform_values { |rows| rows.map { |_, title, count| [ title, count ] } }
   end
 
   # Notes on the focus as a whole, in the order they were written. (notes_in_reading_order has only those on passages.)

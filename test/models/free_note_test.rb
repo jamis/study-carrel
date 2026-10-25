@@ -42,7 +42,7 @@ class FreeNoteTest < ActiveSupport::TestCase
     @focus.notes.create!(unit: verse(3), content: "a")
     @focus.notes.create!(content: "b")
     assert_equal({ @focus.id => 2 }, users(:one).foci.note_counts)
-    assert_equal({ @focus.id => [ "Isaiah" ] }, users(:one).foci.works_read)
+    assert_equal({ @focus.id => [ [ "Isaiah", 1 ] ] }, users(:one).foci.works_read)
   end
 
   test "it can be labelled" do

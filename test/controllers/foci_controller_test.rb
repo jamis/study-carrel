@@ -149,6 +149,20 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     assert_select ".card-current .card-notes a[href=?]", focus_notes_path(light), text: "1 note"
   end
 
+  test "past three works, a card names those with the most notes and counts the rest" do
+    collection = Collection.create!(name: "Shelf", slug: "shelf")
+    # Isaiah and Micah have two notes apiece, the rest one; Ruth comes first of those in library order.
+    { "Ruth" => 1, "Esther" => 1, "Job" => 1, "Jonah" => 1, "Micah" => 2 }.each.with_index(1) do |(title, notes), position|
+      section = Work.create!(title:, slug: title.downcase, collection:, position:).sections.create!(number: 1)
+      notes.times { |i| @focus.notes.create!(unit: section.units.create!(number: i + 1, body: "Text"), content: title) }
+    end
+    @focus.notes.create!(unit: verse(3), content: "One")
+    @focus.notes.create!(unit: verse(8), content: "Two")
+
+    get foci_path
+    assert_select ".card-current .card-notes", "8 notes in Ruth, Micah, Isaiah and 3 other works"
+  end
+
   test "another reader's focuses never appear" do
     users(:two).foci.start!(title: "Someone else's question")
     get foci_path

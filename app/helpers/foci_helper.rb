@@ -16,6 +16,16 @@ module FociHelper
     return "No notes yet" if count.zero?
 
     number = link ? link_to(pluralize(count, "note"), link) : pluralize(count, "note")
-    works.any? ? safe_join([ number, " in ", works.to_sentence ]) : number
+    works.any? ? safe_join([ number, " in ", works_sentence(works) ]) : number
+  end
+
+  # "Ruth, Leviticus and Deuteronomy" from works_read's [title, count] pairs. Past three works, the three with the most
+  # notes (library order breaking ties, and kept in it) and a count of the rest: "Isaiah, Psalms, Romans and 9 other
+  # works".
+  def works_sentence(works)
+    return works.map(&:first).to_sentence if works.size <= 3
+
+    named = works.each_with_index.max_by(3) { |(_, count), i| [ count, -i ] }.sort_by(&:last).map { |(title, _), _| title }
+    "#{named.join(", ")} and #{pluralize(works.size - 3, "other work")}"
   end
 end
