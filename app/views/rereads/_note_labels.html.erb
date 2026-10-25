@@ -1,30 +1,14 @@
-<%# A note's labels on the reread page. Every note has them as footnotes: a line naming, for each label, the label (if
-    it has a name) and its other notes on this focus, each reference showing that note when pointed at. The note you're
-    on also has them as chips you can take off, with + label and "Gather". An unnamed label's chip shows it "like"
-    another of its notes. The ids are on the element, to light the note when its label is pointed at.
-    note; members: each label's notes on this focus, by label id (label_members); editable: false for an archived
-    focus's notes, which have no chips, + label or Gather %>
-<% members = local_assigns.fetch(:members, {}) %>
+<%# A note's labels on the reread page, as pills under its text: named ones A–Z, then unnamed ones, each shown "like"
+    another of its notes. On the note you're on they can be taken off (×), with + label and "Gather". The ids are on the
+    element, to light the note when its label is pointed at.
+    note; editable: false for an archived focus's notes, which have no ×, + label or Gather %>
+<% editable = local_assigns.fetch(:editable, true) %>
 <div class="rr-labels" id="<%= dom_id(note, :labels) %>" data-reread-target="noteLabels" data-compare-target="noteLabels" data-label-ids="<%= note.label_ids.join(" ") %>">
-  <% if note.labels.any? %>
-    <div class="rr-fns">
-      <% footnoted_labels(note).each_with_index do |label, i|
-           others = members.fetch(label.id, []) - [ note ] %>
-        <span class="rr-fn" style="--c: var(--g<%= label.hue %>)"><sup><%= i + 1 %></sup>
-          <% if label.named? %><span class="rr-fn-name"><%= label.name %></span><% end %>
-          <% others.each do |other| %><button type="button" class="rr-fn-ref" data-fn-note="<%= other.id %>" title="<%= note_ref(other) %>"><%= condensed_ref(short_note_ref(other, from: note)) %></button><% end %>
-          <% if others.empty? %><span class="rr-fn-alone">only this note here</span><% end %>
-        </span>
-      <% end %>
-    </div>
+  <% note.labels.sort_by { [ it.named? ? 0 : 1, it.name.to_s.downcase, it.id ] }.each do |label| %>
+    <span class="rr-chip" title="<%= label_title(label, from: note) unless label.named? %>"><%= label_face(label, from: note) %><% if editable %><button class="rr-chip-x" type="button" aria-label="Take off “<%= label_title(label, from: note, snippet: false) %>”" data-label-id="<%= label.id %>" data-action="reread#unlabel">×</button><% end %></span>
   <% end %>
-  <% if local_assigns.fetch(:editable, true) %>
-  <div class="rr-chips">
-    <% note.labels.sort_by { [ it.named? ? 0 : 1, it.name.to_s.downcase, it.id ] }.each do |label| %>
-      <span class="rr-chip" title="<%= label_title(label, from: note) unless label.named? %>"><%= label_face(label, from: note) %><button class="rr-chip-x" type="button" aria-label="Take off “<%= label_title(label, from: note, snippet: false) %>”" data-label-id="<%= label.id %>" data-action="reread#unlabel">×</button></span>
-    <% end %>
+  <% if editable %>
     <button class="rr-add" type="button" data-action="reread#openPicker" title="Label this note (l)">+ label</button>
     <button class="rr-find" type="button" data-action="compare#enter" title="Gather the notes that go with this one (g)">Gather</button>
-  </div>
   <% end %>
 </div>

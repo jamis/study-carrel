@@ -5,7 +5,7 @@ import { citeOf, shortCite, condensedCite, labelIdsOf, escapeHtml } from "lib/no
 
 const MAX_TABS = 3
 
-// Gathering what goes with a note, on the reread page (alongside the reread and footnotes controllers): g, or "Gather"
+// Gathering what goes with a note, on the reread page (alongside the reread and peek controllers): g, or "Gather"
 // on the note you're on. The note you're on is held on a card at the top of the column, its groups (its labels, named
 // or not) numbered for the moment and each shown by its face; every other note of the focus is
 // listed under it, each with a button per group and + for a new group of the two. A note is always grouped from the
@@ -94,7 +94,7 @@ export default class extends Controller {
   // ---------- holding ----------
 
   // Another note held, under a tab of its own: the note at the cursor (Enter), "Hold this" on a row, or "Hold it" from a
-  // footnote. One already held goes back to its tab.
+  // note shown from the card. One already held goes back to its tab.
   hold(row) {
     if (!this.comparing || !row?.dataset.noteId || row === this.#here) return
     const held = this.tabs.findIndex(tab => tab.id === row.dataset.noteId)
@@ -207,8 +207,7 @@ export default class extends Controller {
     try { return new Map(JSON.parse(this.labelsTarget.textContent).map(label => [String(label.id), label])) } catch { return new Map() }
   }
 
-  // The held note's groups, in the order they were made, so their numbers stay put as notes join them (and match its
-  // footnotes).
+  // The held note's groups, in the order they were made, so their numbers stay put as notes join them.
   get #mine() {
     const labels = this.#labels
     return labelIdsOf(this.#here).map(id => labels.get(id)).filter(Boolean).sort((a, b) => a.id - b.id)
@@ -438,7 +437,7 @@ export default class extends Controller {
     else if (event.key === "Escape") { event.preventDefault(); this.naming = null; this.#renderCard(); this.#mark() }
   }
 
-  // Sends a change; the reply redraws the footnotes, chips and the panel, and so this. Returns why it was refused, if
+  // Sends a change; the reply redraws the labels and the panel, and so this. Returns why it was refused, if
   // it was.
   async #send(method, url, body = {}) {
     const response = await fetch(url, {

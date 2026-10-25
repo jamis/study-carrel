@@ -1,7 +1,7 @@
 <%# One note on the reread page. A note on a passage shows the passage and links into the reader; one on the focus as
-    a whole has neither, and goes by its number ("Focus 2"). Its footnote marks follow its text. editor_url: where its
+    a whole has neither, and goes by its number ("Focus 2"). editor_url: where its
     editor loads from (the reader's, for the current focus's notes on passages; its own, for notes on the whole focus;
-    none for another focus's notes on passages, or any of an archived focus's). members: each label's notes on this focus (label_members). %>
+    none for another focus's notes on passages, or any of an archived focus's). %>
 <% unit = note.unit
    editor_url = if focus.archived? then nil
                 elsif note.free? then focus_note_path(focus, note)
@@ -20,7 +20,7 @@
     <% end %>
   </div>
   <% if unit %><p class="rr-passage"><%= unit.body %></p><% end %>
-  <div class="rr-text"><div class="rr-note" id="<%= dom_id(unit || note, :reread_text) %>"><%= note.content %></div><%= render "rereads/marks", note: %></div>
+  <div class="rr-text"><div class="rr-note" id="<%= dom_id(unit || note, :reread_text) %>"><%= note.content %></div></div>
   <div class="rr-editor composer"></div>
-  <%= render "rereads/note_labels", note:, members: local_assigns.fetch(:members, {}), editable: !focus.archived? %>
+  <%= render "rereads/note_labels", note:, editable: !focus.archived? %>
 </article>

@@ -1,23 +1,23 @@
 <% content_for :title, "Notes · #{@focus.title} · Study Carrel" %>
 <%# A focus's notes page (the current focus's or a past one's), where they're reread: those on passages in reading
     order down the column, then those on the focus as a whole, the one you're on lit and the rest dimmed in place, each
-    note's labels as footnotes. The focus's scratchpad is put away behind a tab at the right edge (a bottom sheet on
+    note's labels as pills under it. The focus's scratchpad is put away behind a tab at the right edge (a bottom sheet on
     phones); the labels in use, as a cloud or as tallies, come up over its foot, or on their own. Notes on the whole
     focus can be written and edited here, and so can the current focus's notes on passages, as in the reader.
     "Gather" (g) turns the column into a comparison: up to three notes held under tabs on a card at
     the top, the rest under it, each to put in one of the held note's groups (labels, named or not) or a new group with
     it. Detached notes, whose passages are gone, follow the run, only to read or discard.
-    An archived focus's page is read-only: its notes, footnotes and scratchpad to read, nothing to write, label or
+    An archived focus's page is read-only: its notes, labels and scratchpad to read, nothing to write, label or
     gather, and Unarchive in the lede. %>
 <% archived = @focus.archived? %>
-<main class="reader reread" data-controller="reread footnotes<%= " compare" unless archived %>"
+<main class="reader reread" data-controller="reread<%= " compare peek" unless archived %>"
       data-reread-position-url-value="<%= focus_reread_path(@focus) %>"
       data-reread-read-only-value="<%= archived %>"
       data-reread-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
       data-reread-lift-url-value="<%= focus_notes_path(@focus) %>"
       data-compare-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
       data-compare-rename-url-template-value="<%= focus_label_path(@focus, "{id}") %>"
-      data-action="keydown@document->footnotes#key <%= "keydown@document->compare#key " unless archived %>keydown@document->reread#key mouseover->reread#light click@document->reread#away note:saved@window->reread#saved selectionchange@document->reread#selected">
+      data-action="<%= "keydown@document->peek#key keydown@document->compare#key " unless archived %>keydown@document->reread#key mouseover->reread#light click@document->reread#away note:saved@window->reread#saved selectionchange@document->reread#selected">
   <%= render "shared/rail", focus: Current.focus, here: (:notes if @focus == Current.focus) %>
 
   <div class="reader-col reread-col">
@@ -70,14 +70,14 @@
     <div class="rr-run">
       <% passage_notes, free_notes = @notes.partition(&:unit_id) %>
       <% passage_notes.each do |note| %>
-        <%= render "rereads/row", note:, focus: @focus, here: note == @here, members: @members %>
+        <%= render "rereads/row", note:, focus: @focus, here: note == @here %>
       <% end %>
       <%# Notes on the focus as a whole: what you see across the passages, written here or made of a line in the
           scratchpad. New ones join the end. %>
       <section class="rr-free-notes" id="reread_free" aria-label="On the whole focus">
         <h2 class="rr-free-head">On the whole focus</h2>
         <% free_notes.each do |note| %>
-          <%= render "rereads/row", note:, focus: @focus, here: note == @here, members: @members %>
+          <%= render "rereads/row", note:, focus: @focus, here: note == @here %>
         <% end %>
       </section>
       <% unless @label || archived %>
@@ -88,7 +88,7 @@
       <template data-reread-target="newRow">
         <article class="rr-row rr-free rr-unsaved" data-reread-target="row" data-editor-url="<%= new_focus_note_path(@focus) %>" data-action="click->reread#pick">
           <div class="rr-head"><span class="rr-ref rr-whole">New note</span></div>
-          <div class="rr-text"><div class="rr-note"></div><span class="rr-marks"></span></div>
+          <div class="rr-text"><div class="rr-note"></div></div>
           <div class="rr-editor composer"></div>
           <div class="rr-labels" id="new_note_labels" data-label-ids=""></div>
         </article>
@@ -134,8 +134,8 @@
       <div class="rr-picker-foot" data-reread-target="pickerFoot"></div>
     </div>
     <p class="rr-toast" role="status" data-reread-target="toast" hidden></p>
-    <%# What a footnote opens: a label and its other notes, or one note. %>
-    <div class="fn-pop" data-footnotes-target="pop" hidden></div>
+    <%# What a reference on the Gather card opens: its note. %>
+    <% unless archived %><div class="fn-pop" data-peek-target="pop" hidden></div><% end %>
     <%= form_with url: focus_note_labels_path(@focus, 0), method: :post, class: "rr-label-form", data: { reread_target: "labelForm" } do %>
       <input type="hidden" name="name">
     <% end %>

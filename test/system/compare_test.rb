@@ -133,34 +133,30 @@ class CompareTest < ApplicationSystemTestCase
     assert_no_selector ".rr-cmp-hold"
   end
 
-  test "a note's groups as footnotes: a mark after its text, the other notes under it, each shown when pointed at" do
+  test "a note's labels as pills on every note, and a note on the card shown when pointed at" do
     whole = @focus.notes.create!(content: "Fading and standing")
     whole.join!(@group)
     visit focus_notes_path(@focus)
 
-    within(".rr-row.here") do
-      assert_selector ".rr-fn", text: "40:6"
-      assert_selector ".rr-fn .rr-fn-ref", text: "focus 1"
+    within(".rr-row.here") { assert_selector ".rr-chip .lf-like", text: /like Isaiah 40:6/i }
+    within("#reread_note_#{@fade.id}") do
+      assert_selector ".rr-chip .lf-like", text: /like Isaiah 40:7/i
+      assert_no_selector ".rr-chip-x"
     end
-    within("#reread_note_#{@fade.id}") { assert_selector ".rr-text .rr-mark", text: "1" }
+    within("#reread_note_#{@stands.id}") { assert_no_selector ".rr-chip" }
     within("#reread_note_#{whole.id}") { assert_selector ".rr-ref", text: /Focus 1 · /i }
 
-    # Pointing at a mark shows the group's other notes; at a reference, that note, to go to.
-    find("#reread_note_#{@fade.id} .rr-mark").hover
-    within(".fn-pop") do
-      assert_text "The withering comes from God too"
-      assert_text "Fading and standing"
-    end
-    find(".rr-row.here .rr-fn-ref", text: "40:6").hover
+    # On the Gather card, pointing at one of a group's notes shows it, to hold.
+    keys "g"
+    find(".rr-cmp-card .cmp-jump", text: "40:6").hover
     within(".fn-pop") do
       assert_text "The voice said, Cry"
-      click_on "Go to it"
+      click_on "Hold it"
     end
-    assert_selector ".rr-row.here", text: "All flesh is grass"
+    assert_selector ".rr-cmp-card .cmp-tab.on", text: "40:6"
 
-    # Putting another note in the group adds it to the footnotes of every note in it.
-    keys "g", "j", "j", "1"
-    assert_selector "#reread_note_#{@stands.id} .rr-fn", text: /40:6\s+40:7/
-    assert_selector "#reread_note_#{whole.id} .rr-fn", text: "40:8"
+    # Putting another note in the group gives it the pill.
+    find("#reread_note_#{@stands.id} .cmp-put[data-put='#{@group.id}']").click
+    assert_selector "#reread_note_#{@stands.id} .rr-chip .lf-like", text: /like Isaiah 40:/i
   end
 end

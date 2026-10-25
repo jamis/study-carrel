@@ -11,7 +11,6 @@ class NotesController < ApplicationController
     @all = @focus.notes_for_reread
     @notes = @label ? @all.select { it.label_ids.include?(@label.id) } : @all
     @here = @notes.find { it.id == @focus.reread_note_id } || @notes.first
-    @members = helpers.label_members(@all)
     @detached = @focus.detached_notes.includes(:rich_text_content) unless @label
   end
 

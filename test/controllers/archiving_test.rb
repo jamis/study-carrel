@@ -106,11 +106,11 @@ class ArchivingTest < ActionDispatch::IntegrationTest
     assert_select ".page-actions a[href=?]", edit_focus_path(@old, back: "notes"), 0
     assert_select ".page-actions a[href=?]", export_focus_notes_path(@old)
     assert_select ".rr-archived form[action=?]", unarchive_focus_path(@old, back: "notes")
-    assert_select "main[data-controller=?][data-reread-read-only-value=true]", "reread footnotes"
+    assert_select "main[data-controller=?][data-reread-read-only-value=true]", "reread"
     assert_select ".rr-row .rr-note", /Stillness/
-    assert_select ".rr-row .rr-fn-name", "quiet"
+    assert_select ".rr-row .rr-chip", "quiet"
     assert_select ".rr-row[data-editor-url]:not([data-editor-url=''])", 0
-    assert_select ".rr-chips, .rr-add, .rr-find, .rr-new, .rr-cmp-card, .rr-lift", 0
+    assert_select ".rr-chip-x, .rr-add, .rr-find, .rr-new, .rr-cmp-card, .rr-lift", 0
     assert_select ".rr-discard", 0
     assert_select ".reread-pad .rr-pad-read", /half a thought/
     assert_select ".reread-pad form", 0

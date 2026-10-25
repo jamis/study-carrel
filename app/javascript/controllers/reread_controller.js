@@ -12,7 +12,7 @@ const PICKER_LEAST = 150, PICKER_TALLEST = 340 // px of the picker's cloud
 // notes that carry it. The note you're on gets its editor, if it has one here (data-editor-url); where you are is
 // saved, so the reread opens there again. A new note on the whole focus (n) is written in a row of its own, and a
 // selection in the scratchpad can be made one ("Make a note of this"). An archived focus's page is read-only
-// (readOnly): moving, the footnotes, the labels panel and the scratchpad to read, nothing written or labelled.
+// (readOnly): moving, the labels panel and the scratchpad to read, nothing written or labelled.
 export default class extends Controller {
   static targets = ["row", "newRow", "noteLabels", "labelsBody", "picker", "pickerInput", "pickerOptions", "pickerFoot", "labelForm", "pad", "labelsPanel",
     "lift", "toast"]
@@ -132,14 +132,11 @@ export default class extends Controller {
     // A note on the whole focus has a number now (a new one, if it was cleared and written again): the reply puts it here.
     row.querySelector(".rr-ref.rr-whole")?.setAttribute("id", "new_note_ref")
     if (row.classList.contains("rr-free")) delete row.dataset.cite
-    const marks = row.querySelector(".rr-marks")
-    marks.id = `marks_note_${noteId}`
     if (fresh) {
       const labels = row.querySelector("[data-label-ids]")
       labels.id = `labels_note_${noteId}`
       labels.dataset.labelIds = ""
-      labels.querySelectorAll(".rr-chip, .rr-fns").forEach(el => el.remove())
-      marks.replaceChildren()
+      labels.querySelectorAll(".rr-chip").forEach(el => el.remove())
     }
     this.#mark()
   }

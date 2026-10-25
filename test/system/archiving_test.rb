@@ -32,7 +32,7 @@ class ArchivingSystemTest < ApplicationSystemTestCase
     @old.archive!
     visit focus_notes_path(@old)
     assert_selector ".rr-row.here", text: "Stillness"
-    assert_selector ".rr-row.here .rr-fn-name", text: "quiet"
+    assert_selector ".rr-row.here .rr-chip", exact_text: "quiet"
 
     find("body").send_keys "j"
     assert_selector ".rr-row.here", text: "Nothing like it"
