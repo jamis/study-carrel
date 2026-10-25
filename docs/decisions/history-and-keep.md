@@ -6,7 +6,7 @@
 
 - `visits` table, one row per `(user, unit)`, newest first, capped at 50, written by `PositionsController#update`.
 - Stepping to a neighboring verse moves the latest entry along instead of adding one, so the list holds places, not every verse read.
-- UI: a clock icon in the rail opens a dropdown of the last 8 places before the current one (reference, snippet, age, a dot if the verse has a note in the current focus).
+- UI: a clock icon in the rail opens a dropdown of the last 8 places, newest first, including the one on screen, in the reader and off it alike (decided 2026-10-25): reference, snippet, age, a dot if the verse has a note in the current focus.
 - On phones it folds into the ⋯ menu as "Recent places" to save room: below 720px on library pages, below 900px on the reader.
 - `h` opens it, Up/Down move, Enter goes.
 

@@ -8,18 +8,16 @@ class HistoryControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
   end
 
-  test "lists earlier places, newest first, leaving out the current one" do
+  test "lists places, newest first, the latest included" do
     [ 3, 20, 10 ].each { |n| Visit.record(@user, verse(n)) }
     get history_path
     assert_response :success
-    assert_select "a.hist-item", 2
-    assert_select "a.hist-item:first-of-type .hist-ref", /Isaiah 40:20/
+    assert_select "a.hist-item", 3
+    assert_select "a.hist-item:first-of-type .hist-ref", /Isaiah 40:10/
     assert_select "a.hist-item[href=?]", reading_path("isaiah-kjv", 40, 3)
-    assert_select ".hist-item", text: /Isaiah 40:10/, count: 0
   end
 
-  test "is empty until there is somewhere to go back to" do
-    Visit.record(@user, verse(3))
+  test "is empty until somewhere has been read" do
     get history_path
     assert_select ".hist-empty"
   end
@@ -36,7 +34,7 @@ class HistoryControllerTest < ActionDispatch::IntegrationTest
     [ 3, 20 ].each { |n| Visit.record(@user, verse(n)) }
     @user.foci.start!(title: "Next")
     get history_path
-    assert_select "a.hist-item", 1
+    assert_select "a.hist-item", 2
   end
 
   test "never shows another user's places" do
