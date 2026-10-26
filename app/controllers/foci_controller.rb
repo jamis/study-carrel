@@ -83,8 +83,13 @@ class FociController < ApplicationController
 
   # No Undo: a word of it at the foot of the page it was asked from (flash[:deleted], its title, since it's gone).
   # Deleting the current focus makes the next most recent current, as if it had never been.
+  # The next one is stamped current, so an archived focus that was current more recently doesn't leave none current.
   def destroy
-    @focus.destroy!
+    successor = foci.others.first if @focus == foci.current_one
+    Focus.transaction do
+      @focus.destroy!
+      successor&.make_current!
+    end
     redirect_to back_path, flash: { deleted: @focus.title }
   end
 

@@ -115,6 +115,20 @@ class DeletingTest < ActionDispatch::IntegrationTest
     assert_redirected_to foci_path
   end
 
+  test "deleting the current focus passes over an archived one that was current more recently" do
+    middle = users(:one).foci.start!(title: "Middle")
+    last = users(:one).foci.start!(title: "Last")
+    middle.archive!
+
+    get delete_focus_path(last)
+    assert_select ".delete-final", /“Holy” will be current instead/
+    delete focus_path(last)
+    assert_equal @focus, users(:one).foci.current_one
+
+    middle.unarchive!
+    assert_equal @focus, users(:one).foci.current_one
+  end
+
   test "with no other focus in use, the page doesn't say which will be current" do
     @old.archive!
     get delete_focus_path(@focus)
