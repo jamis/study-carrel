@@ -57,7 +57,7 @@ Matching must be looser than the bundled loader's, which goes by section and par
 A note whose unit is gone (after a revision, or when a work is deleted) moves to `detached_notes`, keeping its focus (if any), body, citation, work title, the passage text and its original times, plus when and why it was detached.
 
 - They show after the focus's notes under "From passages that changed or were removed", are exported with them, and can be discarded.
-- A keep with a remark always becomes a detached note of its own, never merged into a note, since keeps belong to no focus: its focus is blank, and it is shown as a special case at the foot of the Kept page under the same heading (no focus, so not in any focus's export).
+- A keep with a remark always becomes a detached note of its own, never merged into a note, since keeps belong to no focus: its focus is blank, and it is shown on the Kept page among the keeps, by when it was kept, with why it was set aside (no focus, so not in any focus's export). Until 2026-10-25 these stood at the foot of the Kept page under the same heading as a focus's.
 - A keep without a remark is dropped, as are visits.
 - Deleting a text sets aside everything on it first (the confirmation says how much).
 - This could later replace the bundled loader's keeping of leftover rows. (Deleting a focus doesn't use it: with the focus gone its detached notes would have nowhere to be shown; see [foci-and-notes.md](foci-and-notes.md#deleting).)

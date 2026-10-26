@@ -1,57 +1,49 @@
 <% content_for :title, "Kept · Study Carrel" %>
-<% turbo_refreshes_with method: :morph, scroll: :preserve # removing one, or Undo, leaves you where you were %>
-<%# Laid out as a focus's notes page: the passages down the left, each one's remark and actions on a sheet down the
-    right. The passage side is the way back into reading. %>
+<% turbo_refreshes_with method: :morph, scroll: :preserve # jotting, removing, or Undo, leaves you where you were %>
+<%# One column, one stream, newest first, like a commonplace book: passages copied out with a line of your own, and
+    ideas that are only your line, under quiet month heads. Remarks set aside when their passage changed or went
+    take their place by when they were kept. %>
 <%= render "shared/rail", focus: Current.focus, here: :kept %>
-<main class="page notes-page">
-  <% if @keeps.any? %>
-    <%= page_head do %>
-      <span class="page-actions" aria-label="Order">
-        <%= link_to "Newest", kept_path, class: "chip#{" current" unless params[:order] == "reading"}" %>
-        <%= link_to "Reading order", kept_path(order: "reading"), class: "chip#{" current" if params[:order] == "reading"}" %>
-      </span>
+<main class="page kept-page">
+  <header>
+    <div class="kept-head"><svg class="kept-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z"/></svg><h1 class="kept-title">Kept</h1></div>
+    <% if @entries.any? %>
+      <p class="kept-desc">What stayed with you, kept apart from any focus: passages you kept with the ribbon beside a passage’s reference<span class="kept-key"> (<kbd>b</kbd>)</span>, and ideas you’d like to study someday. Open a passage to read on from it, or start a focus from any of them.</p>
     <% end %>
+  </header>
+
+  <%= render "keeps/jot", url: ideas_path, method: :post, key: "n" do %>
+    <button class="jot-open" type="button" data-jot-target="shown" data-action="jot#open">+ Jot an idea<kbd>n</kbd></button>
   <% end %>
 
-  <div class="nb-sheet<%= " nb-empty" if @keeps.empty? && @detached.empty? %>">
-    <header class="nb-focus">
-      <div class="nb-focus-head"><svg class="kept-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z"/></svg><h1 class="nb-focus-title kept-title">Kept</h1></div>
-      <% if @keeps.any? %>
-        <p class="nb-focus-desc kept-desc">Passages that stayed with you, kept apart from any focus. Keep one with the ribbon beside a passage’s reference<span class="kept-key"> (<kbd>b</kbd>)</span>. Open one here to read on from it, or start a focus from it.</p>
-      <% end %>
-    </header>
-    <p class="nb-lede"><%= pluralize(@keeps.size, "passage") %> you wanted to come back to</p>
+  <% if @entries.empty? %>
+    <p class="page-empty">Nothing kept yet. When a passage stays with you, tap the ribbon beside the text; when something comes to you that you’d like to study, jot it here.</p>
+  <% end %>
 
-    <% if @keeps.empty? && @detached.empty? %>
-      <p class="page-empty">Nothing kept yet. When a passage stays with you, tap the ribbon beside the text.</p>
-    <% end %>
-
-    <% @keeps.each do |keep|
-      unit = keep.unit %>
-      <% actions = capture do %>
-        <%= link_to "Start a focus", new_focus_path(unit_id: unit.id), class: "kept-act" %>
-        <%= button_to "Remove", unit_keep_path(unit, order: params[:order].presence), method: :delete,
-              class: "kept-act kept-act-remove", form_class: "inline-form",
-              aria: { label: "Remove #{unit.reference} from Kept" } %>
-      <% end %>
-      <%= render "shared/sheet_row", citation: unit.reference, passage: unit.body,
-            content: (tag.p(keep.remark, class: "nb-remark") if keep.remark), actions: actions,
-            href: reading_path(unit.section.work.slug, unit.section.number, unit.number), actions_class: "kept-acts" %>
-    <% end %>
-
-    <% if @detached.any? %>
-      <h2 class="nb-detached-head">From passages that changed or were removed</h2>
-      <% @detached.each do |detached| %>
-        <%= render "shared/sheet_row", citation: detached.citation, passage: detached.passage, content: detached.content, detached: detached %>
+  <% @entries.chunk_while { |a, b| kept_time(a).beginning_of_month == kept_time(b).beginning_of_month }.each do |month| %>
+    <h2 class="kept-month"><%= l kept_time(month.first), format: "%B %Y" %></h2>
+    <% month.each do |entry| %>
+      <% if entry.is_a?(DetachedNote) %>
+        <%= render "keeps/set_aside", detached: entry %>
+      <% elsif entry.idea? %>
+        <%= render "keeps/idea", idea: entry %>
+      <% else %>
+        <%= render "keeps/passage", keep: entry %>
       <% end %>
     <% end %>
-  </div>
+  <% end %>
 
   <% if (removed = flash[:removed]) && (unit = Unit.visible_to(Current.user).find_by(id: removed["unit_id"])) %>
     <div class="focus-toast" role="status">
       <span>Removed <%= unit.reference %> from Kept</span>
       <%= button_to "Undo", unit_keep_path(unit), method: :post, form_class: "inline-form",
-            params: { remark: removed["remark"], kept_at: removed["kept_at"], order: params[:order].presence }.compact %>
+            params: { remark: removed["remark"], kept_at: removed["kept_at"] }.compact %>
+    </div>
+  <% elsif (removed = flash[:removed_idea]) %>
+    <div class="focus-toast" role="status">
+      <span>Removed “<%= Keep.new(remark: removed["remark"]).idea_title %>” from Kept</span>
+      <%= button_to "Undo", ideas_path, method: :post, form_class: "inline-form",
+            params: { keep: { remark: removed["remark"] }, kept_at: removed["kept_at"] } %>
     </div>
   <% end %>
 </main>

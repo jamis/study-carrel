@@ -6,6 +6,10 @@
 /* With nothing docked beside it, the column takes more of the page than the reader's measure: room to compare notes. */
 .reread-col { --measure: 48em; position: relative; padding-top: 22px; padding-bottom: 50vh; }
 .rr-focus { max-width: var(--measure); margin: calc(10px + 4vh) 0 8px; }
+/* The focus as it stands over the passage in the reader, no bigger. */
+.nb-focus-head { display: flex; align-items: flex-start; gap: 8px; }
+.nb-focus-head .focus-mark { margin-top: .4em; }
+.nb-focus-title { margin: 0; font-size: clamp(19px, 2.4vw, 22px); line-height: 1.3; font-weight: 400; font-style: italic; color: var(--ink-soft); text-wrap: balance; }
 .rr-lede { max-width: var(--measure); margin: 0 0 18px 25px; font-family: var(--sans); font-size: 13px; color: var(--ink-faint); }
 .rr-lede .menu { position: relative; display: inline-block; }
 .rr-filter { border: 0; background: none; padding: 0; color: var(--accent); font: inherit; }

@@ -20,16 +20,21 @@ class FociController < ApplicationController
     @works_read = foci.works_read
   end
 
+  # Started from the Kept page: a kept passage is where reading begins (unit_id), and an idea (keep_id) fills in the
+  # title and description, then goes once the focus is made, its words being in the focus now.
   def new
-    @focus = foci.new
+    @start_idea = start_idea
+    @focus = @start_idea ? foci.new(title: @start_idea.idea_title, description: @start_idea.idea_rest) : foci.new
     @start_keep = Current.user.keeps.find_by(unit_id: params[:unit_id]) if params[:unit_id]
   end
 
   def create
     @focus = foci.new(focus_params)
+    @start_idea = start_idea
     @start_keep = Current.user.keeps.find_by(unit_id: params[:unit_id]) if params[:unit_id]
     if @focus.valid?
       foci.start!(focus_params.merge(last_unit: @start_keep&.unit))
+      @start_idea&.destroy!
       redirect_to continue_path
     else
       render :new, status: :unprocessable_entity
@@ -99,6 +104,8 @@ class FociController < ApplicationController
   helper_method :back_path
 
   def set_focus = @focus = foci.find(params[:id])
+
+  def start_idea = (Current.user.keeps.ideas.find_by(id: params[:keep_id]) if params[:keep_id])
 
   def focus_params = params.expect(focus: [ :title, :description ])
 end

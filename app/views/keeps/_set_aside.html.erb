@@ -1,0 +1,19 @@
+<%# A remark set aside when its passage changed or went: shown as the kept passage was, from the frozen citation and
+    passage, but not linked, since the passage is gone. Discard can't be undone, so it asks. %>
+<% long = detached.passage.length > 300 || detached.passage.count("\n") > 3 %>
+<article class="entry entry-set-aside" id="<%= dom_id(detached) %>" <%= tag.attributes(data: ({ controller: "expand" } if long)) %>>
+  <div class="entry-top">
+    <span class="entry-ref"><%= detached.citation %></span>
+    <span class="entry-date"><%= l detached.noted_at.to_date, format: "%b %-d" %></span>
+  </div>
+  <p class="entry-why">set aside <%= l detached.created_at.to_date, format: :long %>, when <%= detached.why %></p>
+  <p class="entry-quote<%= " clamped" if long %>" data-expand-target="text"><%= detached.passage %></p>
+  <% if long %>
+    <button class="entry-more" type="button" data-action="expand#toggle" data-expand-target="button" aria-expanded="false">Show full passage</button>
+  <% end %>
+  <p class="entry-remark"><%= detached.content.to_plain_text %></p>
+  <div class="kept-acts">
+    <%= button_to "Discard", detached_note_path(detached), method: :delete, class: "kept-act kept-act-remove", form_class: "inline-form",
+          data: { turbo_confirm: "Discard this remark? It can’t be brought back." } %>
+  </div>
+</article>

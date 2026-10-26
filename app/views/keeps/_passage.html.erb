@@ -1,0 +1,19 @@
+<%# A kept passage: its reference (into reading) and the passage in the text's type, then your remark under it. %>
+<% unit = keep.unit
+   long = unit.body.length > 300 || unit.body.count("\n") > 3 %>
+<article class="entry entry-passage" id="<%= dom_id(keep) %>" <%= tag.attributes(data: ({ controller: "expand" } if long)) %>>
+  <div class="entry-top">
+    <%= link_to unit.reference, reading_path(unit.section.work.slug, unit.section.number, unit.number), class: "entry-ref" %>
+    <span class="entry-date"><%= l keep.created_at.to_date, format: "%b %-d" %></span>
+  </div>
+  <p class="entry-quote<%= " clamped" if long %>" data-expand-target="text"><%= unit.body %></p>
+  <% if long %>
+    <button class="entry-more" type="button" data-action="expand#toggle" data-expand-target="button" aria-expanded="false">Show full passage</button>
+  <% end %>
+  <% if keep.remark %><p class="entry-remark"><%= keep.remark %></p><% end %>
+  <div class="kept-acts">
+    <%= link_to "Start a focus", new_focus_path(unit_id: unit.id), class: "kept-act" %>
+    <%= button_to "Remove", unit_keep_path(unit), method: :delete, class: "kept-act kept-act-remove", form_class: "inline-form",
+          aria: { label: "Remove #{unit.reference} from Kept" } %>
+  </div>
+</article>

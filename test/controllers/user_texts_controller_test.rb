@@ -166,9 +166,9 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     get focus_notes_path(@user.foci.current_one)
     assert_select ".rr-gone", 0, "the notes both survived"
     get kept_path
-    assert_select ".nb-detached .nb-ref", "Journal: Monday 1:2"
-    assert_select ".nb-detached .nb-quote", "The house was quiet."
-    assert_select ".nb-detached + .nb-note", /Quiet as rest/
+    assert_select ".entry-set-aside .entry-ref", "Journal: Monday 1:2"
+    assert_select ".entry-set-aside .entry-quote", "The house was quiet."
+    assert_select ".entry-set-aside .entry-remark", /Quiet as rest/
     get export_focus_notes_path(@user.foci.current_one)
     assert_no_match "Quiet as rest", response.body, "a kept remark belongs to no focus"
   end

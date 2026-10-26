@@ -1,0 +1,15 @@
+<%# An idea's words, written in place: the block is what shows until it's opened (the "+ Jot an idea" slip, or the
+    idea itself), and the field takes its place. Enter or a tap away keeps it, Shift+Enter is a new line, Esc leaves it.
+    url, method: where the form goes (a new idea, or this one)
+    value: the words so far (none for a new one)
+    key: a key that opens it from anywhere on the page but a field (n, for a new one) %>
+<div class="jot" data-controller="jot" <%= tag.attributes(data: { jot_key_value: local_assigns[:key], action: ("keydown@document->jot#key" if local_assigns[:key]) }.compact) %>>
+  <%= yield %>
+  <%= form_with url:, method:, scope: :keep, class: "jot-form", html: { hidden: true }, data: { jot_target: "form" } do |form| %>
+    <%= form.text_area :remark, value: local_assigns[:value], maxlength: 200, rows: 2,
+          placeholder: "A question or a topic to study…\nand on a line below, where you might begin",
+          aria: { label: local_assigns[:value] ? "Your idea" : "An idea to study" },
+          data: { jot_target: "field", action: "keydown->jot#fieldKey input->jot#count blur->jot#blur" } %>
+    <p class="jot-foot"><span class="jot-keys">Enter keeps it · Shift+Enter for a new line · Esc leaves it</span><span class="jot-left" data-jot-target="left"></span></p>
+  <% end %>
+</div>

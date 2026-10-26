@@ -1,0 +1,18 @@
+<%# An idea: only your words, the first line its question or topic, the rest (where to begin, where it came from) under
+    it. Pressing it writes it again in place. %>
+<article class="entry entry-idea" id="<%= dom_id(idea) %>">
+  <div class="idea-top">
+    <%= render "keeps/jot", url: idea_path(idea), method: :patch, value: idea.remark do %>
+      <button class="idea-text" type="button" title="Edit" data-jot-target="shown" data-action="jot#open">
+        <span class="idea-line"><%= idea.idea_title %></span>
+        <% if (rest = idea.idea_rest) %><span class="idea-rest"><%= rest %></span><% end %>
+      </button>
+    <% end %>
+    <span class="entry-date"><%= l idea.created_at.to_date, format: "%b %-d" %></span>
+  </div>
+  <div class="kept-acts">
+    <%= link_to "Start a focus", new_focus_path(keep_id: idea.id), class: "kept-act" %>
+    <%= button_to "Remove", idea_path(idea), method: :delete, class: "kept-act kept-act-remove", form_class: "inline-form",
+          aria: { label: "Remove “#{idea.idea_title}” from Kept" } %>
+  </div>
+</article>

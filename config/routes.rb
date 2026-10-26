@@ -53,6 +53,8 @@ Rails.application.routes.draw do
   get "notes", to: "notes#current" # the old address of the current focus's notes
   get "history", to: "history#index"
   get "kept", to: "keeps#index"
+  # Keeps with no passage, written on the Kept page.
+  resources :ideas, only: %i[create update destroy], path: "kept/ideas"
   get "library", to: "library#index"
   get "search", to: "searches#show"
   get "random", to: "random_readings#show", as: :random

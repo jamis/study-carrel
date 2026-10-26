@@ -1,24 +1,23 @@
 # Passages the reader has kept. The ribbon in the reader talks to create / update / destroy (JSON, no body back);
 # the Kept page lists them, removes one (HTML) and puts it back with Undo, remark and place in the list and all.
+# Ideas, keeps with no passage, are written on the Kept page too (IdeasController).
 class KeepsController < ApplicationController
   before_action :set_unit, except: :index
 
+  # One stream, newest first: kept passages, ideas, and remarks set aside when their passage changed or went, each by
+  # when it was kept.
   def index
     keeps = Current.user.keeps.preload(unit: { section: :work })
-    @keeps = if params[:order] == "reading"
-      keeps.joins(unit: :section).in_order_of(:"sections.work_id", Work.ids_in_library_order).order("sections.number", "units.number")
-    else
-      keeps.order(created_at: :desc, id: :desc)
-    end
-    @detached = Current.user.detached_notes.where(kept: true).includes(:rich_text_content)
+    detached = Current.user.detached_notes.where(kept: true).includes(:rich_text_content)
+    @entries = (keeps + detached).sort_by { [ helpers.kept_time(it), it.id ] }.reverse
   end
 
   def create
     Current.user.keeps.find_or_create_by!(unit: @unit) do |keep|
       keep.remark = params[:remark]
-      keep.created_at = kept_at
+      keep.created_at = Keep.kept_at(params[:kept_at])
     end
-    request.format.json? ? head(:no_content) : redirect_to(kept_list_path, status: :see_other)
+    request.format.json? ? head(:no_content) : redirect_to(kept_path, status: :see_other)
   rescue ActiveRecord::RecordNotUnique
     head :no_content
   end
@@ -39,21 +38,11 @@ class KeepsController < ApplicationController
       head :no_content
     else
       removed = { unit_id: @unit.id, remark: keep.remark, kept_at: keep.created_at.iso8601(6) } if keep
-      redirect_to kept_list_path, status: :see_other, flash: { removed: }
+      redirect_to kept_path, status: :see_other, flash: { removed: }
     end
   end
 
   private
 
   def set_unit = @unit = Unit.visible_to(Current.user).find(params[:unit_id])
-
-  # Undo puts a keep back where it was in the newest-first list; anything else is kept now.
-  def kept_at
-    Time.iso8601(params[:kept_at]).clamp(..Time.current) if params[:kept_at]
-  rescue ArgumentError
-    nil
-  end
-
-  # Back to the Kept page in the order it was in.
-  def kept_list_path = kept_path(order: ("reading" if params[:order] == "reading"))
 end

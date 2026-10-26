@@ -47,10 +47,10 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 0, Keep.where(user: @user).count
   end
 
-  test "removing from the Kept page returns there, in its order, with Undo" do
+  test "removing from the Kept page returns there, with Undo" do
     @user.keeps.create!(unit: verse(3), remark: "hm")
-    delete unit_keep_path(verse(3), order: "reading")
-    assert_redirected_to kept_path(order: "reading")
+    delete unit_keep_path(verse(3))
+    assert_redirected_to kept_path
     assert_equal 0, Keep.where(user: @user).count
 
     follow_redirect!
@@ -72,7 +72,7 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "hm", keep.remark
     assert_in_delta kept_at, keep.created_at, 1.second
     follow_redirect!
-    assert_equal [ "Isaiah 40:20", "Isaiah 40:3" ], css_select(".nb-ref").map(&:text)
+    assert_equal [ "Isaiah 40:20", "Isaiah 40:3" ], css_select(".entry-ref").map(&:text)
     assert_select ".focus-toast", 0
   end
 
@@ -100,19 +100,32 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
     @user.keeps.create!(unit: verse(20))
     get kept_path
     assert_response :success
-    assert_equal [ "Isaiah 40:20", "Isaiah 40:3" ], css_select(".nb-ref").map(&:text)
-    assert_select ".nb-linked a.nb-ref[href=?]", reading_path("isaiah-kjv", 40, 3)
-    assert_select ".nb-note .nb-remark", "first one"
-    assert_select ".nb-note .nb-remark", 1, "no remark, nothing in its place"
-    assert_select ".nb-note a[href=?]", new_focus_path(unit_id: verse(3).id)
+    assert_equal [ "Isaiah 40:20", "Isaiah 40:3" ], css_select(".entry-ref").map(&:text)
+    assert_select ".entry-passage a.entry-ref[href=?]", reading_path("isaiah-kjv", 40, 3)
+    assert_select ".entry-passage .entry-remark", "first one"
+    assert_select ".entry-passage .entry-remark", 1, "no remark, nothing in its place"
+    assert_select ".entry-passage a[href=?]", new_focus_path(unit_id: verse(3).id)
     assert_select ".kept-desc", /apart from any focus/
   end
 
-  test "the Kept page can list in reading order" do
-    @user.keeps.create!(unit: verse(20), created_at: 2.days.ago)
-    @user.keeps.create!(unit: verse(3))
-    get kept_path(order: "reading")
-    assert_equal [ "Isaiah 40:3", "Isaiah 40:20" ], css_select(".nb-ref").map(&:text)
+  test "the Kept page is one stream: passages, ideas and remarks set aside, newest first by when they were kept" do
+    travel_to Time.zone.local(2026, 10, 20, 12) do
+      @user.keeps.create!(unit: verse(3), created_at: 40.days.ago)
+      @user.keeps.create!(remark: "Holiness", created_at: 3.days.ago)
+      @user.keeps.create!(unit: verse(20), created_at: 1.day.ago)
+      @user.keeps.create!(remark: "What should I stop doing?\nHeard in a sermon")
+      DetachedNote.create!(user: @user, kept: true, content: "<p>The kettle</p>", citation: "Journal ¶4", work_title: "Journal",
+                           passage: "The kettle sang.", reason: "revised", noted_at: 2.days.ago, edited_at: 2.days.ago)
+      get kept_path
+    end
+    entries = css_select(".entry").map { it.at_css(".entry-ref, .idea-line").text.strip }
+    assert_equal [ "What should I stop doing?", "Isaiah 40:20", "Journal ¶4", "Holiness", "Isaiah 40:3" ], entries
+    assert_equal [ "October 2026", "September 2026" ], css_select(".kept-month").map(&:text)
+    assert_select ".entry-idea .idea-rest", "Heard in a sermon"
+    assert_select ".entry-idea .idea-rest", 1, "an idea of one line has nothing under it"
+    assert_select ".entry-set-aside .entry-ref", "Journal ¶4"
+    assert_select ".entry-set-aside a.entry-ref", 0, "its passage is gone"
+    assert_select ".entry-set-aside button[data-turbo-confirm]", "Discard"
   end
 
   test "the Kept page is empty with a hint" do
@@ -123,8 +136,9 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
 
   test "the Kept page shows only the reader's own" do
     users(:two).keeps.create!(unit: verse(3), remark: "theirs")
+    users(:two).keeps.create!(remark: "their idea")
     get kept_path
-    assert_select ".nb-passage", 0
+    assert_select ".entry", 0
   end
 
   test "the Kept page starts a focus without asking: the current one stays among the others" do
@@ -135,8 +149,9 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
 
   test "the Kept page's query count doesn't grow with the number of keeps" do
     @user.keeps.create!(unit: verse(1))
+    @user.keeps.create!(remark: "an idea")
     one = count_queries { get kept_path }
-    (2..6).each { |n| @user.keeps.create!(unit: verse(n)) }
+    (2..6).each { |n| @user.keeps.create!(unit: verse(n)); @user.keeps.create!(remark: "idea #{n}") }
     six = count_queries { get kept_path }
     assert_equal one, six
   end

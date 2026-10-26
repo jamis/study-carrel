@@ -5,7 +5,10 @@
   <% if @start_keep %>
     <p class="signin-notice start-from">Beginning at <%= link_to @start_keep.unit.reference, reading_path(@start_keep.unit.section.work.slug, @start_keep.unit.section.number, @start_keep.unit.number) %><% if @start_keep.remark %>: <em><%= @start_keep.remark %></em><% end %></p>
   <% end %>
-  <%= render "form", focus: @focus, submit: "Begin", start_keep: @start_keep %>
+  <% if @start_idea %>
+    <p class="signin-notice start-from">From an idea you kept; it leaves Kept once you begin.</p>
+  <% end %>
+  <%= render "form", focus: @focus, submit: "Begin", start_keep: @start_keep, start_idea: @start_idea %>
   <% if Current.user.foci.exists? %>
     <p class="signin-notice">
       <%= link_to "Cancel", foci_path %>

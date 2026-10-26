@@ -2,6 +2,7 @@
   <% if focus.errors.any? %><p class="signin-alert">Give your focus a title.</p><% end %>
   <%= hidden_field_tag :back, local_assigns[:back] if local_assigns[:back] %>
   <%= hidden_field_tag :unit_id, local_assigns[:start_keep].unit_id if local_assigns[:start_keep] %>
+  <%= hidden_field_tag :keep_id, local_assigns[:start_idea].id if local_assigns[:start_idea] %>
   <%= form.text_field :title, required: true, autofocus: true, placeholder: "A question, metaphor, or thesis" %>
   <%= form.text_area :description, rows: 4, placeholder: "Why this? (optional)" %>
   <%= form.submit submit, class: "primary" %>
