@@ -1,0 +1,14 @@
+<%# Naming the label being reread, from its band: "Rename" (or "Name it", for an unnamed group) after what's shown, and
+    the field it opens in the band's place (the band's .naming), saved with Enter, left with Esc. Redrawn when the
+    label is named, from here or from Gather. %>
+<span id="<%= dom_id(label, :naming) %>" class="rr-filter-naming">
+  <span class="rr-filter-rename">· <button type="button" title="<%= label.named? ? "Rename it" : "Give it a name" %> (r)" data-action="reread#startNaming"><%= label.named? ? "Rename" : "Name it" %></button></span>
+  <form class="rr-name-form" data-action="submit->reread#saveName keydown->reread#nameKey">
+    <label class="rr-name-what" for="<%= dom_id(label, :name) %>">Only the <span data-reread-target="count"><%= pluralize(focus.notes.joins(:note_labels).where(note_labels: { label_id: label.id }).count, "note") %></span> labelled</label>
+    <input class="rr-name" id="<%= dom_id(label, :name) %>" type="text" maxlength="40" value="<%= label.name %>" autocomplete="off"
+           placeholder="<%= label.named? ? "Words for it" : "Words for group #{label.letter}" %> (optional)" data-reread-target="nameInput">
+    <span class="rr-name-acts"><button type="submit">Save</button><button type="button" class="quiet" data-action="reread#stopNaming">Cancel</button></span>
+    <span class="rr-name-error" data-reread-target="nameError" hidden></span>
+    <span class="rr-name-hint">On every note it's on, under every focus.<% if label.named? %> Left empty, <%= label.number ? "it's group #{label.letter} again" : "it becomes a lettered group" %>.<% end %> <kbd>Enter</kbd> saves · <kbd>Esc</kbd> leaves it as it was</span>
+  </form>
+</span>

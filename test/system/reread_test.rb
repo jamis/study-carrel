@@ -110,6 +110,34 @@ class RereadTest < ApplicationSystemTestCase
     assert_empty waiting.note_labels.reload
   end
 
+  test "naming an unnamed group from its band, then renaming it; a name already taken is refused" do
+    group = @first.group_with!(@second)
+    visit focus_notes_path(@focus, label: group.id)
+    assert_selector ".rr-filter-band", text: "Only the 2 notes in group A"
+
+    within(".rr-filter-band") { click_on "Name it" }
+    find(".rr-name").send_keys "Set apart", :enter
+    assert_selector ".rr-name-error", text: "You already have a label called “Set apart”."
+    find(".rr-name").send_keys :escape
+    assert_selector ".rr-filter-band", text: "Only the 2 notes in group A"
+    assert_selector ".rr-filter-band", text: "Name it"
+    assert_nil group.reload.name
+
+    find("body").send_keys "r"
+    find(".rr-name").send_keys "wilderness", :enter
+    assert_selector ".rr-filter-band", text: "Only the 2 notes labelled “wilderness”"
+    assert_selector ".rr-filter-band", text: "Rename"
+    assert_selector ".rr-filter.on", text: "the 2 notes labelled “wilderness”"
+    assert_selector ".rr-row .rr-chip.current", text: "wilderness", count: 2
+    assert_equal "wilderness", group.reload.name
+
+    within(".rr-filter-band") { click_on "Rename" }
+    assert_equal "wilderness", find(".rr-name").value
+    find(".rr-name").send_keys [ :control, "a" ], :backspace, :enter
+    assert_selector ".rr-filter-band", text: "Only the 2 notes in group A"
+    assert_nil group.reload.name
+  end
+
   test "the label picker: every label as a cloud, A–Z or recent, and Enter takes the closest match or a new label" do
     %w[ glory grace holiness humility justice mercy peace sorrow wilderness zeal ].each { @second.label!(it) }
     users(:one).foci.create!(title: "Rest", made_current_at: 1.day.ago).notes.create!(unit: verse(31), content: "x").label!("hope")

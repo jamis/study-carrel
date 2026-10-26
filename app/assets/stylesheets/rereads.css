@@ -36,12 +36,31 @@
   display: flex; align-items: center; gap: 8px; max-width: var(--measure); margin: -6px 0 14px; padding: 7px 6px 7px 14px;
   border-radius: 8px; background: var(--accent-soft); font-family: var(--sans); font-size: 13px; color: var(--ink);
 }
-.rr-filter-what { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rr-filter-band .rr-filter-all { flex: none; padding: 2px 4px; color: var(--accent); text-decoration: none; }
+.rr-filter-what { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rr-filter-band .rr-filter-all { flex: none; margin-left: auto; padding: 2px 4px; color: var(--accent); text-decoration: none; }
 .rr-filter-band .rr-filter-all:hover { text-decoration: underline; }
 .rr-filter-band .rr-filter-x { flex: none; padding: 2px 6px; border-radius: 6px; color: var(--ink-soft); font-size: 15px; line-height: 1; text-decoration: none; }
 .rr-filter-band .rr-filter-x:hover { color: var(--accent); background: var(--paper); }
 .comparing .rr-filter-band { display: none; }
+/* Rename (or Name it) after what's shown; it opens a field in the band's place, saying what Enter and Esc do. */
+.rr-filter-naming { display: contents; }
+.rr-filter-rename { flex: none; color: var(--ink-faint); }
+.rr-filter-rename button, .rr-name-acts button { border: 0; background: none; padding: 0; font: inherit; color: var(--accent); }
+.rr-filter-rename button:hover, .rr-name-acts button:hover { text-decoration: underline; }
+.rr-name-form { display: none; }
+.rr-filter-band.naming .rr-filter-what, .rr-filter-band.naming .rr-filter-rename, .rr-filter-band.naming .rr-filter-all { display: none; }
+.rr-filter-band.naming .rr-name-form { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.rr-name {
+  width: 16em; max-width: 100%; padding: 3px 8px; border: 1px solid var(--accent); border-radius: 6px; background: var(--paper);
+  font: 15px var(--serif); color: var(--ink);
+}
+.rr-name:focus { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.rr-name-acts { display: inline-flex; gap: 8px; align-items: baseline; }
+.rr-name-acts button.quiet { color: var(--ink-soft); }
+.rr-name-error, .rr-name-hint { flex-basis: 100%; }
+.rr-name-error { color: var(--accent); }
+.rr-name-hint { font-size: 11.5px; color: var(--ink-faint); }
+.rr-name-hint kbd { font: inherit; color: var(--ink-soft); }
 
 .rr-run { max-width: var(--measure); }
 .rr-row {

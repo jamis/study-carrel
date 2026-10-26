@@ -15,6 +15,7 @@
       data-reread-position-url-value="<%= focus_reread_path(@focus) %>"
       data-reread-read-only-value="<%= archived %>"
       data-reread-filter-value="<%= @label&.id %>"
+      <% if @label %>data-reread-rename-url-value="<%= focus_label_path(@focus, @label) %>"<% end %>
       data-reread-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
       data-reread-lift-url-value="<%= focus_notes_path(@focus) %>"
       data-compare-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
@@ -41,7 +42,7 @@
     <div class="rr-lede">
       <span class="menu" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
         Rereading
-        <button class="rr-filter<%= " on" if @label %>" type="button" title="Reread only the notes with one label" aria-expanded="false" data-menu-target="button" data-action="menu#toggle"><% if @label %>the <span data-reread-target="count"><%= pluralize(@notes.size, "note") %></span> <%= label_phrase(@label) %><% else %><%= pluralize(@notes.size, "note") %><% end %> <span class="rr-caret" aria-hidden="true">▾</span></button>
+        <button class="rr-filter<%= " on" if @label %>" type="button" title="Reread only the notes with one label" aria-expanded="false" data-menu-target="button" data-action="menu#toggle"><% if @label %>the <span data-reread-target="count"><%= pluralize(@notes.size, "note") %></span> <%= label_phrase_tag(@label) %><% else %><%= pluralize(@notes.size, "note") %><% end %> <span class="rr-caret" aria-hidden="true">▾</span></button>
         <%= render "rereads/filter_menu", focus: @focus, notes: @all %>
       </span>
       <% if archived %>
@@ -49,14 +50,15 @@
           <%= button_to "Unarchive", unarchive_focus_path(@focus, back: "notes"), method: :patch, form_class: "inline-form" %></span>
         <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>c</kbd> for the labels, <kbd>s</kbd> the scratchpad</span>
       <% else %>
-        <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to gather, <kbd>c</kbd> for the labels, <kbd>n</kbd> for a new note, <kbd>s</kbd> the scratchpad</span>
+        <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to gather, <kbd>c</kbd> for the labels,<% if @label %> <kbd>r</kbd> to name this one,<% end %> <kbd>n</kbd> for a new note, <kbd>s</kbd> the scratchpad</span>
       <% end %>
     </div>
-    <%# Rereading one label: saying so over the run, with the way back to them all (×, or Esc). Not prefetched, as pills
-        aren't (rereads/_note_labels). %>
+    <%# Rereading one label: saying so over the run, with Rename (r) and the way back to them all (×, or Esc). Not
+        prefetched, as pills aren't (rereads/_note_labels). %>
     <% if @label %>
-      <div class="rr-filter-band">
-        <span class="rr-filter-what">Only the <span data-reread-target="count"><%= pluralize(@notes.size, "note") %></span> <%= label_phrase(@label) %><span data-reread-target="removed" hidden> · 1 just removed</span></span>
+      <div class="rr-filter-band" data-reread-target="band">
+        <span class="rr-filter-what">Only the <span data-reread-target="count"><%= pluralize(@notes.size, "note") %></span> <%= label_phrase_tag(@label) %><span data-reread-target="removed" hidden> · 1 just removed</span></span>
+        <%= render "rereads/filter_naming", label: @label, focus: @focus unless archived %>
         <%= link_to "Show all #{@all.size}", focus_notes_path(@focus, at: @here&.id), class: "rr-filter-all", data: { action: "reread#unfilter", turbo_prefetch: false } %>
         <%= link_to "×", focus_notes_path(@focus, at: @here&.id), class: "rr-filter-x", title: "Show all the notes (Esc)", aria: { label: "Show all the notes" }, data: { action: "reread#unfilter", turbo_prefetch: false } %>
       </div>
@@ -70,7 +72,7 @@
     <% end %>
 
     <% if @label %>
-      <p class="page-empty" data-reread-target="empty" <%= "hidden" if @notes.any? %>>No notes here are <%= label_phrase(@label) %> any more.</p>
+      <p class="page-empty" data-reread-target="empty" <%= "hidden" if @notes.any? %>>No notes here are <%= label_phrase_tag(@label) %> any more.</p>
     <% elsif @notes.empty? %>
       <p class="page-empty"><%= archived ? "No notes." : "No notes yet. Open a verse and write what it says to your question." %></p>
     <% end %>

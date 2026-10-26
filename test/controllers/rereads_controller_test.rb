@@ -43,6 +43,8 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".rr-filter", /labelled “waiting”/
     assert_select ".rr-filter-band", /Only the 1 note labelled “waiting”/
     assert_select ".rr-filter-band a[href=?]", focus_notes_path(@focus, at: @late.id), text: "Show all 2"
+    assert_select ".rr-filter-band .rr-filter-rename button", "Rename"
+    assert_select ".rr-filter-band input.rr-name[value=?]", "waiting"
   end
 
   test "each pill rereads only its label's notes, from that note, and Remove is there to be offered" do
@@ -215,6 +217,8 @@ class NoteLabelsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Holy otherness", group.reload.name
     assert_match %(target="#{ActionView::RecordIdentifier.dom_id(other, :labels)}"), response.body
     assert_match %(target="reread_labels"), response.body
+    assert_match %(targets=".#{ActionView::RecordIdentifier.dom_id(group, :phrase)}"), response.body
+    assert_match %(target="#{ActionView::RecordIdentifier.dom_id(group, :naming)}"), response.body
   end
 
   test "renaming, and taking the name away again" do

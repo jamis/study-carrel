@@ -12,13 +12,14 @@ const PICKER_LEAST = 150, PICKER_TALLEST = 340 // px of the picker's cloud
 // notes that carry it. The note you're on gets its editor, if it has one here (data-editor-url); where you are is
 // saved, so the reread opens there again. A new note on the whole focus (n) is written in a row of its own, and a
 // selection in the scratchpad can be made one ("Make a note of this"). A label's pill rereads only the notes carrying it
-// (filter); there, Remove on the note you're on takes it off, the note staying (to put back) until you move on. An
+// (filter); there, Remove on the note you're on takes it off, the note staying (to put back) until you move on, and the
+// band over the run names or renames the label (r). An
 // archived focus's page is read-only (readOnly): moving, the labels panel and the scratchpad to read, nothing written
 // or labelled.
 export default class extends Controller {
   static targets = ["row", "newRow", "noteLabels", "labelsBody", "picker", "pickerInput", "pickerOptions", "pickerFoot", "labelForm", "pad", "labelsPanel",
-    "lift", "toast", "count", "removed", "empty", "filterMenu"]
-  static values = { positionUrl: String, labelsUrlTemplate: String, liftUrl: String, readOnly: Boolean, filter: String }
+    "lift", "toast", "count", "removed", "empty", "filterMenu", "band", "nameInput", "nameError"]
+  static values = { positionUrl: String, labelsUrlTemplate: String, liftUrl: String, readOnly: Boolean, filter: String, renameUrl: String }
 
   connect() {
     let view = "cloud"
@@ -56,6 +57,7 @@ export default class extends Controller {
   labelsBodyTargetConnected() { this.#mark() }
   // The menu of labels to reread is drawn without knowing which is being reread: marked here.
   filterMenuTargetConnected() { this.#markMenu() }
+  countTargetConnected() { this.#recount() }
 
   get here() { return this.rowTargets.find(row => row.classList.contains("here")) }
 
@@ -339,6 +341,49 @@ export default class extends Controller {
     this.emptyTargets.forEach(empty => { empty.hidden = this.rowTargets.length > 0 })
   }
 
+  // ---------- naming the label being reread ----------
+
+  // The band turns into a field for the label's name: its name, or empty for an unnamed group.
+  startNaming(event) {
+    event?.stopPropagation()
+    if (!this.hasNameInputTarget) return
+    this.bandTarget.classList.add("naming")
+    this.nameErrorTarget.hidden = true
+    this.nameInputTarget.value = this.nameInputTarget.defaultValue
+    this.nameInputTarget.focus()
+    this.nameInputTarget.select()
+  }
+
+  stopNaming() {
+    this.bandTarget.classList.remove("naming")
+    this.bandTarget.querySelector(".rr-filter-rename button")?.focus()
+  }
+
+  // A blank name leaves it unnamed (a lettered group); a name already taken is refused, saying so, the field staying.
+  async saveName(event) {
+    event.preventDefault()
+    const response = await fetch(this.renameUrlValue, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "Accept": "text/vnd.turbo-stream.html", "X-CSRF-Token": csrfToken() },
+      body: JSON.stringify({ name: this.nameInputTarget.value })
+    }).catch(() => null)
+    if (!response?.ok) {
+      this.nameErrorTarget.textContent = response?.status === 422 ? (await response.text()) || "That couldn't be done." : "That couldn't be done."
+      this.nameErrorTarget.hidden = false
+      return this.nameInputTarget.focus()
+    }
+    Turbo.renderStreamMessage(await response.text())
+    this.bandTarget.classList.remove("naming")
+  }
+
+  // Esc leaves the name as it was, and goes no further (not back to all the notes).
+  nameKey(event) {
+    if (event.key !== "Escape") return
+    event.preventDefault()
+    event.stopPropagation()
+    this.stopNaming()
+  }
+
   // ---------- the picker ----------
 
   openPicker(event) {
@@ -546,6 +591,7 @@ export default class extends Controller {
     // Esc, with nothing else to put away, leaves the label being reread for all the notes.
     else if (event.key === "Escape" && this.filterValue && !this.padTarget.classList.contains("open") && this.pickerTarget.hidden &&
              !this.element.querySelector(".rr-filter-menu.open")) { event.preventDefault(); this.unfilter() }
+    else if (event.key === "r" && this.hasNameInputTarget) { event.preventDefault(); this.startNaming() }
     else if (event.key === "n") { event.preventDefault(); this.newNote() }
     else if (event.key === "e") { const editor = this.here?.querySelector("lexxy-editor [contenteditable]"); if (editor) { event.preventDefault(); focusAtEnd(editor) } }
     else if (event.key === "s") {

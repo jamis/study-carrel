@@ -22,6 +22,9 @@ module LabelsHelper
   # How the reread speaks of the notes on one label: "labelled “waiting”", or "in group D".
   def label_phrase(label) = label.named? ? "labelled “#{label.name}”" : "in #{label_title(label, snippet: false)}"
 
+  # The same, marked so that naming the label redraws it wherever the page says it.
+  def label_phrase_tag(label) = tag.span(label_phrase(label), class: dom_id(label, :phrase))
+
   # Where a note stands: its passage's reference, or for a note on the focus as a whole, its number ("focus 2").
   def note_ref(note) = note.unit ? unit_ref(note.unit.section, note.unit) : "focus #{note.number}"
 

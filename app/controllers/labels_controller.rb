@@ -1,12 +1,14 @@
 # Naming a label from the reread: giving an unnamed group of notes words, renaming a label, or taking its name away
 # (leaving it known by its example). A name the user already has for another label is refused, with why; the two
-# aren't merged. The labels on the focus's page are redrawn from the reply.
+# aren't merged. Asked from Gather's card, or from the band while rereading the label. The labels on the focus's page
+# are redrawn from the reply.
 class LabelsController < ApplicationController
   before_action :set_focus, :refuse_archived_focus
 
   def update
     label = Current.user.labels.find(params[:id])
     label.rename!(params[:name].to_s)
+    @renamed = label
     @notes = @focus.notes.where(id: label.note_labels.select(:note_id)).includes(labels: Label::FACE)
     render "note_labels/update"
   rescue ActiveRecord::RecordInvalid
