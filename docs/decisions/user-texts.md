@@ -51,6 +51,7 @@ Matching must be looser than the bundled loader's, which goes by section and par
 - Sentences by exact text in their section, then anywhere in the work.
 - Each old paragraph is paired with the new one most of its sentences went to, and a leftover sentence matches the most alike one there (a rewording, or one half of a sentence split in two), or in its section when its paragraph has no pair (a one-line paragraph reworded), if they share at least 30% of their words.
 - **A sentence merely in the same place is not a match** (revised 2026-10-07; the prototype fell back to it): a note is set aside with its passage rather than hung on words it wasn't written about.
+- **A revision too different to match is refused** (decided 2026-10-26). Finding the most alike leftover compares each one with every leftover sharing a word with it, which grows with the square of the text: a long text with most of its sentences changed (or a different text pasted over it, perhaps deliberately, to tie up the server) took minutes. Past a budget (`TextRevision::COMPARISONS`, about two seconds' work), the review says it's too different to save as a revision and offers to add it as a new text instead; saving refuses it too. Chosen over a share of unchanged sentences, which would refuse a short text reworded throughout, cheap to match; and over searching only nearby paragraphs, which would lose a reworded one-liner moved far. Reviews and saves are also limited to 10 a minute per user.
 
 ## Detached notes
 

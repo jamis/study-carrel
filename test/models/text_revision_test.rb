@@ -200,6 +200,16 @@ class TextRevisionTest < ActiveSupport::TestCase
     assert_equal [ "The cat sat on the mat." ], r.gone.map(&:text)
   end
 
+  test "a revision with too little as it was to match in reasonable time is refused" do
+    stub_const(TextRevision, :COMPARISONS, 60) do
+      assert_not revision.too_different?
+      every_sentence_changed = revision(BEFORE.gsub(/([.!?])(\s)/, ' too\1\2'))
+      assert every_sentence_changed.too_different?
+      assert_raises(ArgumentError) { every_sentence_changed.apply! }
+    end
+    assert_equal BEFORE, @work.reload.source
+  end
+
   test "a text revised without changes keeps everything as it was" do
     ids = Unit.joins(:section).where(sections: { work_id: @work.id }).order(:id).pluck(:id, :body)
     r = revision(BEFORE)

@@ -173,6 +173,30 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match "Quiet as rest", response.body, "a kept remark belongs to no focus"
   end
 
+  test "a revision too different to match is refused, offering to add it as a new text instead" do
+    work = noted_text
+    every_sentence_changed = "# Monday\n\nWoke early today. The house was quiet today.\nRead a little today.\n"
+    stub_const(TextRevision, :COMPARISONS, 0) do
+      patch review_text_path(work), params: params(source: every_sentence_changed)
+      assert_response :success
+      assert_select ".texts-refused", /too different from “Journal”/
+      assert_select ".texts-changes", 0
+      assert_select "form.texts-bar button.primary", 0
+      assert_select ".texts-refused form[action=?] input[name='user_text[source]']", texts_path
+
+      patch text_path(work), params: params(source: every_sentence_changed)
+      assert_response :unprocessable_content
+      assert_select ".texts-refused"
+      assert_equal SOURCE, work.reload.source
+    end
+
+    assert_difference -> { @user.texts.count } do
+      post texts_path, params: params(source: every_sentence_changed)
+    end
+    assert_equal SOURCE, work.reload.source
+    assert_equal 2, Note.count
+  end
+
   test "deleting a text with notes sets them aside first; a set-aside note can be discarded, by its owner only" do
     work = noted_text
     get texts_path

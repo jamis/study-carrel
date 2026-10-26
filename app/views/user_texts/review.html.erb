@@ -6,7 +6,9 @@
     <h2 class="page-title"><%= @text.title %></h2>
     <% if @text.author %><span class="texts-by"><%= @text.author %></span><% end %>
   </div>
-  <% sections = @text.kept_sections; unit = @text.poetry? ? "stanza" : "sentence" %>
+  <% sections = @text.kept_sections; unit = @text.poetry? ? "stanza" : "sentence"
+     refused = @revision&.too_different?
+     revision = @revision unless refused %>
   <p class="texts-summary">
     <b><%= sections.size %></b> <%= "section".pluralize(sections.size) %> ·
     <% if @text.poetry? %>
@@ -34,8 +36,16 @@
     <% end %>
   </div>
 
-  <% if @revision %>
-    <% counts = @revision.counts; fates = @revision.fates; moving = fates.count { it.fate != :stays } %>
+  <% if refused %>
+    <div class="texts-panel texts-refused" role="alert">
+      <p>This is too different from “<%= @work.title %>” to save as a revision of it. Too little of it is unchanged to work out where its notes and kept passages go.</p>
+      <%= form_with model: @text, url: texts_path, class: "inline-form", data: { turbo: false } do |f| %>
+        <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :form %>
+        <button type="submit" class="texts-linkish">Add it as a new text instead</button>
+      <% end %>
+    </div>
+  <% elsif revision %>
+    <% counts = revision.counts; fates = revision.fates; moving = fates.count { it.fate != :stays } %>
     <details class="texts-panel texts-changes" open>
       <summary>What changes <span>· <%= fates.empty? ? "no notes or keeps on this text" : "#{moving} of #{pluralize(fates.size, "note and keep", plural: "notes and keeps")} affected" %></span></summary>
       <div class="texts-panel-body">
@@ -86,10 +96,10 @@
     </details>
   <% end %>
 
-  <p class="texts-legend"><span><i class="shade"></i>Each <%= unit %> is shaded in turn</span><% if checks.any? %><span><i class="flag"></i>Worth a look</span><% end %><% if @revision %><span><i class="reworded"></i>Reworded</span><span><i class="new"></i>New</span><% end %></p>
+  <p class="texts-legend"><span><i class="shade"></i>Each <%= unit %> is shaded in turn</span><% if checks.any? %><span><i class="flag"></i>Worth a look</span><% end %><% if revision %><span><i class="reworded"></i>Reworded</span><span><i class="new"></i>New</span><% end %></p>
 
   <% flagged = checks.select { it.sentence && !it.quiet }.map { [ it.section, it.paragraph, it.sentence ].join(".") }.to_set
-     statuses = @revision&.statuses || []
+     statuses = revision&.statuses || []
      j = -1 %>
   <div class="texts-review-grid">
     <div class="texts-text">
@@ -137,10 +147,10 @@
         class: "texts-bar", authenticity_token: form_authenticity_token, data: { turbo: false } do |f| %>
     <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :form %>
     <div class="texts-bar-in">
-      <span class="info"><%= @work ? "Saving replaces the text. Nothing on an unchanged #{unit} moves." : "You can revise it later; notes on unchanged #{unit.pluralize} stay put." %></span>
+      <span class="info"><%= refused ? "It can’t be saved as a revision." : @work ? "Saving replaces the text. Nothing on an unchanged #{unit} moves." : "You can revise it later; notes on unchanged #{unit.pluralize} stay put." %></span>
       <%= f.button "Edit the text", type: "submit", name: "edit", value: "1", class: "chip", formaction: (@work ? review_text_path(@work) : review_texts_path),
             formnovalidate: true %>
-      <%= f.button(@work ? "Save the revision" : "Add to your texts", type: "submit", class: "primary") %>
+      <%= f.button(@work ? "Save the revision" : "Add to your texts", type: "submit", class: "primary") unless refused %>
     </div>
   <% end %>
 </main>

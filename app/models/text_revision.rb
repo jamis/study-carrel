@@ -17,6 +17,9 @@
 #
 # A sentence left over is gone: its notes and remarked keeps are set aside as detached notes (see DetachedNote).
 # #changes describes all this before anything is saved, for the review.
+#
+# Step 3 compares each leftover with every leftover sharing a word with it, which grows with the square of the text.
+# Past a budget it isn't attempted, and the revision is refused as too different (#too_different?).
 class TextRevision
   Old = Struct.new(:unit, :section, :paragraph, :sentence, :text, keyword_init: true)
   New = Struct.new(:section, :paragraph, :sentence, :text, keyword_init: true)
@@ -25,12 +28,18 @@ class TextRevision
   Fate = Struct.new(:record, :fate, :was, :now, :old_citation, :new_citation, keyword_init: true)
 
   LIKENESS = 0.3
+  # Matching the leftovers past this many comparisons (a couple of seconds) isn't attempted: see #too_different?.
+  COMPARISONS = 10_000_000
 
   attr_reader :work, :text
 
   def initialize(work, text)
     @work, @text = work, text
   end
+
+  # Too little of the text survives as it was for its leftovers to be matched in reasonable time, as with a different
+  # text pasted over it: it can't be saved as a revision, only added as a new text. Nothing else here holds then.
+  def too_different? = plan && @too_different
 
   # Old units' ids mapped to the index of the new sentence each became.
   def matches = plan && @matches
@@ -60,6 +69,8 @@ class TextRevision
   end
 
   def apply!
+    raise ArgumentError, "too different to revise" if too_different?
+
     Work.transaction do
       DetachedNote.set_aside!(Unit.where(id: gone.map { it.unit.id }), reason: "revised")
       Unit.unindex_search(gone.map { it.unit.id })
@@ -119,7 +130,8 @@ class TextRevision
       @matches, @matched_news, @reworded = {}, Set.new, Set.new
       match_by_text_in_section
       match_by_text_anywhere
-      text.poetry? ? match_leftover_stanzas : match_leftovers_in_paired_paragraphs
+      @too_different = comparisons > COMPARISONS
+      text.poetry? ? match_leftover_stanzas : match_leftovers_in_paired_paragraphs unless @too_different
       true
     end
   end
@@ -128,12 +140,14 @@ class TextRevision
   def section_map
     @section_map ||= begin
       labels = text.kept_sections.map { text.label_for(it) }
+      by_label = labels.each_index.group_by { labels[it] }
       map = {}
       old_sections.each_with_index do |section, i|
-        j = labels.each_index.find { |j| !map.value?(j) && labels[j] == section.label }
+        j = by_label[section.label]&.shift
         map[i] = j if j
       end
-      old_sections.each_index { |i| map[i] = i if !map.key?(i) && i < labels.size && !map.value?(i) }
+      taken = map.values.to_set
+      old_sections.each_index { |i| map[i] = i if !map.key?(i) && i < labels.size && !taken.include?(i) }
       map
     end
   end
@@ -145,12 +159,22 @@ class TextRevision
   end
 
   def match_by_text_in_section
+    free = news.each_index.group_by { [ news[it].text, news[it].section ] }
     olds.each do |old|
       section = section_map[old.section] or next
-      j = news_by_text.fetch(old.text, []).reject { @matched_news.include?(it) }.select { news[it].section == section }
-                      .min_by { (news[it].paragraph - old.paragraph).abs }
-      claim(old, j) if j
+      js = free[[ old.text, section ]] or next
+      k = nearest(js, old.paragraph)
+      claim(old, js.delete_at(k)) if k
     end
+  end
+
+  # Where in js (new sentences, in reading order) the one nearest paragraph p is; of two as near, the earlier.
+  def nearest(js, p)
+    above = js.bsearch_index { news[it].paragraph >= p }
+    return above if (above || js.size).zero?
+
+    below = js.bsearch_index { news[it].paragraph >= news[js[(above || js.size) - 1]].paragraph }
+    above.nil? || p - news[js[below]].paragraph <= news[js[above]].paragraph - p ? below : above
   end
 
   def match_by_text_anywhere
@@ -206,6 +230,11 @@ class TextRevision
     shared = Hash.new(0)
     a.each { |word| news_by_word.fetch(word, []).each { shared[it] += 1 unless @matched_news.include?(it) } }
     shared.keys.sort.map { |j| [ j, likeness(shared[j], a.size, words(news[j].text).size) ] }
+  end
+
+  # How much work matching the leftovers takes: for each, the new sentences each of its words is in.
+  def comparisons
+    olds.sum { |old| @matches.key?(old.unit.id) ? 0 : words(old.text).sum { news_by_word.fetch(it, []).size } }
   end
 
   def likeness(shared, a, b) = shared.to_f / [ 1, [ a, b ].min + (a - b).abs / 2.0 ].max
