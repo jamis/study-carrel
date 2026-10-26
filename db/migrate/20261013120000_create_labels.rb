@@ -1,7 +1,13 @@
 # A user's own labels, put on notes while rereading a focus to sort them like index cards into piles. A label belongs to
 # the user, not to a focus, so the same label can gather notes from several focuses. Names are unique per user, ignoring
 # case.
+#
+# The reference on foci makes SQLite rebuild foci (copy, drop, recreate). Rails turns foreign keys off for that, but
+# SQLite ignores the pragma inside a transaction, so dropping the old table would null every detached note's focus.
+# Outside the migration's transaction the pragma holds, and the rebuild has a transaction of its own.
 class CreateLabels < ActiveRecord::Migration[8.1]
+  disable_ddl_transaction!
+
   def change
     create_table :labels do |t|
       t.references :user, null: false, foreign_key: true, index: false

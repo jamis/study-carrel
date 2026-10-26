@@ -2,8 +2,14 @@
 # is stored and never reused: the focus counts the ones it has handed out, so a deleted note leaves a gap rather than
 # its number passing to the next note written. Existing notes are numbered in the order they were written.
 #
-# Only columns and an index are added (no table is rebuilt), so foreign keys pointing at notes are left alone.
+# Going up, only columns and an index are added, so no table is rebuilt. Going down, remove_column makes SQLite rebuild
+# notes and foci. Rails turns foreign keys off for that, but SQLite ignores the pragma inside a transaction, so dropping
+# the old tables would take every label off its notes and empty foci.reread_note_id, labels.example_note_id and
+# detached_notes.focus_id. Outside the migration's transaction the pragma holds, and each rebuild has a transaction of
+# its own.
 class NumberFreeNotes < ActiveRecord::Migration[8.1]
+  disable_ddl_transaction!
+
   def up
     add_column :foci, :free_notes_numbered, :integer, null: false, default: 0
     add_column :notes, :number, :integer
