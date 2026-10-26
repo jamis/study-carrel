@@ -8,7 +8,10 @@
     <div class="note-under">
       <p class="note-under-focus"><%= render "foci/mark" %><span class="note-under-title"><%= focus.title %></span></p>
       <% if focus.archived? %><p class="note-under-archived">Archived, so only to read</p><% end %>
-      <%= link_to unit_note_path(unit), class: "note-under-back", data: { focus_sheet_target: "back" } do %>← Back to <i><%= Current.focus.title %></i><kbd>Esc</kbd><% end %>
+      <%# With no current focus (archived in another tab), there's nothing to go back to. %>
+      <% if Current.focus %>
+        <%= link_to unit_note_path(unit), class: "note-under-back", data: { focus_sheet_target: "back" } do %>← Back to <i><%= Current.focus.title %></i><kbd>Esc</kbd><% end %>
+      <% end %>
     </div>
   <% end %>
   <% if focus.archived? %>

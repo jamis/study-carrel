@@ -129,6 +129,17 @@ class UnitNotesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".note-also", false
   end
 
+  test "under another focus with none current, the editor has no way back" do
+    other = @focus
+    other.notes.create!(unit: @unit, content: "Under Holy")
+    users(:one).foci.start!(title: "Newer").archive!
+    get focus_unit_note_path(other, @unit), headers: { "Turbo-Frame" => "note_editor" }
+    assert_response :success
+    assert_select "turbo-frame#note_editor .note-under-title", "Holy"
+    assert_select "turbo-frame#note_editor .note-under-back", false
+    assert_match "Under Holy", response.body
+  end
+
   test "under the current focus, the editor names the past focuses with a note on the passage" do
     past = @focus
     past.notes.create!(unit: @unit, content: "x")
