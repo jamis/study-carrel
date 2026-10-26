@@ -278,4 +278,32 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     assert_equal SOURCE, work.reload.source
   end
+
+  test "only revising is rate-limited: reviewing a new text and going back to edit it aren't" do
+    work = noted_text
+    over_the_limit do
+      post review_texts_path, params: params
+      assert_response :success
+      post review_texts_path, params: params.merge(edit: "1")
+      assert_response :success
+      post review_text_path(work), params: params.merge(edit: "1")
+      assert_response :success
+
+      post review_text_path(work), params: params(source: REVISED)
+      assert_response :too_many_requests
+      assert_select ".texts-form", /a lot of revising/
+      patch text_path(work), params: params(source: REVISED)
+      assert_response :too_many_requests
+    end
+    assert_equal SOURCE, work.reload.source
+  end
+
+  # Every request counts as the 11th in the minute (the test cache stores nothing, so it never counts).
+  def over_the_limit
+    store = UserTextsController.cache_store
+    store.define_singleton_method(:increment) { |*| 11 }
+    yield
+  ensure
+    store.singleton_class.remove_method(:increment)
+  end
 end

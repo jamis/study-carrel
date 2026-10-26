@@ -3,8 +3,10 @@
 # deletion takes away are set aside as detached notes. Only the owner ever reaches a text.
 class UserTextsController < ApplicationController
   before_action :set_work, only: %i[edit update destroy]
-  # Matching a revision can take a couple of seconds (see TextRevision).
-  rate_limit to: 10, within: 1.minute, by: -> { Current.user.id }, only: %i[review update], with: -> { slow_down }
+  # Matching a revision can take a couple of seconds (see TextRevision). Only that is limited: reviewing a new text or
+  # going back to edit one doesn't match anything.
+  rate_limit to: 10, within: 1.minute, by: -> { Current.user.id }, only: %i[review update], with: -> { slow_down },
+             if: -> { params[:slug] && !params[:edit] }
 
   def index
     @texts = Current.user.texts.to_a
@@ -76,7 +78,7 @@ class UserTextsController < ApplicationController
 
   # The form back, with the text as it was sent.
   def slow_down
-    @work ||= Current.user.texts.find_by!(slug: params[:slug]) if params[:slug]
+    @work ||= Current.user.texts.find_by!(slug: params[:slug])
     @text = UserText.new(text_params)
     @text.errors.add(:base, "That’s a lot of revising in a minute: wait a moment, then try again")
     render :new, status: :too_many_requests
