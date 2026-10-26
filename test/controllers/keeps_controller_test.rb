@@ -40,18 +40,52 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 0, Keep.where(user: @user).count
   end
 
-  test "releases a verse" do
+  test "removes a verse" do
     @user.keeps.create!(unit: verse(3))
     delete unit_keep_path(verse(3)), as: :json
     assert_response :no_content
     assert_equal 0, Keep.where(user: @user).count
   end
 
-  test "releasing from the Kept page returns there" do
-    @user.keeps.create!(unit: verse(3))
-    delete unit_keep_path(verse(3))
-    assert_redirected_to kept_path
+  test "removing from the Kept page returns there, in its order, with Undo" do
+    @user.keeps.create!(unit: verse(3), remark: "hm")
+    delete unit_keep_path(verse(3), order: "reading")
+    assert_redirected_to kept_path(order: "reading")
     assert_equal 0, Keep.where(user: @user).count
+
+    follow_redirect!
+    assert_select ".focus-toast", /Removed Isaiah 40:3 from Kept/
+    assert_select ".focus-toast form[action=?]", unit_keep_path(verse(3))
+  end
+
+  test "Undo puts a removed keep back as it was, remark and place in the list" do
+    kept_at = 3.days.ago
+    @user.keeps.create!(unit: verse(3), remark: "hm", created_at: kept_at)
+    @user.keeps.create!(unit: verse(20), created_at: 1.day.ago)
+    delete unit_keep_path(verse(3))
+    follow_redirect!
+    undo = css_select(".focus-toast form").first
+    post undo["action"], params: css_select(".focus-toast form input[type=hidden]").to_h { [ it["name"], it["value"] ] }
+    assert_redirected_to kept_path
+
+    keep = @user.keeps.find_by(unit: verse(3))
+    assert_equal "hm", keep.remark
+    assert_in_delta kept_at, keep.created_at, 1.second
+    follow_redirect!
+    assert_equal [ "Isaiah 40:20", "Isaiah 40:3" ], css_select(".nb-ref").map(&:text)
+    assert_select ".focus-toast", 0
+  end
+
+  test "Undo can't date a keep in the future" do
+    post unit_keep_path(verse(3)), params: { kept_at: 1.year.from_now.iso8601 }
+    assert_operator @user.keeps.first.created_at, :<=, Time.current
+  end
+
+  test "the Kept page removes without asking" do
+    @user.keeps.create!(unit: verse(3))
+    get kept_path
+    assert_select "form[action=?] button.kept-act-remove:not([data-turbo-confirm])", unit_keep_path(verse(3)), "Remove"
+    assert_select "form[data-turbo-confirm]", 0
   end
 
   test "can't touch another reader's keeps" do

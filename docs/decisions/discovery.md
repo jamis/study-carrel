@@ -18,7 +18,7 @@ Ideas floated:
 - **Flipping as the main action.** Random moves from the rail to beside the arrows ("Turn to another"). The "Another" chip was dropped on 2026-10-05 because its meaning was unclear; under an exploring focus it's plain. Random flips, the arrows settle in to read around a passage. Narrowing the scope (the existing ▾) deserves a more visible place.
 - **Notes hidden entirely while exploring** (the user's idea), replaced by a prominent keep section in the right-hand page or bottom sheet:
   - top: Keep for this passage, then the remark ("What caught you?");
-  - below: what you've kept while exploring, newest first, each with "Start a focus from this".
+  - below: what you've kept while exploring, newest first, each with "Start a focus".
   - Keeps become the only record of an exploration, so the 200-character remark limit may need revisiting.
 - **The kept passages as seeds.** After a few keeps, perhaps one quiet line: "You've kept 6 passages. Is one of them a question?" No counts or progress bars.
 - **Prose landings.** A lone random sentence (Montaigne especially) can land flat out of context; exploring might open with the ¶ view showing.

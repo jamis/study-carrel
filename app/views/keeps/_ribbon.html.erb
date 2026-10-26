@@ -11,7 +11,7 @@
     Kept
     <span class="keep-toast-remark" hidden data-keep-target="toastRemark"></span>
     <button type="button" data-keep-target="toastKept" data-action="keep#openRemark">Add a remark</button>
-    <button type="button" data-keep-target="toastKept" data-action="keep#release">Undo</button>
+    <button type="button" data-keep-target="toastKept" data-action="keep#remove">Undo</button>
     <button type="button" hidden data-keep-target="toastSaved" data-action="keep#openRemark">Edit</button>
   </div>
   <div class="keep-pop" hidden data-keep-target="pop">
@@ -20,7 +20,7 @@
            data-keep-target="remark" data-action="keydown.enter->keep#save:prevent">
     <div class="keep-pop-actions">
       <span class="keep-pop-quiet">
-        <button type="button" data-action="keep#release">Release</button>
+        <button type="button" data-action="keep#remove">Remove</button>
         <%= link_to "See all kept", kept_path %>
       </span>
       <button class="keep-save" type="button" data-action="keep#save">Save</button>

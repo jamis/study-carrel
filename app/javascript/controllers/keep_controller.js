@@ -3,9 +3,9 @@ import { csrfToken, fillId } from "lib/request"
 import { keyboardOpener, giveBackFocus } from "lib/focus"
 
 // The Keep ribbon. Tapping the empty ribbon keeps the verse on screen (and offers Undo / Add a remark for a few
-// seconds); tapping a kept ribbon opens a small popover for the remark, or to release it. Save, Enter or a tap
+// seconds); tapping a kept ribbon opens a small popover for the remark, or to remove it. Save, Enter or a tap
 // elsewhere saves the remark and the toast comes back with it; Esc leaves it as it was. The reader announces each verse
-// it shows with lectio:changed, and this announces keeps and releases with keep:changed.
+// it shows with lectio:changed, and this announces keeps and removals with keep:changed.
 export default class extends Controller {
   static targets = ["button", "toast", "toastRemark", "toastKept", "toastSaved", "pop", "remark"]
   static values = { kept: Object, unitId: Number, urlTemplate: String }
@@ -50,7 +50,7 @@ export default class extends Controller {
     this.send("POST")
   }
 
-  release() {
+  remove() {
     this.kept.delete(this.unitIdValue)
     this.hideToast()
     this.closePop()
@@ -140,11 +140,11 @@ export default class extends Controller {
       this.buttonTarget.setAttribute("aria-label", "Keep this passage")
       this.buttonTarget.title = "Keep this passage (b)"
     } else if (remark) {
-      this.buttonTarget.setAttribute("aria-label", `Kept: “${remark}”. Edit the remark or release`)
+      this.buttonTarget.setAttribute("aria-label", `Kept: “${remark}”. Edit the remark or remove`)
       this.buttonTarget.title = `Kept: “${remark}” (b)`
     } else {
-      this.buttonTarget.setAttribute("aria-label", "Kept. Add a remark or release")
-      this.buttonTarget.title = "Kept: add a remark or release (b)"
+      this.buttonTarget.setAttribute("aria-label", "Kept. Add a remark or remove")
+      this.buttonTarget.title = "Kept: add a remark or remove (b)"
     }
   }
 
@@ -166,7 +166,7 @@ export default class extends Controller {
       if (!response.ok || response.redirected) throw new Error(response.statusText)
     } catch {
       if (method === "PATCH") {
-        // Unless it was released meanwhile, in which case there's no remark to restore.
+        // Unless it was removed meanwhile, in which case there's no remark to restore.
         if (this.kept.has(unitId)) this.kept.set(unitId, previousRemark)
         if (unitId === this.unitIdValue) { this.render(); this.hideToast() }
         alert("Couldn't save your remark. Check your connection and try again.")

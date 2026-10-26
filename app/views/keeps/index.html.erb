@@ -1,4 +1,5 @@
 <% content_for :title, "Kept · Study Carrel" %>
+<% turbo_refreshes_with method: :morph, scroll: :preserve # removing one, or Undo, leaves you where you were %>
 <%# Laid out as a focus's notes page: the passages down the left, each one's remark and actions on a sheet down the
     right. The passage side is the way back into reading. %>
 <%= render "shared/rail", focus: Current.focus, here: :kept %>
@@ -28,13 +29,14 @@
     <% @keeps.each do |keep|
       unit = keep.unit %>
       <% actions = capture do %>
-        <%= link_to "Start a focus from this", new_focus_path(unit_id: unit.id), class: "chip" %>
-        <%= button_to "Release", unit_keep_path(unit), method: :delete, class: "chip", form_class: "inline-form",
-              data: { turbo_confirm: "Release this passage?" } %>
+        <%= link_to "Start a focus", new_focus_path(unit_id: unit.id), class: "kept-act" %>
+        <%= button_to "Remove", unit_keep_path(unit, order: params[:order].presence), method: :delete,
+              class: "kept-act kept-act-remove", form_class: "inline-form",
+              aria: { label: "Remove #{unit.reference} from Kept" } %>
       <% end %>
       <%= render "shared/sheet_row", citation: unit.reference, passage: unit.body,
             content: (tag.p(keep.remark, class: "nb-remark") if keep.remark), actions: actions,
-            href: reading_path(unit.section.work.slug, unit.section.number, unit.number) %>
+            href: reading_path(unit.section.work.slug, unit.section.number, unit.number), actions_class: "kept-acts" %>
     <% end %>
 
     <% if @detached.any? %>
@@ -44,4 +46,12 @@
       <% end %>
     <% end %>
   </div>
+
+  <% if (removed = flash[:removed]) && (unit = Unit.visible_to(Current.user).find_by(id: removed["unit_id"])) %>
+    <div class="focus-toast" role="status">
+      <span>Removed <%= unit.reference %> from Kept</span>
+      <%= button_to "Undo", unit_keep_path(unit), method: :post, form_class: "inline-form",
+            params: { remark: removed["remark"], kept_at: removed["kept_at"], order: params[:order].presence }.compact %>
+    </div>
+  <% end %>
 </main>
