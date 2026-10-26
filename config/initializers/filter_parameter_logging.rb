@@ -6,5 +6,7 @@
 Rails.application.config.filter_parameters += [
   :passw, :email, :secret, :token, :_key, :crypt, :salt, :certificate, :otp, :ssn, :cvv, :cvc,
   # What readers write is private, even from whoever reads the server logs.
-  :content, :remark, :title, :description
+  :content, :remark, :title, :description, :source, :author, :name,
+  # Searches. Exact, since :q would match every key with a "q" in it.
+  /\Aq\z/
 ]
