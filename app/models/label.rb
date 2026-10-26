@@ -3,13 +3,16 @@
 # user.labels. Names are unique per user, ignoring case. A label lasts only while some note carries it.
 #
 # A label needn't have a name: notes found to go together (in the reread's "Gather") make a group
-# before there are words for it. An unnamed label is known by one of its notes, its example; naming it later makes it
-# an ordinary label.
+# before there are words for it. An unnamed label goes by a letter ("group D"), the next its user hands out, and is
+# described by one of its notes, its example; naming it later makes it an ordinary label, which keeps its letter for
+# if the name is taken away again.
 class Label < ApplicationRecord
   belongs_to :user
   belongs_to :example_note, class_name: "Note", optional: true
   has_many :note_labels, dependent: :delete_all
   has_many :notes, through: :note_labels
+
+  before_save :take_number, unless: -> { named? || number }
 
   normalizes :name, with: ->(name) { name.squish.presence }
   validates :name, presence: true, unless: :example_note_id?
@@ -30,13 +33,19 @@ class Label < ApplicationRecord
   # A colour of its own among six, kept for as long as the label lasts.
   def hue = id % 6
 
-  # The note an unnamed label is known by: its example, or when that's the note you're looking from (where "like this
-  # note" says nothing) or it has gone, the next of its notes, in the order they were put on it. Nil when the note
-  # you're looking from is alone in it.
-  def face_note(from: nil)
-    return example_note if example_note && example_note != from
-    note_labels.where.not(note_id: from).order(:created_at, :id).first&.note
+  # An unnamed label's letter, from its number: A to Z, then AA, AB and on.
+  def letter
+    n, letters = number, +""
+    while n.to_i > 0
+      n, at = (n - 1).divmod(26)
+      letters.prepend((65 + at).chr)
+    end
+    letters
   end
+
+  # The note an unnamed label is described by, the same from every note in it: its example, or failing that the first
+  # of its notes, in the order they were put on it.
+  def face_note = example_note || note_labels.order(:created_at, :id).first&.note
 
   # Gives it words, or (blank) takes them away again, leaving it known by its example. A name it shares with another
   # of the user's labels is refused: the two aren't merged.
@@ -44,5 +53,13 @@ class Label < ApplicationRecord
     self.name = new_name
     self.example_note ||= note_labels.order(:created_at, :id).first&.note unless named?
     save!
+  end
+
+  private
+
+  # The next letter its user hands out, never one a dropped label had.
+  def take_number
+    User.where(id: user_id).update_all("labels_lettered = labels_lettered + 1")
+    self.number = User.where(id: user_id).pick(:labels_lettered)
   end
 end

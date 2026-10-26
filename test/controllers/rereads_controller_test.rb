@@ -58,17 +58,19 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".rr-tallies .rr-tally:first-child .rr-ticks i.on", 2
   end
 
-  test "an unnamed label shows as like one of its notes: in the chips, the cloud, the tallies and the filter" do
+  test "an unnamed label shows by its letter, the same on each of its notes: in the chips, the cloud, the tallies and the filter" do
     group = @late.group_with!(@early)
     get focus_notes_path(@focus)
-    assert_select "#reread_note_#{@early.id} .rr-chip .lf-like", "like Isaiah 40:25"
-    assert_select "#reread_note_#{@late.id} .rr-chip .lf-like", "like Isaiah 40:3"
-    assert_select ".rr-cloud .rr-word[data-label-id=?]:not([data-label-name])", group.id.to_s, text: /like Isaiah 40:25/
-    assert_select ".rr-tallies .rr-tally-name", /like Isaiah 40:25/
-    assert_select ".rr-filter-menu .menu-item", /like Isaiah 40:25/
+    assert_select "#reread_note_#{@early.id} .rr-chip .lf", "group A"
+    assert_select "#reread_note_#{@late.id} .rr-chip .lf", "group A"
+    assert_select "#reread_note_#{@early.id} .rr-chip[title^=?]", "group A (like Isaiah 40:25: "
+    assert_select "#reread_note_#{@late.id} .rr-chip[title^=?]", "group A (like Isaiah 40:25: "
+    assert_select ".rr-cloud .rr-word[data-label-id=?]:not([data-label-name])", group.id.to_s, text: "group A"
+    assert_select ".rr-tallies .rr-tally-name", "group A"
+    assert_select ".rr-filter-menu .menu-item", /group A/
 
     get focus_notes_path(@focus, label: group.id)
-    assert_select ".rr-filter", /in the group like Isaiah 40:25/
+    assert_select ".rr-filter", /in group A/
   end
 
   test "the current focus's notes on passages get the reader's editor; a past focus's are only read" do
@@ -161,7 +163,7 @@ class NoteLabelsControllerTest < ActionDispatch::IntegrationTest
     delete focus_note_label_path(@focus, other, group), as: :turbo_stream
     assert_response :success
     assert_match %(target="#{ActionView::RecordIdentifier.dom_id(@note, :labels)}"), response.body
-    assert_match "just this note, so far", response.body
+    assert_match %(<span class="lf-letter">A</span>), response.body
   end
 
   test "a note can't be grouped with itself, or with another focus's note" do

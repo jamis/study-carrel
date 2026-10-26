@@ -73,18 +73,15 @@
 .rr-editor.composer lexxy-toolbar { font-size: 17px; font-family: var(--sans); }
 .rr-editor.composer:not(:focus-within) lexxy-toolbar { display: none; }
 
-/* A reference where room is short (the card, a pill): a long title or name cut off with "…", its last part ("1:6")
+/* A reference where room is short (the card): a long title or name cut off with "…", its last part ("1:6")
    kept whole, the reference left-aligned on one line; a line of them wraps between references, never inside one. The
    whole reference is its title, and heads the pop-up. */
 :is(.cmp-jump, .cmp-tab-ref):has(.ref-name) { max-width: 100%; text-align: left; white-space: nowrap; }
 .ref-name { display: inline-block; vertical-align: bottom; min-width: 0; max-width: 14em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* A box of its own, so it takes its link's underline itself. */
 .cmp-jump .ref-name { text-decoration: underline; text-decoration-color: inherit; text-underline-offset: inherit; }
-/* An unnamed label known by a note with a long reference: "like Quick to Help, Slow… 4:6". */
-.lf-like:has(.ref-name) { white-space: nowrap; }
-/* Shorter still where a line holds several: the tabs, the card's groups, the cloud. */
+/* Shorter still where a line holds several: the tabs, the card's groups. */
 :is(.cmp-tab-ref, .rr-cmp-card) .ref-name { max-width: 7em; }
-.rr-cloud .ref-name { max-width: 4em; }
 
 /* A note's labels as pills under it, quiet; on the note you're on, a little larger, to take off (×), with + label. */
 .rr-labels { font-family: var(--sans); font-size: 12px; }
@@ -290,13 +287,12 @@
 .rr-tally.on .rr-ticks i.on { background: var(--accent); }
 .rr-ticks i.here { height: 9px; margin-top: -2px; }
 
-/* An unnamed label, shown "like" one of its notes: the reference, and on the note you're on, the start of that note. */
-.lf-unnamed { font-style: italic; }
-.lf-like { font-style: normal; }
-.lf-snip { display: none; }
-.rr-row.here .rr-chip .lf-snip { display: inline; }
+/* An unnamed label by its letter, "group D": the word quiet, the letter, which you match by eye, a little heavier. */
+.lf-letter { font-weight: 600; letter-spacing: .02em; }
+.rr-row .rr-chip .lf-letter { color: var(--ink-soft); }
+.rr-row.here .rr-chip .lf-letter { color: var(--ink); }
 .rr-row.here .rr-chip .lf { max-width: 26em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rr-tally-name .lf-unnamed { color: var(--ink-soft); }
+.rr-tally-name .lf-word { color: var(--ink-soft); }
 
 /* The way into gathering what goes with the note you're on, beside + label. */
 .rr-find { display: none; }
@@ -421,9 +417,10 @@
 .peek.open .peek-cut { visibility: hidden; }
 .peek-face { flex: 0 1 auto; min-width: 0; font-size: 14.5px; line-height: 1.4; }
 .peek-face .peek-full { top: -7px; padding: 6px 12px 8px; }
-.peek-face .lf-snip { display: inline; }
-.peek-face .lf-like { font-family: var(--sans); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); margin-right: .2em; }
-.peek-face .lf-unnamed { color: var(--ink); }
+/* On the card, GROUP in small capitals, the letter in the reading face, then the start of the note it's described by. */
+.peek-face .lf-word { font-family: var(--sans); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); }
+.peek-face .lf-letter { font-size: 15px; color: var(--ink); }
+.peek-face .lf-snip { font-style: italic; color: var(--ink-soft); }
 
 /* Phones: the column alone; the scratchpad a bottom sheet. With the sheet shut, the labels come up as their own short
    sheet resting on its handle. */

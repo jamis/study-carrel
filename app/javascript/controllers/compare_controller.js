@@ -236,7 +236,6 @@ export default class extends Controller {
       </button>`
     }).join("")
     const groups = mine.map((label, i) => {
-      const face = String(label.example) === here.dataset.noteId ? label.alt : label.face
       const others = rows.filter(row => row !== here && labelIdsOf(row).includes(String(label.id)))
       const naming = this.naming === String(label.id)
       return `<li class="cmp-group" data-label-id="${label.id}" style="--c: var(--g${label.hue})">
@@ -244,7 +243,7 @@ export default class extends Controller {
         <span class="cmp-g-body">
           ${naming
             ? `<input class="cmp-name" type="text" maxlength="40" value="${escapeHtml(label.named ? stripTags(label.face) : "")}" placeholder="Words for it (optional)" aria-label="Name"><span class="cmp-name-error" hidden></span>`
-            : peek("face", face, "span")}
+            : peek("face", label.face, "span")}
           <span class="cmp-with">${others.length ? `with ${others.map(row => `<button type="button" class="cmp-jump" data-note-id="${row.dataset.noteId}" data-fn-note="${row.dataset.noteId}" data-fn-from="${here.dataset.noteId}" title="${escapeHtml(citeOf(row))}">${condensedCite(shortCite(citeOf(row), cite))}</button>`).join(", ")}` : "just this note, so far"}</span>
           <span class="cmp-g-acts">${naming ? "" : `<button type="button" data-name="${label.id}">${label.named ? "rename" : "name it"}</button> · `}<button type="button" data-leave="${label.id}" title="Take this note out of the group">take out</button></span>
         </span>

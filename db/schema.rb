@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_26_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -128,8 +128,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "example_note_id"
+    t.integer "number"
     t.index ["example_note_id"], name: "index_labels_on_example_note_id"
     t.index ["user_id", "name"], name: "index_labels_on_user_id_and_name", unique: true
+    t.index ["user_id", "number"], name: "index_labels_on_user_id_and_number", unique: true
   end
 
   create_table "note_labels", force: :cascade do |t|
@@ -214,6 +216,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "admin", default: false, null: false
+    t.integer "labels_lettered", default: 0, null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 

@@ -1,7 +1,7 @@
 <%# The labels in use on a focus: as a cloud (each label a pill, alphabetical, larger the more of the focus's notes it
     holds; labels used only under other focuses trail faint and dashed) and as tallies (a mark per note, in reading
-    order, filled where the note carries the label). CSS shows one or the other. An unnamed label shows as "like" one of
-    its notes; only named ones carry data-label-name, which the picker reads.
+    order, filled where the note carries the label). CSS shows one or the other. An unnamed label shows by its letter
+    ("group D"); only named ones carry data-label-name, which the picker reads.
     focus; notes: the focus's notes in reading order, with their labels %>
 <% counts = focus.label_counts
    elsewhere = focus.labels_elsewhere
@@ -9,11 +9,11 @@
    here, away = focus.user.labels.alphabetical.includes(Label::FACE).partition { counts.key?(it.id) }
    most = counts.values.max || 1 %>
 <div data-reread-target="labelsBody">
-<%# For "Gather": each label on this focus's notes, its colour, and its face seen from anywhere but
-    its example, and from its example (where it shows by its next note). %>
+<%# For "Gather": each label on this focus's notes, its colour, and its face (an unnamed one's with the start of the
+    note it's described by). %>
 <script type="application/json" data-compare-target="labels"><%= raw here.map { |label|
-  { id: label.id, hue: label.hue, named: label.named?, example: label.example_note_id,
-    face: label_face(label, words: 40).to_s, alt: label_face(label, from: label.example_note, words: 40).to_s }
+  { id: label.id, hue: label.hue, named: label.named?,
+    face: label_face(label, snippet: true, words: 40).to_s }
 }.to_json %></script>
 <% if here.empty? && away.empty? %>
   <p class="rr-none">No labels yet. Put the note you're on on one with + label<span class="rr-keys">, or <kbd>l</kbd></span>.</p>

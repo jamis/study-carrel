@@ -108,17 +108,45 @@ class LabelTest < ActiveSupport::TestCase
     assert_equal 2, @user.labels.count
   end
 
-  test "an unnamed label is known by its example, or from the example itself, by the next of its notes" do
+  test "an unnamed label is described by its example, from every note in it" do
     other = @focus.notes.create!(unit: verse(3), content: "Wilderness")
     group = @note.group_with!(other)
     assert_equal @note, group.face_note
-    assert_equal @note, group.face_note(from: other)
-    assert_equal other, group.face_note(from: @note)
 
     alone = @focus.notes.create!(unit: verse(4), content: "Valleys")
     group.update!(example_note: alone)
     alone.join!(group)
     assert_equal alone, group.face_note
+  end
+
+  test "unnamed labels are lettered in turn, a letter never handed out twice" do
+    a = @focus.notes.create!(unit: verse(3), content: "a")
+    b = @focus.notes.create!(unit: verse(4), content: "b")
+    first = @note.group_with!(a)
+    second = @note.group_with!(b)
+    assert_equal [ "A", "B" ], [ first.letter, second.letter ]
+
+    b.unlabel!(second)
+    @note.unlabel!(second)
+    assert_equal "C", @note.group_with!(b).letter
+    assert_nil @note.label!("waiting").number
+  end
+
+  test "a label keeps its letter through being named, and a named one takes one when its name goes" do
+    other = @focus.notes.create!(unit: verse(3), content: "Wilderness")
+    group = @note.group_with!(other)
+    group.rename!("set apart")
+    group.rename!("")
+    assert_equal "A", group.reload.letter
+
+    label = @note.label!("waiting")
+    label.rename!("")
+    assert_equal "B", label.reload.letter
+  end
+
+  test "letters run on past Z" do
+    letters = [ 1, 26, 27, 52, 53, 702, 703 ].map { Label.new(number: it).letter }
+    assert_equal %w[ A Z AA AZ BA ZZ AAA ], letters
   end
 
   test "taking its example off moves the example on; taking the last note off drops it" do

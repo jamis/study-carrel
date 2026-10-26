@@ -1,11 +1,11 @@
-<%# A note's labels on the reread page, as pills under its text: named ones A–Z, then unnamed ones, each shown "like"
-    another of its notes. On the note you're on they can be taken off (×), with + label and "Gather". The ids are on the
+<%# A note's labels on the reread page, as pills under its text: named ones A–Z, then unnamed ones by letter
+    ("group D"). On the note you're on they can be taken off (×), with + label and "Gather". The ids are on the
     element, to light the note when its label is pointed at.
     note; editable: false for an archived focus's notes, which have no ×, + label or Gather %>
 <% editable = local_assigns.fetch(:editable, true) %>
 <div class="rr-labels" id="<%= dom_id(note, :labels) %>" data-reread-target="noteLabels" data-compare-target="noteLabels" data-label-ids="<%= note.label_ids.join(" ") %>">
   <% note.labels.sort_by { [ it.named? ? 0 : 1, it.name.to_s.downcase, it.id ] }.each do |label| %>
-    <span class="rr-chip" title="<%= label_title(label, from: note) unless label.named? %>"><%= label_face(label, from: note) %><% if editable %><button class="rr-chip-x" type="button" aria-label="Take off “<%= label_title(label, from: note, snippet: false) %>”" data-label-id="<%= label.id %>" data-action="reread#unlabel">×</button><% end %></span>
+    <span class="rr-chip" title="<%= label_title(label) unless label.named? %>"><%= label_face(label) %><% if editable %><button class="rr-chip-x" type="button" aria-label="Take off “<%= label_title(label, snippet: false) %>”" data-label-id="<%= label.id %>" data-action="reread#unlabel">×</button><% end %></span>
   <% end %>
   <% if editable %>
     <button class="rr-add" type="button" data-action="reread#openPicker" title="Label this note (l)">+ label</button>

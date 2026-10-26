@@ -24,7 +24,7 @@ class CompareTest < ApplicationSystemTestCase
     within(".rr-cmp-card") do
       assert_selector ".rr-ref", text: /Isaiah 40:7/i
       assert_selector ".cmp-group", count: 1
-      assert_selector ".cmp-group .lf-like", text: /like Isaiah 40:6/i
+      assert_selector ".cmp-group .lf", text: /group A All flesh is grass/i
       assert_selector ".cmp-with", text: "with 40:6"
     end
     assert_no_selector ".rr-row.here", visible: true
@@ -42,7 +42,7 @@ class CompareTest < ApplicationSystemTestCase
     assert_selector ".rr-cmp-card .cmp-group", count: 2
     new_group = (@counsel.labels.reload & @wither.labels.reload).sole
     assert_nil new_group.name
-    assert_selector ".rr-cmp-card .cmp-group:nth-child(2) .lf-like", text: /like Isaiah 40:13/i
+    assert_selector ".rr-cmp-card .cmp-group:nth-child(2) .lf", text: /group B The withering comes from God too/i
 
     # Naming it; a name already taken is refused, saying so.
     @fade.label!("fading")
@@ -138,9 +138,9 @@ class CompareTest < ApplicationSystemTestCase
     whole.join!(@group)
     visit focus_notes_path(@focus)
 
-    within(".rr-row.here") { assert_selector ".rr-chip .lf-like", text: /like Isaiah 40:6/i }
+    within(".rr-row.here") { assert_selector ".rr-chip .lf", exact_text: "group A" }
     within("#reread_note_#{@fade.id}") do
-      assert_selector ".rr-chip .lf-like", text: /like Isaiah 40:7/i
+      assert_selector ".rr-chip .lf", exact_text: "group A"
       assert_no_selector ".rr-chip-x"
     end
     within("#reread_note_#{@stands.id}") { assert_no_selector ".rr-chip" }
@@ -157,6 +157,6 @@ class CompareTest < ApplicationSystemTestCase
 
     # Putting another note in the group gives it the pill.
     find("#reread_note_#{@stands.id} .cmp-put[data-put='#{@group.id}']").click
-    assert_selector "#reread_note_#{@stands.id} .rr-chip .lf-like", text: /like Isaiah 40:/i
+    assert_selector "#reread_note_#{@stands.id} .rr-chip .lf", exact_text: "group A"
   end
 end
