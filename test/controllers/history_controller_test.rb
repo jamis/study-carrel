@@ -37,6 +37,18 @@ class HistoryControllerTest < ActionDispatch::IntegrationTest
     assert_select "a.hist-item", 2
   end
 
+  test "lists places with no focus current, marking none as noted" do
+    focus = @user.foci.current_one
+    focus.notes.create!(unit: verse(3), content: "mine")
+    [ 3, 20 ].each { |n| Visit.record(@user, verse(n)) }
+    focus.archive!
+    get history_path
+    assert_response :success
+    assert_select "a.hist-item", 2
+    assert_select ".hist-note", 0
+    assert_select "nav, .rail", 0
+  end
+
   test "never shows another user's places" do
     Visit.record(users(:two), verse(3))
     Visit.record(users(:two), verse(20))
