@@ -183,6 +183,7 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
       assert_select ".texts-changes", 0
       assert_select "form.texts-bar button.primary", 0
       assert_select ".texts-refused form[action=?] input[name='user_text[source]']", texts_path
+      assert_select ".texts-refused form[enctype='multipart/form-data']", 1, "the whole text goes back; urlencoded is capped at 4 MB"
 
       patch text_path(work), params: params(source: every_sentence_changed)
       assert_response :unprocessable_content
@@ -246,6 +247,7 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
 
     post review_texts_path, params: params(source: POEM)
     assert_select ".texts-rule form input[name='user_text[form]'][value=poetry]"
+    assert_select ".texts-rule form[enctype='multipart/form-data']", 1, "the whole text goes back; urlencoded is capped at 4 MB"
     assert_select ".texts-rule button", "This looks like verse: read it as poetry instead"
     post review_texts_path, params: params(source: SOURCE)
     assert_select ".texts-rule form", 0

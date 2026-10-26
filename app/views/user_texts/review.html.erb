@@ -29,7 +29,7 @@
     <% end %>
     <%= @text.headed? ? "Sections come from the # headings." : "No # headings, so it’s one section." %>
     <% if !@work && !@text.poetry? && @text.looks_like_verse? %>
-      <%= form_with model: @text, url: review_texts_path, class: "inline-form", data: { turbo: false } do |f| %>
+      <%= form_with model: @text, url: review_texts_path, multipart: true, class: "inline-form", data: { turbo: false } do |f| %>
         <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :form, value: "poetry" %>
         <button type="submit" class="texts-linkish">This looks like verse: read it as poetry instead</button>
       <% end %>
@@ -39,7 +39,7 @@
   <% if refused %>
     <div class="texts-panel texts-refused" role="alert">
       <p>This is too different from “<%= @work.title %>” to save as a revision of it. Too little of it is unchanged to work out where its notes and kept passages go.</p>
-      <%= form_with model: @text, url: texts_path, class: "inline-form", data: { turbo: false } do |f| %>
+      <%= form_with model: @text, url: texts_path, multipart: true, class: "inline-form", data: { turbo: false } do |f| %>
         <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :form %>
         <button type="submit" class="texts-linkish">Add it as a new text instead</button>
       <% end %>
