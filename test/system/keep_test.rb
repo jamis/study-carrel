@@ -44,6 +44,21 @@ class KeepTest < ApplicationSystemTestCase
     assert_saved_remark "Elsewhere"
   end
 
+  test "closing the remark gives focus back to the ribbon only when it was opened from the keyboard there" do
+    users(:one).keeps.create!(unit: @unit, remark: "Before")
+    visit reading_path("isaiah-kjv", 40, 8)
+
+    find(".keep-btn").click
+    find("#keep-remark").send_keys "Tapped", :enter
+    assert_selector ".keep-pop", visible: :hidden
+    assert_not page.evaluate_script("document.activeElement.classList.contains('keep-btn')")
+
+    find(".keep-btn").send_keys :enter
+    find("#keep-remark").send_keys :escape
+    assert_selector ".keep-pop", visible: :hidden
+    assert page.evaluate_script("document.activeElement.classList.contains('keep-btn')")
+  end
+
   private
 
   # The toast shows a remark before the server has it; give the request a moment to land.

@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { keyboardOpener, giveBackFocus } from "lib/focus"
 
 // The note panel: docked down the right on desktop, a bottom sheet on phones whose handle shows the note's first line.
 export default class extends Controller {
@@ -20,14 +21,16 @@ export default class extends Controller {
     this.viewport?.removeEventListener("scroll", this.fit)
   }
 
-  toggle() {
-    this.#set(!this.element.classList.contains("open"))
+  toggle(event) {
+    const open = !this.element.classList.contains("open")
+    if (open) this.opener = keyboardOpener(event)
+    this.#set(open)
   }
 
   escape() {
     if (!this.element.classList.contains("open")) return
     this.#set(false)
-    this.handleTarget.focus()
+    giveBackFocus(this.opener, this.element)
   }
 
   #set(open) {

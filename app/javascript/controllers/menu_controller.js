@@ -1,11 +1,16 @@
 import { Controller } from "@hotwired/stimulus"
+import { keyboardOpener, giveBackFocus } from "lib/focus"
 
 // A small disclosure menu: the button opens a panel, and an outside tap, Escape or
 // choosing something closes it. (At wider widths CSS shows the panel's items inline.)
 export default class extends Controller {
   static targets = ["button", "panel"]
 
-  toggle() { this.open ? this.close() : this.show() }
+  toggle(event) {
+    if (this.open) return this.close()
+    this.opener = keyboardOpener(event)
+    this.show()
+  }
 
   show() {
     this.panelTarget.classList.add("open")
@@ -20,7 +25,7 @@ export default class extends Controller {
   escape() {
     if (!this.open) return
     this.close()
-    this.buttonTarget.focus()
+    giveBackFocus(this.opener, this.panelTarget)
   }
 
   away(event) {

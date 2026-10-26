@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { keyboardOpener, giveBackFocus } from "lib/focus"
 
 // The focus band's dropdown: the description, and under it the reader's other focuses (o), to write the passage's note
 // under one of them. The list loads as it opens (the reader moves url to the passage it's on). Those noted on the
@@ -8,7 +9,8 @@ export default class extends Controller {
   static targets = ["head", "frame", "list", "item", "filter", "all"]
   static values = { url: String }
 
-  toggle() {
+  toggle(event) {
+    if (!this.isOpen) this.opener = keyboardOpener(event)
     this.#set(!this.isOpen)
   }
 
@@ -17,7 +19,7 @@ export default class extends Controller {
     if (!this.isOpen) return
     event.stopImmediatePropagation()
     this.#set(false)
-    this.headTarget.focus()
+    giveBackFocus(this.opener, this.element)
   }
 
   closeOutside(event) {
@@ -28,6 +30,7 @@ export default class extends Controller {
     if (event.target.closest("input, textarea, [contenteditable]") || event.metaKey || event.ctrlKey || event.altKey) return
     if (event.key === "o" && this.hasFrameTarget) {
       event.preventDefault()
+      this.opener = null
       this.#set(true)
       this.wantFocus = true
       this.#focusList()

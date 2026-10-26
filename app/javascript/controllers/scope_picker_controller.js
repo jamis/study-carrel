@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { keyboardOpener, giveBackFocus } from "lib/focus"
 
 // The search page's "Somewhere else…" (searches/_picker): before anything is typed, the shelves, Your Texts, places
 // searched lately and the whole library; typing lists the collections and works whose titles hold it. ↑↓ move through
@@ -6,7 +7,11 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [ "button", "panel", "filter", "group", "item", "found", "place", "none" ]
 
-  toggle() { this.panelTarget.hidden ? this.show() : this.close() }
+  toggle(event) {
+    if (!this.panelTarget.hidden) return this.close()
+    this.opener = keyboardOpener(event)
+    this.show()
+  }
 
   show() {
     this.panelTarget.hidden = false
@@ -24,7 +29,7 @@ export default class extends Controller {
   escape() {
     if (this.panelTarget.hidden) return
     this.close()
-    this.buttonTarget.focus()
+    giveBackFocus(this.opener, this.panelTarget)
   }
 
   away(event) {

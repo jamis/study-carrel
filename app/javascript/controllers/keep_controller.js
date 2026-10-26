@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { csrfToken, fillId } from "lib/request"
+import { keyboardOpener, giveBackFocus } from "lib/focus"
 
 // The Keep ribbon. Tapping the empty ribbon keeps the verse on screen (and offers Undo / Add a remark for a few
 // seconds); tapping a kept ribbon opens a small popover for the remark, or to release it. Save, Enter or a tap
@@ -28,7 +29,11 @@ export default class extends Controller {
     this.render()
   }
 
-  press() { this.isKept ? this.togglePop() : this.keep() }
+  press(event) {
+    if (!this.isKept) return this.keep()
+    if (this.popTarget.hidden) this.opener = keyboardOpener(event)
+    this.togglePop()
+  }
 
   // "b" does what tapping the ribbon does.
   key(event) {
@@ -75,7 +80,9 @@ export default class extends Controller {
     return true
   }
 
-  openRemark() {
+  // From the toast, which goes away: focus comes back to the ribbon instead.
+  openRemark(event) {
+    this.opener = keyboardOpener(event) && this.buttonTarget
     this.hideToast()
     this.openPop()
   }
@@ -88,7 +95,7 @@ export default class extends Controller {
     this.remarkTarget.focus()
   }
 
-  close() { this.closePop(); this.buttonTarget.focus() }
+  close() { this.closePop(); giveBackFocus(this.opener, this.popTarget) }
   closePop() { this.popTarget.hidden = true }
 
   escape() {
@@ -100,7 +107,9 @@ export default class extends Controller {
   // A tap elsewhere saves an open popover (and the toast says so), or puts the toast away.
   away(event) {
     if (this.element.contains(event.target)) return
-    this.popTarget.hidden ? this.hideToast() : this.save()
+    if (this.popTarget.hidden) return this.hideToast()
+    this.opener = null // focus stays with what was tapped
+    this.save()
   }
 
   // Without a remark, the toast just kept offers one and Undo; with one, it shows what was saved
