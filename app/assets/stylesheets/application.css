@@ -284,8 +284,8 @@
   .rail-dest .ref-work, .rail-dest .ref-unit { flex: none; white-space: pre; }
   .rail-dest .ref-section { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .rail-dest.tight .ref-work { display: none; }
-  /* Random's default is short enough to widen the rail a little rather than be cut to the width of "Random". */
-  .rail-random .rail-dest { display: block; contain: none; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* Random's default (and where Search opens) is short enough to widen the rail a little rather than be cut to the width of "Random". */
+  .rail-random .rail-dest, .rail-search .rail-dest { display: block; contain: none; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   /* Phones: the ⋯ alone, floating top right; its menu takes in the rest, the tools under Study and then the account. */
   @media (max-width: 899px) {
@@ -606,7 +606,7 @@
 .invite-form { max-width: none; margin: 0 0 8px; }
 
 /* ---------- foci pages ---------- */
-a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a):not(.rail a):not(.whole-group a):not(.card-new):not(.note-under-back):not(.note-also-focus):not(.card-act):not(.cards-more a):not(.back-slip a) { color: var(--accent); }
+a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a):not(.rail a):not(.whole-group a):not(.card-new):not(.note-under-back):not(.note-also-focus):not(.card-act):not(.cards-more a):not(.back-slip a):not(.scope-item) { color: var(--accent); }
 .inline-form { display: inline; margin: 0; }
 .page { max-width: 40em; margin: 0 auto; padding: 22px 16px 80px; }
 /* Above the title: the way up (helpers page_head), quietly, and the page's actions at the right. */
@@ -909,6 +909,33 @@ a.tick { display: inline-flex; align-items: center; justify-content: center; tex
 .search-form .chip { padding: 9px 14px; }
 .search-scopes { display: flex; flex-wrap: wrap; gap: 8px; margin: -12px 0 22px; }
 .search-scopes .chip.current { border-color: var(--accent); color: var(--accent); }
+/* "Somewhere else…" (searches/_picker): dashed, a way out of the chain rather than a place in it; it opens a filter over
+   every title, and before anything is typed the shelves, Your Texts, places searched lately and the whole library. */
+.search-scopes { position: relative; align-items: center; }
+.search-scopes .chip-else { color: var(--ink-soft); border-style: dashed; }
+.search-scopes .chip-else[aria-expanded="true"] { border-style: solid; border-color: var(--accent); color: var(--accent); }
+.scope-pop {
+  position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; width: min(360px, 100%);
+  display: flex; flex-direction: column; padding: 6px; font-family: var(--sans);
+  background: var(--bg); border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+}
+.scope-pop[hidden], .scope-pop [hidden] { display: none; }
+.scope-pop input {
+  margin: 2px 2px 6px; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 8px;
+  background: var(--paper); color: var(--ink); font: 16px var(--sans); /* 16px, or iOS zooms in on it */
+}
+.scope-pop input:focus { border-color: var(--accent); outline: none; }
+.scope-list { max-height: min(360px, 55vh); overflow-y: auto; overscroll-behavior: contain; }
+.scope-item {
+  display: flex; flex-direction: column; padding: 7px 12px; border-radius: 8px; font-size: 15px;
+  color: var(--ink); text-decoration: none;
+}
+.scope-item small { font-size: 12px; color: var(--ink-faint); }
+.scope-item:hover, .scope-item[aria-selected="true"] { background: var(--accent-soft); }
+.scope-none { margin: 0; padding: 10px 12px; font-size: 13px; font-style: italic; color: var(--ink-soft); }
+.scope-foot { margin: 4px 6px 2px; padding-top: 6px; border-top: 1px solid var(--rule); font-size: 11px; color: var(--ink-faint); }
+@media (hover: none) { .scope-foot { display: none; } }
+@media (max-width: 719px) { .scope-item { min-height: 44px; justify-content: center; } }
 .search-hint { color: var(--ink-soft); font-family: var(--sans); font-size: 13px; }
 /* On the empty search page, the way back to the last search. */
 .search-last { margin: -12px 0 24px; color: var(--ink-soft); font-family: var(--sans); font-size: 13px; }

@@ -8,14 +8,15 @@
     <p class="search-last" data-controller="last-search" hidden>Your last search, <q data-last-search-target="query"></q>: <a href="<%= search_path %>" data-last-search-target="link">back to the results</a></p>
   <% end %>
 
-  <% if @place %>
-    <nav class="search-scopes" aria-label="Search in">
-      <% RandomScope.chain_for(@place).each do |scope| %>
-        <%= link_to scope.label, search_in_path(@search.query, scope.place), class: "chip#{" current" if scope.place == @place}",
-              aria: { current: (true if scope.place == @place) } %>
-      <% end %>
-    </nav>
-  <% end %>
+  <% scopes = @place ? RandomScope.chain_for(@place) : [ RandomScope.library ] %>
+  <nav class="search-scopes" aria-label="Search in" data-controller="scope-picker"
+       data-action="keydown.esc@window->scope-picker#escape click@window->scope-picker#away">
+    <% scopes.each do |scope| %>
+      <%= link_to scope.label, search_in_path(@search.query, scope.place), class: "chip#{" current" if scope.place == @place}",
+            aria: { current: (true if scope.place == @place) } %>
+    <% end %>
+    <%= render "searches/picker", query: @search.query, here: RandomScope.new(@place), around: scopes %>
+  </nav>
 
   <% if !@search.searching? %>
     <p class="search-hint">This searches the words of the texts, not titles; to find a work by name, browse the <%= link_to "library", library_path %>. Every word must appear. Put a phrase in "quotes", and end a word with * to match its beginning, as in <i>sanctif*</i>.</p>

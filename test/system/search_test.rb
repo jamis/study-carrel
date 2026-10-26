@@ -50,7 +50,7 @@ class SearchTest < ApplicationSystemTestCase
     click_on "Genesis 1:2"
     assert_selector ".lectio"
 
-    find(".rail-btn[aria-label='Search']").click
+    find(".rail-search").click
     assert_selector ".search-hint"
     assert_field "q", with: ""
     within(".search-last") { click_on "back to the results" }
@@ -59,8 +59,38 @@ class SearchTest < ApplicationSystemTestCase
 
   test "with no search yet, Search opens an empty search" do
     visit reading_path("genesis-kjv", 1)
-    find(".rail-btn[aria-label='Search']").click
+    find(".rail-search").click
     assert_selector ".search-hint"
     assert_no_selector ".search-last"
+  end
+
+  test "Search in the reader opens on the work being read, and / does too" do
+    visit reading_path("genesis-kjv", 1)
+    find(".rail-btn[aria-label='Search, in Genesis']").click
+    assert_field "q", placeholder: "Find words in Genesis"
+    assert_selector ".search-scopes .chip.current", text: "Genesis"
+
+    visit reading_path("genesis-kjv", 1)
+    assert_selector ".lectio"
+    find("body").send_keys("/")
+    assert_field "q", placeholder: "Find words in Genesis"
+  end
+
+  test "Somewhere else… finds a place by its title and searches there" do
+    visit search_path(q: "light")
+    click_on "Somewhere else…"
+    assert_no_selector ".scope-found"
+    fill_in placeholder: "A work or collection…", with: "gen"
+    assert_selector ".scope-found .scope-item[aria-selected=true]", text: "Genesis"
+    find_field(placeholder: "A work or collection…").send_keys(:enter)
+    assert_selector ".search-scopes .chip.current", text: "Genesis"
+    assert_field "q", with: "light"
+    assert_selector ".search-summary", text: /2 passages/
+
+    click_on "Somewhere else…"
+    fill_in placeholder: "A work or collection…", with: "nothing like it"
+    assert_selector ".scope-none"
+    find_field(placeholder: "A work or collection…").send_keys(:escape)
+    assert_no_selector ".scope-pop"
   end
 end

@@ -1,0 +1,38 @@
+<%# The search page's "Somewhere else…": a filter over the titles of every collection and work, and, before anything is
+    typed, the user's shelves, Your Texts, the places searched lately and the whole library. Each is a link that runs the
+    query there (scope_picker_controller.js filters and keys through them).
+    query: the search to run; here: the RandomScope searched now; around: the RandomScopes already offered as chips %>
+<% offered = [ here, *around ]
+   shelves = Current.user.shelves.map { RandomScope.new(it) } - offered
+   texts = [ RandomScope.new(OwnTexts.new(Current.user)) ] - offered if Current.user.texts.exists?
+   lately = searched_places - offered - shelves - Array(texts)
+   library = [ RandomScope.library ] - offered %>
+<button class="chip chip-else" type="button" aria-expanded="false" aria-controls="scope-picker"
+        data-scope-picker-target="button" data-action="scope-picker#toggle">Somewhere else…</button>
+<div class="scope-pop" id="scope-picker" role="dialog" aria-label="Search somewhere else" hidden data-scope-picker-target="panel">
+  <input type="text" placeholder="A work or collection…" aria-label="Find a work or collection by title" autocomplete="off"
+         data-scope-picker-target="filter" data-action="input->scope-picker#filter keydown->scope-picker#key">
+  <div class="scope-list" data-scope-picker-target="list">
+    <% [ [ "Your shelves", shelves ], [ nil, Array(texts) ], [ "Searched lately", lately ], [ nil, library ] ].each do |label, group| %>
+      <% next if group.empty? %>
+      <div class="scope-group" data-scope-picker-target="group">
+        <% if label %><div class="menu-label"><%= label %></div><% end %>
+        <% group.each do |scope| %>
+          <%= link_to search_in_path(query, scope.place), class: "scope-item", data: { scope_picker_target: "item" } do %>
+            <%= scope.label %><% if scope.place.is_a?(Shelf) %><small>Your shelf</small><% end %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+    <div class="scope-found" hidden data-scope-picker-target="found">
+      <% search_picker_places.each do |place, trail| %>
+        <%= link_to search_in_path(query, place), class: "scope-item", hidden: true,
+              data: { scope_picker_target: "place", name: place.is_a?(Work) ? place.title : place.name } do %>
+          <%= place.is_a?(Work) ? place.title : place.name %><% sub = [ trail.presence, (place.edition if place.is_a?(Work)) ].compact_blank.join(" · ") %><% if sub.present? %><small><%= sub %></small><% end %>
+        <% end %>
+      <% end %>
+      <p class="scope-none" hidden data-scope-picker-target="none">No work or collection is called that. Only titles are matched here; to find words, search for them.</p>
+    </div>
+  </div>
+  <div class="scope-foot">↑↓ to choose · Enter searches there · Esc closes</div>
+</div>

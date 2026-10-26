@@ -1,6 +1,7 @@
 <%# The phone menu (the ⋯, in shared/_rail): the rail's tools under Study, then the account's under your name.
     focus: the current focus (nil if none); reading: on the reading view (no "Continue reading");
-    random / random_default: as for shared/_rail; me: the name the account goes by %>
+    random / random_default: as for shared/_rail; search_place: where Search opens (nil for the library); me: the name
+    the account goes by %>
 <div class="menu-label">Study</div>
 <%= link_to "Your focuses", foci_path, class: "menu-item" %>
 <% if focus %>
@@ -9,7 +10,7 @@
 <% end %>
 <% unless reading %><%= link_to "Library", library_path, class: "menu-item" %><% end %>
 <button class="menu-item" type="button" data-history-open data-action="menu#close">Recent places<kbd>h</kbd></button>
-<%= link_to search_path, class: "menu-item", data: { controller: "search-key", action: "keydown@window->search-key#key" } do %>Search<kbd>/</kbd><% end %>
+<%= link_to search_path(**search_place_params(search_place)), class: "menu-item", data: { controller: "search-key", action: "keydown@window->search-key#key" } do %>Search<span class="menu-note"><%= search_place ? RandomScope.new(search_place).label : "Whole library" %></span><% end %>
 <%= render "shared/random_menu", scopes: random, default: random_default %>
 <%= link_to "Kept", kept_path, class: "menu-item" %>
 <%= link_to "Your Texts", texts_path, class: "menu-item" %>

@@ -118,7 +118,7 @@ class ReadingsControllerTest < ActionDispatch::IntegrationTest
     get reading_path("isaiah-kjv", 40, 25)
     assert_select ".rail a.rail-btn[href=?]", foci_path, text: "Your focuses"
     assert_select ".rail .history-btn[aria-label=?]", "Recent places"
-    assert_select ".rail a.rail-btn[href=?]", search_path
+    assert_select ".rail a.rail-btn[href=?]", search_path(work: "isaiah-kjv"), text: /in Isaiah/
     assert_select ".rail a.rail-btn[href=?]", kept_path
     assert_select ".rail a.rail-btn[href=?]", focus_notes_path(@focus)
     assert_select ".rail #rail-random"

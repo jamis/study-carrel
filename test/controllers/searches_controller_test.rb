@@ -77,6 +77,54 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".search-hint", /not titles/
   end
 
+  test "the whole library is a chip of its own, with somewhere else beside it" do
+    get search_path(q: "light")
+    assert_select ".search-scopes .chip.current", text: "Whole library"
+    assert_select ".search-scopes .chip-else", text: "Somewhere else…"
+    assert_select ".scope-found a[data-name=Genesis][href=?]", search_path(q: "light", work: "genesis-kjv") do
+      assert_select "small", text: /Old Testament · KJV\z/
+    end
+    assert_select ".scope-found a[data-name=Prose][href=?]", search_path(q: "light", collection: "prose")
+  end
+
+  test "the rail's Search opens on the page's own place, or else the place last searched, or the work last read" do
+    get work_path("walden")
+    assert_select ".rail-search[href=?][aria-label=?]", search_path(work: "walden"), "Search, in Walden"
+
+    get kept_path
+    assert_select ".rail-search[href=?]", search_path
+
+    Visit.record(users(:one), Unit.joins(section: :work).find_by!(works: { slug: "genesis-kjv" }))
+    get kept_path
+    assert_select ".rail-search[href=?]", search_path(work: "genesis-kjv")
+
+    get search_path(q: "light", collection: "bible")
+    get kept_path
+    assert_select ".rail-search[href=?] .rail-dest", search_path(collection: "bible"), text: "in Bible"
+    assert_select ".menu-item[href=?] .menu-note", search_path(collection: "bible"), text: "Bible"
+
+    get search_path(q: "light")
+    get kept_path
+    assert_select ".rail-search[href=?] .rail-dest", search_path, text: "in the library"
+  end
+
+  test "the picker offers shelves and the places searched lately, leaving out those already chips" do
+    shelf = users(:one).shelves.create!(name: "Poets I love")
+    get search_path(q: "light", collection: "bible")
+    get search_path(q: "light", shelf: shelf.slug)
+    get search_path(q: "light", work: "walden")
+    assert_select ".scope-group a.scope-item", text: /Poets I love/, count: 1
+    assert_select ".scope-group a.scope-item[href=?]", search_path(q: "light", collection: "bible"), text: "Bible"
+    assert_select ".scope-group a.scope-item", text: "Walden", count: 0
+    assert_select ".scope-group a.scope-item", text: "Whole library", count: 0
+
+    shelf.destroy
+    get kept_path
+    assert_select ".rail-search[href=?]", search_path(work: "walden")
+    get search_path(q: "light")
+    assert_response :success
+  end
+
   test "signed out, search is closed" do
     sign_out
     get search_path(q: "light")
