@@ -1,7 +1,8 @@
 <% content_for :title, "Notes · #{@focus.title} · Study Carrel" %>
 <%# A focus's notes page (the current focus's or a past one's), where they're reread: those on passages in reading
     order down the column, then those on the focus as a whole, the one you're on lit and the rest dimmed in place, each
-    note's labels as pills under it. The focus's scratchpad is put away behind a tab at the right edge (a bottom sheet on
+    note's labels as pills under it, each rereading only its label's notes (?label=, with a band over the run saying so;
+    there Remove takes the label off the note you're on). The focus's scratchpad is put away behind a tab at the right edge (a bottom sheet on
     phones); the labels in use, as a cloud or as tallies, come up over its foot, or on their own. Notes on the whole
     focus can be written and edited here, and so can the current focus's notes on passages, as in the reader.
     "Gather" (g) turns the column into a comparison: up to three notes held under tabs on a card at
@@ -13,6 +14,7 @@
 <main class="reader reread" data-controller="reread<%= " compare peek" unless archived %>"
       data-reread-position-url-value="<%= focus_reread_path(@focus) %>"
       data-reread-read-only-value="<%= archived %>"
+      data-reread-filter-value="<%= @label&.id %>"
       data-reread-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
       data-reread-lift-url-value="<%= focus_notes_path(@focus) %>"
       data-compare-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
@@ -39,13 +41,8 @@
     <div class="rr-lede">
       <span class="menu" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
         Rereading
-        <button class="rr-filter" type="button" aria-expanded="false" data-menu-target="button" data-action="menu#toggle"><%= @label ? "the #{pluralize(@notes.size, "note")} #{label_phrase(@label)}" : pluralize(@notes.size, "note") %> ▾</button>
-        <span class="menu-panel rr-filter-menu" data-menu-target="panel">
-          <%= link_to focus_reread_path(@focus), class: "menu-item", aria: { current: ("page" unless @label) } do %>All notes<small><%= @all.size %></small><% end %>
-          <% @all.flat_map(&:labels).uniq.sort_by { [ it.named? ? 0 : 1, it.name.to_s.downcase, it.id ] }.each do |label| %>
-            <%= link_to focus_reread_path(@focus, label: label.id), class: "menu-item", aria: { current: ("page" if label == @label) } do %><%= label_title(label, snippet: false) %><small><%= @all.count { it.label_ids.include?(label.id) } %></small><% end %>
-          <% end %>
-        </span>
+        <button class="rr-filter<%= " on" if @label %>" type="button" title="Reread only the notes with one label" aria-expanded="false" data-menu-target="button" data-action="menu#toggle"><% if @label %>the <span data-reread-target="count"><%= pluralize(@notes.size, "note") %></span> <%= label_phrase(@label) %><% else %><%= pluralize(@notes.size, "note") %><% end %> <span class="rr-caret" aria-hidden="true">▾</span></button>
+        <%= render "rereads/filter_menu", focus: @focus, notes: @all %>
       </span>
       <% if archived %>
         <span class="rr-archived">· Archived <%= l @focus.archived_at.to_date, format: :long %> ·
@@ -55,6 +52,15 @@
         <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to gather, <kbd>c</kbd> for the labels, <kbd>n</kbd> for a new note, <kbd>s</kbd> the scratchpad</span>
       <% end %>
     </div>
+    <%# Rereading one label: saying so over the run, with the way back to them all (×, or Esc). Not prefetched, as pills
+        aren't (rereads/_note_labels). %>
+    <% if @label %>
+      <div class="rr-filter-band">
+        <span class="rr-filter-what">Only the <span data-reread-target="count"><%= pluralize(@notes.size, "note") %></span> <%= label_phrase(@label) %><span data-reread-target="removed" hidden> · 1 just removed</span></span>
+        <%= link_to "Show all #{@all.size}", focus_notes_path(@focus, at: @here&.id), class: "rr-filter-all", data: { action: "reread#unfilter", turbo_prefetch: false } %>
+        <%= link_to "×", focus_notes_path(@focus, at: @here&.id), class: "rr-filter-x", title: "Show all the notes (Esc)", aria: { label: "Show all the notes" }, data: { action: "reread#unfilter", turbo_prefetch: false } %>
+      </div>
+    <% end %>
     <% unless archived %>
     <p class="rr-lede rr-cmp-lede">Gathering what goes with the note you're on<span class="rr-keys"> · <kbd>j</kbd>/<kbd>k</kbd> through the others, <kbd>1</kbd>–<kbd>9</kbd> or <kbd>+</kbd> to group, <kbd>Enter</kbd> to hold one under a tab, <kbd>[</kbd>/<kbd>]</kbd> from tab to tab, <kbd>x</kbd> to let one go, <kbd>p</kbd>/<kbd>o</kbd> the whole passage or note, <kbd>g</kbd> or × to go back</span></p>
 
@@ -63,8 +69,10 @@
     <section class="rr-cmp-card" aria-label="The notes you're holding" data-compare-target="card" hidden></section>
     <% end %>
 
-    <% if @notes.empty? %>
-      <p class="page-empty"><%= @label ? "No notes here are #{label_phrase(@label)} any more." : archived ? "No notes." : "No notes yet. Open a verse and write what it says to your question." %></p>
+    <% if @label %>
+      <p class="page-empty" data-reread-target="empty" <%= "hidden" if @notes.any? %>>No notes here are <%= label_phrase(@label) %> any more.</p>
+    <% elsif @notes.empty? %>
+      <p class="page-empty"><%= archived ? "No notes." : "No notes yet. Open a verse and write what it says to your question." %></p>
     <% end %>
 
     <div class="rr-run">

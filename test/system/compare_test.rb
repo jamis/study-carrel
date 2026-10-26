@@ -141,7 +141,7 @@ class CompareTest < ApplicationSystemTestCase
     within(".rr-row.here") { assert_selector ".rr-chip .lf", exact_text: "group A" }
     within("#reread_note_#{@fade.id}") do
       assert_selector ".rr-chip .lf", exact_text: "group A"
-      assert_no_selector ".rr-chip-x"
+      assert_no_selector ".rr-chip-take"
     end
     within("#reread_note_#{@stands.id}") { assert_no_selector ".rr-chip" }
     within("#reread_note_#{whole.id}") { assert_selector ".rr-ref", text: /Focus 1 · /i }

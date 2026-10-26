@@ -605,7 +605,7 @@
 .invite-form { max-width: none; margin: 0 0 8px; }
 
 /* ---------- foci pages ---------- */
-a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a):not(.rail a):not(.whole-group a):not(.card-new):not(.note-under-back):not(.note-also-focus):not(.card-act):not(.kept-act):not(.cards-more a):not(.back-slip a):not(.scope-item) { color: var(--accent); }
+a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a):not(.rail a):not(.whole-group a):not(.card-new):not(.note-under-back):not(.note-also-focus):not(.card-act):not(.kept-act):not(.cards-more a):not(.back-slip a):not(.scope-item):not(.rr-chip-face) { color: var(--accent); }
 .inline-form { display: inline; margin: 0; }
 .page { max-width: 40em; margin: 0 auto; padding: 22px 16px 80px; }
 /* Above the title: the way up (helpers page_head), quietly, and the page's actions at the right. */

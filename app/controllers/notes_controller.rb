@@ -5,12 +5,13 @@ class NotesController < ApplicationController
 
   # A focus's notes, reread one at a time (the current focus's or a past one's): those on passages in reading order,
   # then those on the focus as a whole, one lit at a time, to label as you go, with the focus's scratchpad beside them.
-  # ?label= rereads only the notes carrying one label. Detached notes follow, out of the run.
+  # ?label= rereads only the notes carrying one label; ?at= opens on one note, if it's among them. Detached notes follow,
+  # out of the run.
   def index
     @label = Current.user.labels.find(params[:label]) if params[:label].present?
     @all = @focus.notes_for_reread
     @notes = @label ? @all.select { it.label_ids.include?(@label.id) } : @all
-    @here = @notes.find { it.id == @focus.reread_note_id } || @notes.first
+    @here = @notes.find { it.id == params[:at].to_i } || @notes.find { it.id == @focus.reread_note_id } || @notes.first
     @detached = @focus.detached_notes.includes(:rich_text_content) unless @label
   end
 

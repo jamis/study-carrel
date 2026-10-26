@@ -1,11 +1,15 @@
 <%# A note's labels on the reread page, as pills under its text: named ones A–Z, then unnamed ones by letter
-    ("group D"). On the note you're on they can be taken off (×), with + label and "Gather". The ids are on the
-    element, to light the note when its label is pointed at.
-    note; editable: false for an archived focus's notes, which have no ×, + label or Gather %>
+    ("group D"). Each pill rereads only the notes carrying its label, from this note (the one already rereading shows
+    them all again: the reread controller sees to that). While rereading one label, that label's pill on the note you're
+    on offers to remove it (the reread controller marks it); on the note you're on, + label and "Gather". The ids are
+    on the element, to light the note when its label is pointed at. Pills aren't prefetched: following one takes off a
+    label just removed first, which a page fetched on hover would predate.
+    note, focus; editable: false for an archived focus's notes, which have no Remove, + label or Gather %>
 <% editable = local_assigns.fetch(:editable, true) %>
 <div class="rr-labels" id="<%= dom_id(note, :labels) %>" data-reread-target="noteLabels" data-compare-target="noteLabels" data-label-ids="<%= note.label_ids.join(" ") %>">
   <% note.labels.sort_by { [ it.named? ? 0 : 1, it.name.to_s.downcase, it.id ] }.each do |label| %>
-    <span class="rr-chip" title="<%= label_title(label) unless label.named? %>"><%= label_face(label) %><% if editable %><button class="rr-chip-x" type="button" aria-label="Take off “<%= label_title(label, snippet: false) %>”" data-label-id="<%= label.id %>" data-action="reread#unlabel">×</button><% end %></span>
+    <span class="rr-chip" data-label-id="<%= label.id %>"><%= link_to label_face(label), focus_notes_path(focus, label: label.id, at: note.id),
+          class: "rr-chip-face", data: { action: "reread#follow", turbo_prefetch: false }, title: "Reread only the notes #{label.named? ? "labelled “#{label.name}”" : "in #{label_title(label)}"}" %><% if editable %><button class="rr-chip-take" type="button" title="Remove “<%= label_title(label, snippet: false) %>” from this note" data-label-id="<%= label.id %>" data-action="reread#remove">× Remove</button><% end %></span>
   <% end %>
   <% if editable %>
     <button class="rr-add" type="button" data-action="reread#openPicker" title="Label this note (l)">+ label</button>

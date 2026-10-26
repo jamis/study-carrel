@@ -11,12 +11,14 @@ const PICKER_LEAST = 150, PICKER_TALLEST = 340 // px of the picker's cloud
 // or from the labels panel (c), which shows the labels in use as a cloud or as tallies. Pointing at a label lights the
 // notes that carry it. The note you're on gets its editor, if it has one here (data-editor-url); where you are is
 // saved, so the reread opens there again. A new note on the whole focus (n) is written in a row of its own, and a
-// selection in the scratchpad can be made one ("Make a note of this"). An archived focus's page is read-only
-// (readOnly): moving, the labels panel and the scratchpad to read, nothing written or labelled.
+// selection in the scratchpad can be made one ("Make a note of this"). A label's pill rereads only the notes carrying it
+// (filter); there, Remove on the note you're on takes it off, the note staying (to put back) until you move on. An
+// archived focus's page is read-only (readOnly): moving, the labels panel and the scratchpad to read, nothing written
+// or labelled.
 export default class extends Controller {
   static targets = ["row", "newRow", "noteLabels", "labelsBody", "picker", "pickerInput", "pickerOptions", "pickerFoot", "labelForm", "pad", "labelsPanel",
-    "lift", "toast"]
-  static values = { positionUrl: String, labelsUrlTemplate: String, liftUrl: String, readOnly: Boolean }
+    "lift", "toast", "count", "removed", "empty", "filterMenu"]
+  static values = { positionUrl: String, labelsUrlTemplate: String, liftUrl: String, readOnly: Boolean, filter: String }
 
   connect() {
     let view = "cloud"
@@ -28,13 +30,19 @@ export default class extends Controller {
       this.centreOnLoad = () => this.#centre()
       document.addEventListener("turbo:load", this.centreOnLoad, { once: true })
       this.#openEditor()
+      // Opened on a note (?at=, from a pill or the band): the reread is there now.
+      if (new URLSearchParams(location.search).has("at")) this.#savePosition()
     }
     this.#mark()
+    this.letGoOnLeaving = () => this.#letGo()
+    window.addEventListener("pagehide", this.letGoOnLeaving)
   }
 
   disconnect() {
     clearTimeout(this.saveTimer)
     document.removeEventListener("turbo:load", this.centreOnLoad)
+    window.removeEventListener("pagehide", this.letGoOnLeaving)
+    this.#letGo()
   }
 
   #centre() { this.here?.scrollIntoView({ block: "center" }) }
@@ -44,8 +52,10 @@ export default class extends Controller {
   get #comparing() { return this.element.classList.contains("comparing") }
 
   // A note's chips or the panel were redrawn (labelling replies with both).
-  noteLabelsTargetConnected() { this.#mark() }
+  noteLabelsTargetConnected() { this.#mark(); this.#recount() }
   labelsBodyTargetConnected() { this.#mark() }
+  // The menu of labels to reread is drawn without knowing which is being reread: marked here.
+  filterMenuTargetConnected() { this.#markMenu() }
 
   get here() { return this.rowTargets.find(row => row.classList.contains("here")) }
 
@@ -74,6 +84,8 @@ export default class extends Controller {
     const left = this.here
     left?.classList.remove("here")
     row.classList.add("here")
+    // A note just removed from the label being reread leaves the run, now you've moved on.
+    if (left && left.dataset.noteId === this.removing) { this.#letGo({ render: true }); left.remove(); this.#recount() }
     row.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })
     // A new note left empty goes; one with words in it stays, and its editor's last save makes it.
     const unwritten = left?.classList.contains("rr-unsaved") && !left.querySelector(".lexxy-editor__content")?.textContent.trim()
@@ -229,11 +241,6 @@ export default class extends Controller {
     else this.#submit("post", null, this.labelsPanelTarget.querySelector(`[data-label-id="${id}"][data-label-name]`).dataset.labelName)
   }
 
-  unlabel(event) {
-    event.stopPropagation()
-    this.#submit("delete", event.currentTarget.dataset.labelId)
-  }
-
   #submit(method, labelId, name) {
     if (!this.here?.dataset.noteId) return // a new note can be labelled once its first save makes it
     const form = this.labelFormTarget
@@ -243,6 +250,93 @@ export default class extends Controller {
     if (method === "delete") form.insertAdjacentHTML("beforeend", '<input type="hidden" name="_method" value="delete">')
     form.querySelector("[name=name]").value = name || ""
     form.requestSubmit()
+  }
+
+  // ---------- rereading one label ----------
+
+  // Remove, on the label's pill on the note you're on: crossed out, to put back, until you move on (or leave), when
+  // it's taken off and the note leaves the run.
+  remove(event) {
+    event.stopPropagation()
+    const noteId = event.currentTarget.closest(".rr-row")?.dataset.noteId
+    if (!noteId) return
+    this.removing = this.removing === noteId ? null : noteId
+    this.#mark()
+    this.#recount()
+  }
+
+  // Takes the label off the note just removed from it, if there is one. On the way off the page the reply isn't drawn.
+  #letGo({ render = false } = {}) {
+    const noteId = this.removing
+    if (!noteId || !this.filterValue) return Promise.resolve()
+    this.removing = null
+    const sent = fetch(`${fillId(this.labelsUrlTemplateValue, noteId)}/${this.filterValue}`, {
+      method: "DELETE", headers: { "Accept": "text/vnd.turbo-stream.html", "X-CSRF-Token": csrfToken() }, keepalive: true
+    })
+    if (render) sent.then(response => response.ok && response.text()).then(html => html && Turbo.renderStreamMessage(html))
+    return sent.catch(() => {})
+  }
+
+  // Following a pill, or a label in the menu: a note just removed from the label is taken off first, so the page you
+  // come to has it off.
+  async follow(event) {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button > 0) return
+    event.preventDefault()
+    event.stopPropagation()
+    const href = event.currentTarget.href
+    await this.#letGo()
+    Turbo.visit(href)
+  }
+
+  // Back to all the notes (the band, or Esc), on the note you're on.
+  async unfilter(event) {
+    if (event && (event.metaKey || event.ctrlKey || event.shiftKey || event.button > 0)) return
+    event?.preventDefault()
+    const url = new URL(location.href)
+    url.searchParams.delete("label")
+    url.searchParams.delete("at")
+    if (this.here?.dataset.noteId) url.searchParams.set("at", this.here.dataset.noteId)
+    await this.#letGo()
+    Turbo.visit(url.toString())
+  }
+
+  // The label being reread: its pills show all the notes again, and on the note you're on offer Remove (or, once
+  // removed, Put back).
+  #markFilter() {
+    if (!this.filterValue) return
+    this.element.querySelectorAll(`.rr-chip[data-label-id="${this.filterValue}"]`).forEach(chip => {
+      chip.classList.add("current")
+      const face = chip.querySelector(".rr-chip-face")
+      const url = new URL(face.href)
+      url.searchParams.delete("label")
+      face.href = url.toString()
+      face.title = "Show all the notes again"
+      const take = chip.querySelector(".rr-chip-take")
+      if (!take) return
+      const removed = chip.closest(".rr-row")?.dataset.noteId === this.removing
+      chip.classList.toggle("removed", removed)
+      take.dataset.text ||= take.textContent
+      take.dataset.title ||= take.title
+      take.textContent = removed ? "Put back" : take.dataset.text
+      take.title = removed ? "Put it back on this note" : take.dataset.title
+    })
+  }
+
+  #markMenu() {
+    this.filterMenuTarget.querySelectorAll(".menu-item").forEach(item => {
+      if (item.dataset.labelId === this.filterValue) item.setAttribute("aria-current", "page")
+      else item.removeAttribute("aria-current")
+    })
+  }
+
+  // How many notes the label is on, here, and whether one was just removed.
+  #recount() {
+    if (!this.filterValue) return
+    const n = this.rowTargets.filter(row => row.dataset.noteId !== this.removing &&
+      (row.querySelector("[data-label-ids]")?.dataset.labelIds || "").split(" ").includes(this.filterValue)).length
+    this.countTargets.forEach(count => { count.textContent = `${n} ${n === 1 ? "note" : "notes"}` })
+    this.removedTargets.forEach(removed => { removed.hidden = !this.removing })
+    this.emptyTargets.forEach(empty => { empty.hidden = this.rowTargets.length > 0 })
   }
 
   // ---------- the picker ----------
@@ -421,6 +515,7 @@ export default class extends Controller {
     const noteId = this.here?.dataset.noteId
     this.labelsPanelTarget.querySelectorAll("[data-label-id]").forEach(el => el.classList.toggle("on", on.includes(el.dataset.labelId)))
     this.labelsPanelTarget.querySelectorAll(".rr-ticks i").forEach(tick => tick.classList.toggle("here", tick.dataset.noteId === noteId))
+    this.#markFilter()
   }
 
   // Pointing at a label (in the panel) lights the notes that carry it.
@@ -448,6 +543,9 @@ export default class extends Controller {
     else if (event.key === "k" || event.key === "ArrowLeft") { event.preventDefault(); if (!event.repeat) this.previous() }
     else if (event.key === "l") { event.preventDefault(); this.openPicker() }
     else if (event.key === "c") { event.preventDefault(); this.toggleLabels() }
+    // Esc, with nothing else to put away, leaves the label being reread for all the notes.
+    else if (event.key === "Escape" && this.filterValue && !this.padTarget.classList.contains("open") && this.pickerTarget.hidden &&
+             !this.element.querySelector(".rr-filter-menu.open")) { event.preventDefault(); this.unfilter() }
     else if (event.key === "n") { event.preventDefault(); this.newNote() }
     else if (event.key === "e") { const editor = this.here?.querySelector("lexxy-editor [contenteditable]"); if (editor) { event.preventDefault(); focusAtEnd(editor) } }
     else if (event.key === "s") {

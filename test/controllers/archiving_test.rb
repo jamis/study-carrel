@@ -110,7 +110,7 @@ class ArchivingTest < ActionDispatch::IntegrationTest
     assert_select ".rr-row .rr-note", /Stillness/
     assert_select ".rr-row .rr-chip", "quiet"
     assert_select ".rr-row[data-editor-url]:not([data-editor-url=''])", 0
-    assert_select ".rr-chip-x, .rr-add, .rr-find, .rr-new, .rr-cmp-card, .rr-lift", 0
+    assert_select ".rr-chip-take, .rr-add, .rr-find, .rr-new, .rr-cmp-card, .rr-lift", 0
     assert_select ".rr-discard", 0
     assert_select ".reread-pad .rr-pad-read", /half a thought/
     assert_select ".reread-pad form", 0

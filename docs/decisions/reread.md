@@ -14,7 +14,7 @@ The first part of synthesis (see [synthesis.md](synthesis.md), still exploratory
 - The way up: Your focuses (› Archived, for an archived focus). Copy Markdown and Download `.md` at the right of that line. An archived focus's "Archived October 21, 2026 · Unarchive" follows the count.
 - Detached notes follow the run, out of it, to read or discard (see [foci-and-notes.md](foci-and-notes.md)).
 - The reference links into the reader; on the lit note it reads "Isaiah 40:25 Open in the reader →", all one link (the hint was once a separate span that lit up with the reference but did nothing when clicked).
-- `?label=` rereads only the notes carrying one label, chosen from "Rereading 8 notes ▾" over the run.
+- `?label=` rereads only the notes carrying one label: a pill's name, or "Rereading 8 notes ▾" over the run (see [Rereading one label](#rereading-one-label)).
 - **Editing:** the current focus's lit note gets the reader's editor in place (`e` puts the cursor at its end). A past focus's notes on passages are only read here: the reader's note editor saves to the current focus, and editing them was a nice-to-have left out to keep this simple. Notes on the whole focus save to their own focus, so they can be edited on any focus.
 
 ## Notes on the whole focus
@@ -34,17 +34,28 @@ See [foci-and-notes.md](foci-and-notes.md) for what they are. Here is where they
 - **It was shown "like" one of its notes, 2026-10-19 to 2026-10-26:** "like Isaiah 40:6" and the start of that note, except on the example itself, where it was shown by its next note ("like this note" says nothing). So a group read "like 40:6" on all its notes but one, which read "like 40:8", and the list couldn't be scanned by eye for a group's notes. A number was considered, as the footnotes had (below), but Gather's card numbers groups 1–9 for the moment as keys, and "2 group 7" would have been two numbers for one group.
 - A label lasts only while some note carries it: taking off its last note (or deleting that note) drops it. Taking off its example moves the example on to its next note.
 - **Naming and renaming** from the note's groups in **Gather**; a blank name leaves it unnamed again. A name you already have for another label is refused, saying so ("You already have a label called “waiting”"): merging isn't built yet, so the way round is to move the notes over by hand.
-- Every note shows its labels as **pills** under it (below). The lit note's have ×, with **+ label** (`l`), which opens the picker (below), and **Gather** (`g`): the lit note's pills are where labels are taken off.
+- Every note shows its labels as **pills** under it (below), each a way to reread only its label's notes. The lit note has **+ label** (`l`), which opens the picker (below), and **Gather** (`g`). A label is taken off a note from its pill while rereading that label (below), from the labels panel, or in Gather.
 - A note set aside as a detached note keeps its named labels' names as text (`detached_notes.label_names`), shown under it after the run; they no longer count anywhere. Unnamed ones aren't kept.
 
 ## Labels as pills
 
-**A note's labels as pills under its text** (decided 2026-10-25): named ones A–Z, then unnamed ones ("group **D**"), outlined and quiet in faint ink, without the label colours, which stay in Gather. The lit note's are a little larger, with ×. An archived focus's notes have them without ×.
+**A note's labels as pills under its text** (decided 2026-10-25): named ones A–Z, then unnamed ones ("group **D**"), outlined and quiet in faint ink, without the label colours, which stay in Gather. The lit note's are a little larger. (They had a × to take the label off until 2026-10-26; see below.)
 
 - **They were footnotes, 2026-10-20 to 2026-10-25:** a numbered mark per label after the note's text, in the label's colour, and under the note a line giving each label's name and its other notes by reference, each shown when pointed at. The list of other notes didn't help and made the page wordier, so the pills came back. The numbers had matched the held note's group numbers in Gather; the buttons on each row already show which groups it's in.
 - **Pages for each label are planned** (not decided): each would show every note carrying a label, perhaps across focuses. That's where a label's other notes would be seen.
 - **A long reference is cut short in the middle, never at its end** (decided 2026-10-20): where room is short (the card's groups and tabs; until 2026-10-26, a face "like" a note and the cloud) the title or name is cut off with "…" and the last part ("1:6") kept whole, since that's what tells it from its neighbours: "Quick to Help, Slow to Judge… 1:6". The whole reference is the hover title and heads the pop-up; a note's own heading keeps it whole. A user's text with a long title had broken the footnotes' line, wrapping the title centred in its button with the verse alone under it.
 - Replies to labelling redraw the pills of every note on the label, since an unnamed label's description (its hover title) moves on with its example.
+
+## Rereading one label
+
+**A pill's name rereads only the notes carrying its label** (decided 2026-10-26), and the count over the run is a chip. The filter had been only in "Rereading 8 notes ▾", which read as a sentence: the user had forgotten it was there. Prototyped (not kept) as three changes, switched on and off against the page as it was; all three were kept.
+
+- **A pill** on any note, lit or dimmed, opens `?label=` on that note (`?at=`, which the reread opens on when it's among the notes shown, saving it as where you left off); hovering it says "Reread only the notes labelled “waiting”". The label being reread is outlined in accent on every note, and its pill leads back to all the notes. Not while gathering.
+- **The count is a chip** ("Rereading [8 notes ▾]"), tinted while rereading a label; its menu heads the labels "Only those with the label".
+- **A band over the run** while rereading one ("Only the 5 notes labelled “waiting” · Show all 12 ×", tinted as search's "← Back to results" is); ×, Show all or `Esc` (with nothing else to put away) go back to all the notes, on the note you're on.
+- **Remove:** while rereading a label, its pill on the note you're on is divided, the right side filled in accent: "( waiting | × Remove )". Removing crosses the pill out, dashed, with **Put back**, and "Leaves the run when you move on" under it; the band adds "· 1 just removed". The label comes off when you move on (the note leaving the run), follow a pill or the menu, go back to all the notes, or leave the page; putting it back before then changes nothing, so an unnamed group's letter and example are never lost to a slip. This replaced the × on the lit note's pills, which would have sat beside a pill that now did something else: removing became a second, deliberate step, on a pill you'd just chosen, and it suits pruning a label one note at a time. The labels panel still takes a label off with a tap.
+- A label dropped (its last note removed) is a 404 at its old `?label=`, as another user's is: the two can't be told apart without saying which labels exist. Going back to all the notes from the band or `Esc` doesn't go there.
+- Considered, for the clash of filtering and taking off on one pill: a menu on the pill (an extra click to filter), taking off from the picker only (hard to find), and keeping × with Undo. The user proposed the divided pill instead.
 
 ## The label picker
 

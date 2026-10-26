@@ -22,5 +22,5 @@
   <% if unit %><p class="rr-passage"><%= unit.body %></p><% end %>
   <div class="rr-text"><div class="rr-note" id="<%= dom_id(unit || note, :reread_text) %>"><%= note.content %></div></div>
   <div class="rr-editor composer"></div>
-  <%= render "rereads/note_labels", note:, editable: !focus.archived? %>
+  <%= render "rereads/note_labels", note:, focus:, editable: !focus.archived? %>
 </article>

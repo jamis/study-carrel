@@ -18,6 +18,12 @@ class RereadTest < ApplicationSystemTestCase
     find(".rr-picker input").send_keys "Empty places", :enter
     assert_selector ".rr-row.here .rr-chip", text: "Empty places"
     assert_equal [ "Empty places" ], @first.labels.reload.map(&:name)
+    find(".rr-filter").click
+    within(".rr-filter-menu") do
+      assert_selector ".menu-item[aria-current=page]", text: "All notes"
+      assert_selector ".menu-item", text: "Empty places\n1"
+    end
+    find(".rr-filter").click
 
     find("body").send_keys "j"
     assert_selector ".rr-row.here", text: "The incomparable"
@@ -32,9 +38,76 @@ class RereadTest < ApplicationSystemTestCase
     assert_selector ".rr-labels-panel .rr-word.on", text: "Empty places"
     assert_equal [ "Empty places", "set apart" ], @second.labels.reload.map(&:name).sort
 
-    find(".rr-row.here .rr-chip", text: "set apart").click_on "×"
+    find(".rr-labels-panel .rr-word", text: "set apart").click # tapped again, it comes off
     assert_no_selector ".rr-row.here .rr-chip", text: "set apart"
     assert_no_selector ".rr-labels-panel .rr-word", text: "set apart"
+  end
+
+  test "a pill rereads only its label's notes, from that note; there Remove takes it off, to put back until you move on" do
+    third = @focus.notes.create!(unit: verse(31), content: "Renewed")
+    @first.join!(waiting = third.label!("waiting"))
+    visit focus_notes_path(@focus)
+    assert_selector ".rr-filter", exact_text: "3 notes ▾"
+
+    find("#reread_note_#{third.id} .rr-chip-face", text: "waiting").click
+    assert_selector ".rr-filter.on", text: "the 2 notes labelled “waiting”"
+    find(".rr-filter").click
+    assert_selector ".rr-filter-menu .menu-item[aria-current=page]", text: "waiting"
+    find(".rr-filter").click
+    assert_selector ".rr-filter-band", text: "Only the 2 notes labelled “waiting”"
+    assert_selector ".rr-row[data-note-id]", count: 2
+    assert_selector ".rr-row.here", text: "Renewed"
+    sleep 1 # past the position save's debounce
+    assert_equal third, @focus.reload.reread_note
+
+    within(".rr-row.here") { click_on "× Remove" }
+    assert_selector ".rr-row.here .rr-chip.removed", text: "waiting"
+    assert_selector ".rr-filter-band", text: "Only the 1 note labelled “waiting” · 1 just removed"
+    within(".rr-row.here") { click_on "Put back" }
+    assert_no_selector ".rr-chip.removed"
+    assert_selector ".rr-filter-band", text: "Only the 2 notes labelled “waiting”"
+
+    within(".rr-row.here") { click_on "× Remove" }
+    find("body").send_keys "k"
+    assert_selector ".rr-row.here", text: "The wilderness"
+    assert_no_selector ".rr-row", text: "Renewed"
+    assert_selector ".rr-filter-band", text: "Only the 1 note labelled “waiting”"
+    assert_empty third.labels.reload
+    assert_equal [ @first ], waiting.notes.reload
+
+    find("body").send_keys :escape
+    assert_no_selector ".rr-filter-band"
+    assert_selector ".rr-row[data-note-id]", count: 3
+    assert_selector ".rr-row.here", text: "The wilderness"
+  end
+
+  test "removing the label from its last note, then leaving for all the notes" do
+    group = @first.group_with!(@second)
+    @second.unlabel!(group)
+    visit focus_notes_path(@focus, label: group.id)
+    assert_selector ".rr-filter-band", text: "Only the 1 note in group A"
+    within(".rr-row.here") { click_on "× Remove" }
+    find(".rr-filter-x").hover
+    sleep 0.5 # long enough for Turbo to prefetch it, from before the label came off
+    find(".rr-filter-x").click
+    assert_no_selector ".rr-filter-band"
+    assert_selector ".rr-row.here", text: "The wilderness"
+    assert_no_selector ".rr-row.here .rr-chip", text: "group A"
+    assert_not Label.exists?(group.id)
+  end
+
+  test "following another pill after Remove comes to the note with the label off" do
+    waiting = @second.label!("waiting")
+    visit focus_notes_path(@focus, label: waiting.id)
+    within(".rr-row.here") { click_on "× Remove" }
+    face = find(".rr-row.here .rr-chip-face", text: "set apart")
+    face.hover
+    sleep 0.5 # long enough for Turbo to prefetch it, from before the label came off
+    face.click
+    assert_selector ".rr-filter-band", text: "labelled “set apart”"
+    assert_selector ".rr-row.here", text: "The incomparable"
+    assert_no_selector ".rr-row.here .rr-chip", text: "waiting"
+    assert_empty waiting.note_labels.reload
   end
 
   test "the label picker: every label as a cloud, A–Z or recent, and Enter takes the closest match or a new label" do
@@ -58,7 +131,7 @@ class RereadTest < ApplicationSystemTestCase
 
       find("input").send_keys :up, :enter # round from the first label to the new one
     end
-    assert_selector ".rr-row.here .rr-chip", exact_text: "ho\n×"
+    assert_selector ".rr-row.here .rr-chip", exact_text: "ho"
 
     find("body").send_keys "l"
     within(".rr-picker") do

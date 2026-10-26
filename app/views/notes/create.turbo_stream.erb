@@ -4,7 +4,7 @@
 <% else %>
   <%# The new note's editor made it: its row's labels, now it has an id to label, its number, and its text, for when
       the editor moves on. In the reader's note sheet, its head (its number, no longer "new") and its text. %>
-  <%= turbo_stream.replace "new_note_labels", partial: "rereads/note_labels", locals: { note: @note } %>
+  <%= turbo_stream.replace "new_note_labels", partial: "rereads/note_labels", locals: { note: @note, focus: @focus } %>
   <%= turbo_stream.replace "new_note_ref" do %><span class="rr-ref rr-whole"><span class="rr-cite">Focus <%= @note.number %></span> · <%= l @note.created_at.to_date, format: :long %></span><% end %>
   <%= turbo_stream.update dom_id(@note, :reread_text) do %><%= @note.content %><% end %>
   <%= turbo_stream.replace "new_focus_note_head", partial: "readings/focus_note_head",

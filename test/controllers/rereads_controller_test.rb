@@ -41,6 +41,24 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".rr-row[data-note-id]", 1
     assert_select ".rr-row[data-note-id] .rr-cite", "Isaiah 40:25"
     assert_select ".rr-filter", /labelled “waiting”/
+    assert_select ".rr-filter-band", /Only the 1 note labelled “waiting”/
+    assert_select ".rr-filter-band a[href=?]", focus_notes_path(@focus, at: @late.id), text: "Show all 2"
+  end
+
+  test "each pill rereads only its label's notes, from that note, and Remove is there to be offered" do
+    waiting = @late.label!("waiting")
+    get focus_notes_path(@focus)
+    assert_select "#reread_note_#{@late.id} .rr-chip a.rr-chip-face[href=?]", focus_notes_path(@focus, label: waiting.id, at: @late.id), "waiting"
+    assert_select "#reread_note_#{@late.id} .rr-chip button.rr-chip-take[data-label-id=?]", waiting.id.to_s
+    assert_select ".rr-filter-band", 0
+  end
+
+  test "opens on the note asked for, if it's among those shown" do
+    waiting = @early.label!("waiting")
+    get focus_notes_path(@focus, at: @early.id)
+    assert_select "#reread_note_#{@early.id}.here"
+    get focus_notes_path(@focus, label: waiting.id, at: @late.id)
+    assert_select "#reread_note_#{@early.id}.here"
   end
 
   test "the labels in use: their notes' chips, the cloud sized by count, tallies, and labels from other focuses" do
@@ -63,8 +81,8 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     get focus_notes_path(@focus)
     assert_select "#reread_note_#{@early.id} .rr-chip .lf", "group A"
     assert_select "#reread_note_#{@late.id} .rr-chip .lf", "group A"
-    assert_select "#reread_note_#{@early.id} .rr-chip[title^=?]", "group A (like Isaiah 40:25: "
-    assert_select "#reread_note_#{@late.id} .rr-chip[title^=?]", "group A (like Isaiah 40:25: "
+    assert_select "#reread_note_#{@early.id} .rr-chip-face[title^=?]", "Reread only the notes in group A (like Isaiah 40:25: "
+    assert_select "#reread_note_#{@late.id} .rr-chip-face[title^=?]", "Reread only the notes in group A (like Isaiah 40:25: "
     assert_select ".rr-cloud .rr-word[data-label-id=?]:not([data-label-name])", group.id.to_s, text: "group A"
     assert_select ".rr-tallies .rr-tally-name", "group A"
     assert_select ".rr-filter-menu .menu-item", /group A/
@@ -146,6 +164,7 @@ class NoteLabelsControllerTest < ActionDispatch::IntegrationTest
     assert_match %(target="#{ActionView::RecordIdentifier.dom_id(@note, :labels)}"), response.body
     assert_match %(target="#{ActionView::RecordIdentifier.dom_id(other, :labels)}"), response.body
     assert_match "like Isaiah 40:25", response.body
+    assert_match %r{action="replace" target="reread_filter_menu">.*group #{group.letter}<small>2</small>}m, response.body
   end
 
   test "a note goes on an unnamed label by its id" do

@@ -1,7 +1,8 @@
-<%# The notes whose labels changed: their labels, named from the focus's notes as they now stand; and the labels
-    panel. %>
+<%# The notes whose labels changed: their labels, named from the focus's notes as they now stand; the labels panel;
+    and the menu of labels to reread. %>
 <% all = @focus.notes_for_reread %>
 <% @notes.each do |note| %>
-  <%= turbo_stream.replace dom_id(note, :labels), partial: "rereads/note_labels", locals: { note: } %>
+  <%= turbo_stream.replace dom_id(note, :labels), partial: "rereads/note_labels", locals: { note:, focus: @focus } %>
 <% end %>
 <%= turbo_stream.update "reread_labels", partial: "rereads/labels", locals: { focus: @focus, notes: all } %>
+<%= turbo_stream.replace "reread_filter_menu", partial: "rereads/filter_menu", locals: { focus: @focus, notes: all } %>
