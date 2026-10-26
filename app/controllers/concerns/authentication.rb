@@ -39,7 +39,12 @@ module Authentication
       session.delete(:return_to_after_authenticating) || root_url
     end
 
+    # Whatever the browser's session held before (places searched, say) was someone else's, or nobody's; only the page
+    # that asked for sign-in carries over.
     def start_new_session_for(user)
+      return_to = session[:return_to_after_authenticating]
+      reset_session
+      session[:return_to_after_authenticating] = return_to if return_to
       user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
         Current.session = session
         cookies.signed[:session_id] = { value: session.id, expires: Session::MAX_AGE, httponly: true, same_site: :lax }
@@ -50,5 +55,6 @@ module Authentication
     def terminate_session
       Current.session.user.sessions.delete_all
       cookies.delete(:session_id)
+      reset_session
     end
 end

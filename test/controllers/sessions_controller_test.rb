@@ -59,6 +59,33 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert Session.exists?(other_user.id)
   end
 
+  test "the next person to sign in on the browser doesn't inherit the last one's places searched" do
+    TextLoader.load_collections(Rails.root.join("db/texts/collections.yml"))
+    post session_path, params: { email_address: @user.email_address, password: "password" }
+    get search_path(q: "light", collection: "bible")
+    get kept_path
+    assert_select ".rail-search[href=?]", search_path(collection: "bible")
+
+    delete session_path
+    post session_path, params: { email_address: users(:two).email_address, password: "password" }
+    get kept_path
+    assert_select ".rail-search[href=?]", search_path
+  end
+
+  test "signing in starts a fresh session, keeping only the page that asked for it" do
+    TextLoader.load_collections(Rails.root.join("db/texts/collections.yml"))
+    sign_in_as(@user)
+    get search_path(q: "light", collection: "bible")
+    cookies.delete("session_id")
+
+    get kept_path
+    assert_redirected_to new_session_path
+    post session_path, params: { email_address: users(:two).email_address, password: "password" }
+    assert_redirected_to kept_url
+    follow_redirect!
+    assert_select ".rail-search[href=?]", search_path
+  end
+
   test "a session older than 30 days no longer signs you in" do
     sign_in_as(@user)
     Current.session.update!(created_at: 31.days.ago)
