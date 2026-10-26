@@ -167,6 +167,31 @@ class TextRevisionTest < ActiveSupport::TestCase
     assert_equal "stanza", work.reload.unit_name
   end
 
+  test "merging two sections keeps every sentence, wherever it came from, with its notes" do
+    work = UserText.new(title: "Two", source: "# A\n\nOne line here.\n\n# B\n\nTwo line there.").publish!(@user)
+    units = Unit.joins(:section).where(sections: { work_id: work.id })
+    one, two = units.find_by!(body: "One line here."), units.find_by!(body: "Two line there.")
+    @wait.notes.create!(unit: two, content: "Moved, not lost.")
+    created = [ one.created_at, two.created_at ]
+
+    TextRevision.new(work, UserText.new(title: "Two", source: "# A\n\nOne line here. Two line there.")).apply!
+
+    assert_equal [ "A" ], work.sections.reload.map(&:label)
+    assert_equal [ [ one.id, "1:1" ], [ two.id, "1:2" ] ], work.sections.sole.units.map { [ it.id, it.label ] }
+    assert_equal created, [ one.reload.created_at, two.reload.created_at ]
+    assert_equal two, @wait.notes.sole.unit
+    assert_empty @user.detached_notes
+  end
+
+  test "removing every heading keeps the sentences of every section" do
+    work = UserText.new(title: "Two", source: "# A\n\nOne line here.\n\n# B\n\nTwo line there.").publish!(@user)
+    ids = Unit.joins(:section).where(sections: { work_id: work.id }).order(:id).ids
+
+    TextRevision.new(work, UserText.new(title: "Two", source: "One line here.\n\nTwo line there.")).apply!
+
+    assert_equal ids, Unit.joins(:section).where(sections: { work_id: work.id }).order(:id).ids
+  end
+
   test "a text revised without changes keeps everything as it was" do
     ids = Unit.joins(:section).where(sections: { work_id: @work.id }).order(:id).pluck(:id, :body)
     r = revision(BEFORE)

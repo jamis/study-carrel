@@ -77,7 +77,8 @@ class TextRevision
           updated_at: now, id: by_new[j] }
       end
       kept, added = rows.partition { it[:id] }
-      created = units.where(id: kept.map { it[:id] }).pluck(:id, :created_at).to_h
+      # By id alone: a sentence can come from a section that's gone (sections merged, headings removed).
+      created = Unit.where(id: kept.map { it[:id] }).pluck(:id, :created_at).to_h
       Unit.upsert_all(kept.map { it.merge(created_at: created.fetch(it[:id])) }) if kept.any?
       Unit.insert_all(added.map { it.except(:id).merge(created_at: now) }) if added.any?
 
