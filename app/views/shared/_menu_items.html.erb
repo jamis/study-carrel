@@ -9,7 +9,7 @@
   <% unless reading %><%= link_to "Continue reading", continue_path, class: "menu-item" %><% end %>
 <% end %>
 <% unless reading %><%= link_to "Library", library_path, class: "menu-item" %><% end %>
-<button class="menu-item" type="button" data-history-open data-action="menu#close">Recent places<kbd>h</kbd></button>
+<button class="menu-item" type="button" data-history-open data-action="menu#close">Recent places</button>
 <%= link_to search_path(**search_place_params(search_place)), class: "menu-item", data: { controller: "search-key", action: "keydown@window->search-key#key" } do %>Search<span class="menu-note"><%= search_place ? RandomScope.new(search_place).label : "Whole library" %></span><% end %>
 <%= render "shared/random_menu", scopes: random, default: random_default %>
 <%= link_to "Kept", kept_path, class: "menu-item" %>

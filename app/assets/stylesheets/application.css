@@ -213,7 +213,6 @@
   }
   .menu-panel .menu-item:hover, .menu-panel .signout button:hover { background: var(--accent-soft); color: var(--ink); }
   .menu-panel .signout { width: 100%; }
-  .menu-item kbd { font: inherit; font-size: 12px; color: var(--ink-soft); }
   /* Random: the item rolls in the default scope; the ▾ reveals the wider scopes. */
   .menu-row { display: flex; align-items: stretch; gap: 2px; }
   .menu-row .menu-item { flex: 1; min-width: 0; }

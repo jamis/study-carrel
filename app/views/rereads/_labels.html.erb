@@ -16,7 +16,7 @@
     face: label_face(label, words: 40).to_s, alt: label_face(label, from: label.example_note, words: 40).to_s }
 }.to_json %></script>
 <% if here.empty? && away.empty? %>
-  <p class="rr-none">No labels yet. Put the note you're on on one with + label, or <kbd>l</kbd>.</p>
+  <p class="rr-none">No labels yet. Put the note you're on on one with + label<span class="rr-keys">, or <kbd>l</kbd></span>.</p>
 <% end %>
 <div class="rr-cloud">
   <% here.each do |label|
