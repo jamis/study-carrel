@@ -12,14 +12,18 @@ class KeepsController < ApplicationController
     @entries = (keeps + detached).sort_by { [ helpers.kept_time(it), it.id ] }.reverse
   end
 
+  # Keeping it again (a double tap, a double-clicked Undo) changes nothing. In one transaction (SQLite's are IMMEDIATE),
+  # so the second request finds the first one's keep rather than racing it into the unique index.
   def create
-    Current.user.keeps.find_or_create_by!(unit: @unit) do |keep|
-      keep.remark = params[:remark]
-      keep.created_at = Keep.kept_at(params[:kept_at])
+    Keep.transaction do
+      Current.user.keeps.find_or_create_by!(unit: @unit) do |keep|
+        keep.remark = params[:remark]
+        keep.created_at = Keep.kept_at(params[:kept_at])
+      end
     end
     request.format.json? ? head(:no_content) : redirect_to(kept_path, status: :see_other)
-  rescue ActiveRecord::RecordNotUnique
-    head :no_content
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_content
   end
 
   def update

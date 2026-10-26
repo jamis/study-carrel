@@ -29,9 +29,10 @@ class Note < ApplicationRecord
     end
   end
 
-  # Puts the note on one of its owner's labels, named or not.
+  # Puts the note on one of its owner's labels, named or not. In one transaction (SQLite's are IMMEDIATE), so a second
+  # request finds the first one's row rather than racing it into the unique index.
   def join!(label)
-    note_labels.find_or_create_by!(label:)
+    transaction { note_labels.find_or_create_by!(label:) }
     label
   end
 

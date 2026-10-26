@@ -14,6 +14,19 @@ class KeepsControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ verse(3) ], @user.keeps.map(&:unit)
   end
 
+  test "keeping from the Kept page again (a double-clicked Undo) returns there and changes nothing" do
+    2.times { post unit_keep_path(verse(3)), params: { remark: "hm" } }
+    assert_redirected_to kept_path
+    assert_equal [ verse(3) ], @user.keeps.map(&:unit)
+  end
+
+  test "keeping with a remark that's too long is refused" do
+    post unit_keep_path(verse(3)), params: { remark: "x" * 201 }, as: :json
+    assert_response :unprocessable_content
+    assert_equal [ "Remark is too long (maximum is 200 characters)" ], response.parsed_body["errors"]
+    assert_equal 0, @user.keeps.count
+  end
+
   test "keeps even without a current focus" do
     @user.foci.current_one.archive!
     post unit_keep_path(verse(3)), as: :json
