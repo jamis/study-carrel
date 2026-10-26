@@ -1,4 +1,4 @@
-# Signing up with an invitation link (/join/:token).
+# Signing up with an invitation link (/join?token=…).
 class SignupsController < ApplicationController
   allow_unauthenticated_access
   rate_limit to: 10, within: 3.minutes, with: -> { redirect_to new_session_path, alert: "Try again later." }

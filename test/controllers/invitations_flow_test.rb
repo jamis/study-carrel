@@ -18,6 +18,20 @@ class InvitationsFlowTest < ActionDispatch::IntegrationTest
     assert_select "input[type=password]", 2
   end
 
+  test "the token never reaches the log" do
+    log = StringIO.new
+    Rails.logger.broadcast_to(logger = ActiveSupport::Logger.new(log))
+
+    get join_path(token: @token)
+    post join_path(token: @token), params: join_params
+
+    assert_match %r{Started GET "/join\?token=\[FILTERED\]"}, log.string
+    assert_match %r{Started POST "/join\?token=\[FILTERED\]"}, log.string
+    assert_no_match @token, log.string
+  ensure
+    Rails.logger.stop_broadcasting_to(logger)
+  end
+
   test "signing up creates a regular user, signs them in, and uses up the link" do
     assert_difference "User.count", 1 do
       post join_path(token: @token), params: join_params
@@ -86,8 +100,8 @@ class InvitationsFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_invitations_path
     follow_redirect!
     link = css_select("input.invite-link").first["value"]
-    assert_match %r{/join/[\w-]{20,}\z}, link
-    token = link[%r{/join/(.+)\z}, 1]
+    assert_match %r{/join\?token=[\w-]{20,}\z}, link
+    token = link[%r{/join\?token=(.+)\z}, 1]
     assert Invitation.find_redeemable(token), "the link shown works"
     assert_select ".page-sub", /New invitation for Ruth/
 

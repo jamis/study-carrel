@@ -1,7 +1,8 @@
 Rails.application.routes.draw do
   resource :session
-  get "join/:token", to: "signups#new", as: :join
-  post "join/:token", to: "signups#create"
+  # The token goes in the query string, not the path, so it's filtered from the request line in the log.
+  get "join", to: "signups#new", as: :join
+  post "join", to: "signups#create"
   namespace :admin do
     resources :invitations, only: %i[index create] do
       patch :revoke, on: :member
