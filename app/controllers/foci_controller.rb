@@ -33,8 +33,11 @@ class FociController < ApplicationController
     @start_idea = start_idea
     @start_keep = Current.user.keeps.find_by(unit_id: params[:unit_id]) if params[:unit_id]
     if @focus.valid?
-      foci.start!(focus_params.merge(last_unit: @start_keep&.unit))
-      @start_idea&.destroy!
+      # The idea goes only if the focus is made, so its words are never in both or neither.
+      foci.transaction do
+        foci.start!(focus_params.merge(last_unit: @start_keep&.unit))
+        @start_idea&.destroy!
+      end
       redirect_to continue_path
     else
       render :new, status: :unprocessable_entity

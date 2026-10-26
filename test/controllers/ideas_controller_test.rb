@@ -97,6 +97,18 @@ class IdeasControllerTest < ActionDispatch::IntegrationTest
     assert Keep.exists?(idea.id)
   end
 
+  test "if the idea can't be removed, the focus isn't made either" do
+    idea = @user.keeps.create!(remark: "Holiness")
+    # Rolled back with the test's transaction.
+    Keep.connection.execute("CREATE TRIGGER keep_stays BEFORE DELETE ON keeps BEGIN SELECT RAISE(ABORT, 'stays'); END")
+    assert_no_difference -> { @user.foci.count } do
+      assert_raises(ActiveRecord::StatementInvalid) do
+        post foci_path, params: { keep_id: idea.id, focus: { title: "Holiness" } }
+      end
+    end
+    assert Keep.exists?(idea.id)
+  end
+
   test "ideas aren't in the reader or history" do
     @user.keeps.create!(remark: "Holiness")
     get reading_path("isaiah-kjv", 40, 1)
