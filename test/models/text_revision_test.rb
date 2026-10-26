@@ -210,6 +210,18 @@ class TextRevisionTest < ActiveSupport::TestCase
     assert_equal BEFORE, @work.reload.source
   end
 
+  test "sentences matched as they were don't count toward refusing a revision" do
+    source = (1..20).map { "The day #{it} was long." }.join(" ")
+    work = UserText.new(title: "Days", source:).publish!(@user)
+    r = TextRevision.new(work, UserText.new(title: "Days", source: source.sub("The day 1 was long.", "The day 1 was short.")))
+
+    # The changed sentence shares "the", "day", "was" with the 19 unchanged ones; only it is free to compare against.
+    stub_const(TextRevision, :COMPARISONS, 10) do
+      assert_not r.too_different?
+      assert_equal [ :reworded ] + [ :same ] * 19, r.statuses
+    end
+  end
+
   test "a text revised without changes keeps everything as it was" do
     ids = Unit.joins(:section).where(sections: { work_id: @work.id }).order(:id).pluck(:id, :body)
     r = revision(BEFORE)

@@ -232,7 +232,7 @@ class TextRevision
     shared.keys.sort.map { |j| [ j, likeness(shared[j], a.size, words(news[j].text).size) ] }
   end
 
-  # How much work matching the leftovers takes: for each, the new sentences each of its words is in.
+  # How much work matching the leftovers takes: for each, the free new sentences each of its words is in.
   def comparisons
     olds.sum { |old| @matches.key?(old.unit.id) ? 0 : words(old.text).sum { news_by_word.fetch(it, []).size } }
   end
@@ -243,9 +243,11 @@ class TextRevision
 
   def news_by_text = @news_by_text ||= news.each_index.group_by { news[it].text }
 
+  # The new sentences still free once those matched exactly are taken (it's first wanted after that), by word. Those
+  # already matched would only be passed over, and in a long text the common words are in thousands of them.
   def news_by_word
     @news_by_word ||= news.each_index.each_with_object(Hash.new { |h, k| h[k] = [] }) do |j, index|
-      words(news[j].text).each { index[it] << j }
+      words(news[j].text).each { index[it] << j } unless @matched_news.include?(j)
     end
   end
 
