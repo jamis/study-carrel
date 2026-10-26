@@ -82,7 +82,7 @@ class TextLoader
     collection = find_collection(meta["collection"])
 
     Work.transaction do
-      work = Work.find_or_initialize_by(slug: slug)
+      work = Work.bundled.find_or_initialize_by(slug: slug)
       work.update!(title: title, edition: meta["edition"], author: meta["author"].presence,
                    author_short: meta["author_short"].presence, collection: collection, position: meta["position"].to_i,
                    unit_name: meta["unit"].presence || "verse", group_name: meta["group"].presence)

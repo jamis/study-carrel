@@ -39,6 +39,14 @@ class TextLoaderTest < ActiveSupport::TestCase
     assert Note.exists?(note.id)
   end
 
+  test "never takes over a user's text with the same slug" do
+    theirs = Work.create!(title: "Mine", slug: "sample-kjv", user: users(:one))
+
+    assert_raises(ActiveRecord::RecordInvalid) { TextLoader.new(SAMPLE).load }
+    assert_equal [ "Mine", users(:one) ], [ theirs.reload.title, theirs.user ]
+    assert_empty theirs.sections
+  end
+
   test "places the work in a collection with a position" do
     Collection.create!(slug: "ot", name: "Old Testament", position: 1)
     work = TextLoader.new(SAMPLE.sub("edition: KJV\n", "edition: KJV\ncollection: ot\nposition: 7\n")).load
