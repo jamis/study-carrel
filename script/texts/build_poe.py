@@ -109,7 +109,7 @@ def main(src, out="db/texts"):
             for k, u in enumerate(st, start=1):
                 lines += [f"{k}. {u[0]}"] + u[1:]
             lines.append("")
-        (Path(out) / f"{slug}.txt").write_text("\n".join(lines))
+        (Path(out) / f"{slug}.txt").write_text("\n".join(lines), encoding="utf-8")
         print(f"{g}: {len(works[g])} sections, {sum(len(st) for _, st in works[g])} stanzas")
 
 

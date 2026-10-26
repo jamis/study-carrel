@@ -115,7 +115,7 @@ def build_dickinson(path):
 if __name__ == "__main__":
     walden, dickinson = sys.argv[1:3]
     out = Path(sys.argv[3] if len(sys.argv) > 3 else "db/texts")
-    (out / "walden.txt").write_text(build_walden(walden))
+    (out / "walden.txt").write_text(build_walden(walden), encoding="utf-8")
     for name, text in build_dickinson(dickinson).items():
-        (out / name).write_text(text)
+        (out / name).write_text(text, encoding="utf-8")
     print("Walden and the three Dickinson series written")

@@ -78,7 +78,7 @@ def main(src, out="db/texts"):
             lines.append(f"section: {c}")
             lines += [f"{v}. {books[name][c][v]}" for v in sorted(books[name][c])]
             lines.append("")
-        (Path(out) / f"{slug}.txt").write_text("\n".join(lines))
+        (Path(out) / f"{slug}.txt").write_text("\n".join(lines), encoding="utf-8")
     print("verses:", sum(len(vs) for b in books.values() for vs in b.values()))
     for name in BOOKS:
         print(f"  {name}: {sum(len(vs) for vs in books[name].values())}")

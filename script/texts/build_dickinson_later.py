@@ -35,7 +35,7 @@ def fetch(out):
             if "continue" not in d:
                 break
             cont = d["continue"]; time.sleep(3)
-        (out / f"{key}.json").write_text(json.dumps(pages))
+        (out / f"{key}.json").write_text(json.dumps(pages), encoding="utf-8")
         print(key, len(pages), "pages")
 
 
@@ -142,8 +142,8 @@ if __name__ == "__main__":
     if sys.argv[1] == "--fetch":
         fetch(sys.argv[2]); sys.exit()
     src = Path(sys.argv[1]); out = Path(sys.argv[2] if len(sys.argv) > 2 else "db/texts")
-    sh = single_hound(json.loads((src / "sh.json").read_text()))
-    fp = further_poems(json.loads((src / "fp.json").read_text()))
-    (out / "dickinson-single-hound.txt").write_text(work_file("The Single Hound", "1914", "dickinson-single-hound", 4, sh))
-    (out / "dickinson-further-poems.txt").write_text(work_file("Further Poems", "1929", "dickinson-further-poems", 5, fp))
+    sh = single_hound(json.loads((src / "sh.json").read_text(encoding="utf-8")))
+    fp = further_poems(json.loads((src / "fp.json").read_text(encoding="utf-8")))
+    (out / "dickinson-single-hound.txt").write_text(work_file("The Single Hound", "1914", "dickinson-single-hound", 4, sh), encoding="utf-8")
+    (out / "dickinson-further-poems.txt").write_text(work_file("Further Poems", "1929", "dickinson-further-poems", 5, fp), encoding="utf-8")
     print(len(sh), "Single Hound poems;", len(fp), "Further Poems")

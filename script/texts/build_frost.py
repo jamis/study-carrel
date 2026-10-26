@@ -98,7 +98,7 @@ def main(src, out="db/texts"):
                 lines += [f"{k}. {u[0]}"] + u[1:]
                 total += 1
             lines.append("")
-        (Path(out) / f"frost-{slug}.txt").write_text("\n".join(lines))
+        (Path(out) / f"frost-{slug}.txt").write_text("\n".join(lines), encoding="utf-8")
         print(f"{title}: {len(poems)} poems")
     print("stanza units:", total)
 

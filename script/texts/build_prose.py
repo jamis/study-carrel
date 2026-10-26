@@ -69,7 +69,7 @@ def write(out, slug, header, sections):
             lines.append(f"label: {label}")
         lines += sentences.lines(enumerate(units, start=1) if not isinstance(units, dict) else units.items())
         lines.append("")
-    (Path(out) / f"{slug}.txt").write_text("\n".join(lines))
+    (Path(out) / f"{slug}.txt").write_text("\n".join(lines), encoding="utf-8")
     print(f"{slug}: {len(sections)} sections, {sum(len(u) for _, _, u in sections)} paragraphs")
 
 

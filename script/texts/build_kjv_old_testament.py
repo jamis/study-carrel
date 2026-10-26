@@ -81,7 +81,7 @@ def clean_b(s):
 def main(gutenberg, bpath, cpath, out="db/texts"):
     base = parse_gutenberg(gutenberg)
     b_src = json.loads(Path(bpath).read_text(encoding="utf-8-sig"))
-    c_src = json.loads(Path(cpath).read_text())["books"]
+    c_src = json.loads(Path(cpath).read_text(encoding="utf-8"))["books"]
     stats, patched, unresolved = collections.Counter(), [], []
 
     for bi, book in enumerate(base):
@@ -113,7 +113,7 @@ def main(gutenberg, bpath, cpath, out="db/texts"):
             lines.append(f"section: {c}")
             lines += [f"{v}. {book[c][v]}" for v in sorted(book[c])]
             lines.append("")
-        (outdir / f"{slug}.txt").write_text("\n".join(lines))
+        (outdir / f"{slug}.txt").write_text("\n".join(lines), encoding="utf-8")
 
     print(dict(stats))
     print("verses written:", sum(len(vs) for b in base for vs in b.values()))

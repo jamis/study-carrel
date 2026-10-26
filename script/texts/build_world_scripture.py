@@ -72,7 +72,7 @@ def write(out, slug, header, sections, keep_lines=False, by_sentence=False):
                 first, *rest = u.split("\n")
                 lines += [f"{k}. {first}"] + rest
         lines.append("")
-    (Path(out) / f"{slug}.txt").write_text("\n".join(lines))
+    (Path(out) / f"{slug}.txt").write_text("\n".join(lines), encoding="utf-8")
     print(f"{slug}: {len(sections)} sections, {sum(len(u) for _, _, u in sections)} units")
 
 
