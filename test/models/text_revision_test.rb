@@ -192,6 +192,14 @@ class TextRevisionTest < ActiveSupport::TestCase
     assert_equal ids, Unit.joins(:section).where(sections: { work_id: work.id }).order(:id).ids
   end
 
+  test "a leftover sentence sharing no words with any other is gone, beside one reworded" do
+    work = UserText.new(title: "Two", source: "Woke early today. The cat sat on the mat.").publish!(@user)
+    r = TextRevision.new(work, UserText.new(title: "Two", source: "Woke early this morning. Rain fell all night."))
+
+    assert_equal [ :reworded, :new ], r.statuses
+    assert_equal [ "The cat sat on the mat." ], r.gone.map(&:text)
+  end
+
   test "a text revised without changes keeps everything as it was" do
     ids = Unit.joins(:section).where(sections: { work_id: @work.id }).order(:id).pluck(:id, :body)
     r = revision(BEFORE)

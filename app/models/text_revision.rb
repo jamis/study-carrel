@@ -145,11 +145,10 @@ class TextRevision
   end
 
   def match_by_text_in_section
-    by_text = news.each_index.group_by { news[it].text }
     olds.each do |old|
       section = section_map[old.section] or next
-      j = by_text.fetch(old.text, []).reject { @matched_news.include?(it) }.select { news[it].section == section }
-                 .min_by { (news[it].paragraph - old.paragraph).abs }
+      j = news_by_text.fetch(old.text, []).reject { @matched_news.include?(it) }.select { news[it].section == section }
+                      .min_by { (news[it].paragraph - old.paragraph).abs }
       claim(old, j) if j
     end
   end
@@ -159,15 +158,16 @@ class TextRevision
     olds.each do |old|
       next if @matches.key?(old.unit.id) || old_counts[old.text] > 1
 
-      free = news.each_index.select { !@matched_news.include?(it) && news[it].text == old.text }
+      free = news_by_text.fetch(old.text, []).reject { @matched_news.include?(it) }
       claim(old, free.first) if free.one?
     end
   end
 
   def match_leftovers_in_paired_paragraphs
+    by_id = olds.index_by { it.unit.id }
     votes = Hash.new { |h, k| h[k] = Hash.new(0) }
     @matches.each do |id, j|
-      old = olds.find { it.unit.id == id }
+      old = by_id.fetch(id)
       votes[[ old.section, old.paragraph ]][[ news[j].section, news[j].paragraph ]] += 1
     end
     pairs = votes.transform_values { |v| v.max_by(&:last).first }
@@ -179,11 +179,9 @@ class TextRevision
       section = section_map[old.section]
       next unless to || section
 
-      free = news.each_index.select do |j|
-        !@matched_news.include?(j) && (to ? [ news[j].section, news[j].paragraph ] == to : news[j].section == section)
-      end
-      best = free.max_by { [ likeness(old.text, news[it].text), -(news[it].paragraph - old.paragraph).abs ] }
-      claim(old, best, reworded: true) if best && likeness(old.text, news[best].text) >= LIKENESS
+      best = alike(old).select { |j, _| to ? [ news[j].section, news[j].paragraph ] == to : news[j].section == section }
+                       .max_by { |j, likeness| [ likeness, -(news[j].paragraph - old.paragraph).abs ] }
+      claim(old, best.first, reworded: true) if best && best.last >= LIKENESS
     end
   end
 
@@ -192,11 +190,8 @@ class TextRevision
       section = section_map[old.section]
       next [] if @matches.key?(old.unit.id) || section.nil?
 
-      news.each_index.filter_map do |j|
-        next if @matched_news.include?(j) || news[j].section != section
-
-        likeness = likeness(old.text, news[j].text)
-        [ old, j, likeness, (news[j].paragraph - old.paragraph).abs ] if likeness >= LIKENESS
+      alike(old).filter_map do |j, likeness|
+        [ old, j, likeness, (news[j].paragraph - old.paragraph).abs ] if news[j].section == section && likeness >= LIKENESS
       end
     end
     pairs.sort_by { |_, _, likeness, distance| [ -likeness, distance ] }.each do |old, j|
@@ -204,10 +199,25 @@ class TextRevision
     end
   end
 
-  def likeness(a, b)
-    words = ->(s) { s.downcase.scan(/[a-z’']+/).to_set }
-    a, b = words.(a), words.(b)
-    (a & b).size.to_f / [ 1, [ a.size, b.size ].min + (a.size - b.size).abs / 2.0 ].max
+  # The free new sentences sharing a word with old, in reading order, each with how alike the two are. One sharing no
+  # word is 0 alike, so it's never a match and needn't be looked at.
+  def alike(old)
+    a = words(old.text)
+    shared = Hash.new(0)
+    a.each { |word| news_by_word.fetch(word, []).each { shared[it] += 1 unless @matched_news.include?(it) } }
+    shared.keys.sort.map { |j| [ j, likeness(shared[j], a.size, words(news[j].text).size) ] }
+  end
+
+  def likeness(shared, a, b) = shared.to_f / [ 1, [ a, b ].min + (a - b).abs / 2.0 ].max
+
+  def words(text) = (@words ||= {})[text] ||= text.downcase.scan(/[a-z’']+/).to_set
+
+  def news_by_text = @news_by_text ||= news.each_index.group_by { news[it].text }
+
+  def news_by_word
+    @news_by_word ||= news.each_index.each_with_object(Hash.new { |h, k| h[k] = [] }) do |j, index|
+      words(news[j].text).each { index[it] << j }
+    end
   end
 
   def fate_for(record, old)
