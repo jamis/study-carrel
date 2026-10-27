@@ -112,7 +112,7 @@ export default class extends Controller {
   // ---------- notes on the whole focus ----------
 
   newNote() {
-    if (this.readOnlyValue) return
+    if (this.readOnlyValue || this.#comparing) return
     const section = this.element.querySelector("#reread_free")
     if (!section) return
     // Out of the scratchpad (a phone's sheet, or the drawer at the right) and back to the notes, to write there.

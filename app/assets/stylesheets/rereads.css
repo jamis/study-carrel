@@ -357,7 +357,7 @@
    every other note under it, each with "Hold this", a button per group and + for a new group of the two. */
 .rr-cmp-lede, .rr-cmp-acts, .rr-cmp-hold { display: none; }
 .comparing .rr-cmp-lede { display: block; }
-.comparing .rr-lede:not(.rr-cmp-lede), .comparing .rr-new, .comparing .rr-row .rr-add, .comparing .rr-row .rr-find { display: none; }
+.comparing .rr-lede:not(.rr-cmp-lede), .comparing .rr-new, .comparing .rr-new-phone, .comparing .rr-row .rr-add, .comparing .rr-row .rr-find { display: none; }
 .comparing .rr-row.here { display: none; }
 .comparing .rr-row { opacity: 1; scroll-margin-top: var(--covered, 0px); scroll-margin-bottom: 12px; }
 .comparing .rr-row:hover { background: color-mix(in srgb, var(--paper) 60%, transparent); }

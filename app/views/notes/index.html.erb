@@ -161,7 +161,7 @@
     </button>
     <%# On phones, a new note on the whole focus and the labels are on the scratchpad's handle. %>
     <span class="rr-pad-tools rr-pad-tools-phone">
-      <% unless @label || archived %><button class="rr-summon" type="button" data-action="reread#newNote">New note</button><% end %>
+      <% unless @label || archived %><button class="rr-summon rr-new-phone" type="button" data-action="reread#newNote">New note</button><% end %>
       <button class="rr-summon" type="button" aria-expanded="false" data-action="reread#toggleLabels">Labels</button>
     </span>
     <%# Elsewhere, the scratchpad and the labels are each behind a tab at the right edge, which slides them in. %>
