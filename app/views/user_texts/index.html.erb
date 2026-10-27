@@ -21,7 +21,7 @@
   <% if @collections.any? && @texts.any? %><h3 class="texts-group">In no collection</h3><% end %>
 
   <% if @texts.empty? && @collections.empty? %>
-    <p class="page-empty">Nothing here yet. <%= link_to "Add a text", new_text_path %> to read it a sentence or a stanza at a time, with your focus beside it.</p>
+    <p class="page-empty">Nothing here yet. <%= link_to "Add a text", new_text_path %> to read it a sentence, a stanza or a verse at a time, with your focus beside it.</p>
   <% end %>
   <% @texts.each do |work| %>
     <div class="list-row texts-row-item">

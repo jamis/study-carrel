@@ -79,10 +79,21 @@ A note whose unit is gone (after a revision, or when a work is deleted) moves to
 
 Decided and built 2026-10-06; prototype `prototype/upload.html?poetry`.
 
-- The form asks **Prose** or **Poetry or lyrics**, never guessed, though text with mostly short, open lines added as prose gets a "This looks like verse" hint on the form and in the review.
+- The form asks **Prose**, **Poetry or lyrics** or **Scripture** (below), never guessed, though text with mostly short, open lines added as prose gets a "This looks like verse" hint on the form and in the review.
 - Poetry is read a stanza at a time like Frost (`unit_name` "stanza", no paragraph or sentence).
 - Blank lines separate stanzas, line breaks are kept, and a section with no blank lines is one stanza. `# ` headings make a poem or song a section. Lines are trimmed, so indents are lost.
 - Cited "Songs: Low Water, stanza 2", or "Low Water, stanza 2" with no headings.
 - Part labels like `[Chorus]` and "Repeat chorus (x2)" stay literal. The review flags them (labels as one check that doesn't shade every stanza), along with a stanza that comes more than once (each is read and noted on its own), a line that looks like a title without `# `, lost indents, and very long lines or stanzas.
 - A revision keeps the text's form.
 - Stanzas are matched like sentences, but with no paragraphs to pair: exact text in the section, nearest place first (a chorus sung twice keeps each note on its own chorus), then the most alike leftover stanza in the section, best pairs first, sharing at least 30% of its words.
+
+## Scripture
+
+Decided and built 2026-10-27 (no prototype: a third choice on an existing form), for texts with numbered verses, such as the Pearl of Great Price.
+
+- A third choice on the form, **Scripture**, "A verse at a time, like Isaiah". Saved as `unit_name` "verse", no group, like the bundled Bible.
+- A line starting with a number (`3 `, `3. ` or `3: `) starts that verse; lines after it continue it, **joined** (not kept, as poetry's are). Blank lines don't matter. `# ` headings make sections: `# 1` is chapter 1.
+- **A verse keeps its number as typed**: it's the unit's number, so it's cited "Moses 1:3" ("Moses: Preface, verse 3" under a named heading, "Moses, verse 3" with none) and read in order of number. A number twice in a section can't be added (the form says which line); numbering that doesn't start at 1, skips, or goes back is only flagged.
+- Text before a section's first verse (a title, a superscription) is left out, and flagged with how to keep it: a `# ` heading or a number. So is a verse number with no words.
+- Text added as prose or poetry whose lines mostly start with a number gets a "This looks like numbered verses" hint on the form and in the review.
+- **A revision matches verses by number** in their section (by name, then place), reworded or not: a verse's number is what it is, unlike prose, where a sentence merely in the same place is no match. A verse whose number is gone is then looked for by its exact text anywhere (renumbered or moved); nothing is matched by likeness, so a scripture revision is never refused as too different.

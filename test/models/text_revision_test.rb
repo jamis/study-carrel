@@ -167,6 +167,24 @@ class TextRevisionTest < ActiveSupport::TestCase
     assert_equal "stanza", work.reload.unit_name
   end
 
+  test "scripture is matched by verse number, reworded or not, then a renumbered verse by its text" do
+    work = UserText.new(title: "Moses", source: "# 1\n\n1 The words of God.\n2 And he saw God.\n3 And God spake.\n4 Behold, I am.", form: "scripture").publish!(@user)
+    one, two, three, four = work.sections.sole.units.to_a
+    [ one, two, three, four ].each { @wait.notes.create!(unit: it, content: "On #{it.label}.") }
+
+    r = TextRevision.new(work, UserText.new(title: "Moses", source: "# 1\n\n1 The words of God.\n2 And Moses saw God face to face.\n5 Behold, I am.", form: "scripture"))
+    assert_not r.too_different?
+    assert_equal [ :stays, :reworded, :detached, :stays ], [ one, two, three, four ].map { |u| r.fates.find { it.record.unit_id == u.id }.fate }
+    assert_equal "Moses 1:5", r.fates.find { it.record.unit_id == four.id }.new_citation
+
+    r.apply!
+
+    assert_equal [ 1, 2, 5 ], [ one, two, four ].map { it.reload.number }
+    assert_equal "And Moses saw God face to face.", two.body
+    assert_not Unit.exists?(three.id)
+    assert_equal "Moses 1:3", @user.detached_notes.sole.citation
+  end
+
   test "merging two sections keeps every sentence, wherever it came from, with its notes" do
     work = UserText.new(title: "Two", source: "# A\n\nOne line here.\n\n# B\n\nTwo line there.").publish!(@user)
     units = Unit.joins(:section).where(sections: { work_id: work.id })

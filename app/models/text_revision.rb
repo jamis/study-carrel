@@ -15,6 +15,10 @@
 # nearest place sorts out a chorus sung twice, and in step 3 a leftover stanza takes the most alike leftover in its
 # section, the most alike pairs first.
 #
+# Scripture is matched by number instead: a verse's number is what it is, so a verse keeps its notes when it's reworded,
+# as long as its number stays in its section. Only a verse whose number is gone is looked for by its exact text anywhere
+# (a verse renumbered or moved); nothing is matched by likeness, so no revision is too different.
+#
 # A sentence left over is gone: its notes and remarked keeps are set aside as detached notes (see DetachedNote).
 # #changes describes all this before anything is saved, for the review.
 #
@@ -22,7 +26,7 @@
 # Past a budget it isn't attempted, and the revision is refused as too different (#too_different?).
 class TextRevision
   Old = Struct.new(:unit, :section, :paragraph, :sentence, :text, keyword_init: true)
-  New = Struct.new(:section, :paragraph, :sentence, :text, keyword_init: true)
+  New = Struct.new(:section, :paragraph, :sentence, :text, :number, keyword_init: true)
   # What happens to one note or keep: :stays (on the same sentence), :reworded (on a changed one), :detached, or
   # :dropped (a keep with no remark).
   Fate = Struct.new(:record, :fate, :was, :now, :old_citation, :new_citation, keyword_init: true)
@@ -84,7 +88,7 @@ class TextRevision
       numbers = Hash.new(0)
       rows = news.each_with_index.map do |new, j|
         section_id = sections.fetch(new.section).id
-        { section_id:, number: numbers[section_id] += 1, **text.unit_place(new.paragraph + 1, new.sentence + 1), body: new.text,
+        { section_id:, number: new.number || (numbers[section_id] += 1), **text.unit_place(new.paragraph + 1, new.sentence + 1), body: new.text,
           updated_at: now, id: by_new[j] }
       end
       kept, added = rows.partition { it[:id] }
@@ -117,7 +121,9 @@ class TextRevision
   def news
     @news ||= text.kept_sections.each_with_index.flat_map do |section, si|
       section.paragraphs.each_with_index.flat_map do |paragraph, pi|
-        paragraph.sentences.each_with_index.map { |sentence, k| New.new(section: si, paragraph: pi, sentence: k, text: sentence) }
+        paragraph.sentences.each_with_index.map do |sentence, k|
+          New.new(section: si, paragraph: pi, sentence: k, text: sentence, number: (paragraph.number if text.scripture?))
+        end
       end
     end
   end
@@ -128,10 +134,14 @@ class TextRevision
   def plan
     @plan ||= begin
       @matches, @matched_news, @reworded = {}, Set.new, Set.new
-      match_by_text_in_section
-      match_by_text_anywhere
-      @too_different = comparisons > COMPARISONS
-      text.poetry? ? match_leftover_stanzas : match_leftovers_in_paired_paragraphs unless @too_different
+      if text.scripture?
+        match_verses
+      else
+        match_by_text_in_section
+        match_by_text_anywhere
+        @too_different = comparisons > COMPARISONS
+        text.poetry? ? match_leftover_stanzas : match_leftovers_in_paired_paragraphs unless @too_different
+      end
       true
     end
   end
@@ -156,6 +166,18 @@ class TextRevision
     @matches[old.unit.id] = j
     @matched_news << j
     @reworded << j if reworded
+  end
+
+  # By number in the verse's own section, then by exact text anywhere.
+  def match_verses
+    by_number = news.each_index.index_by { [ news[it].section, news[it].number ] }
+    olds.each do |old|
+      section = section_map[old.section] or next
+      j = by_number[[ section, old.unit.number ]] or next
+      claim(old, j, reworded: news[j].text != old.text)
+    end
+    match_by_text_anywhere
+    @too_different = false
   end
 
   def match_by_text_in_section

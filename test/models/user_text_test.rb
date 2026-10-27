@@ -153,7 +153,76 @@ class UserTextTest < ActiveSupport::TestCase
     assert_equal [ units.last.id ], LibrarySearch.new("sky still", user: users(:one)).page(1).map(&:id)
   end
 
-  test "the form is prose or poetry" do
+  MOSES = <<~TEXT
+    The Words of God, Which He Spake unto Moses
+
+    # 1
+
+    1 The words of God, which he spake unto Moses
+    at a time when Moses was caught up
+    into an exceedingly high mountain,
+
+    2. And he saw God face to face, and he talked with him.
+    3: And God spake unto Moses, saying: Behold, I am the Lord God Almighty.
+
+    # 2
+
+    2 And it came to pass that the Lord spake *unto* Moses.
+    4 Behold, I reveal unto you concerning this heaven.
+    3 And I, God, said: Let there be light.
+    5
+  TEXT
+
+  test "scripture: a numbered line starts a verse, lines after it are joined, and text before the first verse is left out" do
+    t = text(MOSES, form: "scripture", title: "Moses")
+    assert t.valid?
+    assert_equal [ "1", "2" ], t.kept_sections.map(&:label)
+    assert_equal [ [ 1, 2, 3 ], [ 2, 4, 3 ] ], t.kept_sections.map { |s| s.paragraphs.map(&:number) }
+    assert_equal "The words of God, which he spake unto Moses at a time when Moses was caught up into an exceedingly high mountain,",
+                 t.kept_sections.first.paragraphs.first.text
+    assert_equal 6, t.sentence_count
+    assert_equal "Moses 1:3", t.reference(t.kept_sections.first, 3, 1)
+    assert_equal "Moses 2:4", t.reference(t.kept_sections.last, 2, 1)
+  end
+
+  test "scripture checks: text left out, numbering that skips or goes back, an empty verse, Markdown" do
+    messages = text(MOSES, form: "scripture").checks.map { [ it.line, it.message ] }
+    assert_equal [
+      [ 1, "Before the first verse, so it’s left out. Start it with “# ” to make it a heading, or with a number to make it a verse." ],
+      [ 14, "The section starts at verse 2." ],
+      [ 14, "Markdown formatting shows as typed (asterisks and all)." ],
+      [ 15, "No verse 3: numbering jumps to 4." ],
+      [ 16, "Verse 3 comes after verse 4. Verses are read in order of their numbers." ],
+      [ 17, "Verse 5 has no words, so it’s left out." ]
+    ], messages
+  end
+
+  test "scripture with a verse number twice in a section, or with no verses, can't be added" do
+    t = text("# 1\n\n1 In the beginning.\n2 And the earth.\n1 Again.", form: "scripture")
+    assert_not t.valid?
+    assert_equal [ "has verse 1 twice in “1” (line 5); each verse in a section needs its own number" ], t.errors[:source]
+    assert_not text("Just words.", form: "scripture").valid?
+    assert text("# 1\n\n1 In the beginning.\n\n# 2\n\n1 Again.", form: "scripture").valid?
+  end
+
+  test "publishing scripture makes a work read a verse at a time, numbered as typed" do
+    work = text(MOSES, form: "scripture", title: "Moses").publish!(users(:one))
+    assert_equal "verse", work.unit_name
+    assert_equal "scripture", UserText.form_of(work)
+    units = work.sections.last.units
+    assert_equal [ [ 2, nil, nil ], [ 3, nil, nil ], [ 4, nil, nil ] ], units.map { [ it.number, it.paragraph, it.sentence ] }
+    assert_equal "Moses 2:3", units.second.reference
+    assert_equal "And I, God, said: Let there be light.", units.second.body
+    assert_equal "Moses, verse 2", text("1 One.\n2 Two.", form: "scripture", title: "Moses").publish!(users(:one)).sections.sole.units.last.reference
+  end
+
+  test "numbered verses are told from prose and poetry" do
+    assert text(MOSES).looks_like_scripture?
+    assert_not text(JOURNAL).looks_like_scripture?
+    assert_not text(POEMS).looks_like_scripture?
+  end
+
+  test "the form is prose, poetry or scripture" do
     assert_not text("Hello.", form: "verse").valid?
   end
 

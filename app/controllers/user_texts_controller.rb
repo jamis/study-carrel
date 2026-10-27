@@ -51,7 +51,7 @@ class UserTextsController < ApplicationController
     return render(:new, status: :unprocessable_content) if @text.invalid?
 
     work = @text.publish!(Current.user)
-    redirect_to reading_path(work.slug, 1, 1)
+    redirect_to reading_path(work.slug, 1, work.sections.first.units.first.number)
   end
 
   def update

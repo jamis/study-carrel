@@ -6,7 +6,7 @@
     <h2 class="page-title"><%= @text.title %></h2>
     <% if @text.author %><span class="texts-by"><%= @text.author %></span><% end %>
   </div>
-  <% sections = @text.kept_sections; unit = @text.poetry? ? "stanza" : "sentence"
+  <% sections = @text.kept_sections; unit = @text.unit_name
      refused = @revision&.too_different?
      revision = @revision unless refused %>
   <p class="texts-summary">
@@ -14,6 +14,8 @@
     <% if @text.poetry? %>
       <b><%= @text.paragraph_count.to_fs(:delimited) %></b> <%= "stanza".pluralize(@text.paragraph_count) %> ·
       <b><%= @text.line_count.to_fs(:delimited) %></b> <%= "line".pluralize(@text.line_count) %>
+    <% elsif @text.scripture? %>
+      <b><%= @text.paragraph_count.to_fs(:delimited) %></b> <%= "verse".pluralize(@text.paragraph_count) %>
     <% else %>
       <b><%= @text.paragraph_count.to_fs(:delimited) %></b> <%= "paragraph".pluralize(@text.paragraph_count) %> ·
       <b><%= @text.sentence_count.to_fs(:delimited) %></b> <%= "sentence".pluralize(@text.sentence_count) %>
@@ -24,12 +26,19 @@
     <% if @text.poetry? %>
       <%= @text.paragraph_count > sections.size ? "Blank lines separate the stanzas, and every line break is kept." :
             "There are no blank lines inside a section, so each is one stanza, every line break kept." %>
+    <% elsif @text.scripture? %>
+      A line starting with a number starts that verse; the lines after it were joined to it.
     <% else %>
       <%= @text.blank_lines_separate? ? "Blank lines separate the paragraphs; line breaks inside a paragraph were joined." :
             "There are no blank lines between paragraphs, so every line is a paragraph." %>
     <% end %>
     <%= @text.headed? ? "Sections come from the # headings." : "No # headings, so it’s one section." %>
-    <% if !@work && !@text.poetry? && @text.looks_like_verse? %>
+    <% if !@work && !@text.scripture? && @text.looks_like_scripture? %>
+      <%= form_with model: @text, url: review_texts_path, multipart: true, class: "inline-form", data: { turbo: false } do |f| %>
+        <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :collection_id %><%= f.hidden_field :form, value: "scripture" %>
+        <button type="submit" class="texts-linkish">This looks like numbered verses: read it as scripture instead</button>
+      <% end %>
+    <% elsif !@work && @text.sentences? && @text.looks_like_verse? %>
       <%= form_with model: @text, url: review_texts_path, multipart: true, class: "inline-form", data: { turbo: false } do |f| %>
         <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :collection_id %><%= f.hidden_field :form, value: "poetry" %>
         <button type="submit" class="texts-linkish">This looks like verse: read it as poetry instead</button>
@@ -92,7 +101,7 @@
             <span class="snip"><%= check_excerpt(check) %></span>
           </button>
         <% end %>
-        <p class="texts-hint">To fix one, edit the text: <%= @text.poetry? ? "a heading, a blank line, or a line taken out" : "a heading, a blank line, or a backslash beside the period" %>.</p>
+        <p class="texts-hint">To fix one, edit the text: <%= @text.poetry? ? "a heading, a blank line, or a line taken out" : @text.scripture? ? "a heading, or a verse’s number" : "a heading, a blank line, or a backslash beside the period" %>.</p>
       </div>
     </details>
   <% end %>
@@ -109,11 +118,11 @@
         <% count = section.paragraphs.sum { it.sentences.size }; position = 0 %>
         <section class="texts-sec">
           <h3><%= @text.label_for(section) || tag.span(@text.title, class: "untitled") %><span class="mark"><%= pluralize(count, unit) %></span></h3>
-          <% if @text.poetry? %>
+          <% unless @text.sentences? %>
             <% section.paragraphs.each.with_index(1) do |stanza, p| %><% position += 1; j += 1 %>
               <%= tag.div class: [ "s", "texts-stanza", ("flag" if flagged.include?("#{si}.#{p - 1}.0")), (statuses[j] if statuses[j] != :same) ], tabindex: 0,
                     data: { key: "#{si}.#{p - 1}.0", ref: @text.reference(section, p, 1), of: "#{position} of #{count}",
-                            action: "click->text-review#pick keydown.enter->text-review#pick" } do %><b class="pn"><%= p %></b><%= stanza.sentences.first %><% end %>
+                            action: "click->text-review#pick keydown.enter->text-review#pick" } do %><b class="pn"><%= @text.scripture? ? stanza.number : p %></b><%= stanza.sentences.first %><% end %>
             <% end %>
           <% else %>
             <% section.paragraphs.each.with_index(1) do |paragraph, p| %>

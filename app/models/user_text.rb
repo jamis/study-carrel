@@ -1,6 +1,6 @@
 # A text a user adds to their own library, from plain text they paste or upload: prose, read a sentence at a time like
-# the bundled prose, or poetry (poems, song lyrics), read a stanza at a time like Frost. Nothing here is saved until
-# #publish!; the review page shows #sections and #checks first.
+# the bundled prose, poetry (poems, song lyrics), read a stanza at a time like Frost, or scripture, read a numbered verse
+# at a time like Isaiah. Nothing here is saved until #publish!; the review page shows #sections and #checks first.
 #
 # The source is plain text:
 #   - A line starting "# " starts a section named by the rest of the line. Text before the first heading is an
@@ -11,6 +11,10 @@
 #   - Poetry: blank lines separate stanzas and line breaks are kept; with no blank lines, a section is one stanza.
 #     Lines are trimmed, so indents are lost. A stanza is stored as a paragraph of one "sentence", its lines joined by
 #     newlines, so counting and matching treat both forms alike.
+#   - Scripture: a line starting with a number ("3 ", "3. " or "3: ") starts that verse, and lines after it continue it,
+#     joined; blank lines don't matter. A verse keeps its number as typed, which is how it's cited and how a revision
+#     matches it. Text before a section's first verse is left out. A verse is stored, like a stanza, as a paragraph of
+#     one "sentence".
 #   - Everything else is literal.
 class UserText
   include ActiveModel::Model
@@ -19,7 +23,8 @@ class UserText
   MAX_BYTES = 5.megabytes
   HEADING = /\A# (.*)\z/
   OPENING = "Opening"
-  FORMS = %w[prose poetry].freeze
+  FORMS = %w[prose poetry scripture].freeze
+  VERSE = /\A(\d+)[.:]?(?:[[:space:]]+(.*))?\z/
 
   Section = Struct.new(:label, :line, :paragraphs)
   Paragraph = Struct.new(:line, :sentences, :markers) do
@@ -29,6 +34,12 @@ class UserText
   Stanza = Struct.new(:line, :lines, :indented) do
     def sentences = [ lines.join("\n") ]
     def excerpt = lines.join(" / ")
+  end
+  # A verse of scripture: one unit, numbered as typed, its lines joined.
+  Verse = Struct.new(:line, :number, :lines) do
+    def text = lines.join(" ").gsub(/[[:space:]]+/, " ").strip
+    def sentences = [ text ]
+    def excerpt = text
   end
   Check = Struct.new(:message, :line, :section, :paragraph, :sentence, :excerpt, :mark, :quiet, keyword_init: true)
 
@@ -47,9 +58,13 @@ class UserText
   def author = super.to_s.strip.presence
   def source = super.to_s.delete_prefix("\uFEFF").gsub(/\r\n?/, "\n")
   def poetry? = form == "poetry"
+  def scripture? = form == "scripture"
+
+  # What one unit is called.
+  def unit_name = poetry? ? "stanza" : scripture? ? "verse" : "sentence"
 
   # The form of a text already added, which a revision keeps.
-  def self.form_of(work) = work.sentences? ? "prose" : "poetry"
+  def self.form_of(work) = { "sentence" => "prose", "verse" => "scripture" }.fetch(work.unit_name, "poetry")
 
   def sections = @sections ||= parse
   def blank_lines_separate? = sections && @blank_lines_separate
@@ -63,14 +78,15 @@ class UserText
 
   # A unit's reference as the reader will cite it (see Section#reference): "Journal: 10 March 2024 3:2", or
   # "Journal 3:2" for a text with no headings; for poetry "Songs: Low Water, stanza 2", "Songs, stanza 2", or
-  # "Songs 12:2" under a numbered heading.
+  # "Songs 12:2" under a numbered heading; for scripture "Moses 1:3", by the verse's own number.
   def reference(section, paragraph, sentence)
     label = label_for(section)
     numbered = label&.match?(/\A\d+\z/)
-    if poetry?
-      return "#{title}, stanza #{paragraph}" if label.nil?
+    unless sentences?
+      n = scripture? ? section.paragraphs[paragraph - 1].number : paragraph
+      return "#{title}, #{unit_name} #{n}" if label.nil?
 
-      return numbered ? "#{title} #{label}:#{paragraph}" : "#{title}: #{label}, stanza #{paragraph}"
+      return numbered ? "#{title} #{label}:#{n}" : "#{title}: #{label}, #{unit_name} #{n}"
     end
     place = "#{paragraph}:#{sentence}"
     return "#{title} #{place}" if label.nil?
@@ -78,7 +94,7 @@ class UserText
     numbered ? "#{title} #{label} #{place}" : "#{title}: #{label} #{place}"
   end
 
-  # Stanzas, for poetry.
+  # Stanzas, for poetry; verses, for scripture.
   def paragraph_count = sections.sum { it.paragraphs.size }
   def sentence_count = sections.sum { |s| s.paragraphs.sum { it.sentences.size } }
   def line_count = sections.sum { |s| s.paragraphs.sum { it.lines.size } }
@@ -93,9 +109,16 @@ class UserText
     short > lines.size * 0.8 && open > lines.size * 0.4
   end
 
+  # Most lines start with a number: worth suggesting scripture for a text added as prose or poetry.
+  def looks_like_scripture?
+    lines = source.lines.map(&:strip).reject { it.empty? || it.match?(HEADING) }
+    numbered = lines.count { it.match?(/\A\d+[.:]?[[:space:]]+\S/) }
+    numbered >= 3 && numbered > lines.size * 0.5
+  end
+
   # Places in the text worth a second look before adding it, in reading order.
   def checks
-    @checks ||= poetry? ? poetry_checks : prose_checks
+    @checks ||= poetry? ? poetry_checks : scripture? ? scripture_checks : prose_checks
   end
 
   # Adds the text to the user's library. Returns the new work.
@@ -106,7 +129,7 @@ class UserText
       now = Time.current
       kept_sections.each.with_index(1) do |section, number|
         record = work.sections.create!(number:, label: label_for(section))
-        Unit.insert_all(unit_rows(section).each.with_index(1).map { |row, n| row.merge(section_id: record.id, number: n, created_at: now, updated_at: now) })
+        Unit.insert_all(unit_rows(section).each.with_index(1).map { |row, n| { number: n, **row, section_id: record.id, created_at: now, updated_at: now } })
       end
       Unit.reindex_search(work.sections.ids)
       work
@@ -114,16 +137,20 @@ class UserText
   end
 
   # How a work of this form is read.
-  def work_form = poetry? ? { unit_name: "stanza", group_name: nil } : { unit_name: "sentence", group_name: "paragraph" }
+  def work_form = { unit_name:, group_name: ("paragraph" if sentences?) }
 
-  # A unit's place, as stored: a stanza has none beyond its number.
-  def unit_place(paragraph, sentence) = poetry? ? { paragraph: nil, sentence: nil } : { paragraph:, sentence: }
+  # A unit's place, as stored: a stanza or a verse has none beyond its number.
+  def unit_place(paragraph, sentence) = sentences? ? { paragraph:, sentence: } : { paragraph: nil, sentence: nil }
+
+  # Prose, read a sentence at a time.
+  def sentences? = !poetry? && !scripture?
 
   private
 
+  # A verse is numbered as typed; anything else is numbered in reading order by the caller.
   def unit_rows(section)
     section.paragraphs.each.with_index(1).flat_map do |paragraph, p|
-      paragraph.sentences.each.with_index(1).map { |body, s| { **unit_place(p, s), body: } }
+      paragraph.sentences.each.with_index(1).map { |body, s| { **unit_place(p, s), body:, **({ number: paragraph.number } if scripture?) } }
     end
   end
 
@@ -204,6 +231,35 @@ class UserText
     found.sort_by(&:line)
   end
 
+  def scripture_checks
+    found, markdown = [], []
+    (sections && @left_out).each do |stray|
+      message = stray.empty ? "Verse #{stray.text} has no words, so it’s left out." :
+        "Before the first verse#{" of the section" if stray.section}, so it’s left out. Start it with “# ” to make it a heading, or with a number to make it a verse."
+      found << check(message, stray.line, stray.section || 0, excerpt: stray.text)
+    end
+    sections.each_with_index do |section, si|
+      found << check("Empty section; it will be left out.", section.line, si, excerpt: "# #{section.label}") if section.paragraphs.empty?
+      expected = 1
+      section.paragraphs.each_with_index do |verse, vi|
+        at = ->(message, mark: nil) { check(message, verse.line, si, vi, 0, excerpt: verse.excerpt, mark:) }
+        if verse.number < expected
+          found << at.("Verse #{verse.number} comes after verse #{expected - 1}. Verses are read in order of their numbers.")
+        elsif verse.number > expected
+          skipped = expected == verse.number - 1 ? "verse #{expected}" : "verses #{expected}–#{verse.number - 1}"
+          found << at.(vi.zero? ? "The section starts at verse #{verse.number}." : "No #{skipped}: numbering jumps to #{verse.number}.")
+        end
+        expected = [ expected, verse.number + 1 ].max
+        found << at.("A long verse (#{verse.text.length.to_fs(:delimited)} characters). Is a verse number missing?") if verse.text.length > 1500
+        markdown << at.(nil, mark: verse.text[MARKDOWN]) if verse.text.match?(MARKDOWN)
+      end
+    end
+    if markdown.any?
+      found << markdown.first.tap { it.message = markdown.one? ? "Markdown formatting shows as typed (asterisks and all)." : "Markdown formatting shows as typed, in #{markdown.size} verses." }
+    end
+    found.sort_by(&:line)
+  end
+
   MARKDOWN = /\*[^*\s][^*]*\*|_[^_\s][^_]*_|\[[^\]]+\]\([^)]+\)/
   NOT_SPLIT = /[[:space:]]([A-Z])\.[[:space:]]+(?=[“"‘]?[A-Z])/
   SPLIT_AFTER = /(?:\A|[[:space:]])([A-Z][A-Za-z]{0,3}|[A-Za-z]+\.[A-Za-z.]*)\.[”’")\]]*\z/
@@ -246,6 +302,7 @@ class UserText
   def parse
     lines = source.split("\n", -1)
     return parse_poetry(lines) if poetry?
+    return parse_scripture(lines) if scripture?
 
     @blank_lines_separate = blank_line_between_text?(lines)
     sections, current, buffer, buffer_line = [], nil, [], nil
@@ -303,6 +360,38 @@ class UserText
     sections
   end
 
+  # Text before a section's first verse, which is left out.
+  Stray = Struct.new(:section, :line, :text, :empty)
+
+  def parse_scripture(lines)
+    sections, current, verse, stray, @left_out = [], nil, nil, nil, []
+
+    lines.each.with_index(1) do |line, number|
+      text = line.strip
+      if (heading = line.match(HEADING))
+        sections << (current = Section.new(heading[1].strip.presence || "Untitled", number, []))
+        verse = stray = nil
+      elsif text.empty?
+        next
+      elsif (start = text.match(VERSE))
+        sections << (current = Section.new(nil, number, [])) unless current
+        current.paragraphs << (verse = Verse.new(number, start[1].to_i, [ start[2].to_s ]))
+        stray = nil
+      elsif verse
+        verse.lines << text
+      elsif stray
+        stray.text += " / #{text}"
+      else
+        @left_out << (stray = Stray.new((sections.size - 1 if current), number, text))
+      end
+    end
+    sections.each_with_index do |section, si|
+      section.paragraphs.select { it.text.empty? }.each { @left_out << Stray.new(si, it.line, "#{it.number}", :empty) }
+      section.paragraphs.reject! { it.text.empty? }
+    end
+    sections
+  end
+
   def blank_line_between_text?(lines)
     text = lines.each_index.reject { lines[it].strip.empty? }
     text.each_cons(2).any? { |a, b| b > a + 1 && !lines[a].match?(HEADING) && !lines[b].match?(HEADING) }
@@ -316,8 +405,20 @@ class UserText
     elsif !source.valid_encoding? || source.match?(/[\u0000-\u0008\u000E-\u001F]/)
       errors.add(:source, "isn’t plain text")
     elsif sentence_count.zero?
-      errors.add(:source, "has no text outside its headings")
+      errors.add(:source, scripture? ? "has no numbered verses" : "has no text outside its headings")
+    elsif scripture? && (twice = repeated_verse)
+      section, verse = twice
+      errors.add(:source, "has verse #{verse.number} twice#{" in “#{section.label}”" if section.label} (line #{verse.line}); each verse in a section needs its own number")
     end
+  end
+
+  # The first verse whose number an earlier one in its section already has, with its section.
+  def repeated_verse
+    sections.each do |section|
+      seen = Set.new
+      section.paragraphs.each { |verse| return [ section, verse ] unless seen.add?(verse.number) }
+    end
+    nil
   end
 
   def unique_slug

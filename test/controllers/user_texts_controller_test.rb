@@ -73,6 +73,23 @@ class UserTextsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".list-row-title", "Journal"
   end
 
+  test "scripture is reviewed a verse at a time and opens on its first verse, numbered as typed" do
+    source = "# 1\n\n3 And God said, Let there be light.\n4 And God saw the light."
+    post review_texts_path, params: params(source:, form: "scripture")
+    assert_response :success
+    assert_select ".texts-summary", /2\s+verses/
+    assert_select ".texts-stanza[data-ref='Journal 1:4']"
+
+    post texts_path, params: params(source:, form: "scripture")
+    work = @user.texts.last
+    assert_redirected_to reading_path(work.slug, 1, 3)
+    follow_redirect!
+    assert_match "Let there be light.", response.body
+
+    get edit_text_path(work)
+    assert_select "input[type=radio][value=scripture][checked][disabled]"
+  end
+
   test "deleting a text removes its sentences, history and search entries" do
     work = UserText.new(title: "Journal", source: SOURCE).publish!(@user)
     unit = work.sections.first.units.first

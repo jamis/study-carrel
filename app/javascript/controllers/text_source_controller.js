@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // The Add a text form: a chosen or dropped .txt / .md file is read in the browser into the text box (only text is
 // sent), and the box shows how much it holds against the limit. Text that looks like verse, added as prose, gets a
-// hint offering to read it as poetry.
+// hint offering to read it as poetry; text that looks like numbered verses, a hint offering to read it as scripture.
 const LIMIT = 5 * 1024 * 1024
 
 // As UserText#looks_like_verse?: mostly short lines, many without a closing stop.
@@ -14,8 +14,15 @@ function looksLikeVerse(text) {
   return short > lines.length * 0.8 && open > lines.length * 0.4
 }
 
+// As UserText#looks_like_scripture?: most lines start with a number.
+function looksLikeScripture(text) {
+  const lines = text.split("\n").map(l => l.trim()).filter(l => l && !/^# /.test(l))
+  const numbered = lines.filter(l => /^\d+[.:]?\s+\S/.test(l)).length
+  return numbered >= 3 && numbered > lines.length * 0.5
+}
+
 export default class extends Controller {
-  static targets = ["title", "source", "file", "stats", "error", "prose", "poetry", "hint"]
+  static targets = ["title", "source", "file", "stats", "error", "prose", "poetry", "scripture", "hint", "scriptureHint"]
 
   connect() { this.count() }
 
@@ -47,9 +54,16 @@ export default class extends Controller {
     this.count()
   }
 
+  scripture() {
+    this.scriptureTarget.checked = true
+    this.count()
+  }
+
   count() {
     const text = this.sourceTarget.value
-    if (this.hasHintTarget) this.hintTarget.hidden = !this.proseTarget.checked || this.proseTarget.disabled || !looksLikeVerse(text)
+    const numbered = !this.proseTarget.disabled && !this.scriptureTarget.checked && looksLikeScripture(text)
+    if (this.hasScriptureHintTarget) this.scriptureHintTarget.hidden = !numbered
+    if (this.hasHintTarget) this.hintTarget.hidden = numbered || !this.proseTarget.checked || this.proseTarget.disabled || !looksLikeVerse(text)
     if (!text.trim()) { this.statsTarget.textContent = ""; return }
     const words = (text.match(/\S+/g) || []).length
     const kb = new Blob([text]).size / 1024
