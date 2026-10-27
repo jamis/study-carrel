@@ -58,14 +58,14 @@ class TextLoader
 
     entries = YAML.safe_load_file(path)
     entries.each do |attrs|
-      Collection.find_or_initialize_by(slug: attrs.fetch("slug")).update!(attrs.slice("name", "position", "description", "single_work"))
+      Collection.bundled.find_or_initialize_by(slug: attrs.fetch("slug")).update!(attrs.slice("name", "position", "description", "single_work"))
     end
 
     # Parents are linked in a second pass so a file can list them in any order.
     entries.each do |attrs|
-      parent = attrs["parent"] && (Collection.find_by(slug: attrs["parent"]) or
+      parent = attrs["parent"] && (Collection.bundled.find_by(slug: attrs["parent"]) or
         raise Error, "#{path}: unknown parent '#{attrs["parent"]}' for '#{attrs["slug"]}'")
-      Collection.find_by!(slug: attrs.fetch("slug")).update!(parent: parent)
+      Collection.bundled.find_by!(slug: attrs.fetch("slug")).update!(parent: parent)
     end
   end
 
@@ -148,7 +148,7 @@ class TextLoader
   def find_collection(slug)
     return if slug.blank?
 
-    Collection.find_by(slug: slug) or fail_with("unknown collection '#{slug}'")
+    Collection.bundled.find_by(slug: slug) or fail_with("unknown collection '#{slug}'")
   end
 
   def fail_with(msg) = raise(Error, "#{@source}: #{msg}")

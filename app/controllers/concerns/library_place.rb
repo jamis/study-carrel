@@ -5,7 +5,7 @@ module LibraryPlace
   # isn't there or isn't the user's to see.
   def self.find(keys, user)
     if keys[:work].present? then Work.visible_to(user).find_by!(slug: keys[:work])
-    elsif keys[:collection].present? then Collection.find_by!(slug: keys[:collection])
+    elsif keys[:collection].present? then Collection.visible_to(user).find_by!(slug: keys[:collection])
     elsif keys[:texts].present? then OwnTexts.new(user)
     elsif keys[:shelf].present? then user.shelves.find_by!(slug: keys[:shelf])
     end

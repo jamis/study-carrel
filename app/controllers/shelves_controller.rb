@@ -69,11 +69,13 @@ class ShelvesController < ApplicationController
   end
 
   # The library as the editor shows it: collections nested as on their pages (child collections, then works), then
-  # works in no collection, then the user's own texts.
+  # works in no collection, then the user's own collections and texts in none, under Your Texts.
   def load_tree
-    @collections_by_parent = Collection.ordered.to_a.group_by(&:parent_id)
-    @works_by_collection = Work.bundled.ordered.to_a.group_by(&:collection_id)
-    @texts = Current.user.texts.to_a
+    @collections_by_parent = Collection.visible_to(Current.user).ordered.to_a.group_by(&:parent_id)
+    @works_by_collection = Work.visible_to(Current.user).where.not(collection_id: nil).ordered.to_a.group_by(&:collection_id)
+    @loose_works = Work.bundled.where(collection_id: nil).ordered.to_a
+    @own_collections = Current.user.collections.top_level.to_a
+    @texts = Current.user.texts.where(collection_id: nil).to_a
     @work_counts = Collection.work_counts
     @open_ids = @shelf.members.flat_map { @shelf.ancestor_ids(it) }.to_set
   end

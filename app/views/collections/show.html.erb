@@ -3,12 +3,23 @@
 <main class="page">
   <%= page_head library_crumbs(@collection) %>
   <h2 class="page-title"><%= @collection.name %></h2>
-  <div class="page-lede<%= " page-lede-tight" if @collection.description.present? %>"><%= @collection.single_work? ? pluralize(@collection.all_works.count, "book") : pluralize(@work_counts.fetch(@collection.id), "work") %> · <%= render "shelves/put", thing: @collection %></div>
+  <% if flash[:notice] %><p class="signin-notice" role="status"><%= flash[:notice] %></p><% end %>
+  <% if @collection.own? %>
+    <div class="page-lede<%= " page-lede-tight" if @collection.description.present? %>">
+      <% if @works.any? %><%= pluralize(@work_counts.fetch(@collection.id), @collection.work_noun) %> · <% end %><%= link_to "Add a text here", new_text_path(collection: @collection.slug) %>
+      · <%= render "shelves/put", thing: @collection %> · <%= link_to "Delete", delete_collection_path(@collection), class: "lede-delete" %>
+    </div>
+  <% else %>
+    <div class="page-lede<%= " page-lede-tight" if @collection.description.present? %>"><%= @collection.single_work? ? pluralize(@collection.all_works.count, "book") : pluralize(@work_counts.fetch(@collection.id), "work") %> · <%= render "shelves/put", thing: @collection %></div>
+  <% end %>
   <% if @collection.description.present? %><p class="page-lede"><%= @collection.description %></p><% end %>
-  <%= render "shared/search_form", place: @collection %>
+  <%= render "shared/search_form", place: @collection if @works.any? || @children.any? %>
 
   <%= render partial: "collections/row", collection: @children, as: :collection, locals: { work_counts: @work_counts } %>
 
+  <% if @collection.own? && @works.empty? && @children.empty? %>
+    <p class="page-empty">Nothing in it yet. <%= link_to "Add a text", new_text_path(collection: @collection.slug) %> to start it off.</p>
+  <% end %>
   <div class="works">
     <% @works.each do |work| %>
       <%= link_to work_path(work), class: "work-link" do %>

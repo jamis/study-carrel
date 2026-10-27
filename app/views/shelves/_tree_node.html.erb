@@ -6,7 +6,7 @@
    via = (shelf.via(thing) unless shelf.on?(thing))
    name = shelf_thing_name(thing)
    meta = if collection
-            collection.single_work? ? pluralize(collection.all_works.count, "book") : pluralize(@work_counts.fetch(collection.id), "work")
+            collection.single_work? ? pluralize(collection.all_works.count, "book") : pluralize(@work_counts.fetch(collection.id), collection.work_noun)
           elsif thing.short_author.present? && !thing.collection&.name.to_s.include?(thing.short_author)
             thing.short_author
           end

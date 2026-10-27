@@ -2,8 +2,9 @@
 # library (place nil). Rolls are balanced: each branch of the library gets an even chance at every level (Sacred
 # Texts > Bible, Book of Mormon, Quran, ... alike), then the roll picks evenly among the units of the work it reaches;
 # a single-work collection (the Bible) counts as one branch and is even by unit inside, so Obadiah is no likelier than
-# Psalm 119's verses. A user's own texts (OwnTexts) are one more branch of the library, all of them together. A shelf
-# (Shelf) is a place of its own, whose branches are the works and collections on it.
+# Psalm 119's verses. A user's own texts (OwnTexts) are one more branch of the library, all of them together, whose
+# branches are the user's own collections and the texts in none. A shelf (Shelf) is a place of its own, whose branches
+# are the works and collections on it.
 class RandomScope
   attr_reader :place
 
@@ -14,12 +15,11 @@ class RandomScope
   # The places enclosing a work or collection, innermost first: itself, its collections out to the top, the library.
   def self.chain_for(place)
     return [ new(place), library ] if place.is_a?(OwnTexts) || place.is_a?(Shelf)
-    return [ new(place), new(OwnTexts.new(place.user)), library ] if place.is_a?(Work) && place.own_text?
 
     collection = place.is_a?(Work) ? place.collection : place
     collections = collection ? [ *collection.ancestors, collection ].reverse : []
     places = place.is_a?(Work) ? [ place, *collections ] : collections
-    [ *places, nil ].map { new(it) }
+    [ *places, *(OwnTexts.new(place.user) if place&.user_id), nil ].map { new(it) }
   end
 
   # The reader's default: the innermost collection (Your Texts, for one of the user's own), or the work itself when it
@@ -72,11 +72,12 @@ class RandomScope
   end
 
   def branches(node)
-    return works.select(&:user_id) if node.is_a?(OwnTexts)
     return collections.select { node.collection_ids.include?(it.id) } + works.select { node.work_item_ids.include?(it.id) } if node.is_a?(Shelf)
 
-    id = node&.id
-    found = collections.select { it.parent_id == id } + works.select { it.collection_id == id && !it.user_id }
+    # The library's own branches are bundled; the user's own collections and texts are under OwnTexts.
+    id = node.is_a?(OwnTexts) ? nil : node&.id
+    own = node.is_a?(OwnTexts) || node&.user_id
+    found = collections.select { it.parent_id == id && !it.user_id == !own } + works.select { it.collection_id == id && !it.user_id == !own }
     node.nil? && works.any?(&:user_id) ? found << OwnTexts.new(@user) : found
   end
 
@@ -92,5 +93,5 @@ class RandomScope
   # Units per work, for the works that have any.
   def counts = @counts ||= Unit.visible_to(@user).group("sections.work_id").count
   def works = @works ||= Work.where(id: counts.keys).ordered.select(:id, :collection_id, :user_id).to_a
-  def collections = @collections ||= Collection.ordered.to_a
+  def collections = @collections ||= Collection.visible_to(@user).ordered.to_a
 end

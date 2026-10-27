@@ -1,6 +1,6 @@
 # A user's own grouping of works and collections (Poets I love; the Bible and the Book of Mormon together), to roll
-# Random and search in. Private to its owner: it is only ever found through user.shelves, and its works only through
-# Work.visible_to(user).
+# Random and search in. Private to its owner: it is only ever found through user.shelves, and its works and collections
+# only through Work.visible_to(user) and Collection.visible_to(user).
 #
 # A collection on a shelf brings everything nested under it, now and later. Nothing is on a shelf twice: something
 # under a collection on the shelf is on it already, through that collection, and putting a collection on takes in
@@ -22,7 +22,7 @@ class Shelf < ApplicationRecord
     kind, id = key.to_s.split("-", 2)
     case kind
     when "work" then Work.visible_to(user).find_by(id:)
-    when "collection" then Collection.find_by(id:)
+    when "collection" then Collection.visible_to(user).find_by(id:)
     end
   end
 
@@ -34,7 +34,7 @@ class Shelf < ApplicationRecord
   # What's on the shelf: its collections in library order, then its works in library order.
   def members
     things = items.includes(:work, :collection).map(&:thing)
-    collections = things.grep(Collection).sort_by { |c| chain(c.id).reverse.map { [ positions[it], it ] } }
+    collections = things.grep(Collection).select { it.user_id.nil? || it.user_id == user_id }.sort_by { |c| chain(c.id).reverse.map { [ positions[it], it ] } }
     order = Work.ids_in_library_order.each_with_index.to_h
     works = things.grep(Work).select { it.user_id.nil? || it.user_id == user_id }.sort_by { order.fetch(it.id, Float::INFINITY) }
     collections + works

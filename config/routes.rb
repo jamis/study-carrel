@@ -75,7 +75,11 @@ Rails.application.routes.draw do
     resource :item, only: %i[create destroy], controller: "shelf_items"
   end
   get "shelves/:shelf/random", to: "random_readings#show", as: :random_shelf
-  resources :collections, only: :show, param: :slug
+  # A user's own collections are made empty (new > create) and filled by adding texts into them; deleting one (delete >
+  # destroy) takes its texts with it.
+  resources :collections, only: %i[show new create destroy], param: :slug do
+    get :delete, on: :member
+  end
   resources :works, only: :show, param: :slug
   get "read/:slug/:section(/:number)", to: "readings#show", as: :reading
 

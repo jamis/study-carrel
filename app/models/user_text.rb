@@ -36,6 +36,7 @@ class UserText
   attribute :author, :string
   attribute :source, :string
   attribute :form, :string, default: "prose"
+  attribute :collection_id, :integer # one of the user's own collections to put it in, or none
 
   validates :title, presence: true, length: { maximum: 200 }
   validates :form, inclusion: { in: FORMS }
@@ -99,8 +100,9 @@ class UserText
 
   # Adds the text to the user's library. Returns the new work.
   def publish!(user)
+    collection = user.collections.find(collection_id) if collection_id
     Work.transaction do
-      work = user.texts.create!(title:, author:, source:, slug: unique_slug, **work_form)
+      work = user.texts.create!(title:, author:, source:, slug: unique_slug, collection:, **work_form)
       now = Time.current
       kept_sections.each.with_index(1) do |section, number|
         record = work.sections.create!(number:, label: label_for(section))

@@ -18,6 +18,7 @@
       <b><%= @text.paragraph_count.to_fs(:delimited) %></b> <%= "paragraph".pluralize(@text.paragraph_count) %> ·
       <b><%= @text.sentence_count.to_fs(:delimited) %></b> <%= "sentence".pluralize(@text.sentence_count) %>
     <% end %>
+    <% if !@work && (collection = Current.user.collections.find_by(id: @text.collection_id)) %> · in <b><%= collection.name %></b><% end %>
   </p>
   <div class="texts-rule">
     <% if @text.poetry? %>
@@ -30,7 +31,7 @@
     <%= @text.headed? ? "Sections come from the # headings." : "No # headings, so it’s one section." %>
     <% if !@work && !@text.poetry? && @text.looks_like_verse? %>
       <%= form_with model: @text, url: review_texts_path, multipart: true, class: "inline-form", data: { turbo: false } do |f| %>
-        <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :form, value: "poetry" %>
+        <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :collection_id %><%= f.hidden_field :form, value: "poetry" %>
         <button type="submit" class="texts-linkish">This looks like verse: read it as poetry instead</button>
       <% end %>
     <% end %>
@@ -40,7 +41,7 @@
     <div class="texts-panel texts-refused" role="alert">
       <p>This is too different from “<%= @work.title %>” to save as a revision of it. Too little of it is unchanged to work out where its notes and kept passages go.</p>
       <%= form_with model: @text, url: texts_path, multipart: true, class: "inline-form", data: { turbo: false } do |f| %>
-        <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :form %>
+        <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :collection_id %><%= f.hidden_field :form %>
         <button type="submit" class="texts-linkish">Add it as a new text instead</button>
       <% end %>
     </div>
@@ -145,7 +146,7 @@
       per-form token is only good for the form's own action. %>
   <%= form_with model: @text, url: (@work ? text_path(@work) : texts_path), method: (@work ? :patch : :post), multipart: true,
         class: "texts-bar", authenticity_token: form_authenticity_token, data: { turbo: false } do |f| %>
-    <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :form %>
+    <%= f.hidden_field :title %><%= f.hidden_field :author %><%= f.hidden_field :source %><%= f.hidden_field :collection_id %><%= f.hidden_field :form %>
     <div class="texts-bar-in">
       <span class="info"><%= refused ? "It can’t be saved as a revision." : @work ? "Saving replaces the text. Nothing on an unchanged #{unit} moves." : "You can revise it later; notes on unchanged #{unit.pluralize} stay put." %></span>
       <%= f.button "Edit the text", type: "submit", name: "edit", value: "1", class: "chip", formaction: (@work ? review_text_path(@work) : review_texts_path),

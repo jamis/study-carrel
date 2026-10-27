@@ -7,7 +7,7 @@
 **Private to the uploader, always.**
 
 - `works.user_id` (null = bundled), and every lookup goes through one visibility scope (reader, search, Random, Kept, history, export), with tests that another user gets a 404 everywhere.
-- Making a private text public is a manual step for the admin (clear `user_id`, file it in a collection); users can't do it.
+- Making a private text public is a manual step for the admin (clear `user_id`, file it in a collection); users can't do it. A user's own collection goes public the same way, its `user_id` cleared with its texts'.
 - Uploads get a random slug suffix (`journal-k3f9`) so a URL never reveals another user's titles.
 - Encrypting user texts at rest is wanted later.
 
@@ -40,6 +40,18 @@ The upload is saved directly by `UserText#publish!` (not through `TextLoader`, w
 - The Your Texts page has its own search box and Random scope (`OwnTexts`; `?texts=yours`, `/texts/random`).
 - In the reader, Random defaults to Your Texts. User texts are included in search and are one more branch for Random.
 - Revise is on Your Texts and on the work page.
+
+## Collections
+
+**Users can gather their texts into collections of their own** (decided and built 2026-10-27), toward one day uploading a whole collection of works at once (the Pearl of Great Price). Prototype: `prototype/private-collections/index.html`.
+
+- **Private like their texts.** `collections.user_id`, and every lookup goes through `Collection.visible_to(user)`: the collection page, search and Random scoped to it, shelves and the search picker; another user gets a 404. Slugs get a random suffix (`pearl-of-great-price-k3f9`).
+- **Kept out of the bundled tree.** A user's collection nests only under their own, and holds only their own texts; a bundled collection holds only bundled works (validated both ways). So a bundled page's counts and lists never depend on who is looking.
+- **Made empty**, from "New collection" on Your Texts: a name, a line about it, and **One work in parts** (`single_work`, as for the Bible; decided 2026-10-27), described on the form in one sentence: "Like the Bible: its texts are books of a single work, and Random picks evenly from all their passages rather than giving each text an equal chance." Such a collection is listed like a work (upright, quiet) and counts its texts as books; others are listed like Sacred Texts and count texts. The box was put under the Bible alone, the archetype, and doesn't say it can't be changed: nothing hangs off it, and it can't only because nothing edits a collection yet (an edit page, for the name, the line and this, is for later; until then the console). Nothing in the app nests one collection in another.
+- **Filled by adding texts.** Add a text has an optional Collection (None by default); "Add a text here" on the collection's page picks it. A revision leaves a text where it is; moving one in or out isn't built yet.
+- **Where they show:** Your Texts lists the collections first (each with its count and Delete), then the texts "In no collection". The library's Your Texts row counts them. The collection page is like a bundled one's, under Library › Your Texts, with "Add a text here", "Put on a shelf…" and Delete. In the shelf editor they're under Your Texts.
+- **Random:** Your Texts branches into the user's collections and their texts in none, each a branch; a text in a collection chains out through it, then Your Texts, then the library.
+- **Deleting one deletes its texts** (and any collection nested in it), after a page of its own listing them and how many notes and kept passages will be set aside, which they are as when deleting a text. Letting the user keep the texts instead may come later.
 
 ## Revising
 

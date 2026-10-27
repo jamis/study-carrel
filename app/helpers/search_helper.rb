@@ -36,21 +36,21 @@ module SearchHelper
   def search_place_in_words(place) = "in #{place ? RandomScope.new(place).label : "the library"}"
 
   # The picker's list to filter by title: every collection, then every work the user can see, each with the trail of
-  # collections it sits in ("Sacred Texts › Bible").
+  # collections it sits in ("Sacred Texts › Bible", "Your Texts › Journals").
   def search_picker_places
-    collections = Collection.ordered.to_a
+    collections = Collection.visible_to(Current.user).ordered.to_a
     by_id = collections.index_by(&:id)
-    trail = lambda do |id|
+    trail = lambda do |id, own|
       names = []
       while (collection = by_id[id]) && names.size < by_id.size
         names.unshift(collection.name)
         id = collection.parent_id
       end
-      names
+      own ? [ "Your Texts", *names ] : names
     end
     works = Work.visible_to(Current.user).order(:title, :id).select(:id, :slug, :title, :edition, :collection_id, :user_id)
-    collections.sort_by { it.name.downcase }.map { [ it, trail.(it.parent_id).join(" › ") ] } +
-      works.map { [ it, it.own_text? ? "Your Texts" : trail.(it.collection_id).join(" › ") ] }
+    collections.sort_by { it.name.downcase }.map { [ it, trail.(it.parent_id, it.own?).join(" › ") ] } +
+      works.map { [ it, trail.(it.collection_id, it.own_text?).join(" › ") ] }
   end
 
   # A snippet from LibrarySearch, escaped, with its match markers turned into <mark>.

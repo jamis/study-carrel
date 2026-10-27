@@ -20,6 +20,9 @@
       <% end %>
       <label class="texts-field"><span>Title</span><%= f.text_field :title, autocomplete: "off", required: true, autofocus: @text.title.blank?, data: { text_source_target: "title" } %></label>
       <label class="texts-field"><span>Author <small>optional</small></span><%= f.text_field :author, autocomplete: "off" %></label>
+      <% if !revising && (collections = Current.user.collections.to_a).any? %>
+        <label class="texts-field"><span>Collection <small>optional</small></span><%= f.collection_select :collection_id, collections, :id, :name, include_blank: "None" %></label>
+      <% end %>
       <fieldset class="texts-form-choice">
         <legend>Read it as<% if revising %> <small>(a revision keeps its form)</small><% end %></legend>
         <label><%= f.radio_button :form, "prose", disabled: revising, data: { text_source_target: "prose", action: "text-source#count" } %><span><b>Prose</b><span>A sentence at a time, like Walden</span></span></label>

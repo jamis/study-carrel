@@ -5,6 +5,7 @@
 **Collection > Work > Section > Unit** (decided 2026-10-02). A Bible book is a Work, a chapter a Section, a verse a Unit. The unit model is generic, covering verses, poetry stanzas, and prose sentences.
 
 - Collections are a real table (name, slug, position, description, parent) so they can have their own pages, e.g. "Old Testament".
+- **Users can make collections of their own** (decided 2026-10-27), private like their texts (`collections.user_id`, null for the bundled library); see [user-texts.md](user-texts.md#collections).
 - **Collections nest** to any depth (decided 2026-10-02) via `parent_id`: e.g. Sacred Texts > Book of Mormon > 1 Nephi (a Work). A collection's Random and work count include everything nested under it; the library lists top-level collections only.
 - Works have a `position` for canonical order.
 - Loading texts updates in place and **never deletes**, so notes survive reloads. The one exception: a sentence left over after prose is re-split, if nothing hangs off it (see [prose-by-sentence.md](prose-by-sentence.md)).

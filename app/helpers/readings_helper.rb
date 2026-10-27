@@ -1,12 +1,12 @@
 module ReadingsHelper
   # Breadcrumb trail for the top bar: [[label, path, tooltip], ...], Library first, the current page last.
   # Collections nest, so a collection's trail runs through its ancestors; a work adds itself (the edition and
-  # author ride along as its tooltip). A user's own text sits in Your Texts (own_text:, which defaults to the work's,
-  # so the reading view can keep it when it drops the work crumb).
-  def library_crumbs(collection = nil, work: nil, own_text: work&.own_text?)
+  # author ride along as its tooltip). A user's own text or collection sits in Your Texts (own_text:, which defaults to
+  # the work's or collection's, so the reading view can keep it when it drops the work crumb).
+  def library_crumbs(collection = nil, work: nil, own_text: work&.own_text? || collection&.own?)
     trail = [ [ "Library", library_path, nil ] ]
-    (collection ? collection.ancestors + [ collection ] : []).each { |c| trail << [ c.name, collection_path(c), nil ] }
     trail << [ "Your Texts", texts_path, "Only you can see these" ] if own_text
+    (collection ? collection.ancestors + [ collection ] : []).each { |c| trail << [ c.name, collection_path(c), nil ] }
     trail << [ work.title, work_path(work), [ work.byline, work.edition ].compact_blank.join(" · ").presence ] if work
     trail
   end

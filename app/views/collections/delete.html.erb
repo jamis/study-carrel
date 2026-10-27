@@ -1,0 +1,24 @@
+<% content_for :title, "Delete #{@collection.name} · Study Carrel" %>
+<%= render "shared/rail", focus: Current.focus %>
+<%# Before deleting a user's own collection: the texts that go with it, and the notes and keeps on them that are set
+    aside with their passages, then the one button. %>
+<main class="delete-page">
+  <%= page_head [ *library_crumbs(@collection), [ "Delete" ] ] %>
+  <h1 class="page-title">Delete “<%= @collection.name %>”?</h1>
+
+  <% if @works.empty? %>
+    <p class="delete-what">It has no texts in it.</p>
+  <% else %>
+    <div class="delete-what">
+      <strong><%= pluralize(@works.size, "text") %></strong> <%= @works.one? ? "goes" : "go" %> with it:
+      <ul><% @works.each do |work| %><li><%= work.title %></li><% end %></ul>
+    </div>
+  <% end %>
+  <p class="delete-final">This can’t be undone.<% if @annotation_count.positive? %> <%= @works.one? ? "Its" : "Their" %> <%= pluralize(@annotation_count, "note or kept passage", plural: "notes and kept passages") %> will be set aside with the passages they were written on.<% end %></p>
+
+  <div class="delete-actions">
+    <%= button_to "Delete the collection#{" and its #{@works.one? ? "text" : "#{@works.size} texts"}" if @works.any?}", collection_path(@collection),
+          method: :delete, class: "delete-go", form_class: "inline-form" %>
+    <%= link_to "Cancel", collection_path(@collection), class: "delete-cancel" %>
+  </div>
+</main>

@@ -3,7 +3,7 @@
 **Scoped and balanced** (decided 2026-10-05). Code: `RandomScope`.
 
 - The library, collection and work pages roll in that page.
-- The rail's Random (see [reader](reader.md#navigation)) defaults, in the reader, to the *innermost collection* (or the work, if it has no collection), named under its label, and opens a popover, "Pick randomly from", listing the default first and then the other enclosing scopes (the work, each collection out to the top, the whole library) by name alone. On phones the menu's "Random · *default*" has a ▾ listing the others. For a user's own text it defaults to Your Texts (see [user-texts.md](user-texts.md)).
+- The rail's Random (see [reader](reader.md#navigation)) defaults, in the reader, to the *innermost collection* (or the work, if it has no collection), named under its label, and opens a popover, "Pick randomly from", listing the default first and then the other enclosing scopes (the work, each collection out to the top, the whole library) by name alone. On phones the menu's "Random · *default*" has a ▾ listing the others. For a user's own text it defaults to Your Texts, or to its collection when it's in one of the user's own (see [user-texts.md](user-texts.md)).
 - Rolls are **balanced**: at each level they pick evenly among a collection's non-empty child collections and works, treating a single-work collection (the Bible, the Book of Mormon) as one branch that is even by verse inside.
 - In prose a roll lands on any sentence, chosen evenly like a verse (not snapped to a paragraph's start).
 - Every landing stays in history so a chance find can be found again.

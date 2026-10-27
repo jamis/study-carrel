@@ -76,4 +76,54 @@ class CollectionTest < ActiveSupport::TestCase
     assert_equal({ scripture.id => 4, bible.id => 2, ot.id => 2, world.id => 2 }, counts)
     assert_equal 4, scripture.work_count
   end
+
+  test "a user's own collection gets a random slug suffix, and is visible only to them" do
+    bundled = Collection.create!(slug: "ot", name: "Old Testament")
+    mine = users(:one).collections.create!(name: "Pearl of Great Price")
+
+    assert_match(/\Apearl-of-great-price-[a-z0-9]{4}\z/, mine.slug)
+    assert_equal [ bundled, mine ], Collection.visible_to(users(:one)).order(:id).to_a
+    assert_equal [ bundled ], Collection.visible_to(users(:two)).to_a
+  end
+
+  test "a user's own collection nests only under their own, and holds only their own texts" do
+    bundled = Collection.create!(slug: "ot", name: "Old Testament")
+    mine = users(:one).collections.create!(name: "Mine")
+    theirs = users(:two).collections.create!(name: "Theirs")
+
+    assert_not users(:one).collections.new(name: "Under bundled", parent: bundled).valid?
+    assert_not users(:one).collections.new(name: "Under theirs", parent: theirs).valid?
+    assert users(:one).collections.new(name: "Under mine", parent: mine).valid?
+    assert_not Collection.new(slug: "b", name: "Bundled under mine", parent: mine).valid?
+
+    diary = UserText.new(title: "Diary", source: "Words.").publish!(users(:one))
+    assert diary.update(collection: mine)
+    assert_not diary.update(collection: theirs)
+    assert_not diary.update(collection: bundled)
+    assert_not Work.new(title: "Genesis", slug: "genesis", collection: mine).valid?
+  end
+
+  test "removing a user's own collection deletes its texts and nested collections, setting aside their notes" do
+    user = users(:one)
+    focus = user.foci.start!(title: "What is light?")
+    pearl = user.collections.create!(name: "Pearl")
+    inner = user.collections.create!(name: "Inner", parent: pearl)
+    moses = UserText.new(title: "Moses", source: "Let there be light.", collection_id: pearl.id).publish!(user)
+    abraham = UserText.new(title: "Abraham", source: "The stars.", collection_id: inner.id).publish!(user)
+    loose = UserText.new(title: "Diary", source: "Words.").publish!(user)
+    focus.notes.create!(unit: moses.sections.sole.units.sole, content: "On light")
+    shelf = user.shelves.create!(name: "Mine")
+    shelf.replace!([ pearl ])
+
+    assert_difference -> { user.detached_notes.count } => 1, -> { Note.count } => -1 do
+      pearl.remove!
+    end
+    assert_not Collection.exists?(pearl.id)
+    assert_not Collection.exists?(inner.id)
+    assert_not Work.exists?(moses.id)
+    assert_not Work.exists?(abraham.id)
+    assert Work.exists?(loose.id)
+    assert_empty shelf.items.reload
+    assert_equal "Moses", user.detached_notes.sole.work_title
+  end
 end

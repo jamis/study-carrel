@@ -65,4 +65,33 @@ class RandomScopeTest < ActiveSupport::TestCase
     shelf.replace!([ Collection.find_by!(slug: "poetry") ])
     assert_nil RandomScope.new(shelf).unit(user)
   end
+
+  test "a user's own collections are branches of Your Texts, beside their texts in none" do
+    user = users(:one)
+    pearl = user.collections.create!(name: "Pearl")
+    moses = UserText.new(title: "Moses", source: "One. Two. Three. Four. Five. Six.", collection_id: pearl.id).publish!(user)
+    UserText.new(title: "Abraham", source: "Seven.", collection_id: pearl.id).publish!(user)
+    UserText.new(title: "Diary", source: "Words.").publish!(user)
+
+    assert_equal [ "Moses", "Pearl", "Your Texts", "Whole library" ], RandomScope.chain_for(moses).map(&:label)
+    assert_equal [ "Pearl", "Your Texts", "Whole library" ], RandomScope.chain_for(pearl).map(&:label)
+    assert_equal RandomScope.new(pearl), RandomScope.default_for(moses)
+
+    seen = 300.times.map { RandomScope.new(OwnTexts.new(user)).unit(user).section.work.title }.tally
+    assert_includes 100..200, seen["Diary"], "the collection and the loose text are a branch each, so about half"
+    assert_equal %w[Abraham Diary Moses], seen.keys.sort
+    assert 30.times.all? { RandomScope.new(pearl).unit(user).section.work.collection == pearl }
+    assert 30.times.none? { RandomScope.library.unit(users(:two)).section.work.own_text? }
+  end
+
+  test "a user's collection that is one work in parts rolls evenly by passage, not by text" do
+    user = users(:one)
+    pearl = user.collections.create!(name: "Pearl", single_work: true)
+    long = (1..9).map { "Sentence #{it}." }.join(" ")
+    UserText.new(title: "Moses", source: long, collection_id: pearl.id).publish!(user)
+    UserText.new(title: "Abraham", source: "Short.", collection_id: pearl.id).publish!(user)
+
+    seen = 300.times.map { RandomScope.new(pearl).unit(user).section.work.title }.tally
+    assert_includes 10..60, seen["Abraham"], "one passage in ten, so about 30, where by text it would be about 150"
+  end
 end

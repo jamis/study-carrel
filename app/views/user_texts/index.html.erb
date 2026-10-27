@@ -4,11 +4,23 @@
 <main class="page">
   <%= page_head [ [ "Library", library_path ], [ "Your Texts", texts_path ] ] %>
   <h2 class="page-title">Your Texts</h2>
-  <p class="page-lede">Journals, talks, poems, songs: anything you’ve added. Only you can see them. <%= link_to "Add a text", new_text_path %></p>
-  <%= render "shared/search_form", place: place if @texts.any? %>
+  <p class="page-lede">Journals, talks, poems, songs: anything you’ve added. Only you can see them. <%= link_to "Add a text", new_text_path %> · <%= link_to "New collection", new_collection_path %></p>
+  <%= render "shared/search_form", place: place if @any_texts %>
   <% if flash[:alert] || flash[:notice] %><p class="<%= flash[:alert] ? "signin-alert" : "signin-notice" %>" role="status"><%= flash[:alert] || flash[:notice] %></p><% end %>
 
-  <% if @texts.empty? %>
+  <% @collections.each do |collection| %>
+    <div class="list-row">
+      <div class="list-row-title<%= " as-work" if collection.single_work? %>"><%= link_to collection.name, collection_path(collection) %></div>
+      <% if collection.description.present? %><div class="list-row-desc"><%= collection.description %></div><% end %>
+      <div class="list-row-meta">
+        <% count = @work_counts.fetch(collection.id) %><%= count.zero? ? "No texts yet" : pluralize(count, collection.work_noun) %>
+        <%= link_to "Delete", delete_collection_path(collection), class: "texts-delete" %>
+      </div>
+    </div>
+  <% end %>
+  <% if @collections.any? && @texts.any? %><h3 class="texts-group">In no collection</h3><% end %>
+
+  <% if @texts.empty? && @collections.empty? %>
     <p class="page-empty">Nothing here yet. <%= link_to "Add a text", new_text_path %> to read it a sentence or a stanza at a time, with your focus beside it.</p>
   <% end %>
   <% @texts.each do |work| %>

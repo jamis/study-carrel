@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_26_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_27_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -58,8 +58,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_120000) do
     t.datetime "updated_at", null: false
     t.integer "parent_id"
     t.boolean "single_work", default: false, null: false
+    t.integer "user_id"
     t.index ["parent_id"], name: "index_collections_on_parent_id"
     t.index ["slug"], name: "index_collections_on_slug", unique: true
+    t.index ["user_id"], name: "index_collections_on_user_id"
   end
 
   create_table "detached_notes", force: :cascade do |t|
@@ -252,6 +254,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_120000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "collections", "collections", column: "parent_id", on_delete: :nullify
+  add_foreign_key "collections", "users"
   add_foreign_key "detached_notes", "foci", on_delete: :nullify
   add_foreign_key "detached_notes", "users"
   add_foreign_key "foci", "notes", column: "reread_note_id", on_delete: :nullify

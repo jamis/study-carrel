@@ -18,7 +18,7 @@
     <% else %>
       <div class="list-row-desc">Journals, talks, poems, songs: read a sentence or a stanza at a time. Only you can see them.</div>
     <% end %>
-    <div class="list-row-meta"><%= pluralize(@texts.size, "text") if @texts.any? %><%= link_to "Add a text", new_text_path %></div>
+    <div class="list-row-meta"><%= [ (pluralize(@own_collections.size, "collection") if @own_collections.any?), (pluralize(@texts.size, "text") if @texts.any?) ].compact.join(" · ") %><%= link_to "Add a text", new_text_path %></div>
   </div>
 
   <div class="list-row">

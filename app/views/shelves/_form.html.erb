@@ -16,20 +16,20 @@
          autocomplete="off" data-shelf-editor-target="find" data-action="input->shelf-editor#find keydown.enter->shelf-editor#stay">
   <%= hidden_field_tag "items[]", "", id: nil %>
   <ul class="shelf-tree">
-    <% @collections_by_parent.fetch(nil, []).each do |collection| %>
+    <% @collections_by_parent.fetch(nil, []).reject(&:own?).each do |collection| %>
       <%= render "shelves/tree_node", thing: collection, shelf:, depth: 0 %>
     <% end %>
-    <% @works_by_collection.fetch(nil, []).each do |work| %>
+    <% @loose_works.each do |work| %>
       <%= render "shelves/tree_node", thing: work, shelf:, depth: 0 %>
     <% end %>
-    <% if @texts.any? %>
+    <% if @own_collections.any? || @texts.any? %>
       <li data-find="your texts">
         <div class="tree-row tree-group">
           <button class="tree-toggle" type="button" aria-expanded="true" data-action="shelf-editor#toggle" aria-label="Fold Your Texts">▶</button>
           <span class="tree-name">Your Texts</span><span class="tree-meta">only you can see these</span>
         </div>
         <ul>
-          <% @texts.each do |work| %><%= render "shelves/tree_node", thing: work, shelf:, depth: 1 %><% end %>
+          <% [ *@own_collections, *@texts ].each do |thing| %><%= render "shelves/tree_node", thing:, shelf:, depth: 1 %><% end %>
         </ul>
       </li>
     <% end %>

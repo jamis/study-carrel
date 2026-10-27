@@ -164,6 +164,35 @@ class IsolationTest < ActionDispatch::IntegrationTest
     assert_nil other_focus.reload.last_unit
   end
 
+  test "a reader's own collection is invisible to everyone else: not listed, opened, searched, rolled, shelved, added to or deleted" do
+    pearl = @owner.collections.create!(name: "Owner's pearl")
+    work = UserText.new(title: "Moses", source: "Private words about porcupines.", collection_id: pearl.id).publish!(@owner)
+    mine = @other.shelves.create!(name: "Mine")
+    @other.foci.start!(title: "Other's focus")
+    sign_in_as @other
+
+    [ library_path, texts_path, new_text_path(collection: pearl.slug), new_shelf_path ].each do |path|
+      get path
+      assert_no_match "Owner's pearl", response.body, path
+    end
+    [ collection_path(pearl), delete_collection_path(pearl), random_collection_path(pearl.slug), search_path(q: "porcupines", collection: pearl.slug) ].each do |path|
+      get path
+      assert_response :not_found, path
+    end
+    delete collection_path(pearl)
+    assert_response :not_found
+    post shelf_item_path(mine, key: "collection-#{pearl.id}")
+    assert_response :not_found
+    post shelves_path, params: { shelf: { name: "Sneaky" }, items: [ "collection-#{pearl.id}" ] }
+    assert_empty @other.shelves.find_by!(name: "Sneaky").items
+    assert_no_difference -> { Work.count } do
+      post texts_path, params: { user_text: { title: "Cuckoo", source: "Words.", collection_id: pearl.id } }
+    end
+    assert_response :not_found
+
+    assert_equal [ work ], pearl.reload.works.to_a
+  end
+
   test "another reader's shelf can't be seen, rolled in, searched, changed or added to" do
     shelf = @owner.shelves.create!(name: "Owner's shelf")
     shelf.replace!([ verse(3).section.work ])

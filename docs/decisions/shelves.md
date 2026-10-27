@@ -13,7 +13,7 @@
 
 ## Privacy
 
-Like user texts, **private to their owner**: found only through `user.shelves`, with a 404 for anyone else (show, edit, Random, search, adding). Slugs get a random suffix (`poets-i-love-k3f9`). A shelf's works are always resolved through `Work.visible_to(owner)`, so a shelf can never reach another user's text. A user's own texts can go on their shelves one by one; Your Texts as a whole can't.
+Like user texts, **private to their owner**: found only through `user.shelves`, with a 404 for anyone else (show, edit, Random, search, adding). Slugs get a random suffix (`poets-i-love-k3f9`). A shelf's works are always resolved through `Work.visible_to(owner)`, so a shelf can never reach another user's text. A user's own texts and collections can go on their shelves one by one (collections through `Collection.visible_to(owner)`); Your Texts as a whole can't.
 
 ## Two ways to fill one
 

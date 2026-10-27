@@ -5,6 +5,7 @@ class Work < ApplicationRecord
 
   validates :title, :slug, presence: true
   validates :slug, uniqueness: true
+  validate :collection_has_the_same_owner
 
   scope :ordered, -> { order(:position, :id) }
   scope :bundled, -> { where(user_id: nil) }
@@ -67,6 +68,11 @@ class Work < ApplicationRecord
   end
 
   private
+
+  # A user's own text goes only in their own collections, and a bundled work only in bundled ones.
+  def collection_has_the_same_owner
+    errors.add(:collection, "must be one of the same owner's collections") if collection && collection.user_id != user_id
+  end
 
   def siblings = collection ? collection.works : Work.none
 end

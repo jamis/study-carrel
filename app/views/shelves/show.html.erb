@@ -17,7 +17,8 @@
       <div class="list-row-title<%= " as-work" if collection.single_work? %>"><%= link_to collection.name, collection_path(collection) %></div>
       <% if collection.description.present? %><div class="list-row-desc"><%= collection.description %></div><% end %>
       <div class="list-row-meta">
-        <%= [ (pluralize(@work_counts.fetch(collection.id), "work") unless collection.single_work?), ("in #{collection.parent.name}" if collection.parent) ].compact.join(" · ") %>
+        <%= [ (pluralize(@work_counts.fetch(collection.id), collection.work_noun) unless collection.single_work?),
+              ("in #{collection.parent&.name || "Your Texts"}" if collection.parent || collection.own?) ].compact.join(" · ") %>
       </div>
     </div>
   <% end %>
@@ -26,7 +27,7 @@
     <% @members.grep(Work).each do |work| %>
       <%= link_to work_path(work), class: "work-link" do %>
         <span class="work-link-title"><%= work.title %></span>
-        <span class="work-link-meta"><%= work.own_text? ? "Your Texts" : [ work.byline, work.edition, work.collection&.name ].compact_blank.join(" · ") %></span>
+        <span class="work-link-meta"><%= [ ("Your Texts" if work.own_text?), work.byline, work.edition, work.collection&.name ].compact_blank.join(" · ") %></span>
       <% end %>
     <% end %>
   </div>

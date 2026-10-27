@@ -2,22 +2,29 @@
 # edit > review > update (see TextRevision), and deleted. Notes and remarked keeps on sentences that a revision or a
 # deletion takes away are set aside as detached notes. Only the owner ever reaches a text.
 class UserTextsController < ApplicationController
+  include SetsAsideNotes
+
   before_action :set_work, only: %i[edit update destroy]
   # Matching a revision can take a couple of seconds (see TextRevision). Only that is limited: reviewing a new text or
   # going back to edit one doesn't match anything.
   rate_limit to: 10, within: 1.minute, by: -> { Current.user.id }, only: %i[review update], with: -> { slow_down },
              if: -> { params[:slug] && !params[:edit] }
 
+  # The user's collections, then their texts in none.
   def index
-    @texts = Current.user.texts.to_a
+    @collections = Current.user.collections.top_level.to_a
+    @work_counts = Current.user.collections.work_counts
+    @any_texts = Current.user.texts.exists?
+    @texts = Current.user.texts.where(collection_id: nil).to_a
     units = Unit.joins(:section).where(sections: { work_id: @texts })
     @unit_counts = units.group("sections.work_id").count
     @annotation_counts = Note.joins(unit: :section).merge(units).group("sections.work_id").count
                              .merge(Keep.joins(unit: :section).merge(units).group("sections.work_id").count) { |_, a, b| a + b }
   end
 
+  # From a collection's "Add a text here", the text goes into that collection unless the form says otherwise.
   def new
-    @text = UserText.new
+    @text = UserText.new(collection_id: Current.user.collections.find_by(slug: params[:collection])&.id)
   end
 
   def edit
@@ -70,10 +77,11 @@ class UserTextsController < ApplicationController
 
   def set_work = @work = Current.user.texts.find_by!(slug: params[:slug])
 
-  # A revision keeps the text's form, whatever is posted: changing it would change every unit's shape.
+  # A revision keeps the text's form, whatever is posted: changing it would change every unit's shape. It stays in its
+  # collection, too: only a new text is put in one.
   def text_params
-    attrs = params.expect(user_text: %i[title author source form])
-    @work ? attrs.merge(form: UserText.form_of(@work)) : attrs
+    attrs = params.expect(user_text: %i[title author source form collection_id])
+    @work ? attrs.merge(form: UserText.form_of(@work)).except(:collection_id) : attrs
   end
 
   # The form back, with the text as it was sent.
@@ -82,15 +90,5 @@ class UserTextsController < ApplicationController
     @text = UserText.new(text_params)
     @text.errors.add(:base, "That’s a lot of revising in a minute: wait a moment, then try again")
     render :new, status: :too_many_requests
-  end
-
-  def set_aside_count
-    before = Current.user.detached_notes.count
-    yield
-    Current.user.detached_notes.count - before
-  end
-
-  def set_aside_message(count)
-    " #{count == 1 ? "One note was" : "#{count} notes were"} set aside with the passages they were written on." if count.positive?
   end
 end
