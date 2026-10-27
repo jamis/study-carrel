@@ -364,6 +364,15 @@
 .comparing .rr-row.cursor { background: var(--paper); box-shadow: inset 2px 0 0 var(--accent); }
 .comparing .rr-row:not(.cursor):not(.along) .rr-note { color: var(--ink-soft); }
 .comparing.cmp-lighting .rr-row:not(.cmp-lit) { opacity: .3; }
+/* A row's passage cut off opens as the card's do, the whole of it laid over the cut one (under the card, if scrolled
+   beneath it). */
+.comparing .rr-row .rr-passage.cut { cursor: zoom-in; }
+.comparing .rr-row .rr-passage.open { visibility: hidden; }
+.rr-peek {
+  position: absolute; z-index: 4; padding: 8px 12px 10px; cursor: zoom-out;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow);
+}
+.rr-row .rr-peek .rr-passage { display: block; margin: 0 0 0 2px; }
 .comparing .rr-cmp-acts { display: inline-flex; gap: 5px; margin-left: auto; align-self: center; }
 .comparing .rr-cmp-hold {
   display: inline-block; flex: none; white-space: nowrap; padding: 2px 10px; border: 1px solid var(--rule); border-radius: 999px; background: none;

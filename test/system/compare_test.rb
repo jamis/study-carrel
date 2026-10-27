@@ -84,6 +84,37 @@ class CompareTest < ApplicationSystemTestCase
     assert_no_selector ".comparing"
   end
 
+  test "a row's passage cut off opens over it with P or a click; Esc, a click or moving on puts it away" do
+    @focus.notes.create!(unit: verse(12), content: "The scale is the point")
+    # Narrow enough that 40:12 runs past the two lines a row keeps.
+    page.current_window.resize_to(900, 1000)
+    visit focus_notes_path(@focus)
+    keys "g"
+    keys "j", "j", "j"
+    assert_selector ".rr-row.cursor", text: "The scale is the point"
+    assert_selector ".rr-row.cursor .rr-passage.cut"
+    keys "P"
+    assert_selector ".rr-row.cursor .rr-peek", text: "and the hills in a balance"
+    keys :escape
+    assert_no_selector ".rr-peek"
+    assert_selector ".comparing"
+
+    find(".rr-row.cursor .rr-passage").click
+    assert_selector ".rr-row.cursor .rr-peek"
+    keys "j"
+    assert_no_selector ".rr-peek"
+    assert_selector ".rr-row.cursor", text: "Who hath directed"
+
+    # A click on another row's passage moves the cursor there and opens it; a click on it puts it away.
+    find(".rr-row", text: "The scale is the point").find(".rr-passage").click
+    assert_selector ".rr-row.cursor .rr-peek", text: "and the hills in a balance"
+    find(".rr-peek").click
+    assert_no_selector ".rr-peek"
+    assert_selector ".rr-row.cursor", text: "The scale is the point"
+  ensure
+    page.current_window.resize_to(1400, 1000)
+  end
+
   test "holding other notes under tabs: back and forth between them, the one used longest ago giving way, x letting one go" do
     visit focus_notes_path(@focus)
     keys "g"

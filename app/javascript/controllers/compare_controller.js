@@ -16,7 +16,7 @@ const MAX_TABS = 3
 // note, and the list to where it was when that note was last the one you were on. x, or a tab's ×, lets one go.
 //
 // The card is kept short: the passage cut to a line, the note to three, each face to one; what's cut off opens over
-// what's below (hover, a tap, or p and o). A number pointed at on a row lights its group in the card; a group pointed
+// what's below (hover, a tap, or p and o). A row's passage cut off is opened the same way, by a click or P. A number pointed at on a row lights its group in the card; a group pointed
 // at in the card lights its notes in the list. g, Esc or the card's × goes back to the reread, on the note you're on.
 export default class extends Controller {
   static targets = ["card", "labels", "noteLabels"]
@@ -73,6 +73,7 @@ export default class extends Controller {
 
   leave() {
     if (!this.comparing) return
+    this.#closePeeks()
     this.element.classList.remove("comparing", "cmp-lighting")
     this.cardTarget.hidden = true
     this.cardTarget.replaceChildren()
@@ -164,6 +165,7 @@ export default class extends Controller {
   // The note becomes the one you're on (the reread's own move, so where you are is kept), and everything is drawn
   // again.
   #moveTo(row) {
+    this.#closePeeks()
     this.#reread?.goTo(row)
     this.cursor = this.#rowOf(this.cursor) && this.cursor !== row.dataset.noteId ? this.cursor : null
     this.naming = null
@@ -271,7 +273,7 @@ export default class extends Controller {
       const cut = peek.matches(".peek-face") ? peek.firstElementChild : peek.firstElementChild.firstElementChild
       peek.classList.toggle("fits", cut.scrollHeight <= cut.clientHeight + 1)
     })
-    this.opened = null
+    if (this.opened && !this.opened.isConnected) this.opened = null
     const input = this.cardTarget.querySelector(".cmp-name")
     if (input) {
       input.focus()
@@ -306,6 +308,12 @@ export default class extends Controller {
       }).join("") + '<button type="button" class="cmp-put cmp-plus" data-plus title="A new group of these two">+</button>'
       row.classList.toggle("along", ids.some(id => hereIds.includes(id)))
       row.classList.toggle("cursor", row.dataset.noteId === this.cursor)
+      const passage = row.querySelector(".rr-passage")
+      if (passage) {
+        const cut = passage.scrollHeight > passage.clientHeight + 1
+        passage.classList.toggle("cut", cut)
+        passage.title = cut ? "Show the whole passage" + (row.dataset.noteId === this.cursor ? " (P)" : "") : ""
+      }
     })
   }
 
@@ -331,10 +339,30 @@ export default class extends Controller {
 
   // ---------- the cut-off text ----------
 
+  // A peek on the card, or a row's passage (.rr-passage), whose whole text is laid over it in a panel of its own.
   #open(peek) {
-    if (this.opened && this.opened !== peek) this.opened.classList.remove("open")
-    this.opened = peek && !peek.classList.contains("fits") ? peek : null
-    this.opened?.classList.add("open")
+    if (this.opened && this.opened !== peek) this.#shut(this.opened)
+    const cut = peek?.matches(".rr-passage") ? peek.classList.contains("cut") : peek && !peek.classList.contains("fits")
+    this.opened = cut ? peek : null
+    if (!this.opened || this.opened.classList.contains("open")) return
+    this.opened.classList.add("open")
+    if (peek.matches(".rr-passage")) this.#lay(peek)
+  }
+
+  #shut(peek) {
+    peek.classList.remove("open")
+    if (peek.matches(".rr-passage") && peek.previousElementSibling?.matches(".rr-peek")) peek.previousElementSibling.remove()
+  }
+
+  // The row's passage whole, laid exactly over the cut one, so the rows below don't move.
+  #lay(passage) {
+    const full = document.createElement("div")
+    full.className = "rr-peek"
+    full.innerHTML = `<p class="rr-passage">${escapeHtml(passage.textContent.trim())}</p>`
+    full.style.top = `${passage.offsetTop - 9}px`
+    full.style.left = `${passage.offsetLeft - 15}px`
+    full.style.right = `${passage.offsetParent.clientWidth - passage.offsetLeft - passage.offsetWidth - 13}px`
+    passage.before(full)
   }
 
   #closePeeks() {
@@ -351,7 +379,7 @@ export default class extends Controller {
     if (this.canHover) {
       const peek = inCard && event.target.closest(".peek")
       if (peek) this.#open(peek)
-      else if (this.opened) this.#closePeeks()
+      else if (this.opened && this.cardTarget.contains(this.opened)) this.#closePeeks()
     }
     // A number on a row lights its group in the card; a group in the card lights its notes in the list.
     this.#mark(event.target.closest?.(".rr-cmp-acts [data-put]")?.dataset.put || null)
@@ -363,7 +391,8 @@ export default class extends Controller {
   }
 
   #away(event) {
-    if (this.comparing && !this.canHover && this.opened && !this.opened.contains(event.target)) this.#closePeeks()
+    if (!this.comparing || !this.opened || this.opened.contains(event.target)) return
+    if (this.opened.matches(".rr-passage") || !this.canHover) this.#closePeeks()
   }
 
   #click(event) {
@@ -388,9 +417,15 @@ export default class extends Controller {
     if (t.closest("[data-put]")) return this.#put(t.closest("[data-put]").dataset.put, row)
     if (t.closest("[data-plus]")) return this.#plus(row)
     if (t.closest("button")) return
-    this.cursor = row.dataset.noteId
-    this.#renderRows()
-    this.#mark()
+    // The passage laid open: a click on it puts it away.
+    if (t.closest(".rr-peek")) return this.#closePeeks()
+    if (this.cursor !== row.dataset.noteId) {
+      this.cursor = row.dataset.noteId
+      this.#renderRows()
+      this.#mark()
+    }
+    const passage = t.closest(".rr-passage")
+    if (passage) this.#open(passage)
   }
 
   // ---------- moving the cursor ----------
@@ -400,6 +435,7 @@ export default class extends Controller {
     const at = others.findIndex(row => row.dataset.noteId === this.cursor)
     const to = others[at < 0 ? (by > 0 ? 0 : others.length - 1) : Math.max(0, Math.min(others.length - 1, at + by))]
     if (!to) return
+    if (this.opened?.matches(".rr-passage")) this.#closePeeks()
     this.cursor = to.dataset.noteId
     this.#renderRows()
     this.#mark()
@@ -453,7 +489,8 @@ export default class extends Controller {
 
   // g in and out; while comparing: j/k through the others, 1–9 put the one you're at in a group (again to take it out),
   // + or n a new group of the two, Enter holds it under a tab, [ and ] go from tab to tab, x lets the note you're on go,
-  // J/K step the note you're on, p and o open the passage and the note, Esc closes what's open, then goes back.
+  // J/K step the note you're on, p and o open the passage and the note, P the passage at the cursor, Esc closes what's
+// open, then goes back.
   key(event) {
     if (event.metaKey || event.ctrlKey || event.altKey) return
     if (event.target.closest?.("input, textarea, select, [contenteditable]")) return
@@ -481,6 +518,10 @@ export default class extends Controller {
     else if (k === "p" || k === "o") {
       const peek = this.cardTarget.querySelector(k === "p" ? ".peek-passage" : ".peek-note")
       peek && peek === this.opened ? this.#closePeeks() : this.#open(peek)
+    }
+    else if (k === "P" && cursor) {
+      const passage = cursor.querySelector(".rr-passage")
+      passage && passage === this.opened ? this.#closePeeks() : this.#open(passage)
     }
     else return
     event.preventDefault()
