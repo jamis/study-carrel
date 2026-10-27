@@ -100,8 +100,8 @@ class FociController < ApplicationController
 
   def foci = Current.user.foci
 
-  # Editing from a focus's notes page goes back there (?back=notes), as does Cancel; from its card, back to the cards.
-  # Unarchiving or deleting from the archive goes back to it (?back=archived).
+  # Unarchiving from a focus's notes page goes back there (?back=notes); unarchiving or deleting from the archive goes
+  # back to it (?back=archived).
   def back_path
     case params[:back]
     when "notes" then focus_notes_path(@focus)

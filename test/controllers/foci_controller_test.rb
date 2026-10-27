@@ -107,14 +107,9 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", foci_path, text: "Cancel"
   end
 
-  test "edited from its notes page, a focus goes back there" do
+  test "a focus's notes page doesn't offer editing it" do
     get focus_notes_path(@focus)
-    assert_select ".page-actions a[href=?]", edit_focus_path(@focus, back: "notes")
-    get edit_focus_path(@focus, back: "notes")
-    assert_select "input[type=hidden][name=back][value=notes]"
-    assert_select "a[href=?]", focus_notes_path(@focus), text: "Cancel"
-    patch focus_path(@focus), params: { back: "notes", focus: { title: "Holy, again" } }
-    assert_redirected_to focus_notes_path(@focus)
+    assert_select "a[href^=?]", edit_focus_path(@focus), 0
   end
 
   test "the current card links to where its reading left off" do

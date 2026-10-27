@@ -103,7 +103,6 @@ class ArchivingTest < ActionDispatch::IntegrationTest
     get focus_notes_path(@old)
     assert_response :success
     assert_select ".page-trail a[href=?]", archived_foci_path, text: "Archived"
-    assert_select ".page-actions a[href=?]", edit_focus_path(@old, back: "notes"), 0
     assert_select ".page-actions a[href=?]", export_focus_notes_path(@old)
     assert_select ".rr-archived form[action=?]", unarchive_focus_path(@old, back: "notes")
     assert_select "main[data-controller=?][data-reread-read-only-value=true]", "reread"

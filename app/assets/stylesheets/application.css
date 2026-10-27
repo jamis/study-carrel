@@ -605,7 +605,7 @@
 .invite-form { max-width: none; margin: 0 0 8px; }
 
 /* ---------- foci pages ---------- */
-a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a):not(.rail a):not(.whole-group a):not(.card-new):not(.note-under-back):not(.note-also-focus):not(.card-act):not(.kept-act):not(.cards-more a):not(.back-slip a):not(.scope-item):not(.rr-chip-face) { color: var(--accent); }
+a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu-item):not(.as-work a):not(.rail a):not(.whole-group a):not(.card-new):not(.note-under-back):not(.note-also-focus):not(.card-act):not(.kept-act):not(.cards-more a):not(.back-slip a):not(.scope-item):not(.rr-chip-face):not(.page-act) { color: var(--accent); }
 .inline-form { display: inline; margin: 0; }
 .page { max-width: 40em; margin: 0 auto; padding: 22px 16px 80px; }
 /* Above the title: the way up (helpers page_head), quietly, and the page's actions at the right. */
@@ -786,6 +786,11 @@ a.fv-ref:hover { text-decoration: underline; }
 .page-actions { display: flex; gap: 8px; }
 .page-actions .chip { white-space: nowrap; }
 @media (max-width: 599px) { .page-actions .wide-only { display: none; } }
+/* Actions as quiet words beside the trail (a focus's notes page: Copy as Markdown · Download .md), not chips. */
+.page-actions.quiet { gap: 0; font-size: 13px; }
+.page-actions.quiet > * + *::before { content: "·"; margin: 0 7px; color: var(--ink-faint); }
+.page-act { border: 0; background: none; padding: 0; font: inherit; color: var(--ink-faint); text-decoration: none; white-space: nowrap; cursor: pointer; }
+.page-act:hover { color: var(--accent); }
 .fv-quote { white-space: pre-line; }
 
 /* ---------- Kept (keeps/index) ---------- */

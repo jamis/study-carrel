@@ -11,7 +11,7 @@ The first part of synthesis (see [synthesis.md](synthesis.md), still exploratory
 - **The column is about 48em wide** on a wide screen (decided 2026-10-20), wider than the reader's 34em measure: with the scratchpad put away there's nothing beside it, and comparing notes wants the room (the card's tabs were crowded at 36em, the width it had beside the docked scratchpad). Keeping the notes' text to about 40em inside a wider row was the alternative, if the full width reads too long.
 - `j`/`k` (or `←`/`→`) move, as does clicking a note; a held key moves once, as in the reader. The lit note scrolls to the middle.
 - **Where you left off** is kept per focus (`foci.reread_note_id`, cleared if that note goes), so the reread opens there again.
-- The way up: Your focuses (› Archived, for an archived focus). Copy Markdown and Download `.md` at the right of that line. An archived focus's "Archived October 21, 2026 · Unarchive" follows the count.
+- The way up: Your focuses (› Archived, for an archived focus). Copy as Markdown · Download `.md` at the right of that line, quiet words like the trail, not chips. An archived focus's "Archived October 21, 2026 · Unarchive" follows the count.
 - Detached notes follow the run, out of it, to read or discard (see [foci-and-notes.md](foci-and-notes.md)).
 - The reference links into the reader; on the lit note it reads "Isaiah 40:25 Open in the reader →", all one link (the hint was once a separate span that lit up with the reference but did nothing when clicked).
 - `?label=` rereads only the notes carrying one label: a pill's name, or "Rereading 8 notes ▾" over the run (see [Rereading one label](#rereading-one-label)).
