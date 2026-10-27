@@ -8,6 +8,21 @@ class RailTest < ApplicationSystemTestCase
     sign_in_as users(:one)
   end
 
+  test "the labels open from an icon, not the rail's blank stretch, and stay while the pointer is on the rail" do
+    visit library_path
+    find(".rail").hover # its middle, between Kept and the foot
+    assert_no_selector ".rail.labels"
+    assert_no_selector ".rail-label", text: "Your focuses"
+
+    find(".rail-btn[aria-label='Your focuses']").hover
+    assert_selector ".rail.labels .rail-label", text: "Your focuses"
+    find(".rail").hover
+    assert_selector ".rail.labels"
+
+    find("main, .page", match: :first).hover
+    assert_no_selector ".rail.labels"
+  end
+
   test "Random opens the places to pick from, the default first" do
     visit work_path("genesis-kjv")
     find(".rail-random .rail-btn").click

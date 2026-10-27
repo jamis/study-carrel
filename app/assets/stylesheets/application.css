@@ -260,20 +260,20 @@
     border: 1.5px solid currentColor; border-radius: 50%; font: 600 11px var(--sans);
   }
 
-  /* The labels: pointing at the rail (or tabbing into it) widens it over the page at once, each icon's name beside it,
-     so the icons can be learned without waiting on tooltips. Its column stays 52px, so nothing beneath moves; an open
-     popover folds them away again, so it sits beside its icon. */
+  /* The labels: pointing at one of its icons (.labels, rail_controller.js) or tabbing into it widens the rail over the
+     page at once, each icon's name beside it, so the icons can be learned without waiting on tooltips. Its column
+     stays 52px, so nothing beneath moves; an open popover folds them away again, so it sits beside its icon. */
   .rail-label { display: none; font-family: var(--sans); font-size: 14px; color: var(--ink-soft); white-space: nowrap; }
   .rail-label kbd { font: inherit; font-size: 12px; color: var(--ink-faint); margin-left: 10px; }
   .rail-btn:hover .rail-label, .rail-btn[aria-current="page"] .rail-label { color: inherit; }
   @media (min-width: 900px) {
-    .rail:is(:hover, :has(:focus-visible)):not(:has(.open)) {
+    .rail:is(.labels, :has(:focus-visible)):not(:has(.open)) {
       width: max-content; padding-right: 14px; background: var(--bg); border-right: 1px solid var(--rule); box-shadow: 8px 0 24px rgba(0, 0, 0, .08);
     }
-    .rail:is(:hover, :has(:focus-visible)):not(:has(.open)) .rail-label { display: inline; }
-    .rail:is(:hover, :has(:focus-visible)):not(:has(.open)) .rail-label-2 { display: flex; }
-    .rail:is(:hover, :has(:focus-visible)):not(:has(.open)) :is(.rail-btn, .rail-item, .history) { width: 100%; }
-    .rail:is(:hover, :has(:focus-visible)):not(:has(.open)) .rail-btn { padding-right: 14px; }
+    .rail:is(.labels, :has(:focus-visible)):not(:has(.open)) .rail-label { display: inline; }
+    .rail:is(.labels, :has(:focus-visible)):not(:has(.open)) .rail-label-2 { display: flex; }
+    .rail:is(.labels, :has(:focus-visible)):not(:has(.open)) :is(.rail-btn, .rail-item, .history) { width: 100%; }
+    .rail:is(.labels, :has(:focus-visible)):not(:has(.open)) .rail-btn { padding-right: 14px; }
   }
   /* Two-line labels (Continue reading, Random) fit in the folded button's 36px, so opening the rail moves nothing. */
   .rail-label-2 { flex-direction: column; min-width: 0; line-height: 1.15; }

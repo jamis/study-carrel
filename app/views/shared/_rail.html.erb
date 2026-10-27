@@ -1,5 +1,5 @@
 <%# The rail: the app's tools down the left edge of every signed-in page, and you (light/dark, sign out) at its foot.
-    Pointing at it (or tabbing into it) widens it over the page with each icon's name beside it. On phones there's only
+    Pointing at one of its icons (or tabbing into it) widens it over the page with each icon's name beside it. On phones there's only
     a ⋯, top right, whose menu takes in the rest.
     focus: the current focus (nil if none)
     section, previous_section, next_section: on the reading view; Go up then opens the library trail, and Continue
@@ -15,7 +15,7 @@
    trail = (render("readings/trail", section: section, previous_section: previous_section, next_section: next_section) if section)
    continue_unit = (focus.last_unit if focus && !section)
    me = Current.user.email_address.split("@").first %>
-<nav class="rail" aria-label="Tools" data-controller="theme rail" data-action="mouseenter->rail#fit focusin->rail#fit">
+<nav class="rail" aria-label="Tools" data-controller="theme rail" data-action="pointerover->rail#point pointerleave->rail#leave pointerup->rail#lift pointercancel->rail#leave focusin->rail#fit">
   <div class="rail-item menu phone-only" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
     <button class="icon-btn menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-menu"
             data-menu-target="button" data-action="menu#toggle">⋯</button>
