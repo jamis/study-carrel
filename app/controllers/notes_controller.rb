@@ -5,14 +5,18 @@ class NotesController < ApplicationController
 
   # A focus's notes, reread one at a time (the current focus's or a past one's): those on passages in reading order,
   # then those on the focus as a whole, one lit at a time, to label as you go, with the focus's scratchpad beside them.
-  # ?label= rereads only the notes carrying one label; ?at= opens on one note, if it's among them. Detached notes follow,
-  # out of the run.
+  # ?label= rereads only the notes carrying one label (a label's id, so never "none"), or with ?label=none only those
+  # without any; ?at= opens on one note, if it's among them. Detached notes follow, out of the run.
   def index
-    @label = Current.user.labels.find(params[:label]) if params[:label].present?
+    @unlabelled = params[:label] == "none"
+    @label = Current.user.labels.find(params[:label]) if params[:label].present? && !@unlabelled
     @all = @focus.notes_for_reread
-    @notes = @label ? @all.select { it.label_ids.include?(@label.id) } : @all
+    @notes = if @label then @all.select { it.label_ids.include?(@label.id) }
+    elsif @unlabelled then @all.select { it.label_ids.empty? }
+    else @all
+    end
     @here = @notes.find { it.id == params[:at].to_i } || @notes.find { it.id == @focus.reread_note_id } || @notes.first
-    @detached = @focus.detached_notes.includes(:rich_text_content) unless @label
+    @detached = @focus.detached_notes.includes(:rich_text_content) unless @label || @unlabelled
   end
 
   # The editor for a new note on the focus as a whole, and for one already written. Any focus's, not only the current

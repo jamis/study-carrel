@@ -11,10 +11,11 @@
     An archived focus's page is read-only: its notes, labels and scratchpad to read, nothing to write, label or
     gather, and Unarchive in the lede. %>
 <% archived = @focus.archived? %>
+<% filtered = @label || @unlabelled %>
 <main class="reader reread" data-controller="reread<%= " compare peek" unless archived %>"
       data-reread-position-url-value="<%= focus_reread_path(@focus) %>"
       data-reread-read-only-value="<%= archived %>"
-      data-reread-filter-value="<%= @label&.id %>"
+      data-reread-filter-value="<%= @unlabelled ? "none" : @label&.id %>"
       <% if @label %>data-reread-rename-url-value="<%= focus_label_path(@focus, @label) %>"<% end %>
       data-reread-labels-url-template-value="<%= focus_note_labels_path(@focus, "{id}") %>"
       data-reread-lift-url-value="<%= focus_notes_path(@focus) %>"
@@ -39,7 +40,7 @@
     <div class="rr-lede">
       <span class="menu" data-controller="menu" data-action="keydown.esc@window->menu#escape click@window->menu#away">
         Rereading
-        <button class="rr-filter<%= " on" if @label %>" type="button" title="Reread only the notes with one label" aria-expanded="false" data-menu-target="button" data-action="menu#toggle"><% if @label %>the <span data-reread-target="count"><%= pluralize(@notes.size, "note") %></span> <%= label_phrase_tag(@label) %><% else %><%= pluralize(@notes.size, "note") %><% end %> <span class="rr-caret" aria-hidden="true">▾</span></button>
+        <button class="rr-filter<%= " on" if filtered %>" type="button" title="Reread only the notes with one label, or with none" aria-expanded="false" data-menu-target="button" data-action="menu#toggle"><% if @label %>the <span data-reread-target="count"><%= pluralize(@notes.size, "note") %></span> <%= label_phrase_tag(@label) %><% elsif @unlabelled %>the <span data-reread-target="count"><%= pluralize(@notes.size, "note") %></span> without a label<% else %><%= pluralize(@notes.size, "note") %><% end %> <span class="rr-caret" aria-hidden="true">▾</span></button>
         <%= render "rereads/filter_menu", focus: @focus, notes: @all %>
       </span>
       <% if archived %>
@@ -50,12 +51,17 @@
         <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to gather, <kbd>c</kbd> for the labels,<% if @label %> <kbd>r</kbd> to name this one,<% end %> <kbd>n</kbd> for a new note, <kbd>s</kbd> the scratchpad</span>
       <% end %>
     </div>
-    <%# Rereading one label: saying so over the run, with Rename (r) and the way back to them all (×, or Esc). Not
-        prefetched, as pills aren't (rereads/_note_labels). %>
-    <% if @label %>
+    <%# Rereading one label, or the notes without one: saying so over the run, with Rename (r) for a label and the way
+        back to them all (×, or Esc). Not prefetched, as pills aren't (rereads/_note_labels). Notes labelled while
+        rereading those without are counted here until you move on and they leave the run. %>
+    <% if filtered %>
       <div class="rr-filter-band" data-reread-target="band">
-        <span class="rr-filter-what">Only the <span data-reread-target="count"><%= pluralize(@notes.size, "note") %></span> <%= label_phrase_tag(@label) %><span data-reread-target="removed" hidden> · 1 just removed</span></span>
-        <%= render "rereads/filter_naming", label: @label, focus: @focus unless archived %>
+        <% if @label %>
+          <span class="rr-filter-what">Only the <span data-reread-target="count"><%= pluralize(@notes.size, "note") %></span> <%= label_phrase_tag(@label) %><span data-reread-target="removed" hidden> · 1 just removed</span></span>
+          <%= render "rereads/filter_naming", label: @label, focus: @focus unless archived %>
+        <% else %>
+          <span class="rr-filter-what">Only the <span data-reread-target="count"><%= pluralize(@notes.size, "note") %></span> without a label<span data-reread-target="removed" hidden></span></span>
+        <% end %>
         <%= link_to "Show all #{@all.size}", focus_notes_path(@focus, at: @here&.id), class: "rr-filter-all", data: { action: "reread#unfilter", turbo_prefetch: false } %>
         <%= link_to "×", focus_notes_path(@focus, at: @here&.id), class: "rr-filter-x", title: "Show all the notes (Esc)", aria: { label: "Show all the notes" }, data: { action: "reread#unfilter", turbo_prefetch: false } %>
       </div>
@@ -70,6 +76,8 @@
 
     <% if @label %>
       <p class="page-empty" data-reread-target="empty" <%= "hidden" if @notes.any? %>>No notes here are <%= label_phrase_tag(@label) %> any more.</p>
+    <% elsif @unlabelled %>
+      <p class="page-empty" data-reread-target="empty" <%= "hidden" if @notes.any? %>>Every note here has a label now.</p>
     <% elsif @notes.empty? %>
       <p class="page-empty"><%= archived ? "No notes." : "No notes yet. Open a verse and write what it says to your question." %></p>
     <% end %>
@@ -87,7 +95,7 @@
           <%= render "rereads/row", note:, focus: @focus, here: note == @here %>
         <% end %>
       </section>
-      <% unless @label || archived %>
+      <% unless filtered || archived %>
         <button class="rr-new" type="button" data-action="reread#newNote" title="A note on the focus as a whole (n)">+ New note</button>
       <% end %>
       <%# A new note on the whole focus, before its first save makes it (removed again if you move on with it empty). %>
@@ -158,7 +166,7 @@
     </button>
     <%# On phones, a new note on the whole focus and the labels are on the scratchpad's handle. %>
     <span class="rr-pad-tools rr-pad-tools-phone">
-      <% unless @label || archived %><button class="rr-summon rr-new-phone" type="button" data-action="reread#newNote">New note</button><% end %>
+      <% unless filtered || archived %><button class="rr-summon rr-new-phone" type="button" data-action="reread#newNote">New note</button><% end %>
       <button class="rr-summon" type="button" aria-expanded="false" data-action="reread#toggleLabels">Labels</button>
     </span>
     <%# Elsewhere, the scratchpad and the labels are each behind a tab at the right edge, which slides them in. %>

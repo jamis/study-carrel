@@ -18,7 +18,7 @@ The first part of synthesis (see [synthesis.md](synthesis.md), still exploratory
 - The way up: Your focuses (› Archived, for an archived focus). Copy as Markdown · Download `.md` at the right of that line, quiet words like the trail, not chips. An archived focus's "Archived October 21, 2026 · Unarchive" follows the count.
 - Detached notes follow the run, out of it, to read or discard (see [foci-and-notes.md](foci-and-notes.md)).
 - The reference links into the reader; on the lit note it reads "Isaiah 40:25 Open in the reader →", all one link (the hint was once a separate span that lit up with the reference but did nothing when clicked).
-- `?label=` rereads only the notes carrying one label: a pill's name, or "Rereading 8 notes ▾" over the run (see [Rereading one label](#rereading-one-label)).
+- `?label=` rereads only the notes carrying one label: a pill's name, or "Rereading 8 notes ▾" over the run (see [Rereading one label](#rereading-one-label)); `?label=none` only those without one (see [Rereading the notes without a label](#rereading-the-notes-without-a-label)).
 - **Editing:** the current focus's lit note gets the reader's editor in place (`e` puts the cursor at its end). A past focus's notes on passages are only read here: the reader's note editor saves to the current focus, and editing them was a nice-to-have left out to keep this simple. Notes on the whole focus save to their own focus, so they can be edited on any focus.
 
 ## Notes on the whole focus
@@ -61,6 +61,15 @@ See [foci-and-notes.md](foci-and-notes.md) for what they are. Here is where they
 - **Rename** (decided 2026-10-26): the band has "· Rename" after what it shows ("· Name it" for an unnamed group), or `r`. It opens a field in the band's place, "Only the 5 notes labelled [ waiting ] Save · Cancel", empty for an unnamed group ("Words for group D (optional)"), saying the name changes on every note it's on, under every focus, and what leaving it empty does. Enter saves, redrawing the band, the lede and the pills; Esc leaves it as it was, going no further. A name already taken is refused there, as in Gather. Renaming had been only on Gather's card, on hover, where the user couldn't find it; while rereading a label is when you're looking at what it holds. Prototyped (not kept) with the name itself as the button, dotted-underlined; a plain "Rename" said what it did.
 - A label dropped (its last note removed) is a 404 at its old `?label=`, as another user's is: the two can't be told apart without saying which labels exist. Going back to all the notes from the band or `Esc` doesn't go there.
 - Considered, for the clash of filtering and taking off on one pill: a menu on the pill (an extra click to filter), taking off from the picker only (hard to find), and keeping × with Undo. The user proposed the divided pill instead.
+
+## Rereading the notes without a label
+
+**"Without a label" in the "Rereading 8 notes ▾" menu** (decided 2026-10-28), under All notes with its count, once any note on the focus has a label. Studying goes in turns: read, write notes, label them, read more, write more; this finds the ones not yet sorted.
+
+- It's `?label=none`: labels go by id there, so a label called "none" is still `?label=17`, and one parameter means one filter, the label or the lack of one.
+- Set as rereading a label is: the chip "Rereading [the 4 notes without a label ▾]", and a band "Only the 4 notes without a label · Show all 12 ×" (no Rename: nothing to name); ×, Show all or `Esc` go back to all the notes, on the note you're on. Notes on passages and on the whole focus both; detached notes and "+ New note" left out, as under a label.
+- **A note labelled there stays until you move on**, with its new pills, the band adding "· 1 just labelled"; then it leaves the run, as a note removed from a label does. So a slip doesn't take it from under you, and `j` works through what's left until "Every note here has a label now." Not while gathering: Gather's rows are the notes without a label, to group with each other, and those grouped there leave once you're back and move on.
+- Considered: a mark on each unlabelled note, or a count in the tallies, to see them without filtering. Left out to keep the page quiet.
 
 ## The label picker
 

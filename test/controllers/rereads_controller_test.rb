@@ -47,6 +47,35 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".rr-filter-band input.rr-name[value=?]", "waiting"
   end
 
+  test "rereads only the notes without a label, from the menu once some have one" do
+    get focus_notes_path(@focus)
+    assert_select ".rr-filter-menu .menu-item", text: /Without a label/, count: 0
+
+    @late.label!("waiting")
+    get focus_notes_path(@focus)
+    assert_select ".rr-filter-menu a.menu-item[href=?][data-label-id=none]", focus_notes_path(@focus, label: "none"), text: "Without a label1"
+
+    @focus.detached_notes.create!(user: users(:one), citation: "Morning 3", work_title: "Morning", passage: "Grey field.",
+                                   reason: "revised", noted_at: 1.day.ago, edited_at: 1.day.ago, content: "<p>gone</p>")
+    get focus_notes_path(@focus, label: "none")
+    assert_select ".rr-row[data-note-id]", 1
+    assert_select ".rr-row[data-note-id] .rr-cite", "Isaiah 40:3"
+    assert_select ".rr-filter.on", /the 1 note without a label/
+    assert_select ".rr-filter-band", /Only the 1 note without a label/
+    assert_select ".rr-filter-band a[href=?]", focus_notes_path(@focus, at: @early.id), text: "Show all 2"
+    assert_select ".rr-filter-band .rr-filter-rename", 0
+    assert_select ".rr-gone", 0
+    assert_select ".rr-new", 0
+  end
+
+  test "with every note labelled, the notes without a label say so" do
+    @late.label!("waiting")
+    @early.label!("waiting")
+    get focus_notes_path(@focus, label: "none")
+    assert_select ".rr-row[data-note-id]", 0
+    assert_select ".page-empty", "Every note here has a label now."
+  end
+
   test "each pill rereads only its label's notes, from that note, and Remove is there to be offered" do
     waiting = @late.label!("waiting")
     get focus_notes_path(@focus)

@@ -81,6 +81,43 @@ class RereadTest < ApplicationSystemTestCase
     assert_selector ".rr-row.here", text: "The wilderness"
   end
 
+  test "rereading the notes without a label: one labelled stays until you move on, then leaves the run" do
+    third = @focus.notes.create!(unit: verse(31), content: "Renewed")
+    visit focus_notes_path(@focus)
+    find(".rr-filter").click
+    within(".rr-filter-menu") { click_on "Without a label" }
+    assert_selector ".rr-filter-band", text: "Only the 2 notes without a label"
+    assert_selector ".rr-row[data-note-id]", count: 2
+    find(".rr-filter").click
+    assert_selector ".rr-filter-menu .menu-item[aria-current=page]", text: "Without a label"
+    find(".rr-filter").click
+    assert_selector ".rr-row.here", text: "The wilderness"
+
+    find("body").send_keys "l"
+    find(".rr-picker input").send_keys "Empty places", :enter
+    assert_selector ".rr-row.here .rr-chip", text: "Empty places"
+    assert_selector ".rr-filter-band", text: "Only the 1 note without a label · 1 just labelled"
+
+    find("body").send_keys "j"
+    assert_selector ".rr-row.here", text: "Renewed"
+    assert_no_selector ".rr-row", text: "The wilderness"
+    assert_selector ".rr-filter-band", text: "Only the 1 note without a label"
+    assert_no_selector ".rr-filter-band", text: "just labelled"
+
+    find("body").send_keys "l"
+    find(".rr-picker input").send_keys "Empty places", :enter
+    assert_selector ".rr-row.here .rr-chip", text: "Empty places"
+    find("body").send_keys "k" # nowhere to go: it stays
+    assert_selector ".rr-row.here", text: "Renewed"
+    assert_selector ".rr-filter-band", text: "Only the 0 notes without a label · 1 just labelled"
+
+    find("body").send_keys :escape
+    assert_no_selector ".rr-filter-band"
+    assert_selector ".rr-row[data-note-id]", count: 3
+    assert_selector ".rr-row.here", text: "Renewed"
+    assert_equal [ "Empty places" ], third.labels.reload.map(&:name)
+  end
+
   test "removing the label from its last note, then leaving for all the notes" do
     group = @first.group_with!(@second)
     @second.unlabel!(group)

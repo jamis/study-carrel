@@ -1,10 +1,13 @@
-<%# The menu under the count over the run: all the notes, or only those carrying one of the labels on them, each with
-    how many. Redrawn as notes are labelled; the reread controller marks the one being reread. Not prefetched, as pills
+<%# The menu under the count over the run: all the notes, those without a label (once some have one), or only those
+    carrying one of the labels on them, each with how many. Redrawn as notes are labelled; the reread controller marks the one being reread. Not prefetched, as pills
     aren't (rereads/_note_labels).
     focus; notes: the focus's notes, with their labels %>
 <span class="menu-panel rr-filter-menu" id="reread_filter_menu" data-menu-target="panel" data-reread-target="filterMenu">
   <%= link_to focus_notes_path(focus), class: "menu-item", data: { label_id: "", action: "reread#follow", turbo_prefetch: false } do %>All notes<small><%= notes.size %></small><% end %>
   <% labels = notes.flat_map(&:labels).uniq.sort_by { [ it.named? ? 0 : 1, it.name.to_s.downcase, it.id ] } %>
+  <% if labels.any? %>
+    <%= link_to focus_notes_path(focus, label: "none"), class: "menu-item", data: { label_id: "none", action: "reread#follow", turbo_prefetch: false } do %>Without a label<small><%= notes.count { it.label_ids.empty? } %></small><% end %>
+  <% end %>
   <% if labels.any? %>
     <span class="menu-rule"></span>
     <span class="rr-filter-head">Only those with the label</span>

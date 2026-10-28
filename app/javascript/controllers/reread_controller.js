@@ -13,7 +13,8 @@ const PICKER_LEAST = 150, PICKER_TALLEST = 340 // px of the picker's cloud
 // saved, so the reread opens there again. A new note on the whole focus (n) is written in a row of its own, and a
 // selection in the scratchpad can be made one ("Make a note of this"). A label's pill rereads only the notes carrying it
 // (filter); there, Remove on the note you're on takes it off, the note staying (to put back) until you move on, and the
-// band over the run names or renames the label (r). An
+// band over the run names or renames the label (r). The notes without a label are reread the same way (filter "none"):
+// one labelled there stays, with its pills, until you move on. An
 // archived focus's page is read-only (readOnly): moving, the labels panel and the scratchpad to read, nothing written
 // or labelled.
 export default class extends Controller {
@@ -61,6 +62,9 @@ export default class extends Controller {
 
   get here() { return this.rowTargets.find(row => row.classList.contains("here")) }
 
+  // Rereading the notes without a label (?label=none).
+  get #unlabelled() { return this.filterValue === "none" }
+
   // ---------- moving ----------
 
   next() { this.#step(1) }
@@ -88,6 +92,11 @@ export default class extends Controller {
     row.classList.add("here")
     // A note just removed from the label being reread leaves the run, now you've moved on.
     if (left && left.dataset.noteId === this.removing) { this.#letGo({ render: true }); left.remove(); this.#recount() }
+    // So do notes labelled while rereading those without a label; not while gathering, whose rows they are.
+    if (this.#unlabelled && !this.#comparing) {
+      this.rowTargets.filter(r => r !== row && labelIdsOf(r).length).forEach(r => r.remove())
+      this.#recount()
+    }
     row.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })
     // A new note left empty goes; one with words in it stays, and its editor's last save makes it.
     const unwritten = left?.classList.contains("rr-unsaved") && !left.querySelector(".lexxy-editor__content")?.textContent.trim()
@@ -231,9 +240,7 @@ export default class extends Controller {
     return seen
   }
 
-  get #hereLabelIds() {
-    return (this.here?.querySelector("[data-label-ids]")?.dataset.labelIds || "").split(" ").filter(Boolean)
-  }
+  get #hereLabelIds() { return this.here ? labelIdsOf(this.here) : [] }
 
   toggleLabel(event) {
     if (this.readOnlyValue) return
@@ -331,13 +338,21 @@ export default class extends Controller {
     })
   }
 
-  // How many notes the label is on, here, and whether one was just removed.
+  // How many notes the label is on, here, and whether one was just removed; or how many are without a label, and how
+  // many were just labelled.
   #recount() {
     if (!this.filterValue) return
-    const n = this.rowTargets.filter(row => row.dataset.noteId !== this.removing &&
-      (row.querySelector("[data-label-ids]")?.dataset.labelIds || "").split(" ").includes(this.filterValue)).length
+    let n
+    if (this.#unlabelled) {
+      const notes = this.rowTargets.filter(row => row.dataset.noteId)
+      const labelled = notes.filter(row => labelIdsOf(row).length).length
+      n = notes.length - labelled
+      this.removedTargets.forEach(removed => { removed.hidden = !labelled; removed.textContent = ` · ${labelled} just labelled` })
+    } else {
+      n = this.rowTargets.filter(row => row.dataset.noteId !== this.removing && labelIdsOf(row).includes(this.filterValue)).length
+      this.removedTargets.forEach(removed => { removed.hidden = !this.removing })
+    }
     this.countTargets.forEach(count => { count.textContent = `${n} ${n === 1 ? "note" : "notes"}` })
-    this.removedTargets.forEach(removed => { removed.hidden = !this.removing })
     this.emptyTargets.forEach(empty => { empty.hidden = this.rowTargets.length > 0 })
   }
 
@@ -612,6 +627,9 @@ function closeness(name, q) {
   const n = name.toLowerCase()
   return n.startsWith(q) ? 0 : n.split(/[\s-]+/).some(word => word.startsWith(q)) ? 1 : 2
 }
+
+// The ids of the labels on a note's row.
+const labelIdsOf = row => (row.querySelector("[data-label-ids]")?.dataset.labelIds || "").split(" ").filter(Boolean)
 
 const upcaseFirst = text => text.charAt(0).toUpperCase() + text.slice(1)
 const escapeHtml = text => text.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c])
