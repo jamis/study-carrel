@@ -4,7 +4,7 @@
    a drawer behind a tab at the right edge; the labels in use, as a cloud or as tallies, come up over its foot, or on
    their own when it's put away. */
 /* With nothing docked beside it, the column takes more of the page than the reader's measure: room to compare notes. */
-.reread-col { --measure: 48em; position: relative; padding-top: 22px; padding-bottom: 50vh; }
+.reread-col { --measure: 48em; --bleed-l: 44px; --bleed-r: 56px; position: relative; padding-top: 22px; padding-bottom: 50vh; }
 .rr-focus { max-width: var(--measure); margin: calc(10px + 4vh) 0 8px; }
 /* The focus as it stands over the passage in the reader, no bigger. */
 .nb-focus-head { display: flex; align-items: flex-start; gap: 8px; }
@@ -64,7 +64,8 @@
 
 .rr-run { max-width: var(--measure); }
 .rr-row {
-  position: relative; padding: 18px 20px 18px 24px; border-radius: 10px; cursor: pointer;
+  --pad-l: 24px; --pad-r: 20px;
+  position: relative; padding: 18px var(--pad-r) 18px var(--pad-l); border-radius: 10px; cursor: pointer;
   opacity: .38; transition: opacity .25s, background .25s;
 }
 .rr-row + .rr-row { margin-top: 2px; }
@@ -103,6 +104,37 @@
 .rr-row.here .rr-editor:has(turbo-frame[complete]) { display: block; margin-top: 8px; }
 .rr-row.here:has(.rr-editor turbo-frame[complete]) .rr-text { display: none; }
 .rr-editor.composer lexxy-editor { font-size: 21px; line-height: 1.5; font-family: var(--serif); }
+.rr-divide { display: none; }
+
+/* Read as a commonplace book: each entry headed by its passage in full ink, the reference under it, then the note.
+   The one you're on is a band of paper across the page (the column's padding on either side), ruled in accent above
+   and below, with a hairline between passage and note running its whole width; the text keeps its measure. While
+   gathering, the rows stay as they were above (the passage quoted under its reference), for the card and its peeks. */
+.reread:not(.comparing) .rr-run { max-width: none; }
+.reread:not(.comparing) :is(.rr-new, .rr-gone) { max-width: var(--measure); }
+.reread:not(.comparing) .rr-row { display: flex; flex-direction: column; }
+.reread:not(.comparing) .rr-row > * { max-width: calc(var(--measure) - var(--pad-l) - var(--pad-r)); }
+.reread:not(.comparing) .rr-row .rr-passage {
+  order: -1; max-width: 36rem; margin: 0; padding: 0; border: 0; font-size: 18px; line-height: 1.45; color: var(--ink);
+}
+.reread:not(.comparing) .rr-row.here .rr-passage { font-size: 22px; }
+.reread:not(.comparing) .rr-row.here .rr-passage.rr-long { font-size: 19px; }
+.reread:not(.comparing) .rr-row:has(.rr-passage) .rr-head { margin-top: 8px; }
+.reread:not(.comparing) .rr-row :is(.rr-text, .rr-editor) { max-width: 38rem; }
+.reread:not(.comparing) .rr-row :is(.rr-text, .rr-note) { font-size: 16.5px; }
+.reread:not(.comparing) .rr-row .rr-text { margin-top: 10px; }
+.reread:not(.comparing) .rr-row.here :is(.rr-text, .rr-note), .reread:not(.comparing) .rr-editor.composer lexxy-editor { font-size: 18.5px; }
+.reread:not(.comparing) .rr-row.here {
+  margin-left: calc(-1 * var(--bleed-l)); margin-right: calc(-1 * var(--bleed-r));
+  padding-left: calc(var(--pad-l) + var(--bleed-l)); padding-right: calc(var(--pad-r) + var(--bleed-r));
+  border-block: 1px solid var(--accent); border-radius: 0; box-shadow: none;
+}
+.reread:not(.comparing) .rr-row.here .rr-divide {
+  display: block; align-self: stretch; max-width: none; height: 0;
+  margin: 16px calc(-1 * (var(--pad-r) + var(--bleed-r))) 0 calc(-1 * (var(--pad-l) + var(--bleed-l)));
+  border: 0; border-top: 1px solid var(--rule);
+}
+.reread:not(.comparing) .rr-row.here .rr-divide ~ :is(.rr-text, .rr-editor:has(turbo-frame[complete])) { margin-top: 14px; }
 .rr-editor.composer .lexxy-editor__content { min-height: 1lh; overflow: visible; }
 .rr-editor.composer .lexxy-editor__content > :first-child { margin-top: 0; }
 .rr-editor.composer .lexxy-editor__content > p:last-of-type { margin-bottom: 0; }
@@ -170,7 +202,10 @@
 .rr-gone + .rr-gone { border-top: 1px solid var(--rule); }
 .rr-gone .rr-ref { color: var(--ink-faint); }
 .rr-why { margin: 2px 0 0; font: 12px var(--sans); color: var(--ink-faint); }
-.rr-gone .rr-passage { -webkit-line-clamp: 4; }
+.rr-gone { display: flex; flex-direction: column; }
+.rr-gone > * { max-width: 38rem; }
+.reread .rr-gone .rr-passage { order: -1; margin: 0 0 8px; padding: 0; border: 0; font-size: 17px; line-height: 1.45; -webkit-line-clamp: 4; }
+.rr-gone .rr-labels { max-width: none; }
 .rr-gone .rr-labels { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
 .rr-gone .rr-chip + .rr-chip::before { content: "·"; margin-right: 6px; }
 .rr-discard { margin-left: auto; }
@@ -486,13 +521,15 @@
    sheet resting on its handle. */
 @media (max-width: 899px) {
   .reread { display: block; }
-  .reread-col { padding: 14px 8px 60vh; }
+  .reread-col { --bleed-l: 8px; --bleed-r: 8px; padding: 14px 8px 60vh; }
   .reread-col > .page-head { padding: 0 44px 0 8px; }
   .rr-focus { margin-top: 10px; padding: 0 44px 0 8px; }
   .rr-lede, .reread .page-empty, .rr-free-head { margin-left: 16px; }
   .rr-toast { bottom: 76px; max-width: calc(100vw - 32px); }
   .rr-keys { display: none; }
-  .rr-row, .rr-gone { padding: 14px 12px 14px 16px; }
+  .rr-row { --pad-l: 16px; --pad-r: 12px; padding-block: 14px; }
+  .rr-gone { padding: 14px 12px 14px 16px; }
+  .reread:not(.comparing) .rr-row.here { margin-block: 12px; }
   .rr-pad-tools-phone { display: flex; position: absolute; top: 15px; right: 44px; z-index: 2; }
   .reread-pad .panel-handle .preview { margin-right: 120px; }
   .reread-pad { overflow: visible; }

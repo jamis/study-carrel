@@ -19,7 +19,10 @@
       <span class="rr-ref rr-whole"><span class="rr-cite">Focus <%= note.number %></span> · <%= l note.created_at.to_date, format: :long %></span>
     <% end %>
   </div>
-  <% if unit %><p class="rr-passage"><%= unit.body %></p><% end %>
+  <% if unit %>
+    <p class="rr-passage<%= " rr-long" if unit.body.length > 200 || unit.body.count("\n") >= 6 %>"><%= unit.body %></p>
+    <hr class="rr-divide">
+  <% end %>
   <div class="rr-text"><div class="rr-note" id="<%= dom_id(unit || note, :reread_text) %>"><%= note.content %></div></div>
   <div class="rr-editor composer"></div>
   <%= render "rereads/note_labels", note:, focus:, editable: !focus.archived? %>
