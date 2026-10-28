@@ -343,7 +343,7 @@
 .rr-none { margin: 0; font-family: var(--sans); font-size: 13px; color: var(--ink-faint); }
 .rr-none kbd { font: inherit; }
 
-/* The cloud: each label a pill (so a label of several words reads as one), larger the more notes it holds. */
+/* The cloud: each label a pill (so a label of several words reads as one), larger the more notes it holds than the labels' average. */
 .rr-cloud { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; padding: 6px 0 2px; }
 .rr-word {
   max-width: 100%; overflow: hidden; text-overflow: ellipsis; padding: .14em .6em .2em; border: 1px solid var(--rule); border-radius: 999px; background: var(--bg);
@@ -352,7 +352,7 @@
 .rr-word:hover { color: var(--ink); border-color: var(--ink-faint); }
 .rr-word.on { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
 /* Used only under other focuses so far: on offer, faint and dashed. */
-.rr-word.away { font-size: 14px; font-style: italic; color: var(--ink-faint); border-style: dashed; background: none; }
+.rr-word.away { font-size: 12px; font-style: italic; color: var(--ink-faint); border-style: dashed; background: none; }
 
 /* The tallies: a mark per note in reading order, filled where it carries the label; the note you're on stands taller. */
 .rr-tallies { display: none; }

@@ -1,13 +1,14 @@
-<%# The labels in use on a focus: as a cloud (each label a pill, alphabetical, larger the more of the focus's notes it
-    holds; labels used only under other focuses trail faint and dashed) and as tallies (a mark per note, in reading
-    order, filled where the note carries the label). CSS shows one or the other. An unnamed label shows by its letter
-    ("group D"); only named ones carry data-label-name, which the picker reads.
+<%# The labels in use on a focus: as a cloud (each label a pill, alphabetical, sized against the labels' average count,
+    a geometric mean: 16px at it, 5px more for each doubling above and 5px less for each halving below, so labels used
+    equally are all 16px whatever the count; labels used only under other focuses trail faint and dashed) and as tallies
+    (a mark per note, in reading order, filled where the note carries the label). CSS shows one or the other. An unnamed
+    label shows by its letter ("group D"); only named ones carry data-label-name, which the picker reads.
     focus; notes: the focus's notes in reading order, with their labels %>
 <% counts = focus.label_counts
    elsewhere = focus.labels_elsewhere
    used = focus.user.labels.last_used
    here, away = focus.user.labels.alphabetical.includes(Label::FACE).partition { counts.key?(it.id) }
-   most = counts.values.max || 1 %>
+   average = counts.empty? ? 1 : 2 ** (counts.values.sum { Math.log2(it) } / counts.size) %>
 <div data-reread-target="labelsBody">
 <%# For "Compare": each label on this focus's notes, its colour, and its face (an unnamed one's with the start of the
     note it's described by). %>
@@ -22,7 +23,7 @@
   <% here.each do |label|
        n = counts[label.id]
        also = elsewhere[label.id] %>
-    <button type="button" class="rr-word" style="font-size: <%= 15 + (17 * Math.sqrt(n.to_f / most)).round %>px"
+    <button type="button" class="rr-word" style="font-size: <%= (16 + 5 * Math.log2(n / average)).clamp(11, 34).round %>px"
             data-label-id="<%= label.id %>" <%= tag.attributes(data: { label_name: label.name }) %> data-label-used="<%= used[label.id]&.then { (it.to_f * 1000).round } %>" data-action="reread#toggleLabel"
             title="<%= label_title(label) %>: <%= pluralize(n, "note") %><%= "; also under #{also.to_sentence}" if also %>"><%= label_face(label) %></button>
   <% end %>
