@@ -1,9 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
 import { citeOf, escapeHtml } from "lib/notes"
 
-// A note shown from its reference, on the reread page while gathering (alongside the reread and compare controllers).
-// Pointing at a reference on the Gather card (data-fn-note) shows that note: its passage and what's written. A tap does
-// the same on a touch screen. From the pop-up, "Hold it" holds the note under a tab. Clicking a reference with a mouse,
+// A note shown from its reference, on the reread page while comparing (alongside the reread and compare controllers).
+// Pointing at a reference on the Compare card (data-fn-note) shows that note: its passage and what's written. A tap does
+// the same on a touch screen. From the pop-up, "Compare with this" puts the note under a tab, to compare with. Clicking a reference with a mouse,
 // which has shown it already, does that straight away.
 // data-fn-peek: shows the note when pointed at, but a click is left to what it's on (the card's tabs).
 export default class extends Controller {
@@ -79,7 +79,7 @@ export default class extends Controller {
   #noteHtml(row) {
     const passage = row.querySelector(".rr-passage")?.textContent.trim()
     const note = row.querySelector(".rr-note")?.innerHTML || ""
-    const go = `<button type="button" class="fn-go" data-fn-go="${row.dataset.noteId}">Hold it</button>`
+    const go = `<button type="button" class="fn-go" data-fn-go="${row.dataset.noteId}">Compare with this</button>`
     return `<div class="fn-note">
       <div class="fn-ref"><span class="rr-ref${row.classList.contains("rr-free") ? " rr-whole" : ""}">${escapeHtml(citeOf(row))}</span>${go}</div>
       ${passage ? `<p class="rr-passage">${escapeHtml(passage)}</p>` : ""}

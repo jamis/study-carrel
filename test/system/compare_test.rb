@@ -16,7 +16,7 @@ class CompareTest < ApplicationSystemTestCase
   # Keys to the page, not to an element (which Selenium may click first).
   def keys(*keys) = page.driver.browser.action.send_keys(*keys).perform
 
-  test "gathering what goes with a note: into a group of its, a new group of two, naming one, and back" do
+  test "comparing notes: into a group of its, a new group of two, naming one, and back" do
     visit focus_notes_path(@focus)
     assert_selector ".rr-row.here", text: "The withering"
 
@@ -73,7 +73,7 @@ class CompareTest < ApplicationSystemTestCase
     measured = @focus.notes.create!(unit: verse(12), content: "The scale is the point")
     @focus.update!(reread_note: measured)
     visit focus_notes_path(@focus)
-    click_on "Gather"
+    click_on "Compare"
     assert_selector ".rr-cmp-card .cmp-band.cut"
     assert_no_selector ".cmp-entry", visible: true
     keys "p"
@@ -131,18 +131,18 @@ class CompareTest < ApplicationSystemTestCase
     page.current_window.resize_to(1400, 1000)
   end
 
-  test "holding other notes under tabs: back and forth between them, the one used longest ago giving way, x letting one go" do
+  test "comparing with other notes under tabs: back and forth between them, the one used longest ago giving way, x putting one away" do
     visit focus_notes_path(@focus)
     keys "g"
     assert_selector ".cmp-tab", count: 1
     assert_selector ".cmp-tab.on .cmp-tab-ref", text: /40:7/
 
-    # Hold this, on a row: under a tab of its own; the note left is back in the list, held.
+    # Compare with this, on a row: under a tab of its own; the note left is back in the list, under its tab.
     find(".rr-row", text: "Who hath directed").find(".rr-cmp-hold").click
     assert_selector ".rr-cmp-card .cmp-head .rr-ref", text: /Isaiah 40:13/i
     assert_equal %w[40:7 40:13], all(".cmp-tab-ref").map { it.text.strip }
     assert_selector ".rr-row", text: "The withering" do |row|
-      row.assert_selector ".rr-cmp-hold.rr-held", text: "Held · go to its tab"
+      row.assert_selector ".rr-cmp-hold.rr-held", text: "Comparing · go to its tab"
     end
 
     keys "["
@@ -168,12 +168,12 @@ class CompareTest < ApplicationSystemTestCase
     assert_selector ".rr-row.here", text: "Who hath directed"
   end
 
-  test "leaving with notes still held leaves no Hold buttons behind on their rows" do
+  test "leaving with notes still under tabs leaves no Compare with this buttons behind on their rows" do
     visit focus_notes_path(@focus)
     keys "g"
     find(".rr-row", text: "Who hath directed").find(".rr-cmp-hold").click
     find(".rr-row", text: "The word stands").find(".rr-cmp-hold").click
-    assert_selector ".rr-cmp-hold", text: "Held · go to its tab", count: 2
+    assert_selector ".rr-cmp-hold", text: "Comparing · go to its tab", count: 2
 
     find(".rr-cmp-card .cmp-close").click
     assert_no_selector ".comparing"
@@ -193,12 +193,12 @@ class CompareTest < ApplicationSystemTestCase
     within("#reread_note_#{@stands.id}") { assert_no_selector ".rr-chip" }
     within("#reread_note_#{whole.id}") { assert_selector ".rr-ref", text: /Focus 1 · /i }
 
-    # On the Gather card, pointing at one of a group's notes shows it, to hold.
+    # On the Compare card, pointing at one of a group's notes shows it, to compare with.
     keys "g"
     find(".rr-cmp-card .cmp-jump", text: "40:6").hover
     within(".fn-pop") do
       assert_text "The voice said, Cry"
-      click_on "Hold it"
+      click_on "Compare with this"
     end
     assert_selector ".rr-cmp-card .cmp-tab.on", text: "40:6"
 

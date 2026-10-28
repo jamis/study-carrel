@@ -1,6 +1,6 @@
 # Naming a label from the reread: giving an unnamed group of notes words, renaming a label, or taking its name away
 # (leaving it known by its example). A name the user already has for another label is refused, with why; the two
-# aren't merged. Asked from Gather's card, or from the band while rereading the label. The labels on the focus's page
+# aren't merged. Asked from Compare's card, or from the band while rereading the label. The labels on the focus's page
 # are redrawn from the reply.
 class LabelsController < ApplicationController
   before_action :set_focus, :refuse_archived_focus

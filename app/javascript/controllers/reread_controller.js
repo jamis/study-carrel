@@ -50,7 +50,7 @@ export default class extends Controller {
   #centre() { this.here?.scrollIntoView({ block: "center" }) }
   centre() { this.#centre() }
 
-  // While gathering what goes with a note (the compare controller), the column is that controller's.
+  // While comparing notes (the compare controller), the column is that controller's.
   get #comparing() { return this.element.classList.contains("comparing") }
 
   // A note's chips or the panel were redrawn (labelling replies with both).
@@ -92,7 +92,7 @@ export default class extends Controller {
     row.classList.add("here")
     // A note just removed from the label being reread leaves the run, now you've moved on.
     if (left && left.dataset.noteId === this.removing) { this.#letGo({ render: true }); left.remove(); this.#recount() }
-    // So do notes labelled while rereading those without a label; not while gathering, whose rows they are.
+    // So do notes labelled while rereading those without a label; not while comparing, whose rows they are.
     if (this.#unlabelled && !this.#comparing) {
       this.rowTargets.filter(r => r !== row && labelIdsOf(r).length).forEach(r => r.remove())
       this.#recount()

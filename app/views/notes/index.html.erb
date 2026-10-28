@@ -5,11 +5,11 @@
     there Remove takes the label off the note you're on). The focus's scratchpad is put away behind a tab at the right edge (a bottom sheet on
     phones); the labels in use, as a cloud or as tallies, come up over its foot, or on their own. Notes on the whole
     focus can be written and edited here, and so can the current focus's notes on passages, as in the reader.
-    "Gather" (g) turns the column into a comparison: up to three notes held under tabs on a card at
-    the top, the rest under it, each to put in one of the held note's groups (labels, named or not) or a new group with
+    "Compare" (g) turns the column into a comparison: up to three notes to compare with, under tabs on a card at
+    the top, the rest under it, each to put in one of that note's groups (labels, named or not) or a new group with
     it. Detached notes, whose passages are gone, follow the run, only to read or discard.
     An archived focus's page is read-only: its notes, labels and scratchpad to read, nothing to write, label or
-    gather, and Unarchive in the lede. %>
+    compare, and Unarchive in the lede. %>
 <% archived = @focus.archived? %>
 <% filtered = @label || @unlabelled %>
 <main class="reader reread" data-controller="reread<%= " compare peek" unless archived %>"
@@ -48,7 +48,7 @@
           <%= button_to "Unarchive", unarchive_focus_path(@focus, back: "notes"), method: :patch, form_class: "inline-form" %></span>
         <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>c</kbd> for the labels, <kbd>s</kbd> the scratchpad</span>
       <% else %>
-        <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to gather, <kbd>c</kbd> for the labels,<% if @label %> <kbd>r</kbd> to name this one,<% end %> <kbd>n</kbd> for a new note, <kbd>s</kbd> the scratchpad</span>
+        <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to compare, <kbd>c</kbd> for the labels,<% if @label %> <kbd>r</kbd> to name this one,<% end %> <kbd>n</kbd> for a new note, <kbd>s</kbd> the scratchpad</span>
       <% end %>
     </div>
     <%# Rereading one label, or the notes without one: saying so over the run, with Rename (r) for a label and the way
@@ -67,11 +67,11 @@
       </div>
     <% end %>
     <% unless archived %>
-    <p class="rr-lede rr-cmp-lede">Gathering what goes with the note you're on<span class="rr-keys"> · <kbd>j</kbd>/<kbd>k</kbd> through the others, <kbd>1</kbd>–<kbd>9</kbd> or <kbd>+</kbd> to group, <kbd>Enter</kbd> to hold one under a tab, <kbd>[</kbd>/<kbd>]</kbd> from tab to tab, <kbd>x</kbd> to let one go, <kbd>p</kbd> the whole of it (<kbd>P</kbd> a row's passage), <kbd>g</kbd> or × to go back</span></p>
+    <p class="rr-lede rr-cmp-lede">Comparing the other notes with the one you're on<span class="rr-keys"> · <kbd>j</kbd>/<kbd>k</kbd> through the others, <kbd>1</kbd>–<kbd>9</kbd> or <kbd>+</kbd> to group, <kbd>Enter</kbd> to compare with one, <kbd>[</kbd>/<kbd>]</kbd> from tab to tab, <kbd>x</kbd> to put one away, <kbd>p</kbd> the whole of it (<kbd>P</kbd> a row's passage), <kbd>g</kbd> or × to go back</span></p>
 
-    <%# Gathering what goes with a note: the notes held under tabs at the top of the column, the one you're on with its
+    <%# Comparing notes: the notes to compare with, under tabs at the top of the column, the one you're on with its
         groups numbered for the moment. Drawn from the rows by the compare controller. %>
-    <section class="rr-cmp-card" aria-label="The notes you're holding" data-compare-target="card" hidden></section>
+    <section class="rr-cmp-card" aria-label="The notes you're comparing with" data-compare-target="card" hidden></section>
     <% end %>
 
     <% if @label %>
@@ -149,7 +149,7 @@
       <div class="rr-picker-foot" data-reread-target="pickerFoot"></div>
     </div>
     <p class="rr-toast" role="status" data-reread-target="toast" hidden></p>
-    <%# What a reference on the Gather card opens: its note. %>
+    <%# What a reference on the Compare card opens: its note. %>
     <% unless archived %><div class="fn-pop" data-peek-target="pop" hidden></div><% end %>
     <%= form_with url: focus_note_labels_path(@focus, 0), method: :post, class: "rr-label-form", data: { reread_target: "labelForm" } do %>
       <input type="hidden" name="name">

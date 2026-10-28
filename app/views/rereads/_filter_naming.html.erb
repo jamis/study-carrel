@@ -1,6 +1,6 @@
 <%# Naming the label being reread, from its band: "Rename" (or "Name it", for an unnamed group) after what's shown, and
     the field it opens in the band's place (the band's .naming), saved with Enter, left with Esc. Redrawn when the
-    label is named, from here or from Gather. %>
+    label is named, from here or from Compare. %>
 <span id="<%= dom_id(label, :naming) %>" class="rr-filter-naming">
   <span class="rr-filter-rename">· <button type="button" title="<%= label.named? ? "Rename it" : "Give it a name" %> (r)" data-action="reread#startNaming"><%= label.named? ? "Rename" : "Name it" %></button></span>
   <form class="rr-name-form" data-action="submit->reread#saveName keydown->reread#nameKey">

@@ -2,7 +2,7 @@ module LabelsHelper
   FACE_WORDS = 10
 
   # A label as it's shown: its name, or for an unnamed one, "group D", the same from every note in it. With snippet, an
-  # unnamed one adds the start of the note it's described by (Gather's card, to recall what the group was about).
+  # unnamed one adds the start of the note it's described by (Compare's card, to recall what the group was about).
   def label_face(label, snippet: false, words: FACE_WORDS)
     return tag.span(label.name, class: "lf") if label.named?
     note = label.face_note if snippet

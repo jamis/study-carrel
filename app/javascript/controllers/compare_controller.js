@@ -5,18 +5,18 @@ import { citeOf, shortCite, condensedCite, labelIdsOf, escapeHtml } from "lib/no
 
 const MAX_TABS = 3
 
-// Gathering what goes with a note, on the reread page (alongside the reread and peek controllers): g, or "Gather"
-// on the note you're on. The note you're on is held on a card at the top of the column, its groups (its labels, named
+// Comparing notes, on the reread page (alongside the reread and peek controllers): g, or "Compare" on the note
+// you're on. The note you're on is held up on a card at the top of the column, its groups (its labels, named
 // or not) numbered for the moment and each shown by its face; every other note of the focus is
 // listed under it, each with a button per group and + for a new group of the two. A note is always grouped from the
 // held note's side: you choose among its groups, never the other note's, so a note already in several just gains one.
 //
-// Up to three notes are held at once, under tabs along the card's top: "Hold this" on a row (Enter) holds that note
-// under a tab of its own, the one used longest ago giving way, without the list moving. A tab ([ and ]) goes back to its
-// note, and the list to where it was when that note was last the one you were on. x, or a tab's ×, lets one go.
+// Up to three notes to compare with at once, under tabs along the card's top: "Compare with this" on a row (Enter) puts
+// that note under a tab of its own, the one used longest ago giving way, without the list moving. A tab ([ and ]) goes back to its
+// note, and the list to where it was when that note was last the one you were on. x, or a tab's ×, puts one away.
 //
 // The card is the held note's band, as on the page, kept short: the passage cut to a line and the note to one, since
-// you know the note you're holding; a click on either (or p, o) lays the whole entry over the card. Each group's face
+// you know the note you're comparing with; a click on either (or p, o) lays the whole entry over the card. Each group's face
 // is cut to a line too, opening over what's below on hover or a tap. A row's passage cut off opens over it, by a click
 // or P. A number pointed at on a row lights its group in the card; a group pointed
 // at in the card lights its notes in the list. g, Esc or the card's × goes back to the reread, on the note you're on.
@@ -94,10 +94,10 @@ export default class extends Controller {
     this.pending = requestAnimationFrame(() => { this.pending = null; if (this.comparing) this.#render() })
   }
 
-  // ---------- holding ----------
+  // ---------- comparing with another note ----------
 
-  // Another note held, under a tab of its own: the note at the cursor (Enter), "Hold this" on a row, or "Hold it" from a
-  // note shown from the card. One already held goes back to its tab.
+  // Another note to compare with, under a tab of its own: the note at the cursor (Enter), or "Compare with this" on a row
+  // or on a note shown from the card. One already held goes back to its tab.
   hold(row) {
     if (!this.comparing || !row?.dataset.noteId || row === this.#here) return
     const held = this.tabs.findIndex(tab => tab.id === row.dataset.noteId)
@@ -139,7 +139,7 @@ export default class extends Controller {
     else this.#restore(place)
   }
 
-  // Lets a held note go; letting go of the last one leaves.
+  // Puts a note away; putting away the last one leaves.
   #untab(k) {
     if (this.tabs.length <= 1) return this.leave()
     const [ gone ] = this.tabs.splice(k, 1)
@@ -257,10 +257,10 @@ export default class extends Controller {
     }).join("")
 
     this.cardTarget.innerHTML = `
-      <div class="cmp-tabs" role="tablist" aria-label="Held notes">
-        <span class="cmp-holding" aria-hidden="true">Holding</span>
+      <div class="cmp-tabs" role="tablist" aria-label="Notes to compare with">
+        <span class="cmp-holding" aria-hidden="true">Comparing</span>
         ${tabs}
-        <button type="button" class="cmp-close" aria-label="Back to the reread" title="Back to the reread (g)">Done<span class="wide-only"> gathering</span> ×</button>
+        <button type="button" class="cmp-close" aria-label="Back to the reread" title="Back to the reread (g)">Done<span class="wide-only"> comparing</span> ×</button>
       </div>
       <div class="cmp-band">
         ${passage ? `<p class="rr-passage cmp-line" data-entry>${escapeHtml(passage)}</p>` : ""}
@@ -270,7 +270,7 @@ export default class extends Controller {
         </div>
         ${passage ? `<hr class="cmp-divide">` : ""}
         <div class="rr-note cmp-line" data-entry>${note}</div>
-        <div class="cmp-entry" role="dialog" aria-label="The note you're holding" title="Put it away (Esc)">
+        <div class="cmp-entry" role="dialog" aria-label="The note you're comparing with" title="Put it away (Esc)">
           ${passage ? `<p class="rr-passage${long ? " rr-long" : ""}">${escapeHtml(passage)}</p>${ref}<hr>` : ref}
           <div class="rr-note">${note}</div>
         </div>
@@ -299,7 +299,7 @@ export default class extends Controller {
     }
   }
 
-  // Each other note: "Hold this" by its reference, and a button per held group (filled when it's in it) and + for a
+  // Each other note: "Compare with this" by its reference, and a button per held group (filled when it's in it) and + for a
   // new group of the two.
   #renderRows() {
     const mine = this.#mine, hereIds = labelIdsOf(this.#here), held = this.tabs.map(tab => tab.id)
@@ -320,8 +320,8 @@ export default class extends Controller {
         tools.append(labels, acts, hold)
       }
       const isHeld = held.includes(row.dataset.noteId)
-      hold.textContent = isHeld ? "Held · go to its tab" : "Hold this"
-      hold.title = isHeld ? "" : "Hold it under a tab of its own (Enter)"
+      hold.textContent = isHeld ? "Comparing · go to its tab" : "Compare with this"
+      hold.title = isHeld ? "" : "Compare with it, under a tab of its own (Enter)"
       hold.classList.toggle("rr-held", isHeld)
       acts.innerHTML = mine.map((label, i) => {
         const on = ids.includes(String(label.id))
@@ -519,7 +519,7 @@ export default class extends Controller {
   // ---------- keys ----------
 
   // g in and out; while comparing: j/k through the others, 1–9 put the one you're at in a group (again to take it out),
-  // + or n a new group of the two, Enter holds it under a tab, [ and ] go from tab to tab, x lets the note you're on go,
+  // + or n a new group of the two, Enter compares with it under a tab, [ and ] go from tab to tab, x puts the note you're on away,
   // J/K step the note you're on, p or o opens the whole of it, P the passage at the cursor, Esc closes what's
 // open, then goes back.
   key(event) {

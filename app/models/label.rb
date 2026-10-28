@@ -2,7 +2,7 @@
 # user, not to a focus, so the same label can gather notes from several focuses; it's only ever found through
 # user.labels. Names are unique per user, ignoring case. A label lasts only while some note carries it.
 #
-# A label needn't have a name: notes found to go together (in the reread's "Gather") make a group
+# A label needn't have a name: notes found to go together (in the reread's "Compare") make a group
 # before there are words for it. An unnamed label goes by a letter ("group D"), the next its user hands out, and is
 # described by one of its notes, its example; naming it later makes it an ordinary label, which keeps its letter for
 # if the name is taken away again.
