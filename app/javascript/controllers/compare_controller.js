@@ -15,8 +15,10 @@ const MAX_TABS = 3
 // under a tab of its own, the one used longest ago giving way, without the list moving. A tab ([ and ]) goes back to its
 // note, and the list to where it was when that note was last the one you were on. x, or a tab's ×, lets one go.
 //
-// The card is kept short: the passage cut to a line, the note to three, each face to one; what's cut off opens over
-// what's below (hover, a tap, or p and o). A row's passage cut off is opened the same way, by a click or P. A number pointed at on a row lights its group in the card; a group pointed
+// The card is the held note's band, as on the page, kept short: the passage cut to a line and the note to one, since
+// you know the note you're holding; a click on either (or p, o) lays the whole entry over the card. Each group's face
+// is cut to a line too, opening over what's below on hover or a tap. A row's passage cut off opens over it, by a click
+// or P. A number pointed at on a row lights its group in the card; a group pointed
 // at in the card lights its notes in the list. g, Esc or the card's × goes back to the reread, on the note you're on.
 export default class extends Controller {
   static targets = ["card", "labels", "noteLabels"]
@@ -228,7 +230,9 @@ export default class extends Controller {
     if (!here) return this.leave()
     const cite = citeOf(here)
     const passage = here.querySelector(".rr-passage")?.textContent.trim()
+    const long = here.querySelector(".rr-passage")?.classList.contains("rr-long")
     const note = here.querySelector(".rr-note")?.innerHTML || ""
+    const ref = `<div class="rr-ref${here.classList.contains("rr-free") ? " rr-whole" : ""}">${escapeHtml(here.querySelector(".rr-cite")?.textContent || cite)}</div>`
     const at = rows.indexOf(here) + 1
     const tabs = this.tabs.map((tab, k) => {
       const row = this.#rowOf(tab.id), on = row === here
@@ -254,25 +258,38 @@ export default class extends Controller {
 
     this.cardTarget.innerHTML = `
       <div class="cmp-tabs" role="tablist" aria-label="Held notes">
+        <span class="cmp-holding" aria-hidden="true">Holding</span>
         ${tabs}
-        <button type="button" class="cmp-close" aria-label="Back to the reread" title="Back to the reread (g)">×</button>
+        <button type="button" class="cmp-close" aria-label="Back to the reread" title="Back to the reread (g)">Done<span class="wide-only"> gathering</span> ×</button>
       </div>
-      <div class="cmp-head">
-        <div class="rr-ref${here.classList.contains("rr-free") ? " rr-whole" : ""}">${escapeHtml(here.querySelector(".rr-cite")?.textContent || cite)}</div>
-        <span class="cmp-steps"><button type="button" data-step="-1" aria-label="The note before" title="The note before (K)">‹</button><span class="cmp-at">${at} of ${rows.length}</span><button type="button" data-step="1" aria-label="The note after" title="The note after (J)">›</button></span>
-      </div>
-      ${passage ? peek("passage", `<p class="rr-passage">${escapeHtml(passage)}</p>`) : ""}
-      ${peek("note", `<div class="rr-note">${note}</div>`)}
-      <ol class="cmp-groups">
-        ${groups}
-        ${mine.length ? "" : `<li class="cmp-new">In no group yet. On a note below, <kbd>+</kbd> starts one of the two.</li>`}
-      </ol>`
+      <div class="cmp-band">
+        ${passage ? `<p class="rr-passage cmp-line" data-entry>${escapeHtml(passage)}</p>` : ""}
+        <div class="cmp-head">
+          ${ref}
+          <span class="cmp-steps"><button type="button" data-step="-1" aria-label="The note before" title="The note before (K)">‹</button><span class="cmp-at">${at} of ${rows.length}</span><button type="button" data-step="1" aria-label="The note after" title="The note after (J)">›</button></span>
+        </div>
+        ${passage ? `<hr class="cmp-divide">` : ""}
+        <div class="rr-note cmp-line" data-entry>${note}</div>
+        <div class="cmp-entry" role="dialog" aria-label="The note you're holding" title="Put it away (Esc)">
+          ${passage ? `<p class="rr-passage${long ? " rr-long" : ""}">${escapeHtml(passage)}</p>${ref}<hr>` : ref}
+          <div class="rr-note">${note}</div>
+        </div>
+        ${mine.length ? `<div class="cmp-groups-head">In ${mine.length} group${mine.length > 1 ? "s" : ""}</div>` : ""}
+        <ol class="cmp-groups">
+          ${groups}
+          ${mine.length ? "" : `<li class="cmp-new">In no group yet. On a note below, <kbd>+</kbd> starts one of the two.</li>`}
+        </ol>
+      </div>`
 
-    // Only what's cut off can be opened.
+    // Only what's cut off can be opened: a face, or the held note (its passage or its note).
     this.cardTarget.querySelectorAll(".peek").forEach(peek => {
-      const cut = peek.matches(".peek-face") ? peek.firstElementChild : peek.firstElementChild.firstElementChild
+      const cut = peek.firstElementChild
       peek.classList.toggle("fits", cut.scrollHeight <= cut.clientHeight + 1)
     })
+    const band = this.cardTarget.querySelector(".cmp-band")
+    const cutOff = [ ...band.querySelectorAll(".cmp-line") ].some(line => line.scrollHeight > line.clientHeight + 1)
+    band.classList.toggle("cut", cutOff)
+    band.querySelectorAll(".cmp-line").forEach(line => { line.title = cutOff ? "Show the whole note (o)" : "" })
     if (this.opened && !this.opened.isConnected) this.opened = null
     const input = this.cardTarget.querySelector(".cmp-name")
     if (input) {
@@ -290,13 +307,17 @@ export default class extends Controller {
       const ids = labelIdsOf(row)
       let hold = row.querySelector(".rr-cmp-hold"), acts = row.querySelector(".rr-cmp-acts")
       if (!acts) {
+        // After the pills, on their line: the pills are wrapped with them (a reply replaces the pills in place).
+        const tools = document.createElement("div")
+        tools.className = "rr-cmp-tools"
+        const labels = row.querySelector(".rr-labels")
+        labels.before(tools)
+        acts = document.createElement("span")
+        acts.className = "rr-cmp-acts"
         hold = document.createElement("button")
         hold.type = "button"
         hold.className = "rr-cmp-hold"
-        row.querySelector(".rr-ref").after(hold)
-        acts = document.createElement("span")
-        acts.className = "rr-cmp-acts"
-        row.querySelector(".rr-head").append(acts)
+        tools.append(labels, acts, hold)
       }
       const isHeld = held.includes(row.dataset.noteId)
       hold.textContent = isHeld ? "Held · go to its tab" : "Hold this"
@@ -339,10 +360,13 @@ export default class extends Controller {
 
   // ---------- the cut-off text ----------
 
-  // A peek on the card, or a row's passage (.rr-passage), whose whole text is laid over it in a panel of its own.
+  // A face on the card (.peek), the held note's whole entry (.cmp-entry), or a row's passage (.rr-passage), whose whole
+  // text is laid over it in a panel of its own.
   #open(peek) {
     if (this.opened && this.opened !== peek) this.#shut(this.opened)
-    const cut = peek?.matches(".rr-passage") ? peek.classList.contains("cut") : peek && !peek.classList.contains("fits")
+    const cut = peek?.matches(".rr-passage") ? peek.classList.contains("cut")
+      : peek?.matches(".cmp-entry") ? peek.closest(".cmp-band").classList.contains("cut")
+      : peek && !peek.classList.contains("fits")
     this.opened = cut ? peek : null
     if (!this.opened || this.opened.classList.contains("open")) return
     this.opened.classList.add("open")
@@ -365,6 +389,11 @@ export default class extends Controller {
     passage.before(full)
   }
 
+  #toggleEntry() {
+    const entry = this.cardTarget.querySelector(".cmp-entry")
+    entry && entry === this.opened ? this.#closePeeks() : this.#open(entry)
+  }
+
   #closePeeks() {
     const was = !!this.opened?.isConnected
     this.#open(null)
@@ -379,7 +408,7 @@ export default class extends Controller {
     if (this.canHover) {
       const peek = inCard && event.target.closest(".peek")
       if (peek) this.#open(peek)
-      else if (this.opened && this.cardTarget.contains(this.opened)) this.#closePeeks()
+      else if (this.opened?.matches(".peek")) this.#closePeeks()
     }
     // A number on a row lights its group in the card; a group in the card lights its notes in the list.
     this.#mark(event.target.closest?.(".rr-cmp-acts [data-put]")?.dataset.put || null)
@@ -391,8 +420,8 @@ export default class extends Controller {
   }
 
   #away(event) {
-    if (!this.comparing || !this.opened || this.opened.contains(event.target)) return
-    if (this.opened.matches(".rr-passage") || !this.canHover) this.#closePeeks()
+    if (!this.comparing || !this.opened || this.opened.contains(event.target) || event.target.closest?.("[data-entry]")) return
+    if (!this.opened.matches(".peek") || !this.canHover) this.#closePeeks()
   }
 
   #click(event) {
@@ -405,6 +434,8 @@ export default class extends Controller {
       if (t.closest("[data-step]")) return this.#step(Number(t.closest("[data-step]").dataset.step))
       if (t.closest("[data-name]")) { this.naming = t.closest("[data-name]").dataset.name; return this.#renderCard() }
       if (t.closest("[data-leave]")) return this.#put(t.closest("[data-leave]").dataset.leave, this.#here)
+      if (t.closest("[data-entry]")) return this.#toggleEntry()
+      if (t.closest(".cmp-entry")) return this.#closePeeks()
       if (!this.canHover && t.closest(".peek")) {
         const peek = t.closest(".peek")
         return peek === this.opened ? this.#closePeeks() : this.#open(peek)
@@ -435,7 +466,7 @@ export default class extends Controller {
     const at = others.findIndex(row => row.dataset.noteId === this.cursor)
     const to = others[at < 0 ? (by > 0 ? 0 : others.length - 1) : Math.max(0, Math.min(others.length - 1, at + by))]
     if (!to) return
-    if (this.opened?.matches(".rr-passage")) this.#closePeeks()
+    this.#closePeeks()
     this.cursor = to.dataset.noteId
     this.#renderRows()
     this.#mark()
@@ -489,7 +520,7 @@ export default class extends Controller {
 
   // g in and out; while comparing: j/k through the others, 1–9 put the one you're at in a group (again to take it out),
   // + or n a new group of the two, Enter holds it under a tab, [ and ] go from tab to tab, x lets the note you're on go,
-  // J/K step the note you're on, p and o open the passage and the note, P the passage at the cursor, Esc closes what's
+  // J/K step the note you're on, p or o opens the whole of it, P the passage at the cursor, Esc closes what's
 // open, then goes back.
   key(event) {
     if (event.metaKey || event.ctrlKey || event.altKey) return
@@ -515,10 +546,7 @@ export default class extends Controller {
     else if (/^[1-9]$/.test(k) && cursor) { const label = this.#mine[Number(k) - 1]; if (label) this.#put(label.id, cursor) }
     else if ((k === "+" || k === "=" || k === "n") && cursor) this.#plus(cursor)
     else if (k === "Enter" && cursor) this.hold(cursor)
-    else if (k === "p" || k === "o") {
-      const peek = this.cardTarget.querySelector(k === "p" ? ".peek-passage" : ".peek-note")
-      peek && peek === this.opened ? this.#closePeeks() : this.#open(peek)
-    }
+    else if (k === "p" || k === "o") this.#toggleEntry()
     else if (k === "P" && cursor) {
       const passage = cursor.querySelector(".rr-passage")
       passage && passage === this.opened ? this.#closePeeks() : this.#open(passage)

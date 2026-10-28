@@ -108,33 +108,33 @@
 
 /* Read as a commonplace book: each entry headed by its passage in full ink, the reference under it, then the note.
    The one you're on is a band of paper across the page (the column's padding on either side), ruled in accent above
-   and below, with a hairline between passage and note running its whole width; the text keeps its measure. While
-   gathering, the rows stay as they were above (the passage quoted under its reference), for the card and its peeks. */
-.reread:not(.comparing) .rr-run { max-width: none; }
-.reread:not(.comparing) :is(.rr-new, .rr-gone) { max-width: var(--measure); }
-.reread:not(.comparing) .rr-row { display: flex; flex-direction: column; }
-.reread:not(.comparing) .rr-row > * { max-width: calc(var(--measure) - var(--pad-l) - var(--pad-r)); }
-.reread:not(.comparing) .rr-row .rr-passage {
+   and below, with a hairline between passage and note running its whole width; the text keeps its measure.
+   Gathering keeps it: the held note's band becomes the card, the row at the cursor a quieter band (below). */
+.reread .rr-run { max-width: none; }
+.reread :is(.rr-new, .rr-gone) { max-width: var(--measure); }
+.reread .rr-row { display: flex; flex-direction: column; }
+.reread .rr-row > * { max-width: calc(var(--measure) - var(--pad-l) - var(--pad-r)); }
+.reread .rr-row .rr-passage {
   order: -1; max-width: 36rem; margin: 0; padding: 0; border: 0; font-size: 18px; line-height: 1.45; color: var(--ink);
 }
-.reread:not(.comparing) .rr-row.here .rr-passage { font-size: 22px; }
-.reread:not(.comparing) .rr-row.here .rr-passage.rr-long { font-size: 19px; }
-.reread:not(.comparing) .rr-row:has(.rr-passage) .rr-head { margin-top: 8px; }
-.reread:not(.comparing) .rr-row :is(.rr-text, .rr-editor) { max-width: 38rem; }
-.reread:not(.comparing) .rr-row :is(.rr-text, .rr-note) { font-size: 16.5px; }
-.reread:not(.comparing) .rr-row .rr-text { margin-top: 10px; }
-.reread:not(.comparing) .rr-row.here :is(.rr-text, .rr-note), .reread:not(.comparing) .rr-editor.composer lexxy-editor { font-size: 18.5px; }
-.reread:not(.comparing) .rr-row.here {
+.reread .rr-row.here .rr-passage { font-size: 22px; }
+.reread .rr-row.here .rr-passage.rr-long { font-size: 19px; }
+.reread .rr-row:has(.rr-passage) .rr-head { margin-top: 8px; }
+.reread .rr-row :is(.rr-text, .rr-editor) { max-width: 38rem; }
+.reread .rr-row :is(.rr-text, .rr-note) { font-size: 16.5px; }
+.reread .rr-row .rr-text { margin-top: 10px; }
+.reread .rr-row.here :is(.rr-text, .rr-note), .reread .rr-editor.composer lexxy-editor { font-size: 18.5px; }
+.reread .rr-row.here {
   margin-left: calc(-1 * var(--bleed-l)); margin-right: calc(-1 * var(--bleed-r));
   padding-left: calc(var(--pad-l) + var(--bleed-l)); padding-right: calc(var(--pad-r) + var(--bleed-r));
   border-block: 1px solid var(--accent); border-radius: 0; box-shadow: none;
 }
-.reread:not(.comparing) .rr-row.here .rr-divide {
+.reread .rr-row.here .rr-divide {
   display: block; align-self: stretch; max-width: none; height: 0;
   margin: 16px calc(-1 * (var(--pad-r) + var(--bleed-r))) 0 calc(-1 * (var(--pad-l) + var(--bleed-l)));
   border: 0; border-top: 1px solid var(--rule);
 }
-.reread:not(.comparing) .rr-row.here .rr-divide ~ :is(.rr-text, .rr-editor:has(turbo-frame[complete])) { margin-top: 14px; }
+.reread .rr-row.here .rr-divide ~ :is(.rr-text, .rr-editor:has(turbo-frame[complete])) { margin-top: 14px; }
 .rr-editor.composer .lexxy-editor__content { min-height: 1lh; overflow: visible; }
 .rr-editor.composer .lexxy-editor__content > :first-child { margin-top: 0; }
 .rr-editor.composer .lexxy-editor__content > p:last-of-type { margin-bottom: 0; }
@@ -388,29 +388,41 @@
 .rr-row.here .rr-find:hover { border-color: var(--accent); }
 
 /* ---------- gathering what goes with a note (the compare controller) ---------- */
-/* Up to three notes held under tabs on a card at the top of the column, the one you're on with its groups numbered;
-   every other note under it, each with "Hold this", a button per group and + for a new group of the two. */
+/* Up to three notes held under tabs on a card at the top of the column: the held note's band, as on the page, cut to a
+   line of passage and a line of note, with its groups numbered under them. Every other note under it, as on the page,
+   with a button per group, + for a new group of the two and "Hold this" after its pills. */
 .rr-cmp-lede, .rr-cmp-acts, .rr-cmp-hold { display: none; }
 .comparing .rr-cmp-lede { display: block; }
 .comparing .rr-lede:not(.rr-cmp-lede), .comparing .rr-new, .comparing .rr-new-phone, .comparing .rr-row .rr-add, .comparing .rr-row .rr-find { display: none; }
 .comparing .rr-row.here { display: none; }
 .comparing .rr-row { opacity: 1; scroll-margin-top: var(--covered, 0px); scroll-margin-bottom: 12px; }
-.comparing .rr-row:hover { background: color-mix(in srgb, var(--paper) 60%, transparent); }
-.comparing .rr-row.cursor { background: var(--paper); box-shadow: inset 2px 0 0 var(--accent); }
+.comparing .rr-row:hover { background: color-mix(in srgb, var(--paper) 55%, transparent); }
 .comparing .rr-row:not(.cursor):not(.along) .rr-note { color: var(--ink-soft); }
+/* The row at the cursor: a band across the page as the note you're on is, but quieter, ruled in the rule colour, so
+   it's never taken for the held note. */
+.comparing .rr-row.cursor {
+  margin-left: calc(-1 * var(--bleed-l)); margin-right: calc(-1 * var(--bleed-r));
+  padding-left: calc(var(--pad-l) + var(--bleed-l)); padding-right: calc(var(--pad-r) + var(--bleed-r));
+  background: var(--paper); border-block: 1px solid var(--rule); border-radius: 0;
+}
 .comparing.cmp-lighting .rr-row:not(.cmp-lit) { opacity: .3; }
-/* A row's passage cut off opens as the card's do, the whole of it laid over the cut one (under the card, if scrolled
-   beneath it). */
+/* A row's passage cut off opens over it, the whole of it laid over the cut one (under the card, if scrolled beneath
+   it). */
 .comparing .rr-row .rr-passage.cut { cursor: zoom-in; }
 .comparing .rr-row .rr-passage.open { visibility: hidden; }
 .rr-peek {
   position: absolute; z-index: 4; padding: 8px 12px 10px; cursor: zoom-out;
   background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow);
 }
-.rr-row .rr-peek .rr-passage { display: block; margin: 0 0 0 2px; }
-.comparing .rr-cmp-acts { display: inline-flex; gap: 5px; margin-left: auto; align-self: center; }
+.rr-row .rr-peek .rr-passage { display: block; }
+/* A row's pills, then its groups' buttons and Hold this, on one line (wrapping) within the note's measure. */
+.rr-cmp-tools { display: contents; }
+.comparing .rr-cmp-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; max-width: 38rem; margin-top: 10px; }
+.comparing .rr-cmp-tools > .rr-labels { margin-top: 0; }
+.comparing .rr-cmp-tools > .rr-labels:not(:has(.rr-chip)) { display: none; }
+.comparing .rr-cmp-acts { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 5px; }
 .comparing .rr-cmp-hold {
-  display: inline-block; flex: none; white-space: nowrap; padding: 2px 10px; border: 1px solid var(--rule); border-radius: 999px; background: none;
+  display: inline-block; flex: none; white-space: nowrap; margin-left: 6px; padding: 2px 10px; border: 1px solid var(--rule); border-radius: 999px; background: none;
   font: 12px var(--sans); color: var(--ink-faint); opacity: 0; transition: opacity .15s;
 }
 .comparing .rr-row:hover .rr-cmp-hold, .comparing .rr-row.cursor .rr-cmp-hold, .rr-cmp-hold:focus-visible, .rr-cmp-hold.rr-held { opacity: 1; }
@@ -419,53 +431,79 @@
 @media (hover: none) { .comparing .rr-cmp-hold { opacity: 1; } }
 
 .cmp-put {
-  min-width: 28px; height: 28px; padding: 0 6px; border: 1px solid var(--rule); border-radius: 999px; background: none;
-  font: 600 12px var(--sans); color: var(--ink-faint); opacity: .55;
+  min-width: 26px; height: 26px; padding: 0 6px; border: 1px solid var(--rule); border-radius: 999px; background: var(--bg);
+  font: 600 12px var(--sans); color: var(--ink-faint); opacity: .7;
 }
 .rr-row:hover .cmp-put, .rr-row.cursor .cmp-put, .cmp-put.on { opacity: 1; }
 .cmp-put:hover { border-color: var(--c, var(--accent)); color: var(--c, var(--accent)); }
 .cmp-put.on { background: var(--c); border-color: var(--c); color: var(--paper); }
-.cmp-plus { border-style: dashed; font-weight: 400; font-size: 15px; }
+.cmp-plus { border-style: dashed; background: none; font-weight: 400; font-size: 15px; }
 @media (hover: none) { .cmp-put { opacity: 1; } }
 
+/* The card: the held notes' tabs cut into the top of the held note's band, which runs across the page as the note
+   you're on does. */
 .rr-cmp-card[hidden] { display: none; }
-.rr-cmp-card {
-  position: sticky; top: 0; z-index: 5; max-width: calc(var(--measure) + 24px); margin: 0 -12px 10px; padding: 0 20px 10px;
-  background: var(--paper); border: 1px solid var(--rule); border-top: 0; border-radius: 0 0 12px 12px; box-shadow: 0 8px 18px rgba(0, 0, 0, .06);
-}
-.rr-cmp-card .rr-ref { font-size: 10.5px; }
-.rr-cmp-card .rr-passage { display: block; margin: 0; font-size: 14px; }
-.rr-cmp-card .rr-note { margin: 0; font-size: 17px; line-height: 1.45; }
-
-/* The held notes' tabs, each its reference and its first words; the one you're on open onto the card. The × at the
-   right never wraps: the tabs give way, cutting their words shorter, the one you're on last. */
+.rr-cmp-card { --pad-l: 24px; --pad-r: 20px; position: sticky; top: 0; z-index: 5; margin: 0 calc(-1 * var(--bleed-r)) 14px calc(-1 * var(--bleed-l)); }
 .cmp-tabs {
-  display: flex; align-items: stretch; gap: 4px; margin: 0 -20px 8px; padding: 6px 10px 0;
-  border-bottom: 1px solid var(--rule); background: var(--bg); font-family: var(--sans);
+  display: flex; align-items: flex-end; gap: 2px; padding: 8px var(--bleed-r) 0 calc(var(--bleed-l) + 14px);
+  background: var(--bg); font-family: var(--sans);
 }
+.cmp-holding { flex: none; align-self: center; margin-right: 8px; font: 600 10px var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
 .cmp-tab {
-  flex: 1 1 auto; display: flex; align-items: baseline; gap: 6px; min-width: 0; max-width: 16em; margin-bottom: -1px; padding: 5px 6px 5px 10px;
-  border: 1px solid transparent; border-bottom: 0; border-radius: 8px 8px 0 0; background: none; color: var(--ink-faint); text-align: left;
+  position: relative; z-index: 1; flex: 1 1 auto; display: flex; align-items: baseline; gap: 7px; min-width: 0; max-width: 17em; margin-bottom: -1px;
+  padding: 6px 8px 6px 10px; border: 1px solid transparent; border-bottom: 0; background: none; color: var(--ink-faint); text-align: left;
 }
 .cmp-tab:hover { color: var(--ink-soft); }
-.cmp-tab.on { flex-shrink: .2; background: var(--paper); border-color: var(--rule); color: var(--ink); }
+.cmp-tab.on { flex-shrink: .2; background: var(--paper); border-color: var(--accent); color: var(--ink); }
 .cmp-tab-ref { flex: none; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
 .cmp-tab.on .cmp-tab-ref { color: var(--accent); }
-.cmp-tab-words { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-family: var(--serif); font-size: 13px; font-style: italic; }
+.cmp-tab-words { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-family: var(--serif); font-size: 13.5px; font-style: italic; }
 .cmp-tab-x { flex: none; padding: 0 3px; font-size: 14px; line-height: 1; color: var(--ink-faint); opacity: 0; }
 .cmp-tab:hover .cmp-tab-x, .cmp-tab.on .cmp-tab-x { opacity: 1; }
 .cmp-tab-x:hover { color: var(--accent); }
-.cmp-tabs .cmp-close { flex: none; align-self: center; margin-left: auto; padding: 0 4px 4px 10px; border: 0; background: none; font-size: 20px; line-height: 1; color: var(--ink-faint); }
+.cmp-tabs .cmp-close { flex: none; align-self: center; margin-left: auto; padding: 0 0 4px 12px; border: 0; background: none; font-size: 13px; white-space: nowrap; color: var(--ink-faint); }
 .cmp-tabs .cmp-close:hover { color: var(--accent); }
-/* The note's reference, and at the right of its line where it stands in the run, to step along it. */
+
+.cmp-band {
+  position: relative; padding: 12px calc(var(--pad-r) + var(--bleed-r)) 12px calc(var(--pad-l) + var(--bleed-l));
+  background: var(--paper); border-block: 1px solid var(--accent); box-shadow: 0 10px 22px -12px rgba(40, 25, 10, .22);
+}
+.cmp-band > * { max-width: 38rem; }
+/* The held note, a line of passage and a line of note: you know the note you're holding. When either is cut off, a
+   click on it (or p, o) lays the whole entry over the card. */
+.cmp-line { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.cmp-band .rr-passage.cmp-line { margin: 0; font-size: 18px; line-height: 1.45; color: var(--ink); white-space: normal; }
+.cmp-band .rr-note.cmp-line { margin: 10px 0 0; font-size: 16.5px; line-height: 1.5; color: var(--ink); }
+.cmp-band .rr-note.cmp-line .lexxy-content > * { margin: 0; }
+.cmp-band.cut .cmp-line { cursor: zoom-in; }
+.cmp-band.cut .cmp-line:hover { color: var(--accent); }
+/* The reference under the passage, and at the right of its line where it stands in the run, to step along it. */
 .cmp-head { display: flex; align-items: baseline; gap: 12px; }
+.rr-passage + .cmp-head { margin-top: 6px; }
 .cmp-steps { flex: none; display: flex; align-items: baseline; gap: 2px; margin-left: auto; white-space: nowrap; font-family: var(--sans); font-size: 12.5px; color: var(--ink-faint); }
 .cmp-steps button { border: 0; background: none; padding: 0 6px; font-size: 16px; line-height: 1; color: var(--ink-soft); }
 .cmp-steps button:hover { color: var(--accent); }
 .cmp-at { font-variant-numeric: tabular-nums; }
+.cmp-divide {
+  max-width: none; height: 0; margin: 10px calc(-1 * (var(--pad-r) + var(--bleed-r))) 0 calc(-1 * (var(--pad-l) + var(--bleed-l)));
+  border: 0; border-top: 1px solid var(--rule);
+}
+/* The whole entry, over the card from where its text starts: passage, reference, note. */
+.cmp-entry {
+  position: absolute; z-index: 20; top: 6px; left: calc(var(--pad-l) + var(--bleed-l) - 16px);
+  width: min(calc(38rem + 32px), calc(100% - var(--pad-l) - var(--bleed-l) + 8px)); max-width: none; max-height: 70vh; overflow-y: auto;
+  padding: 12px 16px 16px; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); cursor: zoom-out;
+}
+.cmp-entry:not(.open) { display: none; }
+.cmp-entry .rr-passage { display: block; margin: 0; font-size: 20px; line-height: 1.45; color: var(--ink); white-space: pre-line; }
+.cmp-entry .rr-passage.rr-long { font-size: 18px; }
+.cmp-entry .rr-passage + .rr-ref { display: block; margin-top: 8px; }
+.cmp-entry hr { height: 0; margin: 12px -16px 0; border: 0; border-top: 1px solid var(--rule); }
+.cmp-entry .rr-note { margin-top: 12px; font-size: 17.5px; color: var(--ink); }
 
-/* The note you're on, cut short, and its groups a line each. */
-.cmp-groups { list-style: none; margin: 8px 0 0; padding: 0; }
+/* Its groups, a line each, the number in the group's colour. */
+.cmp-groups-head { margin: 12px 0 4px; font: 600 10px var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+.cmp-groups { list-style: none; margin: 0; padding: 0; }
 .cmp-group { display: flex; gap: 10px; align-items: center; margin: 0 -10px; padding: 3px 10px; border-radius: 8px; transition: background .15s; }
 .cmp-group.hot { background: color-mix(in srgb, var(--c) 16%, transparent); }
 .cmp-num {
@@ -487,7 +525,7 @@
 .cmp-g-acts button:hover { text-decoration: underline; }
 /* The note at the cursor, picked out among a group's notes. */
 .cmp-jump.at { color: var(--c); font-weight: 600; text-decoration-color: currentColor; }
-.cmp-new { padding: 4px 0 0; font-family: var(--sans); font-size: 11.5px; color: var(--ink-faint); }
+.cmp-new { padding: 10px 0 0; font-family: var(--sans); font-size: 11.5px; color: var(--ink-faint); }
 .cmp-new kbd { font: inherit; color: var(--ink-soft); }
 .cmp-name {
   min-width: 0; max-width: 20em; padding: 3px 8px; border: 1px solid var(--accent); border-radius: 6px; background: var(--bg);
@@ -496,22 +534,18 @@
 .cmp-name-error { font-family: var(--sans); font-size: 12.5px; color: var(--accent); }
 .cmp-name-error[hidden] { display: none; }
 
-/* Kept short: cut to a line (the passage, a face) or five (the note). What's cut off opens over what's below, the same
-   text whole, in a panel laid exactly over the cut one, so nothing under it moves. */
+/* A group's face, cut to a line. What's cut off opens over what's below, the same text whole, in a panel laid exactly
+   over the cut one, so nothing under it moves. */
 .peek { position: relative; display: block; }
 .peek-cut > *, .peek-full > * { margin: 0; }
-.peek-passage { margin-top: 2px; }
-.peek-note { margin-top: 4px; }
-.peek-passage .peek-cut > *, .peek-face .peek-cut { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-.peek-note .peek-cut > * { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.peek-face .peek-cut { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .peek-full {
-  display: none; position: absolute; z-index: 20; top: -9px; left: -13px; right: -13px; padding: 8px 12px 10px;
+  display: none; position: absolute; z-index: 20; top: -7px; left: -13px; right: -13px; padding: 6px 12px 8px;
   background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow);
 }
 .peek.open .peek-full { display: block; }
 .peek.open .peek-cut { visibility: hidden; }
 .peek-face { flex: 0 1 auto; min-width: 0; font-size: 14.5px; line-height: 1.4; }
-.peek-face .peek-full { top: -7px; padding: 6px 12px 8px; }
 /* On the card, GROUP in small capitals, the letter in the reading face, then the start of the note it's described by. */
 .peek-face .lf-word { font-family: var(--sans); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); }
 .peek-face .lf-letter { font-size: 15px; color: var(--ink); }
@@ -529,7 +563,7 @@
   .rr-keys { display: none; }
   .rr-row { --pad-l: 16px; --pad-r: 12px; padding-block: 14px; }
   .rr-gone { padding: 14px 12px 14px 16px; }
-  .reread:not(.comparing) .rr-row.here { margin-block: 12px; }
+  .reread .rr-row.here { margin-block: 12px; }
   .rr-pad-tools-phone { display: flex; position: absolute; top: 15px; right: 44px; z-index: 2; }
   .reread-pad .panel-handle .preview { margin-right: 120px; }
   .reread-pad { overflow: visible; }
@@ -540,10 +574,10 @@
   }
   .rr-labels-panel { padding: 12px 16px 14px; }
   .rr-labels-hint { display: none; }
-  .rr-cmp-card { margin: 0 -8px 8px; padding: 0 14px 8px; border-radius: 0; border-width: 0 0 1px; }
-  .rr-cmp-card .rr-note { font-size: 16px; }
-  .cmp-tabs { margin: 0 -14px 6px; padding: 4px 6px 0; }
+  .rr-cmp-card { --pad-l: 16px; --pad-r: 12px; }
+  .cmp-tabs { padding: 4px 8px 0; }
   .cmp-tab { flex: 1 1 0; max-width: none; }
-  .cmp-tab-words, .cmp-with { display: none; }
+  .cmp-holding, .cmp-tab-words, .cmp-with, .cmp-close .wide-only { display: none; }
+  .cmp-entry { left: 8px; width: calc(100% - 16px); }
   .rr-cmp-lede { margin-left: 16px; }
 }

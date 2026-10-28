@@ -33,7 +33,7 @@ class CompareTest < ApplicationSystemTestCase
     keys "j", "j"
     assert_selector ".rr-row.cursor", text: "The word stands"
     keys "1"
-    assert_selector ".rr-row.cursor .cmp-put.on", text: "1"
+    assert_selector ".rr-row.cursor .rr-cmp-tools .rr-cmp-acts .cmp-put.on", text: "1"
     assert_selector ".rr-cmp-card .cmp-with", text: "with 40:6, 40:8"
     assert_equal [ @group ], @stands.labels.reload
 
@@ -69,17 +69,33 @@ class CompareTest < ApplicationSystemTestCase
     assert_selector ".rr-row.here .rr-chip", text: "counsel"
   end
 
-  test "the card keeps its passage to a line, opening it with p; Esc closes it, then goes back" do
+  test "the card keeps the held note to a line each, the whole entry over it with p or a click; Esc closes it, then goes back" do
     measured = @focus.notes.create!(unit: verse(12), content: "The scale is the point")
     @focus.update!(reread_note: measured)
     visit focus_notes_path(@focus)
     click_on "Gather"
-    assert_selector ".rr-cmp-card .peek-passage:not(.fits)"
+    assert_selector ".rr-cmp-card .cmp-band.cut"
+    assert_no_selector ".cmp-entry", visible: true
     keys "p"
-    assert_selector ".rr-cmp-card .peek-passage.open .peek-full", text: "weighed the mountains in scales"
+    within(".rr-cmp-card .cmp-entry.open") do
+      assert_text "weighed the mountains in scales"
+      assert_selector ".rr-ref", text: /Isaiah 40:12/i
+      assert_text "The scale is the point"
+    end
     keys :escape
-    assert_no_selector ".rr-cmp-card .peek.open"
+    assert_no_selector ".cmp-entry", visible: true
     assert_selector ".comparing"
+
+    # A click on either line opens it; a click on it, or moving the cursor, puts it away.
+    find(".rr-cmp-card .rr-note.cmp-line").click
+    assert_selector ".cmp-entry.open", text: "weighed the mountains in scales"
+    find(".cmp-entry").click
+    assert_no_selector ".cmp-entry", visible: true
+    find(".rr-cmp-card .rr-passage.cmp-line").click
+    assert_selector ".cmp-entry.open"
+    keys "j"
+    assert_no_selector ".cmp-entry", visible: true
+
     keys :escape
     assert_no_selector ".comparing"
   end
