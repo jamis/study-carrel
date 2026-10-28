@@ -52,7 +52,7 @@ class ArchivingSystemTest < ApplicationSystemTestCase
 
     within(".rr-archived") { click_on "Unarchive" }
     assert_no_selector ".rr-archived"
-    assert_selector ".page-actions", text: "Edit"
+    assert_selector ".rr-new", text: "+ New note"
     assert_not @old.reload.archived?
   end
 end
