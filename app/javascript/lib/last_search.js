@@ -15,6 +15,12 @@ export const lastSearch = {
     const url = get(KEY)
     return url ? new URL(url, location.origin).searchParams.get("q") : null
   },
+  // Names it in a <q>, which adds its own quote marks unless the query has some already ("search query", or
+  // holy "the word"), when it's shown as typed.
+  name(q, query) {
+    q.textContent = query
+    q.classList.toggle("verbatim", query.includes('"'))
+  },
   get slip() { return get(SLIP) === "1" },
   set slip(up) { set(SLIP, up ? "1" : null) }
 }

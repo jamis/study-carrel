@@ -919,6 +919,8 @@ a.tick { display: inline-flex; align-items: center; justify-content: center; tex
 /* On the empty search page, the way back to the last search. */
 .search-last { margin: -12px 0 24px; color: var(--ink-soft); font-family: var(--sans); font-size: 13px; }
 .search-last q { font-style: italic; }
+/* A query with quote marks of its own is shown as typed (lastSearch.name). */
+q.verbatim { quotes: none; }
 .search-summary { margin-bottom: 10px; }
 .search-works { margin: 0 0 28px; font-family: var(--sans); font-size: 13px; }
 .search-works summary { cursor: pointer; color: var(--ink-soft); width: max-content; margin-bottom: 8px; }

@@ -57,6 +57,23 @@ class SearchTest < ApplicationSystemTestCase
     assert_selector ".search-result.returned", text: /Genesis 1:2/i
   end
 
+  test "a query with quote marks of its own is named as typed, without more around it" do
+    quotes = "getComputedStyle(document.querySelector('%s q')).quotes"
+    visit search_path(q: "light")
+    click_on "Genesis 1:2"
+    within(".back-slip") { assert_link "Back to results for light" }
+    assert_not_equal "none", evaluate_script(quotes % ".back-slip"), "a plain query is quoted"
+
+    visit search_path(q: %("let there be"))
+    click_on "Genesis 1:1"
+    within(".back-slip") { assert_link %(Back to results for "let there be") }
+    assert_equal "none", evaluate_script(quotes % ".back-slip")
+
+    find(".rail-search").click
+    within(".search-last") { assert_text %(Your last search, "let there be") }
+    assert_equal "none", evaluate_script(quotes % ".search-last")
+  end
+
   test "with no search yet, Search opens an empty search" do
     visit reading_path("genesis-kjv", 1)
     find(".rail-search").click

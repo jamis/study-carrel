@@ -10,7 +10,7 @@ export default class extends Controller {
     const query = lastSearch.query()
     if (!url || !query) return
     this.linkTarget.href = url
-    this.queryTarget.textContent = query
+    lastSearch.name(this.queryTarget, query)
     this.element.hidden = false
   }
 }

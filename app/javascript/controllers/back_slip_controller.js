@@ -15,7 +15,7 @@ export default class extends Controller {
     this.element.style.height = ""
     if (!lastSearch.slip || !url || !query) return
     this.linkTarget.href = url
-    this.queryTarget.textContent = query
+    lastSearch.name(this.queryTarget, query)
     this.element.hidden = false
   }
 
