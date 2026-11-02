@@ -355,7 +355,7 @@ export default class extends Controller {
   #covered() {
     if (!this.comparing) return
     const top = parseFloat(getComputedStyle(this.cardTarget).top) || 0
-    this.element.style.setProperty("--covered", `${top + this.cardTarget.offsetHeight + 12}px`)
+    this.element.style.setProperty("--covered", `${top + this.cardTarget.offsetHeight + 24}px`)
   }
 
   // ---------- the cut-off text ----------
@@ -470,7 +470,7 @@ export default class extends Controller {
     this.cursor = to.dataset.noteId
     this.#renderRows()
     this.#mark()
-    to.scrollIntoView({ block: "nearest", behavior: this.#motion })
+    to.scrollIntoView({ block: "start", behavior: this.#motion })
   }
 
   // ---------- grouping ----------
