@@ -592,15 +592,9 @@ export default class extends Controller {
     this.element.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === view))
   }
 
-  // The note you're on: its labels marked in the panel, its tick in the tallies taller.
+  // The label being reread marked in the panel (nothing else there is: it has no tie to the note you're on).
   #mark() {
-    const on = this.#hereLabelIds
-    const noteId = this.here?.dataset.noteId
-    this.labelsPanelTarget.querySelectorAll("[data-label-id]").forEach(el => {
-      el.classList.toggle("on", on.includes(el.dataset.labelId))
-      el.toggleAttribute("aria-current", el.dataset.labelId === this.filterValue)
-    })
-    this.labelsPanelTarget.querySelectorAll(".rr-ticks i").forEach(tick => tick.classList.toggle("here", tick.dataset.noteId === noteId))
+    this.labelsPanelTarget.querySelectorAll("[data-label-id]").forEach(el => el.toggleAttribute("aria-current", el.dataset.labelId === this.filterValue))
     this.#markFilter()
   }
 

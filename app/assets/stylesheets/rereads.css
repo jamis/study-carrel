@@ -352,13 +352,11 @@
   font-family: var(--serif); line-height: 1.15; color: var(--ink-soft); white-space: nowrap; text-decoration: none;
 }
 .rr-word:hover { color: var(--ink); border-color: var(--ink-faint); }
-.rr-word.on { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
 /* Used only under other focuses so far: on offer, faint and dashed. */
 .rr-word.away { font-size: 12px; font-style: italic; color: var(--ink-faint); border-style: dashed; background: none; }
 .rr-word.away:hover { color: var(--ink-faint); border-color: var(--rule); }
 /* The label being reread: tapped again, it shows all the notes. */
-.rr-word[aria-current] { border-color: var(--ink-soft); box-shadow: 0 0 0 1px var(--ink-soft); }
-.rr-word.on[aria-current] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.rr-word[aria-current] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
 
 /* The tallies: a mark per note in reading order, filled where it carries the label; the note you're on stands taller. */
 .rr-tallies { display: none; }
@@ -371,13 +369,12 @@
 .rr-tally:hover, .rr-tally[aria-current] { background: var(--bg); }
 .rr-tally-name { font-size: 13.5px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rr-tally-n { font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
-.rr-tally.on :is(.rr-tally-name, .rr-tally-n) { color: var(--accent); }
-.rr-tally.on .rr-tally-name::before { content: "✓ "; }
+.rr-tally[aria-current] :is(.rr-tally-name, .rr-tally-n) { color: var(--accent); }
+.rr-tally[aria-current] .rr-tally-name::before { content: "✓ "; }
 .rr-ticks { grid-column: 1 / -1; display: flex; gap: 2px; }
 .rr-ticks i { flex: 1; max-width: 14px; height: 5px; border-radius: 1px; background: var(--rule); opacity: .6; }
 .rr-ticks i.on { background: var(--ink-soft); opacity: 1; }
-.rr-tally.on .rr-ticks i.on { background: var(--accent); }
-.rr-ticks i.here { height: 9px; margin-top: -2px; }
+.rr-tally[aria-current] .rr-ticks i.on { background: var(--accent); }
 
 /* An unnamed label by its letter, "group D": the word quiet, the letter, which you match by eye, a little heavier. */
 .lf-letter { font-weight: 600; letter-spacing: .02em; }

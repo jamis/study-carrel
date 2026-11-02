@@ -31,7 +31,8 @@ class RereadTest < ApplicationSystemTestCase
 
     find("body").send_keys "c"
     within(".rr-labels-panel") do
-      assert_selector ".rr-word.on", text: "set apart"
+      assert_selector ".rr-word", text: "set apart"
+      assert_no_selector "[aria-current], .on" # nothing marked until a label is reread, the note's labels neither
       click_on "Empty places" # rereads only its notes, not labelling the one you're on
     end
     assert_selector ".rr-filter.on", text: "the 1 note labelled “Empty places”"
@@ -39,6 +40,7 @@ class RereadTest < ApplicationSystemTestCase
     assert_selector ".rr-row.here", text: "The wilderness"
     assert_equal [ "set apart" ], @second.labels.reload.map(&:name)
     assert_selector ".reread-pad.labels-open" # kept open through the change of filter
+    assert_selector ".rr-labels-panel .rr-word[aria-current]", count: 1
 
     find(".rr-labels-panel .rr-word[aria-current]", text: "Empty places").click # tapped again, all the notes
     assert_selector ".rr-filter", exact_text: "2 notes ▾"
@@ -67,14 +69,15 @@ class RereadTest < ApplicationSystemTestCase
     assert_selector ".rr-row.here", text: "The incomparable"
     find("body").send_keys "c"
     within(".rr-labels-panel") do
-      assert_selector ".rr-word.on", text: "set apart"
+      assert_selector ".rr-word", text: "set apart"
       click_on "Tallies"
       assert_selector "[data-view=tallies][aria-pressed=true]"
       find(".rr-tally", text: "set apart").click
     end
     assert_selector ".rr-filter.on", text: "the 2 notes labelled “set apart”"
     assert_selector ".rr-row.here", text: "The incomparable"
-    assert_selector ".reread-pad.labels-open.show-tallies .rr-tally", text: "set apart"
+    assert_selector ".reread-pad.labels-open.show-tallies .rr-tally[aria-current]", text: "set apart"
+    assert_no_selector ".rr-ticks i.here"
 
     find(".rr-tally", text: "set apart").click # all the notes, on this note
     assert_selector ".rr-filter", exact_text: "2 notes ▾"
