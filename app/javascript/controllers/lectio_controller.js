@@ -8,7 +8,7 @@ import { splitClauses, savedBreaks, saveBreaks, clauseMode } from "lib/clauses"
 // one tap (or p) away. A long passage can also be read a clause at a time (; turns it on and off): the arrows then
 // step through its clauses, marked in place with the rest dimmed, and on into the next passage.
 export default class extends Controller {
-  static targets = ["unit", "now", "body", "pilcrow", "prevButton", "nextButton", "position", "ref", "refUnit", "grid", "tick", "editor", "band",
+  static targets = ["unit", "now", "body", "pilcrow", "prevButton", "nextButton", "prevSide", "nextSide", "position", "ref", "refUnit", "grid", "tick", "editor", "band",
     "whole", "wholeButton", "clausesButton", "clauseMenu", "pips", "breaks", "mark"]
   static values = { current: Number, base: String, refTemplate: String, refUnitTemplate: String, positionUrl: String, unitName: String,
     groupName: String, noteUrlTemplate: String, othersUrlTemplate: String, focusId: Number, prevUrl: String, prevLabel: String, nextUrl: String, nextLabel: String }
@@ -156,8 +156,12 @@ export default class extends Controller {
 
     const unit = (number) => number !== undefined && `${this.unitNameValue} ${this.labels.get(number)}`
     const within = (delta) => split && this.clauses[this.clause + delta]
-    this.fillStep(this.prevButtonTarget, within(-1) ? "Previous clause" : unit(this.numbers[i - 1]) || this.prevLabelValue)
-    this.fillStep(this.nextButtonTarget, within(1) ? "Next clause" : unit(this.numbers[i + 1]) || this.nextLabelValue)
+    const prev = within(-1) ? "Previous clause" : unit(this.numbers[i - 1]) || this.prevLabelValue
+    const next = within(1) ? "Next clause" : unit(this.numbers[i + 1]) || this.nextLabelValue
+    this.fillStep(this.prevButtonTarget, prev)
+    this.fillStep(this.nextButtonTarget, next)
+    this.prevSideTarget.hidden = !prev
+    this.nextSideTarget.hidden = !next
 
     this.clausesButtonTarget.setAttribute("aria-pressed", this.clausesOn)
     this.clausesButtonTarget.title = this.clausesOn ? `Read the whole ${this.unitNameValue.toLowerCase()} (;)` : "Read clause by clause (;)"

@@ -88,6 +88,11 @@
         </div>
       </nav>
     </article>
+
+    <%# Off phones, the margins either side of the passage step too: tall strips fixed in the window, so they're always
+        where the pointer was. The arrows in the steps stay the ones for the keyboard and screen readers. %>
+    <button class="side side-prev" type="button" tabindex="-1" aria-hidden="true" data-lectio-target="prevSide" data-action="lectio#previous" <%= "hidden" unless prev_label %>><span>‹</span></button>
+    <button class="side side-next" type="button" tabindex="-1" aria-hidden="true" data-lectio-target="nextSide" data-action="lectio#next" <%= "hidden" unless next_label %>><span>›</span></button>
   </div>
 
   <%# The note sheet, turned between two tabs: the passage's note, and the focus (its notes on the whole focus). The tab

@@ -303,8 +303,8 @@
   }
 
   /* ---------- reader: the rail | the passage | the note, docked ---------- */
-  .reader { display: grid; grid-template-columns: 52px minmax(0, 1fr) 380px; min-height: 100vh; }
-  @media (max-width: 1099px) { .reader { grid-template-columns: 52px minmax(0, 1fr) 340px; } }
+  .reader { --panel-w: 380px; display: grid; grid-template-columns: 52px minmax(0, 1fr) var(--panel-w); min-height: 100vh; }
+  @media (max-width: 1099px) { .reader { --panel-w: 340px; } }
 
   /* Where you are: the library trail, indented a step per level, and the chapters either side. */
   .trail { list-style: none; margin: 0; padding: 2px 0; }
@@ -326,7 +326,7 @@
   .menu-trail { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--rule); }
 
   /* The reading column: the focus over the passage; the reference row sticks to the top while a long passage scrolls. */
-  .reader-col { min-width: 0; padding: 0 56px 80px 44px; }
+  .reader-col { min-width: 0; padding: 0 56px 110px 44px; } /* room at the foot for the steps */
 
   /* ---------- lectio: one passage, large ---------- */
   .lectio { max-width: 34em; touch-action: pan-y; }
@@ -340,9 +340,27 @@
   /* A paragraph's first sentence opens with a pilcrow, hung in the margin so the text stays flush. */
   .pilcrow { position: absolute; transform: translateX(calc(-100% - .3em)); font-weight: 400; color: var(--accent); opacity: .7; }
 
-  /* ‹ 25 of 31 ›, and the grid of every verse behind the number. */
-  .steps { position: relative; display: flex; align-items: center; gap: 4px; margin: 40px 0 0 -10px; font-family: var(--sans); }
+  /* ‹ 25 of 31 ›, and the grid of every verse behind the number. Pinned to the foot of the window under the column, so the
+     arrows are in the same place whatever the passage's length; the text of a long one scrolls under it and fades out. */
+  .steps {
+    position: fixed; z-index: 10; left: 52px; right: var(--panel-w); bottom: 0; display: flex; align-items: center; gap: 4px;
+    padding: 14px 56px 18px 34px; font-family: var(--sans); background: linear-gradient(transparent, var(--bg) 16px);
+  }
   .step { border: 0; border-radius: 8px; background: none; padding: 6px 10px; font-size: 16px; line-height: 1.2; color: var(--ink-faint); }
+  .step[hidden] { display: block; visibility: hidden; } /* a missing arrow keeps its room, so nothing slides sideways */
+
+  /* The margins step too: a strip either side of the passage, the height of the window. The right one stands just past
+     the measure (34em of the reading column, or less when the column is narrower). */
+  .side {
+    position: fixed; z-index: 1; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; width: 44px;
+    padding: 0; border: 0; background: transparent; font: 26px/1 var(--sans); color: var(--ink-faint); cursor: pointer;
+  }
+  .side[hidden] { display: none; }
+  /* Pointing anywhere in the strip lights only its arrow, on a disc like the row's: a lit strip the height of the window distracts. */
+  .side span { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding-bottom: 3px; border-radius: 50%; transition: background-color .15s, color .15s; }
+  .side:hover span { color: var(--accent); background: var(--accent-soft); }
+  .side-prev { left: 52px; }
+  .side-next { left: calc(52px + 44px + min(34rem, 100vw - 52px - var(--panel-w) - 100px) + 4px); }
   .step-of { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
   .step:hover, .step[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
   .unit-grid {
@@ -535,6 +553,11 @@
   @media (max-width: 899px) {
     .reader { display: block; }
     .reader-col { padding: 0 16px 140px; }
+    /* The steps stand on the sheet's handle, the two one footer; the sheet covers them when it opens. No margins to
+       step in: swiping does that. */
+    .steps { left: 0; right: 0; bottom: calc(52px + env(safe-area-inset-bottom)); padding: 2px 16px 0 6px; background: var(--bg); }
+    .steps .step { min-width: 44px; min-height: 44px; }
+    .side { display: none; }
     /* The focus starts level with the ⋯ and keeps clear of it; its rule still runs the column's width. */
     .focus { margin-top: 18px; padding-right: 44px; }
     .back-slip { margin-right: 40px; }

@@ -17,7 +17,11 @@ Visual tone (ideas, not decisions): quiet study desk, not a productivity tool. S
 **Lectio mode only** for v1: one verse at a time, large, with nothing else from the chapter on screen.
 
 - Revised 2026-10-05 (the reader felt cluttered): the faded neighbors, the numbered-circle verse strip and the bevelled band behind the verse are gone.
-- Below the passage, `‹ 25 of 31 ›`: the arrows step (naming where they go as a tooltip, and carrying on into the next chapter at an edge), and the number opens a plain grid of every verse (a dot = has a note, a small ribbon = kept).
+- `‹ 25 of 31 ›`: the arrows step (naming where they go as a tooltip, and carrying on into the next chapter at an edge), and the number opens a plain grid of every verse (a dot = has a note, a small ribbon = kept).
+- **The steps hold still** (decided 2026-11-02). They sat under the passage, so they rode up and down with its length, and scanning quickly meant moving the pointer after every click. Prototyped as `prototype/reader/steady-steps.html` (not kept): A, a set room for the passage, the steps riding the window's foot past it; B, the steps in the reference row; C, pinned to the window's foot; D, tall strips in the margins; **E, C and D together**, chosen.
+  - The row (`‹ n of N ›`, ¶, `;` and the pips) is pinned to the foot of the window under the reading column; a long passage scrolls under it and fades out. An arrow gone at either end keeps its room, so nothing slides sideways.
+  - Off phones, the margins step too: a window-tall strip either side of the passage, the right one just past the measure, `‹`/`›` faint in the middle; pointing anywhere in a strip lights only its arrow, on a disc like the row's (a lit strip the height of the window distracted). They're for the pointer only (no tooltip, out of the tab order and hidden from screen readers; the row's arrows are those).
+  - On phones, the row stands on the note sheet's handle, the two one footer, the arrows full-size targets; the sheet covers it when open. No margin strips there: they'd take the reading width, sit where the thumb holds the phone and where an edge swipe starts, and swiping already steps.
 - Prose is read a sentence at a time; see [prose-by-sentence.md](prose-by-sentence.md).
 - Full-chapter reading view deferred as a possible future option.
 
