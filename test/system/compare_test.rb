@@ -180,6 +180,24 @@ class CompareTest < ApplicationSystemTestCase
     assert_no_selector ".rr-cmp-hold"
   end
 
+  test "coming back on a note held keeps the tabs; on any other note starts afresh" do
+    visit focus_notes_path(@focus)
+    keys "g"
+    find(".rr-row", text: "Who hath directed").find(".rr-cmp-hold").click
+    assert_equal %w[40:7 40:13], all(".cmp-tab-ref").map { it.text.strip }
+
+    find(".rr-cmp-card .cmp-close").click
+    assert_selector ".rr-row.here", text: "Who hath directed"
+    keys "g"
+    assert_equal %w[40:7 40:13], all(".cmp-tab-ref").map { it.text.strip }
+
+    find(".rr-cmp-card .cmp-close").click
+    keys "k"
+    assert_selector ".rr-row.here", text: "The word stands"
+    keys "g"
+    assert_equal %w[40:8], all(".cmp-tab-ref").map { it.text.strip }
+  end
+
   test "a note's labels as pills on every note, and a note on the card shown when pointed at" do
     whole = @focus.notes.create!(content: "Fading and standing")
     whole.join!(@group)

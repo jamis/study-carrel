@@ -66,8 +66,10 @@ export default class extends Controller {
     this.element.classList.add("comparing")
     this.cardTarget.hidden = false
     this.cursor = null
-    // The tabs held last time stay, so long as their notes do; the note you're on is held too.
+    // The tabs held last time stay, so long as their notes do, when you come back on one of them (stepping out and
+    // back); on any other note you start afresh with it alone.
     this.tabs = this.tabs.filter(tab => this.#rowOf(tab.id))
+    if (!this.tabs.some(tab => tab.id === here.dataset.noteId)) this.tabs = []
     this.#addTab(here.dataset.noteId)
     this.#render()
     scrollTo({ top: 0 })
