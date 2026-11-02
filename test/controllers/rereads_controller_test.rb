@@ -101,9 +101,11 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     get focus_notes_path(@focus)
     assert_select "#reread_note_#{@early.id} .rr-chip", 2
     assert_select ".rr-cloud .rr-word:not(.away)", 2
-    assert_select ".rr-cloud .rr-word.away", "waiting"
+    assert_select ".rr-cloud a.rr-word", 2
+    assert_select ".rr-cloud a.rr-word[href=?]", focus_notes_path(@focus, label: @late.labels.first.id), text: "set apart"
+    assert_select ".rr-cloud span.rr-word.away", "waiting"
     assert_select ".rr-cloud .rr-word[data-label-name=?][title*=?]", "set apart", "2 notes"
-    assert_select ".rr-tallies .rr-tally", 2
+    assert_select ".rr-tallies a.rr-tally", 2
     assert_select ".rr-tallies .rr-tally:first-child .rr-ticks i.on", 2
   end
 

@@ -331,6 +331,8 @@
   transform: translateY(102%); visibility: hidden; transition: transform .28s cubic-bezier(.2,.8,.2,1), visibility 0s .28s;
 }
 .reread-pad.labels-open .rr-labels-panel { transform: none; visibility: visible; transition: transform .28s cubic-bezier(.2,.8,.2,1); }
+/* Opened as the page comes, kept open through a change of filter: already there. */
+.reread-pad.still .rr-labels-panel { transition: none; }
 .rr-labels-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
 .rr-views { display: flex; gap: 2px; margin-left: auto; font-family: var(--sans); font-size: 12px; }
 .rr-views button { border: 0; background: none; padding: 2px 8px; border-radius: 999px; color: var(--ink-faint); }
@@ -347,12 +349,16 @@
 .rr-cloud { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; padding: 6px 0 2px; }
 .rr-word {
   max-width: 100%; overflow: hidden; text-overflow: ellipsis; padding: .14em .6em .2em; border: 1px solid var(--rule); border-radius: 999px; background: var(--bg);
-  font-family: var(--serif); line-height: 1.15; color: var(--ink-soft); white-space: nowrap;
+  font-family: var(--serif); line-height: 1.15; color: var(--ink-soft); white-space: nowrap; text-decoration: none;
 }
 .rr-word:hover { color: var(--ink); border-color: var(--ink-faint); }
 .rr-word.on { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
 /* Used only under other focuses so far: on offer, faint and dashed. */
 .rr-word.away { font-size: 12px; font-style: italic; color: var(--ink-faint); border-style: dashed; background: none; }
+.rr-word.away:hover { color: var(--ink-faint); border-color: var(--rule); }
+/* The label being reread: tapped again, it shows all the notes. */
+.rr-word[aria-current] { border-color: var(--ink-soft); box-shadow: 0 0 0 1px var(--ink-soft); }
+.rr-word.on[aria-current] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 
 /* The tallies: a mark per note in reading order, filled where it carries the label; the note you're on stands taller. */
 .rr-tallies { display: none; }
@@ -360,9 +366,9 @@
 .show-tallies .rr-tallies { display: block; }
 .rr-tally {
   display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 12px; width: calc(100% + 16px);
-  padding: 6px 8px; margin: 0 -8px; border: 0; border-radius: 8px; background: none; text-align: left; font-family: var(--sans);
+  padding: 6px 8px; margin: 0 -8px; border: 0; border-radius: 8px; background: none; text-align: left; font-family: var(--sans); text-decoration: none;
 }
-.rr-tally:hover { background: var(--bg); }
+.rr-tally:hover, .rr-tally[aria-current] { background: var(--bg); }
 .rr-tally-name { font-size: 13.5px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rr-tally-n { font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
 .rr-tally.on :is(.rr-tally-name, .rr-tally-n) { color: var(--accent); }

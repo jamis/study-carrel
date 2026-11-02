@@ -2,7 +2,8 @@
     a geometric mean: 16px at it, 5px more for each doubling above and 5px less for each halving below, so labels used
     equally are all 16px whatever the count; labels used only under other focuses trail faint and dashed) and as tallies
     (a mark per note, in reading order, filled where the note carries the label). CSS shows one or the other. An unnamed
-    label shows by its letter ("group D"); only named ones carry data-label-name, which the picker reads.
+    label shows by its letter ("group D"); only named ones carry data-label-name, which the picker reads. Each label in
+    use rereads only its notes, as a pill does; one used only under other focuses has none here, so isn't a link.
     focus; notes: the focus's notes in reading order, with their labels %>
 <% counts = focus.label_counts
    elsewhere = focus.labels_elsewhere
@@ -23,21 +24,21 @@
   <% here.each do |label|
        n = counts[label.id]
        also = elsewhere[label.id] %>
-    <button type="button" class="rr-word" style="font-size: <%= (16 + 5 * Math.log2(n / average)).clamp(11, 34).round %>px"
-            data-label-id="<%= label.id %>" <%= tag.attributes(data: { label_name: label.name }) %> data-label-used="<%= used[label.id]&.then { (it.to_f * 1000).round } %>" data-action="reread#toggleLabel"
-            title="<%= label_title(label) %>: <%= pluralize(n, "note") %><%= "; also under #{also.to_sentence}" if also %>"><%= label_face(label) %></button>
+    <a class="rr-word" style="font-size: <%= (16 + 5 * Math.log2(n / average)).clamp(11, 34).round %>px" href="<%= focus_notes_path(focus, label: label.id) %>"
+       data-label-id="<%= label.id %>" <%= tag.attributes(data: { label_name: label.name }) %> data-label-used="<%= used[label.id]&.then { (it.to_f * 1000).round } %>" data-action="reread#filterBy" data-turbo-prefetch="false"
+       title="<%= label_title(label) %>: <%= pluralize(n, "note") %><%= "; also under #{also.to_sentence}" if also %>"><%= label_face(label) %></a>
   <% end %>
   <% away.each do |label| %>
-    <button type="button" class="rr-word away" data-label-id="<%= label.id %>" <%= tag.attributes(data: { label_name: label.name }) %> data-label-used="<%= used[label.id]&.then { (it.to_f * 1000).round } %>" data-action="reread#toggleLabel"
-            title="<%= label_title(label) %>: under <%= elsewhere[label.id]&.to_sentence %>"><%= label_face(label) %></button>
+    <span class="rr-word away" data-label-id="<%= label.id %>" <%= tag.attributes(data: { label_name: label.name }) %> data-label-used="<%= used[label.id]&.then { (it.to_f * 1000).round } %>"
+          title="<%= label_title(label) %>: under <%= elsewhere[label.id]&.to_sentence %>"><%= label_face(label) %></span>
   <% end %>
 </div>
 <div class="rr-tallies">
   <% here.sort_by { -counts[it.id] }.each do |label| %>
-    <button type="button" class="rr-tally" data-label-id="<%= label.id %>" data-action="reread#toggleLabel">
+    <a class="rr-tally" href="<%= focus_notes_path(focus, label: label.id) %>" data-label-id="<%= label.id %>" data-action="reread#filterBy" data-turbo-prefetch="false">
       <span class="rr-tally-name" title="<%= label_title(label) unless label.named? %>"><%= label_face(label) %></span><span class="rr-tally-n"><%= counts[label.id] %></span>
       <span class="rr-ticks"><% notes.each do |note| %><i data-note-id="<%= note.id %>"<%= ' class="on"'.html_safe if note.label_ids.include?(label.id) %>></i><% end %></span>
-    </button>
+    </a>
   <% end %>
 </div>
 </div>

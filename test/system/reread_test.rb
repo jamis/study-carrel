@@ -32,15 +32,57 @@ class RereadTest < ApplicationSystemTestCase
     find("body").send_keys "c"
     within(".rr-labels-panel") do
       assert_selector ".rr-word.on", text: "set apart"
-      click_on "Empty places"
+      click_on "Empty places" # rereads only its notes, not labelling the one you're on
     end
-    assert_selector ".rr-row.here .rr-chip", text: "Empty places"
-    assert_selector ".rr-labels-panel .rr-word.on", text: "Empty places"
-    assert_equal [ "Empty places", "set apart" ], @second.labels.reload.map(&:name).sort
+    assert_selector ".rr-filter.on", text: "the 1 note labelled “Empty places”"
+    assert_selector ".rr-row[data-note-id]", count: 1
+    assert_selector ".rr-row.here", text: "The wilderness"
+    assert_equal [ "set apart" ], @second.labels.reload.map(&:name)
+    assert_selector ".reread-pad.labels-open" # kept open through the change of filter
 
-    find(".rr-labels-panel .rr-word", text: "set apart").click # tapped again, it comes off
-    assert_no_selector ".rr-row.here .rr-chip", text: "set apart"
-    assert_no_selector ".rr-labels-panel .rr-word", text: "set apart"
+    find(".rr-labels-panel .rr-word[aria-current]", text: "Empty places").click # tapped again, all the notes
+    assert_selector ".rr-filter", exact_text: "2 notes ▾"
+    assert_selector ".rr-row.here", text: "The wilderness"
+    assert_selector ".reread-pad.labels-open"
+
+    find("#reread_note_#{@second.id} .rr-chip-face", text: "set apart").click # a pill too
+    assert_selector ".rr-filter.on", text: "the 1 note labelled “set apart”"
+    assert_selector ".reread-pad.labels-open"
+  end
+
+  test "on a phone, the labels panel is put away as a label in it is reread" do
+    page.current_window.resize_to(500, 900)
+    visit focus_notes_path(@focus)
+    find("body").send_keys "c"
+    find(".rr-labels-panel .rr-word", text: "set apart").click
+    assert_selector ".rr-filter.on", text: "the 1 note labelled “set apart”"
+    assert_no_selector ".reread-pad.labels-open"
+  ensure
+    page.current_window.resize_to(1400, 1000)
+  end
+
+  test "a label in the panel rereads its notes from the note you're on, when it carries it" do
+    @first.label!("set apart")
+    visit focus_notes_path(@focus, at: @second.id)
+    assert_selector ".rr-row.here", text: "The incomparable"
+    find("body").send_keys "c"
+    within(".rr-labels-panel") do
+      assert_selector ".rr-word.on", text: "set apart"
+      click_on "Tallies"
+      assert_selector "[data-view=tallies][aria-pressed=true]"
+      find(".rr-tally", text: "set apart").click
+    end
+    assert_selector ".rr-filter.on", text: "the 2 notes labelled “set apart”"
+    assert_selector ".rr-row.here", text: "The incomparable"
+    assert_selector ".reread-pad.labels-open.show-tallies .rr-tally", text: "set apart"
+
+    find(".rr-tally", text: "set apart").click # all the notes, on this note
+    assert_selector ".rr-filter", exact_text: "2 notes ▾"
+    assert_selector ".reread-pad.labels-open"
+    find(".rr-tally", text: "set apart").click # a page seen before, which Turbo previews from its cache first
+    assert_selector ".rr-filter.on", text: "the 2 notes labelled “set apart”"
+    assert_no_selector "html[data-turbo-preview]"
+    assert_selector ".reread-pad.labels-open"
   end
 
   test "a pill rereads only its label's notes, from that note; there Remove takes it off, to put back until you move on" do

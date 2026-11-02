@@ -204,7 +204,7 @@
         <button class="rr-close" type="button" aria-label="Put the labels away" data-action="reread#toggleLabels">×</button>
       </div>
       <div class="rr-labels-body" id="reread_labels"><%= render "rereads/labels", focus: @focus, notes: @all %></div>
-      <p class="rr-labels-hint">Point at a label to light its notes<%= "; tap it to put the note you're on on it, or take it off" unless archived %>.</p>
+      <p class="rr-labels-hint">Point at a label to light its notes; tap it to reread only them.</p>
     </section>
   </aside>
   <%= render "foci/toast", back: "notes" %>

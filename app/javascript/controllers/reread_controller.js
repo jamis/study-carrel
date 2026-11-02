@@ -5,14 +5,15 @@ import { focusAtEnd } from "lib/caret"
 
 const VIEW_KEY = "reread-labels-view"
 const SORT_KEY = "reread-picker-sort"
+const PANEL_KEY = "reread-labels-carried" // the labels panel, open as the filter changes, to open again on the next page
 const PICKER_LEAST = 150, PICKER_TALLEST = 340 // px of the picker's cloud
 
-// Rereading a focus's notes: one lit at a time down the column (j/k, the arrows, or a click), labelled with + label (l)
-// or from the labels panel (c), which shows the labels in use as a cloud or as tallies. Pointing at a label lights the
-// notes that carry it. The note you're on gets its editor, if it has one here (data-editor-url); where you are is
+// Rereading a focus's notes: one lit at a time down the column (j/k, the arrows, or a click), labelled with + label (l).
+// The labels panel (c) shows the labels in use as a cloud or as tallies; pointing at a label lights the notes that
+// carry it, and tapping it rereads only them. The note you're on gets its editor, if it has one here (data-editor-url); where you are is
 // saved, so the reread opens there again. A new note on the whole focus (n) is written in a row of its own, and a
 // selection in the scratchpad can be made one ("Make a note of this"). A label's pill rereads only the notes carrying it
-// (filter); there, Remove on the note you're on takes it off, the note staying (to put back) until you move on, and the
+// (filter), as does a label in the panel; there, Remove on the note you're on takes it off, the note staying (to put back) until you move on, and the
 // band over the run names or renames the label (r). The notes without a label are reread the same way (filter "none"):
 // one labelled there stays, with its pills, until you move on. An
 // archived focus's page is read-only (readOnly): moving, the labels panel and the scratchpad to read, nothing written
@@ -36,6 +37,7 @@ export default class extends Controller {
       if (new URLSearchParams(location.search).has("at")) this.#savePosition()
     }
     this.#mark()
+    this.#openCarriedPanel()
     this.letGoOnLeaving = () => this.#letGo()
     window.addEventListener("pagehide", this.letGoOnLeaving)
   }
@@ -242,22 +244,12 @@ export default class extends Controller {
 
   get #hereLabelIds() { return this.here ? labelIdsOf(this.here) : [] }
 
-  toggleLabel(event) {
-    if (this.readOnlyValue) return
-    const id = event.currentTarget.dataset.labelId
-    if (!this.here) return
-    if (this.#hereLabelIds.includes(id)) this.#submit("delete", id)
-    else this.#submit("post", null, this.labelsPanelTarget.querySelector(`[data-label-id="${id}"][data-label-name]`).dataset.labelName)
-  }
-
-  #submit(method, labelId, name) {
+  // Puts the note you're on on the label of this name (made if it's new).
+  #label(name) {
     if (!this.here?.dataset.noteId) return // a new note can be labelled once its first save makes it
     const form = this.labelFormTarget
-    const base = fillId(this.labelsUrlTemplateValue, this.here.dataset.noteId)
-    form.action = labelId ? `${base}/${labelId}` : base
-    form.querySelector("[name=_method]")?.remove()
-    if (method === "delete") form.insertAdjacentHTML("beforeend", '<input type="hidden" name="_method" value="delete">')
-    form.querySelector("[name=name]").value = name || ""
+    form.action = fillId(this.labelsUrlTemplateValue, this.here.dataset.noteId)
+    form.querySelector("[name=name]").value = name
     form.requestSubmit()
   }
 
@@ -288,23 +280,42 @@ export default class extends Controller {
 
   // Following a pill, or a label in the menu: a note just removed from the label is taken off first, so the page you
   // come to has it off.
-  async follow(event) {
+  follow(event) {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.button > 0) return
     event.preventDefault()
     event.stopPropagation()
-    const href = event.currentTarget.href
-    await this.#letGo()
-    Turbo.visit(href)
+    this.#refilter(event.currentTarget.href)
+  }
+
+  // A label in the panel: rereads only its notes, from the note you're on if it carries it; the label already being
+  // reread shows all of them again.
+  filterBy(event) {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button > 0) return
+    const id = event.currentTarget.dataset.labelId
+    if (id === this.filterValue) return this.unfilter(event)
+    event.preventDefault()
+    const url = new URL(event.currentTarget.href)
+    if (this.here?.dataset.noteId) url.searchParams.set("at", this.here.dataset.noteId)
+    this.#refilter(url)
   }
 
   // Back to all the notes (the band, or Esc), on the note you're on.
-  async unfilter(event) {
+  unfilter(event) {
     if (event && (event.metaKey || event.ctrlKey || event.shiftKey || event.button > 0)) return
     event?.preventDefault()
     const url = new URL(location.href)
     url.searchParams.delete("label")
     url.searchParams.delete("at")
     if (this.here?.dataset.noteId) url.searchParams.set("at", this.here.dataset.noteId)
+    this.#refilter(url)
+  }
+
+  // To the notes under another filter (or none): a note just removed from the label is taken off first, and the labels
+  // panel, if it's open on a wide screen, stays open (on a phone it would cover the notes).
+  async #refilter(url) {
+    if (this.padTarget.classList.contains("labels-open") && matchMedia("(min-width: 900px)").matches) {
+      try { sessionStorage.setItem(PANEL_KEY, "1") } catch {}
+    }
     await this.#letGo()
     Turbo.visit(url.toString())
   }
@@ -538,7 +549,7 @@ export default class extends Controller {
 
   #choose(name) {
     this.#closePicker()
-    this.#submit("post", null, name)
+    this.#label(name)
   }
 
   #closePicker() {
@@ -559,6 +570,18 @@ export default class extends Controller {
     this.element.querySelectorAll(".rr-summon").forEach(b => b.setAttribute("aria-expanded", open))
   }
 
+  // Kept open through a change of filter: already up, without sliding up again. Not on Turbo's preview of a page seen
+  // before (drawn with the panel as it was left), which would use up the flag before the page itself comes.
+  #openCarriedPanel() {
+    if (document.documentElement.hasAttribute("data-turbo-preview")) return
+    let carried = false
+    try { carried = sessionStorage.getItem(PANEL_KEY); sessionStorage.removeItem(PANEL_KEY) } catch {}
+    if (!carried || this.padTarget.classList.contains("labels-open")) return
+    this.padTarget.classList.add("still")
+    this.toggleLabels()
+    requestAnimationFrame(() => requestAnimationFrame(() => this.padTarget.classList.remove("still")))
+  }
+
   view(event) {
     this.#setView(event.currentTarget.dataset.view)
     try { localStorage.setItem(VIEW_KEY, event.currentTarget.dataset.view) } catch {}
@@ -573,7 +596,10 @@ export default class extends Controller {
   #mark() {
     const on = this.#hereLabelIds
     const noteId = this.here?.dataset.noteId
-    this.labelsPanelTarget.querySelectorAll("[data-label-id]").forEach(el => el.classList.toggle("on", on.includes(el.dataset.labelId)))
+    this.labelsPanelTarget.querySelectorAll("[data-label-id]").forEach(el => {
+      el.classList.toggle("on", on.includes(el.dataset.labelId))
+      el.toggleAttribute("aria-current", el.dataset.labelId === this.filterValue)
+    })
     this.labelsPanelTarget.querySelectorAll(".rr-ticks i").forEach(tick => tick.classList.toggle("here", tick.dataset.noteId === noteId))
     this.#markFilter()
   }
