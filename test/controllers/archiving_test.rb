@@ -87,6 +87,8 @@ class ArchivingTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
     patch make_current_focus_path(@old)
     assert_response :forbidden
+    patch make_current_focus_path(@old, back: "reader", unit_id: verse(3).id)
+    assert_response :forbidden
     assert_equal "Rest", @old.reload.title
     assert_equal @focus, users(:one).foci.current_one
   end

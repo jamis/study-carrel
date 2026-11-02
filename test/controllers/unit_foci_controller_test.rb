@@ -25,6 +25,13 @@ class UnitFociControllerTest < ActionDispatch::IntegrationTest
     assert_select ".pick-all", false
   end
 
+  test "beside each, a way to switch to it, reading on here" do
+    other = start("Other").first
+    start("Current")
+    get unit_foci_path(@unit), headers: { "Turbo-Frame" => "other_foci" }
+    assert_select ".pick-list li form[action=?][data-turbo-frame=_top] button.pick-switch", make_current_focus_path(other, back: "reader", unit_id: @unit.id), text: /or switch to it/
+  end
+
   test "a long list shows five until asked for all, with a filter" do
     start(*(1..9).map { "Focus #{it}" }, "Current")
     get unit_foci_path(@unit)

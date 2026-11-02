@@ -2,7 +2,7 @@
 
 ## Foci
 
-One focus at a time. No parallel foci in v1. The focus is the app's current state: no switcher or lenses. You read under one focus, but a passage's note can be written under any of your other focuses from the reader without making it current (decided 2026-10-21; see [Notes under another focus](#notes-under-another-focus)). Archiving one puts it away (see [Archiving](#archiving)); deleting one throws it away, with everything written under it (see [Deleting](#deleting)).
+One focus at a time. No parallel foci in v1. The focus is the app's current state: no lenses. You read under one focus, but a passage's note can be written under any of your other focuses from the reader without making it current (decided 2026-10-21; see [Notes under another focus](#notes-under-another-focus)), and you can switch to another there and read on where you are (decided 2026-11-02; see [Switching in the reader](#switching-in-the-reader)). Archiving one puts it away (see [Archiving](#archiving)); deleting one throws it away, with everything written under it (see [Deleting](#deleting)).
 
 **Every focus not archived is in use; one is just current** (decided 2026-10-21). Choosing another doesn't retire the old one. Each focus stores when it was last made current (`foci.made_current_at`), and the latest is the current one; making one current stamps it and touches nothing else. Until then `archived_at` had meant "not current", stamped on the old focus whenever another was started or chosen, so every focus but one read as finished.
 
@@ -54,7 +54,7 @@ One focus at a time. No parallel foci in v1. The focus is the app's current stat
 
 - No label. The focus in soft-ink italic, 19–22px, accent on hover; a statement (a thesis, a metaphor) mustn't pass for the passage's title, and the soft italic reads as an epigraph, not a heading.
 - A small thought bubble before it, in the faint ink of the keep ribbon and in the ribbon's slot, so the focus lines up with the reference below; wrapped lines stay clear of it. (The drawing is a stand-in, to be replaced with a better one.)
-- A chevron at the end of its last line drops the description, and under it **your other focuses**, to note this passage under one of them (decided 2026-10-21; see [Notes under another focus](#notes-under-another-focus)). Nothing else: "Edit focus", "New focus" and "All focuses" went on 2026-10-20 (editing is done from the cards, a new focus is the dashed card, and All focuses is the rail's "Your focuses"). It closes on a second click, a click outside, or Esc, and never touches the note sheet.
+- A chevron at the end of its last line drops the description, and under it **your other focuses**, to note this passage under one of them (decided 2026-10-21; see [Notes under another focus](#notes-under-another-focus)) or switch to one (decided 2026-11-02; see [Switching in the reader](#switching-in-the-reader)). Nothing else: "Edit focus", "New focus" and "All focuses" went on 2026-10-20 (editing is done from the cards, a new focus is the dashed card, and All focuses is the rail's "Your focuses"). It closes on a second click, a click outside, or Esc, and never touches the note sheet.
 - **With neither a description nor another focus**, no chevron and nothing to click: the focus isn't a button, takes no hover colour and has no title. (It used to drop "No description yet. Add one.") Without a description but with other focuses, it drops the list alone.
 - A hairline rule across the whole column sets it off from the passage.
 - Not sticky: it scrolls away with the top of a long passage, and the reference row sticks to the top instead. On phones it starts level with the ⋯ and keeps clear of it.
@@ -88,7 +88,18 @@ Notes that lose their unit (a revised or deleted user text) become detached note
 - **Also noted under:** under the current focus's note, a faint line names your other focuses with a note on this passage, each opening that note in place. It's how you find what you wrote elsewhere, without leaving the reader.
 - Any of your focuses not archived can be written under; archived ones aren't in the list. Another user's focus is a 404.
 - An archived focus's note on the passage is still named under "Also noted under", and opens read-only: its text, no editor, the slip saying "Archived, so only to read".
-- Considered: a picker in the sheet itself, at the foot of the passage's note ("Note this under another focus…"), the prototype's A. The list under the focus was preferred: it sits with the focus it's an alternative to. A switcher that kept your place was rejected: you'd still have to switch back, and could forget.
+- Considered: a picker in the sheet itself, at the foot of the passage's note ("Note this under another focus…"), the prototype's A. The list under the focus was preferred: it sits with the focus it's an alternative to. A switcher that kept your place was rejected for this: you'd still have to switch back, and could forget. That still holds for noting one passage elsewhere; reading on under another focus is a different need, met by switching (below).
+
+### Switching in the reader
+
+**Another focus can be made current from the reader, keeping your place** (decided 2026-11-02). Noting under another focus serves a passage that answers another question; it doesn't serve having started reading under the wrong one, which meant going to the cards to make the other current and losing your place. Prototype: `prototype/reader/switch.html` (transient).
+
+- **In the list under the focus** (`o`): beside each focus, a target of its own, "or switch to it", set off by a hairline and lit on its own, so it's never inside the row that notes under that focus (nor mistaken for it). Faint until the row is pointed at; on phones, faint and always there. `⇧1`–`9` switches to that one; `⇧Enter` to the one the arrows or the filter are on.
+- **At the foot of a note under another focus:** "Read on under *…*? Switch to it", under the note, the whole note away from "← Back to …" on the slip, so one isn't taken for the other. (Tried beside the focus's name on the slip; it crowded it.) No key: ⇧Enter is a line break in the editor.
+- **Switching** makes that focus current (`PATCH /foci/:id/make_current?back=reader&unit_id=…`) and reloads the reader at the same passage, its place there too (`last_unit`), so Continue resumes here. The focus over the passage, the note, the verse grid's dots and "Notes on this focus" become the new one's. The old focus stays in use, keeping its own place.
+- **A word at the foot**, "Now reading under "…" · Undo", fading after eight seconds as the cards' do. Undo makes the old one current again, reading on wherever you are by then. Clause by clause stays on, as it does across chapters.
+- Archived focuses aren't in the list, and can't be made current (403); another user's focus is a 404.
+- Considered (in the prototype): switching only from the note's foot (B), always two steps; and two verbs over the list, "Note this verse under | Switch to" (C), one more thing to set each time. The row's own target, with the note's foot as well, was chosen.
 
 ## Notes pages
 

@@ -56,8 +56,12 @@ class FociController < ApplicationController
   end
 
   # Back to the cards, where the card moves into the current slot (a view transition) and its ribbon unrolls
-  # (flash[:made_current]).
+  # (flash[:made_current]). Switched to from the reader (?back=reader), it reads on where you are: the passage you were
+  # on (unit_id), or, undoing, where the focus switched from had got to. A word of it there says which focus is now
+  # current, with Undo (flash[:switched], the one switched from).
   def make_current
+    return switch_in_reader if params[:back] == "reader"
+
     @focus.make_current!
     redirect_to foci_path, flash: { made_current: true }
   end
@@ -99,6 +103,19 @@ class FociController < ApplicationController
   private
 
   def foci = Current.user.foci
+
+  def switch_in_reader
+    from = foci.current_one
+    unit = params[:unit_id] ? Unit.visible_to(Current.user).find(params[:unit_id]) : from&.last_unit
+    return redirect_to(foci_path) unless unit
+
+    Focus.transaction do
+      @focus.make_current!
+      @focus.update!(last_unit: unit)
+    end
+    redirect_to reading_path(unit.section.work.slug, unit.section.number, unit.number),
+      flash: (params[:undo] || from.nil? || from == @focus ? {} : { switched: from.id })
+  end
 
   # Unarchiving from a focus's notes page goes back there (?back=notes); unarchiving or deleting from the archive goes
   # back to it (?back=archived).

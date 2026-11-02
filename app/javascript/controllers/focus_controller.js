@@ -4,7 +4,9 @@ import { keyboardOpener, giveBackFocus } from "lib/focus"
 // The focus band's dropdown: the description, and under it the reader's other focuses (o), to write the passage's note
 // under one of them. The list loads as it opens (the reader moves url to the passage it's on). Those noted on the
 // passage come first; five show until "All N focuses…", and a long list has a filter (Enter takes the first). 1–9 and
-// the arrows choose. Choosing one opens its note in the sheet's editor (focus-sheet listens for focus:chose).
+// the arrows choose. Choosing one opens its note in the sheet's editor (focus-sheet listens for focus:chose). Beside
+// each, "or switch to it" makes it current, reading on here: ⇧1–9, or ⇧Enter on the one the arrows (or the filter)
+// are on.
 export default class extends Controller {
   static targets = ["head", "frame", "list", "item", "filter", "all"]
   static values = { url: String }
@@ -38,9 +40,13 @@ export default class extends Controller {
     }
     if (!this.isOpen || !this.hasListTarget) return
     const items = this.#shown
-    if (/^[1-9]$/.test(event.key) && items[event.key - 1]) {
+    const digit = /^Digit([1-9])$/.exec(event.code)?.[1] // ⇧1 is "!" as a key
+    if (digit && items[digit - 1]) {
       event.preventDefault()
-      items[event.key - 1].querySelector("a").click()
+      items[digit - 1].querySelector(event.shiftKey ? ".pick-switch" : "a").click()
+    } else if (event.key === "Enter" && event.shiftKey && document.activeElement?.matches(".pick")) {
+      event.preventDefault() // not a new window
+      document.activeElement.closest("li").querySelector(".pick-switch").click()
     } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault()
       const links = items.map(li => li.querySelector("a"))
@@ -80,7 +86,7 @@ export default class extends Controller {
   filterKey(event) {
     if (event.key === "Enter") {
       event.preventDefault()
-      this.#shown[0]?.querySelector("a").click()
+      this.#shown[0]?.querySelector(event.shiftKey ? ".pick-switch" : "a").click()
     } else if (event.key === "ArrowDown") {
       event.preventDefault()
       event.stopPropagation()
@@ -97,8 +103,11 @@ export default class extends Controller {
   get #shown() { return this.itemTargets.filter(li => !li.hidden) }
 
   #number() {
-    this.itemTargets.forEach(li => li.querySelector(".pick-num").textContent = "")
-    this.#shown.slice(0, 9).forEach((li, i) => li.querySelector(".pick-num").textContent = i + 1)
+    this.itemTargets.forEach(li => li.querySelector(".pick-num").textContent = li.querySelector(".pick-switch-num").textContent = "")
+    this.#shown.slice(0, 9).forEach((li, i) => {
+      li.querySelector(".pick-num").textContent = i + 1
+      li.querySelector(".pick-switch-num").textContent = `⇧${i + 1}`
+    })
   }
 
   // Opened with o, the filter (or the first focus) takes the keys, once the list is in.

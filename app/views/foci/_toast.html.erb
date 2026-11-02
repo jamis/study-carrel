@@ -1,10 +1,17 @@
 <%# Just archived or unarchived a focus: a word of it at the foot of the page, with Undo, fading after a while. Just
-    deleted one: a word of it, without Undo (flash[:deleted] is its title, since it's gone).
+    deleted one: a word of it, without Undo (flash[:deleted] is its title, since it's gone). Just switched to one in the
+    reader: which is current now, and Undo back to the one switched from (flash[:switched]), reading on where you are.
     back: the page it was done from, where Undo comes back to (nil for the cards, "archived", "notes"). %>
 <% back = local_assigns[:back]
    archived = flash[:archived] && Current.user.foci.find_by(id: flash[:archived])
-   unarchived = flash[:unarchived] && Current.user.foci.find_by(id: flash[:unarchived]) %>
-<% if flash[:deleted] %>
+   unarchived = flash[:unarchived] && Current.user.foci.find_by(id: flash[:unarchived])
+   switched = flash[:switched] && Current.focus && Current.user.foci.active.find_by(id: flash[:switched]) %>
+<% if switched %>
+  <div class="focus-toast" role="status">
+    <span>Now reading under “<%= Current.focus.title.truncate(48) %>”</span>
+    <%= button_to "Undo", make_current_focus_path(switched, back: "reader", undo: 1), method: :patch, form_class: "inline-form" %>
+  </div>
+<% elsif flash[:deleted] %>
   <div class="focus-toast" role="status"><span>Deleted “<%= flash[:deleted].truncate(48) %>”</span></div>
 <% elsif archived || unarchived %>
   <div class="focus-toast" role="status">

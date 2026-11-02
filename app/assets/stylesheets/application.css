@@ -114,15 +114,26 @@
   .pick-filter::placeholder { color: var(--ink-faint); }
   .pick-filter:focus { outline: none; border-color: var(--accent); }
   .pick-list { list-style: none; margin: 0 -10px; padding: 0; }
+  .pick-list li { display: flex; }
   .pick-list li[hidden] { display: none; }
-  .pick { display: flex; align-items: baseline; gap: 8px; padding: 6px 10px; border-radius: 8px; text-decoration: none; }
+  .pick { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 8px; padding: 6px 10px; border-radius: 8px 0 0 8px; text-decoration: none; }
   .pick .focus-mark { width: 14px; height: 13px; margin-top: 0; align-self: center; }
   .pick-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16.5px; font-style: italic; color: var(--ink-soft); }
   .pick-noted { flex: none; font: 11px var(--sans); letter-spacing: .04em; color: var(--accent); }
-  .pick-num { flex: none; min-width: 1ch; text-align: right; font: 11px var(--sans); color: var(--ink-faint); }
+  .pick-num { flex: none; min-width: 1ch; text-align: right; font: 11px var(--sans); font-variant-numeric: tabular-nums; color: var(--ink-faint); }
   .pick:is(:hover, :focus-visible) { outline: none; background: var(--accent-soft); }
   .pick:is(:hover, :focus-visible) .pick-title { color: var(--ink); }
   .pick:is(:hover, :focus-visible) .focus-mark { stroke: var(--accent); }
+  /* Beside each, a target of its own, set off by a hairline and lit on its own: make it current, reading on here. */
+  .pick-switch-form { display: flex; flex: none; }
+  .pick-switch {
+    display: flex; align-items: center; gap: 6px; margin-left: 6px; padding: 0 10px; border: 0; border-left: 1px solid var(--rule);
+    border-radius: 0 8px 8px 0; background: none; cursor: pointer; font: 12px var(--sans); color: var(--ink-faint); white-space: nowrap;
+  }
+  .pick-list li:hover .pick-switch { color: var(--ink-soft); }
+  .pick-switch:is(:hover, :focus-visible) { outline: none; color: var(--accent); background: var(--accent-soft); }
+  /* Every row's key takes the same room, set or not (none past 9), so the hairlines line up down the list. */
+  .pick-switch-num { min-width: 2.2em; text-align: right; font: 10.5px var(--sans); font-variant-numeric: tabular-nums; color: var(--ink-faint); }
   .pick-all { display: block; margin: 6px 0 0 22px; padding: 0; border: 0; background: none; cursor: pointer; font-family: var(--sans); font-size: 12.5px; color: var(--ink-soft); }
   .pick-all:is(:hover, :focus-visible) { color: var(--accent); }
   .pick-all[hidden] { display: none; }
@@ -537,6 +548,19 @@
   .note-under-back kbd { margin-left: 6px; font: 11px var(--sans); color: var(--ink-faint); }
   /* Under the current focus's note: the other focuses with a note on this passage, each opening it here. */
   .note-under-archived { margin: 4px 0 0 21px; font: 12.5px var(--sans); color: var(--ink-faint); }
+  /* At the note's foot, the whole note away from "← Back": making that focus current, reading on here. */
+  .note-under-foot {
+    flex: none; display: flex; align-items: baseline; gap: 10px; margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--rule);
+    font: 13px var(--sans); color: var(--ink-faint);
+  }
+  .note-under-foot > span { flex: 1; min-width: 0; }
+  .composer .note-under-foot form { flex: none; display: block; }
+  .note-under-foot i { font-family: var(--serif); font-size: 14.5px; color: var(--ink-soft); }
+  .note-under-switch {
+    padding: 3px 10px; border: 1px solid var(--accent); border-radius: 999px; background: none; cursor: pointer;
+    font: 12.5px var(--sans); color: var(--accent); white-space: nowrap;
+  }
+  .note-under-switch:hover { background: var(--accent); color: var(--paper); }
   .note-read { flex: 1; min-height: 0; font-size: 17px; overflow-y: auto; }
   .note-read .lexxy-content > :first-child { margin-top: 0; }
   .note-also { flex: none; margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--ink-faint); }
@@ -592,7 +616,7 @@
     .panel-handle .ref { flex: 0 1 auto; max-width: 55%; }
     .panel.open .panel-handle .preview { display: none; }
     .tabs { margin-top: 0; }
-    .tab .key, .fs-new kbd, .pick-num, .note-under-back kbd { display: none; }
+    .tab .key, .fs-new kbd, .pick-num, .pick-switch-num, .note-under-back kbd { display: none; }
     .panel:has(.note-under) .handle-unit .ref { color: var(--accent); }
     .preview { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--serif); font-size: 15px; color: var(--ink-soft); }
     .preview.empty { font-style: italic; color: var(--ink-faint); }
@@ -758,6 +782,9 @@ a:not(.chip):not(.page-trail a):not(.brand):not(.tick):not(.work-link):not(.menu
 .focus-toast span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .focus-toast button { flex: none; padding: 0; border: 0; background: none; color: var(--accent-soft); font-size: 14px; text-decoration: underline; }
 .focus-toast:hover, .focus-toast:focus-within { animation-play-state: paused; }
+/* In the reader, over the steps at the window's foot (on phones, over the steps on the sheet's handle). */
+.reader ~ .focus-toast { bottom: 76px; }
+@media (max-width: 899px) { .reader ~ .focus-toast { bottom: calc(52px + 48px + 16px + env(safe-area-inset-bottom)); } }
 @keyframes toast-go { to { opacity: 0; visibility: hidden; } }
 
 /* ---------- notes ---------- */

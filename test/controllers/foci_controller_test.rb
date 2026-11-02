@@ -84,6 +84,28 @@ class FociManagementTest < ActionDispatch::IntegrationTest
     assert_select ".card-arrived", false
   end
 
+  test "switched to from the reader, it reads on where you are, with Undo back to the one switched from" do
+    other = users(:one).foci.start!(title: "Light")
+    other.update!(last_unit: verse(3))
+    patch make_current_focus_path(@focus, back: "reader", unit_id: verse(25).id)
+    assert_redirected_to reading_path("isaiah-kjv", 40, 25)
+    assert_equal @focus, users(:one).foci.current_one
+    assert_equal verse(25), @focus.reload.last_unit
+
+    follow_redirect!
+    assert_select ".focus-title", "Holy"
+    assert_select ".focus-toast", /Now reading under “Holy”/
+    assert_select ".focus-toast form[action=?]", make_current_focus_path(other, back: "reader", undo: 1)
+
+    # Undoing reads on where the focus switched from had got to, and says nothing.
+    @focus.update!(last_unit: verse(26))
+    patch make_current_focus_path(other, back: "reader", undo: 1)
+    assert_redirected_to reading_path("isaiah-kjv", 40, 26)
+    assert_equal other, users(:one).foci.current_one
+    follow_redirect!
+    assert_select ".focus-toast", false
+  end
+
   test "the band drops the description, and nothing else" do
     get reading_path("isaiah-kjv", 40)
     assert_select ".focus[data-controller=focus] button.focus-head .focus-caret"

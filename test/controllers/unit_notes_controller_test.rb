@@ -129,6 +129,16 @@ class UnitNotesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".note-also", false
   end
 
+  test "under a past focus, the note's foot offers to switch to it, reading on here" do
+    past = @focus
+    users(:one).foci.start!(title: "Newer")
+    get focus_unit_note_path(past, @unit), headers: { "Turbo-Frame" => "note_editor" }
+    assert_select ".note-under-foot", /Read on under\s+Holy\?/
+    assert_select ".note-under-foot form[action=?][data-turbo-frame=_top]", make_current_focus_path(past, back: "reader", unit_id: @unit.id)
+    get unit_note_path(@unit), headers: { "Turbo-Frame" => "note_editor" }
+    assert_select ".note-under-foot", false
+  end
+
   test "under another focus with none current, the editor has no way back" do
     other = @focus
     other.notes.create!(unit: @unit, content: "Under Holy")
@@ -137,6 +147,7 @@ class UnitNotesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "turbo-frame#note_editor .note-under-title", "Holy"
     assert_select "turbo-frame#note_editor .note-under-back", false
+    assert_select "turbo-frame#note_editor .note-under-foot", false
     assert_match "Under Holy", response.body
   end
 

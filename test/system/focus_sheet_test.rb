@@ -131,6 +131,34 @@ class FocusSheetTest < ApplicationSystemTestCase
     assert_no_selector ".note-under"
   end
 
+  test "switching to another focus from the reader keeps your place, and Undo switches back" do
+    current = users(:one).foci.start!(title: "Waiting")
+    visit reading_path("isaiah-kjv", 40, 25)
+    find("body").send_keys "o"
+    within(".focus-others") { click_on "or switch to it" }
+    assert_selector ".focus-title", text: "Holy"
+    assert_current_path reading_path("isaiah-kjv", 40, 25)
+    assert_equal @focus, users(:one).foci.current_one
+    within(".focus-toast") do
+      assert_text "Now reading under “Holy”"
+      click_on "Undo"
+    end
+    assert_selector ".focus-title", text: "Waiting"
+    assert_current_path reading_path("isaiah-kjv", 40, 25)
+    assert_no_selector ".focus-toast"
+
+    # ⇧1 switches to the first; from a note under another focus, its foot does too.
+    find("body").send_keys "o"
+    assert_selector ".focus-others .pick-title", text: "Holy"
+    find("body").send_keys [ :shift, "1" ]
+    assert_selector ".focus-title", text: "Holy"
+    find("body").send_keys "o"
+    within(".focus-others") { click_on "Waiting" }
+    within("#sheet_pane_unit .note-under-foot") { click_on "Switch to it" }
+    assert_selector ".focus-title", text: "Waiting"
+    assert_equal current, users(:one).foci.current_one
+  end
+
   test "with another focus, the focus drops even without a description" do
     users(:one).foci.start!(title: "Bare")
     visit reading_path("isaiah-kjv", 40, 25)

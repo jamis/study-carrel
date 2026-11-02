@@ -1,6 +1,7 @@
 <%# Under the focus's description in the reader: the reader's other focuses, one line each, those noted on this passage
     first. Five show (more if more are noted) until "All N focuses…"; past seven, a filter (focus_controller.js). Each
-    opens that focus's note on the passage in the sheet's editor. %>
+    opens that focus's note on the passage in the sheet's editor; beside it, apart, "or switch to it" makes it current
+    and reads on here (the whole page, not the frame). %>
 <%= turbo_frame_tag "other_foci" do %>
   <% if @foci.any? %>
     <% short = [ 5, @noted.size ].max %>
@@ -16,6 +17,9 @@
                 data: { turbo_frame: "note_editor", action: "focus#chose" } do %>
             <%= render "foci/mark" %><span class="pick-title"><%= focus.title %></span><% if @noted.include?(focus.id) %><span class="pick-noted">noted</span><% end %><kbd class="pick-num"></kbd>
           <% end %>
+          <%= button_to make_current_focus_path(focus, back: "reader", unit_id: @unit.id), method: :patch, class: "pick-switch",
+                form_class: "pick-switch-form", form: { data: { turbo_frame: "_top" } },
+                title: "Make it your current focus, staying here" do %>or switch to it<kbd class="pick-switch-num"></kbd><% end %>
         </li>
       <% end %>
     </ul>

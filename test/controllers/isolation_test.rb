@@ -83,6 +83,8 @@ class IsolationTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     patch make_current_focus_path(@owner_focus)
     assert_response :not_found
+    patch make_current_focus_path(@owner_focus, back: "reader", unit_id: verse(3).id)
+    assert_response :not_found
     patch archive_focus_path(@owner_focus)
     assert_response :not_found
     assert_not @owner_focus.reload.archived?

@@ -1,7 +1,8 @@
 <%# The passage's note. Under the current focus, with the reader's other focuses that have a note on this passage named
     under it ("Also noted under …"), each opening that note here. Under another focus (chosen from the picker under the
-    focus), that focus heads it on a slip, with the way back (Esc); a new verse goes back too. An archived focus's note
-    (opened from "Also noted under") is only shown, its slip saying it's archived. %>
+    focus), that focus heads it on a slip, with the way back (Esc); a new verse goes back too. At the note's foot, as far
+    from the way back as the sheet allows, "Read on under … ? Switch to it" makes it current, staying here. An archived
+    focus's note (opened from "Also noted under") is only shown, its slip saying it's archived. %>
 <% under = focus != Current.focus %>
 <%= turbo_frame_tag "note_editor", data: { lectio_target: "editor" } do %>
   <% if under %>
@@ -23,6 +24,13 @@
           aria: { label: under ? "Note under #{focus.title}" : "Note" },
           data: { autosave_target: "editor", action: "lexxy:initialize->autosave#ready lexxy:change->autosave#changed lexxy:blur->autosave#save" } %>
     <p class="autosave-status" aria-live="polite" data-autosave-target="status">&nbsp;</p>
+  <% end %>
+  <% if under && Current.focus %>
+    <div class="note-under-foot">
+      <span>Read on under <i><%= focus.title %></i>?</span>
+      <%= button_to "Switch to it", make_current_focus_path(focus, back: "reader", unit_id: unit.id), method: :patch, class: "note-under-switch",
+            form_class: "inline-form", form: { data: { turbo_frame: "_top" } }, title: "Make it your current focus, staying here" %>
+    </div>
   <% end %>
   <% end %>
   <% unless under %>
