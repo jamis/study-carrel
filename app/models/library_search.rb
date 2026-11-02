@@ -47,9 +47,30 @@ class LibrarySearch
            .preload(section: :work)
   end
 
+  # Where the results stand around one section, for stepping through them from the reader: how many come before it,
+  # the ones in it (in order), and the nearest outside it either way (nil past the first or last). The section needn't
+  # be in the place searched: reading on can wander out of it.
+  Around = Data.define(:total, :before, :hits, :previous, :next)
+
+  def around(section)
+    here = matches.where(sections: { work_id: section.work_id })
+    earlier, later = (counts.keys - [ section.work ]).partition { rank(it) < rank(section.work) }
+    hits = here.where(units: { section_id: section.id }).order("units.number").to_a
+    Around.new(
+      total:, hits:,
+      before: earlier.sum { counts[it] } + here.where("sections.number < ?", section.number).count,
+      previous: in_order(here.where("sections.number < ?", section.number)).last ||
+        (in_order(matches.where(sections: { work_id: earlier.last.id })).last if earlier.any?),
+      next: in_order(here.where("sections.number > ?", section.number)).first ||
+        (in_order(matches.where(sections: { work_id: later.first.id })).first if later.any?)
+    )
+  end
+
   private
 
   def library_order = @library_order ||= Work.ids_in_library_order
+  def rank(work) = (@ranks ||= library_order.each_with_index.to_h)[work.id]
+  def in_order(units) = units.order("sections.number", "units.number").preload(section: :work)
 
   def matches
     return Unit.none unless searching?

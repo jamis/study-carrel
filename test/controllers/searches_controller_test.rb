@@ -125,6 +125,25 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "the results around a section, for the reader's band to step through" do
+    genesis = Work.find_by!(slug: "genesis-kjv").sections.first
+    get search_around_path(section: genesis.id, q: "light", work: "genesis-kjv")
+    assert_equal({ "total" => 2, "before" => 0, "per_page" => LibrarySearch::PER_PAGE, "previous" => nil, "next" => nil },
+                 response.parsed_body.except("hits"))
+    assert_equal [ [ 1, "Genesis 1", ":1", reading_path("genesis-kjv", 1, 1) ], [ 2, "Genesis 1", ":2", reading_path("genesis-kjv", 1, 2) ] ],
+                 response.parsed_body["hits"].map { it.values_at("number", "name", "unit", "url") }
+
+    get search_around_path(section: genesis.id, q: "light")
+    assert_equal [ 1, "Walden: Economy", ", paragraph 1", reading_path("walden", 1, 1) ],
+                 response.parsed_body["previous"].values_at("number", "name", "unit", "url"), "Prose comes before the Bible"
+  end
+
+  test "the results around another user's text are not found" do
+    theirs = UserText.new(title: "Diary", source: "Light at dawn.").publish!(users(:two))
+    get search_around_path(section: theirs.sections.first.id, q: "light")
+    assert_response :not_found
+  end
+
   test "signed out, search is closed" do
     sign_out
     get search_path(q: "light")

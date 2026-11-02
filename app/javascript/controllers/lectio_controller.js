@@ -259,9 +259,9 @@ export default class extends Controller {
     if (current) this.wholeTarget.scrollTop = current.offsetTop - (this.wholeTarget.clientHeight - current.offsetHeight) / 2
   }
 
-  // The Keep ribbon follows the verse on screen.
+  // The Keep ribbon follows the verse on screen, and the band's results (see back_slip_controller) are counted from it.
   announce() {
-    this.dispatch("changed", { detail: { unitId: this.unitIds.get(this.currentValue) } })
+    this.dispatch("changed", { detail: { unitId: this.unitIds.get(this.currentValue), number: this.currentValue } })
   }
 
   keepChanged({ detail: { unitId, kept } }) {

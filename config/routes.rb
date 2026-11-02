@@ -58,6 +58,7 @@ Rails.application.routes.draw do
   resources :ideas, only: %i[create update destroy], path: "kept/ideas"
   get "library", to: "library#index"
   get "search", to: "searches#show"
+  get "search/around", to: "searches#around", as: :search_around
   get "random", to: "random_readings#show", as: :random
   get "collections/:collection/random", to: "random_readings#show", as: :random_collection
   get "works/:work/random", to: "random_readings#show", as: :random_work

@@ -29,10 +29,18 @@
   <% prev_unit = (@units[at - 1] if at.positive?) %>
   <% next_unit = @units[at + 1] %>
   <div class="reader-col">
-    <%# Up after opening a search result, until you leave the reader (see lib/last_search). %>
-    <div class="back-slip" data-controller="back-slip" hidden>
+    <%# Up after opening a search result, until you leave the reader (see lib/last_search). Under the way back, the
+        results either side of where you are, to step to with [ and ]. %>
+    <div class="back-slip" data-controller="back-slip" hidden
+         data-back-slip-around-url-value="<%= search_around_path(section: @section.id) %>" data-back-slip-number-value="<%= @current.number %>"
+         data-action="lectio:changed@window->back-slip#moved keydown@document->back-slip#key">
       <a href="<%= search_path %>" data-back-slip-target="link">← Back to results for <q data-back-slip-target="query"></q></a>
       <button class="back-slip-x" type="button" title="Put this away" aria-label="Put this away" data-action="back-slip#dismiss">×</button>
+      <nav class="back-slip-results" aria-label="Results" data-back-slip-target="results">
+        <a class="back-slip-step" data-back-slip-target="previous" hidden><span>‹ </span><span class="back-slip-name"></span><span></span></a>
+        <span class="back-slip-where" data-back-slip-target="where"></span>
+        <a class="back-slip-step" data-back-slip-target="next" hidden><span class="back-slip-name"></span><span></span><span> ›</span></a>
+      </nav>
     </div>
     <%= render "foci/band", focus: @focus, unit: @current, others: @other_foci %>
     <article class="lectio" data-action="touchstart->lectio#touchStart touchend->lectio#touchEnd keydown@document->lectio#key">

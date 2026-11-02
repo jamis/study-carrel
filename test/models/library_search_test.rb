@@ -77,6 +77,29 @@ class LibrarySearchTest < ActiveSupport::TestCase
     assert_equal [ "Matthew 1:1" ], refs("father")
   end
 
+  test "around a section: the results before it, those in it, and the nearest either side" do
+    around = LibrarySearch.new("holy").around(@genesis.sections.second)
+    assert_equal [ 3, 1 ], [ around.total, around.before ]
+    assert_equal [ "Genesis 2:1" ], around.hits.map(&:reference)
+    assert_equal [ "Walden: Economy, paragraph 1", "Matthew 1:1" ], [ around.previous, around.next ].map(&:reference)
+
+    around = LibrarySearch.new("holy").around(@genesis.sections.first)
+    assert_equal [ 1, [], "Genesis 2:1" ], [ around.before, around.hits, around.next.reference ]
+    assert_equal "Walden: Economy, paragraph 1", around.previous.reference
+  end
+
+  test "around a section in reading order, in the place searched or out of it" do
+    TextLoader.new("work: Many\n\nsection: 1\n1. amen\n2. so\n3. amen\n\nsection: 2\n1. so\n\nsection: 3\n1. amen\n").load
+    many = Work.find_by!(slug: "many")
+    around = LibrarySearch.new("amen", place: many).around(many.sections.first)
+    assert_equal [ 3, 0, [ 1, 3 ], nil, "Many 3:1" ], [ around.total, around.before, around.hits.map(&:number), around.previous, around.next.reference ]
+    around = LibrarySearch.new("amen", place: many).around(many.sections.second)
+    assert_equal [ 2, [], "Many 1:3", "Many 3:1" ], [ around.before, around.hits, around.previous.reference, around.next.reference ]
+
+    around = LibrarySearch.new("holy", place: @genesis).around(Work.find_by!(slug: "matthew-kjv").sections.first)
+    assert_equal [ 1, 1, [], "Genesis 2:1", nil ], [ around.total, around.before, around.hits, around.previous.reference, around.next ]
+  end
+
   test "a shelf searches the works on it and under its collections" do
     shelf = users(:one).shelves.create!(name: "Mine")
     shelf.replace!([ Collection.find_by!(slug: "old-testament"), Work.find_by!(slug: "walden") ])

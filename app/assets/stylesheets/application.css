@@ -61,17 +61,32 @@
   /* The way back to the search a result was opened from: a tinted band over the focus, pushing it down. Put away, it
      closes up and the focus rises to its usual place. */
   .back-slip {
-    display: flex; align-items: center; gap: 8px; max-width: 34em; margin-top: 12px; padding: 7px 6px 7px 12px; overflow: hidden;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; max-width: 34em; margin-top: 12px; padding: 7px 6px 7px 12px; overflow: hidden;
     border-radius: 8px; background: var(--accent-soft); font-family: var(--sans); font-size: 13px;
     transition: height .2s, margin-top .2s, padding .2s, opacity .2s;
   }
   .back-slip.closing { margin-top: 0; padding-top: 0; padding-bottom: 0; opacity: 0; }
   .back-slip[hidden] { display: none; }
-  .back-slip a { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); text-decoration: none; }
-  .back-slip a:hover { color: var(--accent); }
+  .back-slip > a { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); text-decoration: none; }
+  .back-slip > a:hover { color: var(--accent); }
   .back-slip q { font-style: italic; }
   .back-slip-x { flex: none; border: 0; background: none; padding: 2px 6px; border-radius: 6px; color: var(--ink-soft); font-size: 15px; line-height: 1; }
   .back-slip-x:hover { color: var(--accent); background: var(--paper); }
+  /* The results either side, under the way back: "‹ Isaiah 22:4 · 3 of 13 · Isaiah 40:2 ›". A long title shortens on
+     its side and its number stays. The row is there while they load, so the focus doesn't drop when they come. */
+  .back-slip-results {
+    display: flex; align-items: baseline; flex-basis: 100%; min-width: 0; min-height: calc(1.5em + 6px); margin: 4px 6px 0 0; padding-top: 5px;
+    border-top: 1px solid color-mix(in srgb, var(--ink-faint) 30%, transparent); font-size: 12.5px; color: var(--ink-soft);
+  }
+  .back-slip-results[hidden] { display: none; }
+  .back-slip-step { display: inline-flex; flex: 0 1 auto; min-width: 0; padding: 1px 4px; border-radius: 5px; color: var(--ink-soft); text-decoration: none; }
+  .back-slip-step[hidden] { display: none; }
+  .back-slip-step:hover { color: var(--accent); background: var(--paper); }
+  .back-slip-step span { flex: none; white-space: pre; }
+  .back-slip-step .back-slip-name { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .back-slip-where { flex: 1 0 auto; padding: 0 6px; text-align: center; color: var(--ink-faint); white-space: nowrap; }
+  .back-slip-where b { font-weight: 500; color: var(--ink-soft); }
+  .back-slip-where .short { display: none; }
   .back-slip + .focus { transition: margin-top .2s; }
   .back-slip:not([hidden], .closing) + .focus { margin-top: calc(10px + 5vh); }
   .focus-head {
@@ -585,6 +600,8 @@
     /* The focus starts level with the ⋯ and keeps clear of it; its rule still runs the column's width. */
     .focus { margin-top: 18px; padding-right: 44px; }
     .back-slip { margin-right: 40px; }
+    .back-slip-where .long { display: none; }
+    .back-slip-where .short { display: inline; }
     .back-slip:not([hidden], .closing) + .focus { margin-top: 10px; }
     .focus::after { margin-right: -44px; }
     .pilcrow { position: static; transform: none; margin-right: .2em; }

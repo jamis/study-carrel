@@ -21,6 +21,38 @@ class SearchTest < ApplicationSystemTestCase
     assert_selector ".search-result.returned", count: 1
   end
 
+  test "the band steps through the results, by the reader within a chapter and on into the next, and back lands on the one you're on" do
+    TextLoader.new("work: Lamps\n\nsection: 1\n1. A light.\n2. Dark.\n3. A light again.\n\nsection: 2\n1. Dark.\n2. Light at last.\n").load
+    visit search_path(q: "light", work: "lamps")
+    click_on "Lamps 1:1"
+    within(".back-slip-results") do
+      assert_text "1 of 3"
+      assert_no_selector ".back-slip-step[aria-label^='Previous']"
+      assert_selector ".back-slip-step[aria-label='Next result: Lamps 1:3 (])']"
+    end
+
+    find("body").send_keys("]")
+    assert_selector ".ref", text: /Lamps 1:3/i
+    assert_current_path reading_path("lamps", 1, 3)
+    within(".back-slip-results") { assert_text "2 of 3" }
+
+    find("body").send_keys("j")
+    assert_current_path reading_path("lamps", 2, 1)
+    within(".back-slip-results") do
+      assert_text "between 2 and 3 of 3"
+      assert_selector ".back-slip-step[aria-label='Previous result: Lamps 1:3 ([)']"
+    end
+    find("body").send_keys("]")
+    assert_selector ".ref", text: /Lamps 2:2/i
+    within(".back-slip-results") { assert_text "3 of 3" }
+    assert_no_selector ".back-slip-step[aria-label^='Next']"
+
+    find("body").send_keys("[")
+    assert_current_path reading_path("lamps", 1, 3)
+    within(".back-slip") { click_on "Back to results for light" }
+    assert_selector ".search-result.returned", text: /Lamps 1:3/i
+  end
+
   test "the way back goes when put away, or when you leave the reader" do
     visit search_path(q: "light")
     click_on "Genesis 1:2"
