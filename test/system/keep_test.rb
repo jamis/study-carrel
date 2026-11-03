@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class KeepTest < ApplicationSystemTestCase
+class KeepSystemTest < ApplicationSystemTestCase
   setup do
     load_isaiah
     users(:one).foci.start!(title: "Holy")
