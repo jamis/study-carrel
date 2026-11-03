@@ -5,7 +5,8 @@ import { lastSearch } from "lib/last_search"
 // from opening a result until you leave the reader or put it away with ×. Under it, the results either side of where
 // you are ("‹ Isaiah 22:4 · 3 of 13 · Isaiah 40:2 ›"), stepped to with [ and ]: within the chapter by the reader
 // itself, beyond it by a visit. Where they stand around the chapter comes from the server once a page (around_url);
-// the way back is kept on the result you're on, or the one before it.
+// the way back is kept on the result you're on, or the one before it. The chapter's results come with where their
+// matches are, handed to the reader to mark (back-slip:marks) until the band is put away.
 export default class extends Controller {
   static targets = [ "link", "query", "results", "previous", "where", "next" ]
   static values = { aroundUrl: String, number: Number }
@@ -41,7 +42,9 @@ export default class extends Controller {
     } catch (error) {
       if (error.name === "AbortError") return
     }
-    if (this.around) this.render(); else this.resultsTarget.hidden = true
+    if (!this.around) return this.resultsTarget.hidden = true
+    this.render()
+    this.dispatch("marks", { detail: { marks: this.around.hits.map(h => [ h.number, h.marks ]) } })
   }
 
   moved({ detail: { number } }) {
@@ -127,6 +130,7 @@ export default class extends Controller {
   // Closes up (see .closing), the focus rising into its place, then goes.
   dismiss() {
     lastSearch.slip = false
+    this.dispatch("marks", { detail: { marks: [] } })
     const band = this.element
     band.style.height = `${band.offsetHeight}px`
     band.offsetHeight // so the height above is where the transition starts

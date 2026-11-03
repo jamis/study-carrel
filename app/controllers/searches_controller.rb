@@ -12,12 +12,13 @@ class SearchesController < ApplicationController
 
   # The reader's band steps through the results of the search it came from (back_slip_controller.js): where they stand
   # around the section being read (LibrarySearch#around), once per section, since the reader moves within one itself.
+  # The ones in it carry where their matches are, for the reader to mark.
   def around
     section = Section.joins(:work).merge(Work.visible_to(Current.user)).find(params[:section])
     around = LibrarySearch.new(params[:q], place: library_place, user: Current.user).around(section)
     render json: {
       total: around.total, before: around.before, per_page: LibrarySearch::PER_PAGE,
-      hits: around.hits.map { around_result(it, section) },
+      hits: around.hits.map { around_result(it, section).merge(marks: LibrarySearch.marks(it.marked)) },
       previous: around_result(around.previous), next: around_result(around.next)
     }
   end

@@ -6,7 +6,8 @@ import { splitClauses, savedBreaks, saveBreaks, clauseMode } from "lib/clauses"
 // Switches verses client-side; the whole section is already on the page. Prose is read a sentence at a time: a
 // sentence is cited by its paragraph ("12:3"), the first of a paragraph opens with a ¶, and the whole paragraph is
 // one tap (or p) away. A long passage can also be read a clause at a time (; turns it on and off): the arrows then
-// step through its clauses, marked in place with the rest dimmed, and on into the next passage.
+// step through its clauses, marked in place with the rest dimmed, and on into the next passage. Come from a search,
+// its matches are marked in the passage, the whole paragraph and the grid, until the band is put away (searchMarks).
 export default class extends Controller {
   static targets = ["unit", "now", "body", "pilcrow", "prevButton", "nextButton", "prevSide", "nextSide", "position", "ref", "refUnit", "grid", "tick", "editor", "band",
     "whole", "wholeButton", "clausesButton", "clauseMenu", "pips", "breaks", "mark"]
@@ -31,6 +32,8 @@ export default class extends Controller {
     this.fitRefs = () => this.refTargets.forEach(r => this.fitRef(r))
     this.refObserver = new ResizeObserver(this.fitRefs)
     this.refTargets.filter(r => r.closest(".panel")).forEach(r => this.refObserver.observe(r))
+    // The search's matches, by verse: [start, end] offsets into its text (see back_slip_controller).
+    this.found = new Map()
     this.breaksSet = savedBreaks()
     const mode = clauseMode.get()
     this.clausesOn = !!mode
@@ -142,16 +145,19 @@ export default class extends Controller {
     const split = this.splitting
 
     this.nowTarget.className = ["now", this.sizes.get(n), split && "clauses"].filter(Boolean).join(" ")
+    const marks = this.found.get(n)
     if (split) {
+      let at = 0 // where each clause starts in the passage, for its marks
       this.bodyTarget.replaceChildren(...this.clauses.flatMap(({ text, gap }, k) => {
         const span = document.createElement("span")
         span.className = k === this.clause ? "clause current" : "clause"
         span.dataset.clause = k
-        span.textContent = text
+        span.replaceChildren(...this.marked(text, marks, at))
+        at += text.length + gap.length
         return [span, gap]
       }))
     } else {
-      this.bodyTarget.textContent = body
+      this.bodyTarget.replaceChildren(...this.marked(body, marks))
     }
 
     const unit = (number) => number !== undefined && `${this.unitNameValue} ${this.labels.get(number)}`
@@ -173,6 +179,33 @@ export default class extends Controller {
     }))
     this.pipsTarget.setAttribute("aria-label", `Clause ${this.clause + 1} of ${this.clauses.length}; where to break`)
     this.markTargets.forEach(m => m.setAttribute("aria-pressed", this.breaksSet.has(m.dataset.mark)))
+  }
+
+  // Text with the search's matches in it marked: marks are [start, end] offsets into the passage, and the text is
+  // the part of it from `offset` (a clause), so a match across a clause's end is marked on both sides.
+  marked(text, marks = [], offset = 0) {
+    const nodes = []
+    let at = 0
+    for (const [start, end] of marks) {
+      const from = Math.max(start - offset, at), to = Math.min(end - offset, text.length)
+      if (to <= from) continue
+      if (from > at) nodes.push(text.slice(at, from))
+      const mark = document.createElement("mark")
+      mark.textContent = text.slice(from, to)
+      nodes.push(mark)
+      at = to
+    }
+    if (at < text.length) nodes.push(text.slice(at))
+    return nodes
+  }
+
+  // The band's search results in this chapter, with where their matches are; none once it's put away.
+  searchMarks({ detail: { marks } }) {
+    this.found = new Map(marks)
+    this.renderPassage()
+    this.updateMarkers()
+    this.wholeParagraph = null // its sentences are redrawn with the marks
+    if (this.hasWholeTarget && this.wholeTarget.classList.contains("open")) this.fillWhole()
   }
 
   get splitting() { return this.clausesOn && this.clauses.length > 1 }
@@ -238,7 +271,7 @@ export default class extends Controller {
       const links = this.numbers.filter(n => this.paragraphs.get(n) === paragraph).map(n => {
         const link = document.createElement("a")
         link.href = `${this.baseValue}/${n}`
-        link.textContent = this.bodies.get(n)
+        link.replaceChildren(...this.marked(this.bodies.get(n), this.found.get(n)))
         link.dataset.number = n
         link.dataset.action = "lectio#go"
         return link
@@ -291,15 +324,17 @@ export default class extends Controller {
     this.updateMarkers()
   }
 
-  // The grid marks every verse that has a note, and every one that's kept.
+  // The grid marks every verse that has a note, every one that's kept, and the search's results.
   updateMarkers() {
     this.tickTargets.forEach(tick => {
       const n = Number(tick.dataset.number)
       const has = this.noted.has(n)
       const kept = this.kept.has(n)
+      const found = this.found.has(n)
       tick.classList.toggle("has", has)
       tick.classList.toggle("kept", kept)
-      tick.setAttribute("aria-label", `${this.unitNameValue} ${this.labels.get(n)}${has ? ", has a note" : ""}${kept ? ", kept" : ""}`)
+      tick.classList.toggle("found", found)
+      tick.setAttribute("aria-label", `${this.unitNameValue} ${this.labels.get(n)}${has ? ", has a note" : ""}${kept ? ", kept" : ""}${found ? ", a search result" : ""}`)
     })
   }
 

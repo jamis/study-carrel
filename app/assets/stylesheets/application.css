@@ -410,6 +410,7 @@
     content: ""; position: absolute; top: 0; right: 5px; width: 5px; height: 7px; background: var(--accent);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
   }
+  .cell.found { background: color-mix(in srgb, var(--hl) 70%, transparent); color: var(--ink); }
   /* Prose: a row per paragraph, its sentences numbered from 1. */
   .unit-grid.by-group.open { display: block; width: max-content; overflow-x: hidden; }
   .grid-group { display: flex; align-items: flex-start; gap: 4px; }
@@ -431,6 +432,14 @@
   .whole-group a:hover { color: var(--ink); }
   .whole-group a.has { text-decoration: underline dotted color-mix(in srgb, var(--accent) 55%, transparent); text-underline-offset: 4px; }
   .whole-group a.current { color: var(--ink); background: var(--accent-soft); box-shadow: 0 0 0 2px var(--accent-soft); }
+
+  /* Come from a search, its matches in the passage and the whole paragraph, washed like the results' excerpts. */
+  .now mark, .whole-group mark { background: var(--hl); color: inherit; border-radius: 2px; box-shadow: 0 0 0 .06em var(--hl); }
+  /* Outside the current clause: a fainter wash, the words a little brighter than the dimmed text so they stay legible. */
+  .now.clauses .clause:not(.current) mark {
+    background: color-mix(in srgb, var(--hl) 50%, var(--bg)); box-shadow: 0 0 0 .06em color-mix(in srgb, var(--hl) 50%, var(--bg));
+    color: color-mix(in srgb, var(--ink) 50%, var(--bg));
+  }
 
   /* ;: the passage a clause at a time, the current clause marked and the rest dimmed. */
   .now .clause { border-radius: .12em; transition: color .25s ease, background-color .25s ease; }

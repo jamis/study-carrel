@@ -6,7 +6,7 @@
       data-lectio-note-url-template-value="<%= unit_note_path("{id}") %>"
       data-lectio-others-url-template-value="<%= unit_foci_path("{id}") %>"
       data-lectio-focus-id-value="<%= @focus.id %>"
-      data-action="note:saved@window->lectio#noteSaved keep:changed@window->lectio#keepChanged"
+      data-action="note:saved@window->lectio#noteSaved keep:changed@window->lectio#keepChanged back-slip:marks->lectio#searchMarks"
       data-lectio-base-value="<%= reading_path(@section.work.slug, @section.number) %>"
       data-lectio-ref-template-value="<%= @section.reference_template %>"
       data-lectio-ref-unit-template-value="<%= @section.reference_unit_template %>"

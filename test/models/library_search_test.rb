@@ -100,6 +100,19 @@ class LibrarySearchTest < ActiveSupport::TestCase
     assert_equal [ 1, 1, [], "Genesis 2:1", nil ], [ around.total, around.before, around.hits, around.previous.reference, around.next ]
   end
 
+  test "the results around a section carry where their matches are, stemmed, by prefix and as phrases" do
+    hits = ->(query) { LibrarySearch.new(query, place: @genesis).around(@genesis.sections.first).hits }
+    assert_equal [ [ [ 8, 15 ] ] ], hits.("bless").map { LibrarySearch.marks(it.marked) }
+    assert_equal [ [ [ 37, 47 ] ] ], hits.("sanct*").map { LibrarySearch.marks(it.marked) }
+    assert_equal [ [ [ 3, 16 ] ] ], hits.(%("the beginning")).map { LibrarySearch.marks(it.marked) }
+  end
+
+  test "marks count as the browser does, in UTF-16" do
+    assert_equal [ [ 5, 10 ] ], LibrarySearch.marks("🕯 \u00e9 \u0002light\u0003"), "a candle is two, é one"
+    assert_equal [ [ 0, 4 ], [ 30, 34 ] ], LibrarySearch.marks("\u0002holy\u0003, for the LORD's house is \u0002holy\u0003.")
+    assert_equal [], LibrarySearch.marks("nothing marked")
+  end
+
   test "a shelf searches the works on it and under its collections" do
     shelf = users(:one).shelves.create!(name: "Mine")
     shelf.replace!([ Collection.find_by!(slug: "old-testament"), Work.find_by!(slug: "walden") ])

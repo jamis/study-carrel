@@ -132,6 +132,7 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
                  response.parsed_body.except("hits"))
     assert_equal [ [ 1, "Genesis 1", ":1", reading_path("genesis-kjv", 1, 1) ], [ 2, "Genesis 1", ":2", reading_path("genesis-kjv", 1, 2) ] ],
                  response.parsed_body["hits"].map { it.values_at("number", "name", "unit", "url") }
+    assert response.parsed_body["hits"].all? { it["marks"].present? }, "each hit says where its matches are"
 
     get search_around_path(section: genesis.id, q: "light")
     assert_equal [ 1, "Walden: Economy", ", paragraph 1", reading_path("walden", 1, 1) ],

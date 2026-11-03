@@ -48,14 +48,15 @@ class LibrarySearch
   end
 
   # Where the results stand around one section, for stepping through them from the reader: how many come before it,
-  # the ones in it (in order), and the nearest outside it either way (nil past the first or last). The section needn't
-  # be in the place searched: reading on can wander out of it.
+  # the ones in it (in order, each with its matches #marked, see .marks), and the nearest outside it either way (nil
+  # past the first or last). The section needn't be in the place searched: reading on can wander out of it.
   Around = Data.define(:total, :before, :hits, :previous, :next)
 
   def around(section)
     here = matches.where(sections: { work_id: section.work_id })
     earlier, later = (counts.keys - [ section.work ]).partition { rank(it) < rank(section.work) }
-    hits = here.where(units: { section_id: section.id }).order("units.number").to_a
+    hits = here.where(units: { section_id: section.id }).order("units.number")
+               .select("units.*", "highlight(unit_search, 0, char(2), char(3)) AS marked").to_a
     Around.new(
       total:, hits:,
       before: earlier.sum { counts[it] } + here.where("sections.number < ?", section.number).count,
@@ -65,6 +66,20 @@ class LibrarySearch
         (in_order(matches.where(sections: { work_id: later.first.id })).first if later.any?)
     )
   end
+
+  # Where the matches are in text marked by highlight() (see MARK_START), as [start, end] offsets into the text
+  # unmarked, counted in UTF-16 code units as the browser counts them, for the reader to mark the passage.
+  def self.marks(marked)
+    at = 0
+    marked.scan(/([^#{MARK_START}]*)#{MARK_START}([^#{MARK_END}]*)#{MARK_END}/o).map do |before, match|
+      start = at + utf16_length(before)
+      at = start + utf16_length(match)
+      [ start, at ]
+    end
+  end
+
+  def self.utf16_length(text) = text.encode("UTF-16LE").bytesize / 2
+  private_class_method :utf16_length
 
   private
 

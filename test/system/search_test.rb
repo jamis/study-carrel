@@ -53,6 +53,43 @@ class SearchTest < ApplicationSystemTestCase
     assert_selector ".search-result.returned", text: /Lamps 1:3/i
   end
 
+  test "the matches are marked in the passage, the grid and the whole paragraph, until the band is put away" do
+    visit search_path(q: "light")
+    click_on "Genesis 1:2"
+    within(".now") { assert_selector "mark", text: "light", count: 1 }
+    assert_equal 2, evaluate_script("document.querySelectorAll('.cell.found').length")
+
+    find(".back-slip-x").click
+    assert_no_selector ".now mark"
+    assert_equal 0, evaluate_script("document.querySelectorAll('.cell.found').length")
+  end
+
+  test "reading clause by clause, the matches are marked across the whole passage" do
+    TextLoader.new("work: Lamps\n\nsection: 1\n1. A lamp unto my feet, and a light unto my path.\n").load
+    visit search_path(q: "light", work: "lamps")
+    click_on "Lamps 1:1"
+    within(".now") { assert_selector "mark", text: "light" }
+    find("body").send_keys(";")
+    within(".now") do
+      assert_selector ".clause.current", text: "A lamp unto my feet,"
+      assert_selector ".clause:not(.current) mark", text: "light"
+    end
+  end
+
+  test "in prose the whole paragraph marks the matches too" do
+    TextLoader.new("work: Walden\nunit: sentence\ngroup: paragraph\n\nsection: 1\nlabel: Economy\n1.1 I went to the woods.\n1.2 The light was low.\n1.3 Dark came.\n").load
+    visit search_path(q: "light", work: "walden")
+    find(".fv-ref", match: :first).click
+    within(".now") { assert_selector "mark", text: "light" }
+    find("body").send_keys("k")
+    within(".now") { assert_no_selector "mark" }
+    find("body").send_keys("p")
+    within(".whole-group") do
+      assert_selector "a.current", text: "I went to the woods."
+      assert_selector "mark", text: "light", count: 1
+    end
+  end
+
   test "the way back goes when put away, or when you leave the reader" do
     visit search_path(q: "light")
     click_on "Genesis 1:2"
