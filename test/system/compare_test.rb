@@ -73,7 +73,8 @@ class CompareTest < ApplicationSystemTestCase
     measured = @focus.notes.create!(unit: verse(12), content: "The scale is the point")
     @focus.update!(reread_note: measured)
     visit focus_notes_path(@focus)
-    click_on "Compare"
+    find(".rr-row.here").hover # its verbs, shown on the note pointed at
+    within(".rr-row.here") { click_on "Compare" }
     assert_selector ".rr-cmp-card .cmp-band.cut"
     assert_no_selector ".cmp-entry", visible: true
     keys "p"

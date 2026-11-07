@@ -5,8 +5,8 @@ import { citeOf, shortCite, condensedCite, labelIdsOf, escapeHtml } from "lib/no
 
 const MAX_TABS = 3
 
-// Comparing notes, on the reread page (alongside the reread and peek controllers): g, or "Compare" on the note
-// you're on. The note you're on is held up on a card at the top of the column, its groups (its labels, named
+// Comparing notes, on the reread page (alongside the reread and peek controllers): g, or "Compare" on a note, which
+// becomes the one you're on. The note you're on is held up on a card at the top of the column, its groups (its labels, named
 // or not) numbered for the moment and each shown by its face; every other note of the focus is
 // listed under it, each with a button per group and + for a new group of the two. A note is always grouped from the
 // held note's side: you choose among its groups, never the other note's, so a note already in several just gains one.
@@ -61,6 +61,10 @@ export default class extends Controller {
 
   enter(event) {
     event?.stopPropagation()
+    if (this.comparing) return
+    // From a note's own Compare: that note.
+    const row = event?.currentTarget?.closest?.(".rr-row")
+    if (row) this.#reread?.take(row)
     const here = this.#here
     if (this.comparing || !here?.dataset.noteId) return
     this.element.classList.add("comparing")
@@ -529,7 +533,8 @@ export default class extends Controller {
     if (event.target.closest?.("input, textarea, select, [contenteditable]")) return
     const k = event.key
     if (!this.comparing) {
-      if (k === "g" && !event.repeat && this.#here?.dataset.noteId) { event.preventDefault(); this.enter() }
+      // The cursor's note, or with no cursor the one pointed at.
+      if (k === "g" && !event.repeat && this.#reread?.aim()?.dataset.noteId) { event.preventDefault(); this.enter() }
       return
     }
     // Esc puts away the scratchpad or the labels first, if they're out (their own keys see to it).

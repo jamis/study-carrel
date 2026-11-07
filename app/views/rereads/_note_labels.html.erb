@@ -1,7 +1,8 @@
 <%# A note's labels on the reread page, as pills under its text: named ones A–Z, then unnamed ones by letter
     ("group D"). Each pill rereads only the notes carrying its label, from this note (the one already rereading shows
-    them all again: the reread controller sees to that). While rereading one label, that label's pill on the note you're
-    on offers to remove it (the reread controller marks it); on the note you're on, + label and "Compare". The ids are
+    them all again: the reread controller sees to that). While rereading one label, that label's pill offers to remove it
+    (the reread controller marks it). At the right end of their line, the note's verbs, + label, Compare and Edit (when
+    it has an editor here), shown when the note is pointed at or the cursor is on it. The ids are
     on the element, to light the note when its label is pointed at. Pills aren't prefetched: following one takes off a
     label just removed first, which a page fetched on hover would predate.
     note, focus; editable: false for an archived focus's notes, which have no Remove, + label or Compare %>
@@ -12,7 +13,10 @@
           class: "rr-chip-face", data: { action: "reread#follow", turbo_prefetch: false }, title: "Reread only the notes #{label.named? ? "labelled “#{label.name}”" : "in #{label_title(label)}"}" %><% if editable %><button class="rr-chip-take" type="button" title="Remove “<%= label_title(label, snippet: false) %>” from this note" data-label-id="<%= label.id %>" data-action="reread#remove">× Remove</button><% end %></span>
   <% end %>
   <% if editable %>
-    <button class="rr-add" type="button" data-action="reread#openPicker" title="Label this note (l)">+ label</button>
-    <button class="rr-find" type="button" data-action="compare#enter" title="Compare the other notes with this one (g)">Compare</button>
+    <span class="rr-acts">
+      <button class="rr-add" type="button" data-action="reread#openPicker" title="Label this note (l)">+ label</button>
+      <button class="rr-find" type="button" data-action="compare#enter" title="Compare the other notes with this one (g)">Compare</button>
+      <button class="rr-edit" type="button" data-action="reread#edit" title="Edit this note (e)">Edit</button>
+    </span>
   <% end %>
 </div>

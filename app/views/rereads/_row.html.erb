@@ -1,5 +1,6 @@
 <%# One note on the reread page. A note on a passage shows the passage and links into the reader; one on the focus as
-    a whole has neither, and goes by its number ("Focus 2"). editor_url: where its
+    a whole has neither, and goes by its number ("Focus 2"). Its place in the run ("7 of 13") hangs in the margin,
+    filled in by the reread controller. editor_url: where its
     editor loads from (the reader's, for the current focus's notes on passages; its own, for notes on the whole focus;
     none for another focus's notes on passages, or any of an archived focus's). %>
 <% unit = note.unit
@@ -9,11 +10,12 @@
                 end %>
 <article class="rr-row<%= " here" if here %><%= " rr-free" if note.free? %>" id="<%= dom_id(note, :reread) %>" data-reread-target="row"
          data-note-id="<%= note.id %>" data-cite="<%= note_ref(note) %>"
-         data-editor-url="<%= editor_url %>" data-action="click->reread#pick">
+         data-editor-url="<%= editor_url %>">
+  <span class="rr-num" aria-hidden="true"></span>
   <div class="rr-head">
     <% if unit %>
-      <%= link_to reading_path(unit.section.work.slug, unit.section.number, unit.number), class: "rr-ref" do %>
-        <span class="rr-cite"><%= unit_ref(unit.section, unit) %></span><span class="rr-open">Open in the reader →</span>
+      <%= link_to reading_path(unit.section.work.slug, unit.section.number, unit.number), class: "rr-ref", title: "Open in the reader" do %>
+        <span class="rr-cite"><%= unit_ref(unit.section, unit) %></span>
       <% end %>
     <% else %>
       <span class="rr-ref rr-whole"><span class="rr-cite">Focus <%= note.number %></span> · <%= l note.created_at.to_date, format: :long %></span>
@@ -21,7 +23,6 @@
   </div>
   <% if unit %>
     <p class="rr-passage<%= " rr-long" if unit.body.length > 200 || unit.body.count("\n") >= 6 %>"><%= unit.body %></p>
-    <hr class="rr-divide">
   <% end %>
   <div class="rr-text"><div class="rr-note" id="<%= dom_id(unit || note, :reread_text) %>"><%= note.content %></div></div>
   <div class="rr-editor composer"></div>

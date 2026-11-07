@@ -10,11 +10,18 @@ class RereadTest < ApplicationSystemTestCase
     sign_in_as users(:one)
   end
 
-  test "stepping through the notes, labelling one, and the cloud" do
+  # Keys to whatever has the focus (an editor, or the page), not to an element (which Selenium may click first).
+  def keys(*keys) = page.driver.browser.action.send_keys(*keys).perform
+
+  test "every note in full, numbered, nothing lit; stepping through them, labelling one, and the cloud" do
     visit focus_notes_path(@focus)
     assert_selector ".rr-row.here", text: "The wilderness"
+    assert_no_selector ".rr-cursor-on"
+    assert_selector ".rr-row:first-child .rr-num", text: "1\nof 2"
+    assert_selector ".rr-row", text: "The incomparable"
 
-    find("body").send_keys "l"
+    find("body").send_keys "l" # with no cursor and nothing pointed at, on the note the page opened on
+    assert_selector ".rr-cursor-on .rr-row.here", text: "The wilderness"
     find(".rr-picker input").send_keys "Empty places", :enter
     assert_selector ".rr-row.here .rr-chip", text: "Empty places"
     assert_equal [ "Empty places" ], @first.labels.reload.map(&:name)
@@ -120,6 +127,9 @@ class RereadTest < ApplicationSystemTestCase
     assert_empty third.labels.reload
     assert_equal [ @first ], waiting.notes.reload
 
+    find("body").send_keys :escape # the cursor away first
+    assert_no_selector ".rr-cursor-on"
+    assert_selector ".rr-filter-band"
     find("body").send_keys :escape
     assert_no_selector ".rr-filter-band"
     assert_selector ".rr-row[data-note-id]", count: 3
@@ -156,7 +166,7 @@ class RereadTest < ApplicationSystemTestCase
     assert_selector ".rr-row.here", text: "Renewed"
     assert_selector ".rr-filter-band", text: "Only the 0 notes without a label · 1 just labelled"
 
-    find("body").send_keys :escape
+    find("body").send_keys :escape, :escape # the cursor away, then back to all the notes
     assert_no_selector ".rr-filter-band"
     assert_selector ".rr-row[data-note-id]", count: 3
     assert_selector ".rr-row.here", text: "Renewed"
@@ -168,6 +178,7 @@ class RereadTest < ApplicationSystemTestCase
     @second.unlabel!(group)
     visit focus_notes_path(@focus, label: group.id)
     assert_selector ".rr-filter-band", text: "Only the 1 note in group A"
+    find(".rr-row.here").hover # Remove is on the pill of the note pointed at
     within(".rr-row.here") { click_on "× Remove" }
     find(".rr-filter-x").hover
     sleep 0.5 # long enough for Turbo to prefetch it, from before the label came off
@@ -181,6 +192,7 @@ class RereadTest < ApplicationSystemTestCase
   test "following another pill after Remove comes to the note with the label off" do
     waiting = @second.label!("waiting")
     visit focus_notes_path(@focus, label: waiting.id)
+    find(".rr-row.here").hover
     within(".rr-row.here") { click_on "× Remove" }
     face = find(".rr-row.here .rr-chip-face", text: "set apart")
     face.hover
@@ -255,11 +267,14 @@ class RereadTest < ApplicationSystemTestCase
 
   test "opens where it left off" do
     visit focus_notes_path(@focus)
+    find("body").send_keys "j" # the cursor up, on the note at the top
+    assert_selector ".rr-cursor-on .rr-row.here", text: "The wilderness"
     find("body").send_keys "j"
     assert_selector ".rr-row.here", text: "The incomparable"
     sleep 1 # past the position save's debounce
     visit focus_notes_path(@focus)
     assert_selector ".rr-row.here", text: "The incomparable"
+    assert_no_selector ".rr-cursor-on" # only scrolled to
   end
 
   test "coming back to a note far down, it stands in view" do
@@ -278,7 +293,11 @@ class RereadTest < ApplicationSystemTestCase
     whole = @focus.notes.create!(content: "Across it all")
     visit focus_notes_path(@focus)
     find(".rr-row", text: "Across it all").click
-    assert_selector ".rr-row.here", text: "Across it all"
+    assert_no_selector ".rr-row.here", text: "Across it all" # a click only reads
+    find(".rr-row", text: "Across it all").hover
+    within(".rr-row", text: "Across it all") { click_on "+ label" } # acting on it does
+    keys :escape
+    assert_selector ".rr-cursor-on .rr-row.here", text: "Across it all"
     sleep 1 # past the position save's debounce
     visit foci_path
     find(".card-notes a[href='#{focus_notes_path(@focus)}']", match: :first).click
@@ -295,9 +314,19 @@ class RereadTest < ApplicationSystemTestCase
     assert_equal "Compare Amos 5?", @focus.reload.scratchpad.to_plain_text.strip
   end
 
-  test "the current focus's note can be edited where it stands" do
+  test "the current focus's note can be edited where it stands, with Edit or e; Esc puts the editor away" do
     visit focus_notes_path(@focus)
-    within(".rr-row.here") { find("lexxy-editor [contenteditable]").send_keys :end, " Met there." }
+    assert_no_selector "lexxy-editor"
+    find(".rr-row", text: "The incomparable").hover
+    within(".rr-row", text: "The incomparable") { click_on "Edit" }
+    within(".rr-row.here") { find("lexxy-editor [contenteditable]", text: "The incomparable") }
+    keys :escape
+    assert_no_selector ".rr-row lexxy-editor"
+    assert_selector ".rr-cursor-on .rr-row.here", text: "The incomparable"
+
+    keys "k", "e"
+    within(".rr-row.here") { find("lexxy-editor [contenteditable]", text: "The wilderness") }
+    keys " Met there."
     within(".rr-row.here") { assert_text "Saved" }
     assert_equal "The wilderness Met there.", @first.reload.content.to_plain_text.strip
   end
@@ -311,21 +340,25 @@ class RereadTest < ApplicationSystemTestCase
     assert_equal "Holiness keeps stooping.", note.content.to_plain_text.strip
     assert_selector ".rr-row.here#reread_note_#{note.id}"
 
-    # Moving on shows its text in the row, and coming back opens its editor on it, not on a new note.
-    find("body").send_keys :escape, "k"
+    # Moving on shows its text in the row, and editing it again opens its editor on it, not on a new note.
+    keys :escape
+    assert_no_selector ".rr-row lexxy-editor"
+    keys "k"
     assert_selector "#reread_note_#{note.id}:not(.here) .rr-note", text: "Holiness keeps stooping."
-    find("body").send_keys "j"
+    keys "j"
+    assert_selector ".rr-row.here#reread_note_#{note.id}"
+    keys "e"
     within(".rr-row.here#reread_note_#{note.id}") { assert_selector "lexxy-editor [contenteditable]", text: "Holiness keeps stooping." }
     assert_equal 1, @focus.free_notes.count
 
-    find("body").send_keys :escape, "l"
+    keys :escape, "l"
     find(".rr-picker input").send_keys "the poor", :enter
     assert_selector ".rr-row.here .rr-chip", text: "the poor"
     assert_equal [ "the poor" ], note.labels.reload.map(&:name)
 
-    find("body").send_keys "n"
+    keys "n"
     assert_selector ".rr-row.here.rr-unsaved"
-    find("body").send_keys :escape, "k"
+    keys :escape, "k"
     assert_no_selector ".rr-unsaved"
     assert_equal 1, @focus.free_notes.count
   end

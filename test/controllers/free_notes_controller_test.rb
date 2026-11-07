@@ -90,10 +90,10 @@ class FreeNotesControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "the notes page lists them after the notes on passages" do
+  test "the notes page lists them after the notes on passages, unheaded" do
     @focus.notes.create!(content: "Across them all")
     get focus_notes_path(@focus)
-    assert_select "#reread_free .rr-free-head", "On the whole focus"
+    assert_select "#reread_free .rr-free-head", count: 0
     assert_select "#reread_free .rr-row .rr-ref", /\AFocus 1 · /
     assert_select "#reread_free .rr-row .rr-note", /Across them all/
     assert_select ".rr-new", "+ New note"

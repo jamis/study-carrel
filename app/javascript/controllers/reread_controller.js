@@ -8,12 +8,16 @@ const SORT_KEY = "reread-picker-sort"
 const PANEL_KEY = "reread-labels-carried" // the labels panel, open as the filter changes, to open again on the next page
 const PICKER_LEAST = 150, PICKER_TALLEST = 340 // px of the picker's cloud
 
-// Rereading a focus's notes: one lit at a time down the column (j/k, the arrows, or a click), labelled with + label (l).
+// Rereading a focus's notes: all of them down the column in full, nothing lit, each numbered in the margin ("7 of 13").
+// The note you're on (here) is the one you last acted on; it's shown only as a cursor, a band of paper, which j/k (or
+// the arrows) bring up and move and Esc or a click elsewhere puts away. A note's verbs, + label (l), Compare (g) and
+// Edit (e), show when it's pointed at (tapped, on a phone); acting on a note makes it the one you're on, and the keys
+// act on the cursor's note, or with no cursor on the note pointed at (failing that, the one you're on). Edit opens its editor in place, if it has one here
+// (data-editor-url), until you move on or press Esc.
 // The labels panel (c) shows the labels in use as a cloud or as tallies; pointing at a label lights the notes that
-// carry it, and tapping it rereads only them. The note you're on gets its editor, if it has one here (data-editor-url); where you are is
-// saved, so the reread opens there again. A new note on the whole focus (n) is written in a row of its own, and a
+// carry it, and tapping it rereads only them. Where you are is saved, so the reread opens there again. A new note on the whole focus (n) is written in a row of its own, and a
 // selection in the scratchpad can be made one ("Make a note of this"). A label's pill rereads only the notes carrying it
-// (filter), as does a label in the panel; there, Remove on the note you're on takes it off, the note staying (to put back) until you move on, and the
+// (filter), as does a label in the panel; there, Remove on a note's pill takes it off, the note staying (to put back) until you move on, and the
 // band over the run names or renames the label (r). The notes without a label are reread the same way (filter "none"):
 // one labelled there stays, with its pills, until you move on. An
 // archived focus's page is read-only (readOnly): moving, the labels panel and the scratchpad to read, nothing written
@@ -28,13 +32,15 @@ export default class extends Controller {
     try { view = localStorage.getItem(VIEW_KEY) || view } catch {}
     this.#setView(view)
     if (this.here) {
-      this.#centre()
+      // Opened on a note (?at=, from a pill or the band): the cursor on it, so you see where you came from, and the reread
+      // is there now. Otherwise the page only opens where you left off, nothing shown.
+      const at = new URLSearchParams(location.search).has("at")
+      const bring = () => this.here?.scrollIntoView({ block: at ? "center" : "start" })
+      if (at) { this.#show(); this.#savePosition() }
+      bring()
       // Turbo scrolls the page (to the top, or where it was) after it's rendered, so again once the visit is done.
-      this.centreOnLoad = () => this.#centre()
+      this.centreOnLoad = bring
       document.addEventListener("turbo:load", this.centreOnLoad, { once: true })
-      this.#openEditor()
-      // Opened on a note (?at=, from a pill or the band): the reread is there now.
-      if (new URLSearchParams(location.search).has("at")) this.#savePosition()
     }
     this.#mark()
     this.#openCarriedPanel()
@@ -49,8 +55,8 @@ export default class extends Controller {
     this.#letGo()
   }
 
-  #centre() { this.here?.scrollIntoView({ block: "center" }) }
-  centre() { this.#centre() }
+  // Back from comparing: the cursor on the note you're on, in the middle.
+  centre() { this.#show(); this.here?.scrollIntoView({ block: "center" }) }
 
   // While comparing notes (the compare controller), the column is that controller's.
   get #comparing() { return this.element.classList.contains("comparing") }
@@ -61,8 +67,46 @@ export default class extends Controller {
   // The menu of labels to reread is drawn without knowing which is being reread: marked here.
   filterMenuTargetConnected() { this.#markMenu() }
   countTargetConnected() { this.#recount() }
+  // Notes come and go (a new one, one made of the scratchpad, one leaving the run): numbered again, once.
+  rowTargetConnected() { this.#renumberSoon() }
+  rowTargetDisconnected() { this.#renumberSoon() }
 
   get here() { return this.rowTargets.find(row => row.classList.contains("here")) }
+
+  // ---------- the cursor ----------
+
+  get #shown() { return this.element.classList.contains("rr-cursor-on") }
+  #show(on = true) { this.element.classList.toggle("rr-cursor-on", on) }
+
+  // The note to act on: the cursor's; with no cursor, the note pointed at, which becomes the one you're on, or failing
+  // that the one you're on (where the page opened).
+  aim() {
+    const pointed = this.rowTargets.find(row => row.matches(":hover") || row.classList.contains("tapped"))
+    const row = this.#shown ? this.here : pointed || this.here
+    if (row) this.take(row)
+    return row
+  }
+
+  // Acting on a note (one of its verbs, or a key) makes it the one you're on, the cursor on it, where it is.
+  take(row) {
+    if (row !== this.here) this.#go(row, { scroll: false })
+    this.#show()
+  }
+
+  #renumberSoon() {
+    if (this.numbering) return
+    this.numbering = true
+    queueMicrotask(() => { this.numbering = false; this.#renumber() })
+  }
+
+  // Each note's place in the run, hung in the margin over how many there are.
+  #renumber() {
+    const rows = this.rowTargets
+    rows.forEach((row, i) => {
+      const num = row.querySelector(".rr-num")
+      if (num) num.innerHTML = `${i + 1}<small>of ${rows.length}</small>`
+    })
+  }
 
   // Rereading the notes without a label (?label=none).
   get #unlabelled() { return this.filterValue === "none" }
@@ -72,22 +116,28 @@ export default class extends Controller {
   next() { this.#step(1) }
   previous() { this.#step(-1) }
 
-  pick(event) {
-    const row = event.currentTarget
-    if (this.#comparing || row.classList.contains("here") || event.target.closest("a, button")) return
-    this.#go(row)
-  }
-
   // Onto a note (from the compare controller).
   goTo(row) { if (row && row !== this.here) this.#go(row) }
 
+  // The first press brings the cursor up on the note at the top of the window, rather than away from what you're reading;
+  // after that, a note at a time.
   #step(by) {
     const rows = this.rowTargets
+    if (!this.#shown) {
+      const top = rows.find(row => row.getBoundingClientRect().bottom > 80) || rows.at(-1)
+      if (!top) return
+      this.#show()
+      return top === this.here ? this.#scrollTo(top, "nearest") : this.#go(top, { scroll: "nearest" })
+    }
     const to = rows[rows.indexOf(this.here) + by]
-    if (to) this.#go(to)
+    if (to) this.#go(to, { scroll: "nearest" })
   }
 
-  #go(row) {
+  #scrollTo(row, block) {
+    row.scrollIntoView({ block, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })
+  }
+
+  #go(row, { scroll = "center" } = {}) {
     this.#closePicker()
     const left = this.here
     left?.classList.remove("here")
@@ -99,19 +149,31 @@ export default class extends Controller {
       this.rowTargets.filter(r => r !== row && labelIdsOf(r).length).forEach(r => r.remove())
       this.#recount()
     }
-    row.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })
+    if (scroll) this.#scrollTo(row, scroll)
     // A new note left empty goes; one with words in it stays, and its editor's last save makes it.
     const unwritten = left?.classList.contains("rr-unsaved") && !left.querySelector(".lexxy-editor__content")?.textContent.trim()
-    this.#openEditor()
+    if (left !== row) this.#closeEditor()
     if (unwritten) left.remove()
     this.#mark()
     this.#savePosition()
   }
 
+  // Edit (e): the note's editor, in place, the caret at the end of it once it's in.
+  edit(event) {
+    if (this.readOnlyValue || this.#comparing) return
+    const row = event?.currentTarget?.closest?.(".rr-row") || this.aim()
+    if (!row?.dataset.editorUrl) return
+    this.take(row)
+    const into = () => { const editor = row.querySelector("lexxy-editor [contenteditable]"); if (editor) focusAtEnd(editor) }
+    if (row.querySelector("turbo-frame#note_editor")) return into()
+    this.#openEditor()
+    row.querySelector("turbo-frame").addEventListener("turbo:frame-load", () => setTimeout(into), { once: true })
+  }
+
   // The note's editor, in the row you're on: the reader's for the current focus's notes on passages, its own for a note
-  // on the whole focus. The old frame goes, so its editor saves as it disconnects, and a new one loads for this note.
+  // on the whole focus. Any other frame goes, so its editor saves as it disconnects, and a new one loads for this note.
   #openEditor() {
-    this.element.querySelector("turbo-frame#note_editor")?.remove()
+    this.#closeEditor()
     const url = this.here.dataset.editorUrl
     if (!url) return
     const frame = document.createElement("turbo-frame")
@@ -119,6 +181,9 @@ export default class extends Controller {
     frame.src = url
     this.here.querySelector(".rr-editor").append(frame)
   }
+
+  // Put away (moving on, or Esc): its last save goes as it disconnects, and the note's text shows again.
+  #closeEditor() { this.element.querySelector("turbo-frame#note_editor")?.remove() }
 
   // ---------- notes on the whole focus ----------
 
@@ -131,6 +196,8 @@ export default class extends Controller {
     const row = this.newRowTarget.content.firstElementChild.cloneNode(true)
     section.append(row)
     this.#go(row)
+    this.#show()
+    this.#openEditor()
     // Once its editor is in, into it, and the row (taller now) back to the middle: after the editor has scrolled its
     // caret into view, which would otherwise leave the row at the foot of the screen, under a phone's sheet.
     row.querySelector("turbo-frame").addEventListener("turbo:frame-load", () => {
@@ -198,7 +265,7 @@ export default class extends Controller {
     getSelection().removeAllRanges()
     this.#toast("Made a note on the whole focus.", "Go to it", () => {
       const row = this.element.querySelector(`#reread_note_${noteId}`)
-      if (row) this.#go(row)
+      if (row) { this.#go(row); this.#show() }
     })
   }
 
@@ -259,8 +326,11 @@ export default class extends Controller {
   // it's taken off and the note leaves the run.
   remove(event) {
     event.stopPropagation()
-    const noteId = event.currentTarget.closest(".rr-row")?.dataset.noteId
+    const row = event.currentTarget.closest(".rr-row")
+    const noteId = row?.dataset.noteId
     if (!noteId) return
+    // Onto it: a note removed before it leaves the run now.
+    this.take(row)
     this.removing = this.removing === noteId ? null : noteId
     this.#mark()
     this.#recount()
@@ -414,7 +484,10 @@ export default class extends Controller {
 
   openPicker(event) {
     event?.stopPropagation()
-    const add = this.here?.querySelector(".rr-add")
+    const row = event?.currentTarget?.closest?.(".rr-row") || this.aim()
+    if (!row) return
+    this.take(row)
+    const add = row.querySelector(".rr-add")
     if (!add) return
     this.pickerInputTarget.value = ""
     this.choice = -1
@@ -432,7 +505,7 @@ export default class extends Controller {
     const col = picker.offsetParent || picker.parentElement
     let floor = window.visualViewport?.height || window.innerHeight
     if (matchMedia("(max-width: 899px)").matches) floor = Math.min(floor, this.padTarget.getBoundingClientRect().top)
-    // + label out of sight (l pressed with the lit note scrolled away): back into the middle first.
+    // + label out of sight (l pressed with the cursor's note scrolled away): back into the middle first.
     const seen = add.getBoundingClientRect()
     if (seen.top < 0 || seen.bottom > floor) add.scrollIntoView({ block: "center" })
     const box = add.getBoundingClientRect(), colBox = col.getBoundingClientRect()
@@ -558,8 +631,17 @@ export default class extends Controller {
     if (this.pickerTarget.contains(document.activeElement)) document.activeElement.blur()
   }
 
+  // A click elsewhere than the cursor's note puts the cursor away. On a phone, with nothing to point with, a tap on a note
+  // shows its verbs (again, hides them).
   away(event) {
     if (!this.pickerTarget.hidden && !this.pickerTarget.contains(event.target) && !event.target.closest(".rr-add")) this.#closePicker()
+    // Not while comparing, nor from something the click took away (the card's ×, emptying the card as it leaves).
+    if (this.#comparing || !event.target.isConnected) return
+    const row = event.target.closest?.(".rr-row")
+    if (matchMedia("(hover: none)").matches && !event.target.closest("a, button")) {
+      this.rowTargets.forEach(r => r.classList.toggle("tapped", r === row && !r.classList.contains("tapped")))
+    }
+    if (this.#shown && row !== this.here && !event.target.closest(".rr-new, .rr-picker, .reread-pad, .rr-toast, .rr-filter-band, .rr-lede, .rr-cmp-card")) this.#show(false)
   }
 
   // ---------- the labels panel ----------
@@ -617,18 +699,27 @@ export default class extends Controller {
     if (event.metaKey || event.ctrlKey || event.altKey) return
     if (event.key === "Escape" && this.padTarget.classList.contains("labels-open") && this.pickerTarget.hidden) return this.toggleLabels()
     if (this.#comparing && event.key !== "s" && event.key !== "c") return
+    // Esc with a note's editor open puts it away first, the cursor staying on the note (not from the picker or the
+    // scratchpad, which have their own).
+    if (event.key === "Escape" && this.element.querySelector("turbo-frame#note_editor") && !event.target.closest(".rr-picker, .reread-pad")) {
+      event.preventDefault()
+      return this.#closeEditor()
+    }
     if (event.target.closest("input, textarea, select, [contenteditable]")) return
     // One press is one step: holding a key down doesn't speed through the notes.
     if (event.key === "j" || event.key === "ArrowRight") { event.preventDefault(); if (!event.repeat) this.next() }
     else if (event.key === "k" || event.key === "ArrowLeft") { event.preventDefault(); if (!event.repeat) this.previous() }
     else if (event.key === "l") { event.preventDefault(); this.openPicker() }
     else if (event.key === "c") { event.preventDefault(); this.toggleLabels() }
+    // Esc puts the cursor away, before it leaves the label being reread.
+    else if (event.key === "Escape" && this.#shown && !this.padTarget.classList.contains("open") && this.pickerTarget.hidden &&
+             !this.element.querySelector(".rr-filter-menu.open")) { event.preventDefault(); this.#show(false) }
     // Esc, with nothing else to put away, leaves the label being reread for all the notes.
     else if (event.key === "Escape" && this.filterValue && !this.padTarget.classList.contains("open") && this.pickerTarget.hidden &&
              !this.element.querySelector(".rr-filter-menu.open")) { event.preventDefault(); this.unfilter() }
     else if (event.key === "r" && this.hasNameInputTarget) { event.preventDefault(); this.startNaming() }
     else if (event.key === "n") { event.preventDefault(); this.newNote() }
-    else if (event.key === "e") { const editor = this.here?.querySelector("lexxy-editor [contenteditable]"); if (editor) { event.preventDefault(); focusAtEnd(editor) } }
+    else if (event.key === "e") { event.preventDefault(); this.edit() }
     else if (event.key === "s") {
       const pad = this.padTarget.querySelector(".composer lexxy-editor [contenteditable]")
       // Read-only, there's no editor to go into: it only comes out (or goes away again).

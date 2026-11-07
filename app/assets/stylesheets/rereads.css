@@ -62,79 +62,77 @@
 .rr-name-hint { font-size: 11.5px; color: var(--ink-faint); }
 .rr-name-hint kbd { font: inherit; color: var(--ink-soft); }
 
-.rr-run { max-width: var(--measure); }
+/* Read as a commonplace book, every entry in full and nothing lit or dimmed, so the notes can be scanned down the page:
+   each headed by its passage in full ink, the reference under it, a short rule, then the note; its labels under that,
+   and at the right end of their line its verbs. Between entries a hairline from the rail to the window's right edge,
+   with an ornament set in on it; each entry's place in the run hung in the margin ("7 of 13"). The cursor (j/k) is a
+   band of paper the same width, the text where it was. Comparing keeps the entries (below). */
+.rr-run { max-width: none; }
+.reread :is(.rr-new, .rr-gone) { max-width: var(--measure); }
 .rr-row {
   --pad-l: 24px; --pad-r: 20px;
-  position: relative; padding: 18px var(--pad-r) 18px var(--pad-l); border-radius: 10px; cursor: pointer;
-  opacity: .38; transition: opacity .25s, background .25s;
+  position: relative; display: flex; flex-direction: column; padding: 28px var(--pad-r) 28px var(--pad-l); scroll-margin-block: 24px;
 }
-.rr-row + .rr-row { margin-top: 2px; }
-.rr-row:hover { opacity: .7; }
-.rr-row.here { opacity: 1; cursor: auto; background: var(--paper); box-shadow: inset 2px 0 0 var(--accent); }
-/* Pointing at a label lights the notes that carry it, wherever they are. */
-.reread.lighting .rr-row:not(.here) { opacity: .16; }
-.reread.lighting .rr-row.lit { opacity: 1; }
-.reread.lighting .rr-row.here:not(.lit) { opacity: .55; }
+.rr-row > * { max-width: calc(var(--measure) - var(--pad-l) - var(--pad-r)); }
+/* The line between entries, and the ornament on it; none over the first, or on either side of the cursor's band. */
+.rr-row::before {
+  content: ""; position: absolute; top: 0; left: calc(-1 * var(--bleed-l)); right: calc(-1 * var(--bleed-r)); max-width: none;
+  border-top: 1px solid var(--rule);
+}
+.rr-row::after {
+  content: "❧"; position: absolute; top: -.75em; left: calc(var(--pad-l) + 2rem - 8px); max-width: none; padding: 0 8px;
+  background: var(--bg); font-size: 15px; line-height: 1.5; color: var(--ink-faint);
+}
+.rr-run > .rr-row:first-child::before, .rr-run > .rr-row:first-child::after,
+.rr-run > .rr-free-notes:first-child > .rr-row:first-child::before, .rr-run > .rr-free-notes:first-child > .rr-row:first-child::after { display: none; }
+.rr-cursor-on .rr-row.here::before, .rr-cursor-on .rr-row.here::after,
+.rr-cursor-on .rr-row.here + .rr-row::before, .rr-cursor-on .rr-row.here + .rr-row::after { display: none; }
+/* Across the end of the passages and the start of the notes on the whole focus, as between any two. */
+.rr-cursor-on .rr-row.here + .rr-free-notes > .rr-row:first-child::before,
+.rr-cursor-on .rr-row.here + .rr-free-notes > .rr-row:first-child::after { display: none; }
 
-.rr-head { display: flex; align-items: baseline; gap: 12px; }
+/* Its place in the run, in the margin level with the head of the entry: the number over what it's out of. */
+.rr-num {
+  position: absolute; top: 33px; right: calc(100% - var(--pad-l) + 16px); max-width: none;
+  font: 12px/1.2 var(--sans); font-variant-numeric: tabular-nums; color: var(--ink-faint); text-align: center; white-space: nowrap;
+}
+.rr-num small { display: block; margin-top: 1px; font-size: 9.5px; opacity: .7; }
+.rr-num:empty { display: none; }
+
+.rr-head { display: flex; align-items: baseline; gap: 12px; margin-top: 8px; }
+.rr-free .rr-head { margin-top: 0; }
 .rr-ref { font-family: var(--sans); font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
 .rr-ref:hover .rr-cite { text-decoration: underline; }
-.rr-open { display: none; margin-left: 12px; font-size: 12px; letter-spacing: normal; text-transform: none; color: var(--ink-faint); }
-.rr-row.here .rr-open { display: inline; }
-.rr-ref:hover .rr-open { color: var(--accent); }
-.rr-passage {
-  margin: 6px 0 0; font-size: 15.5px; line-height: 1.5; color: var(--ink-soft); white-space: pre-line;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-}
-.rr-row.here .rr-passage { display: block; font-size: 16.5px; }
-/* In the run the passage is set as a quotation, so it reads as the text and the note as yours. */
-:is(.rr-row, .rr-gone) .rr-passage { margin: 8px 0 0 2px; padding-left: 14px; border-left: 2px solid var(--rule); }
-:is(.rr-row, .rr-gone) .rr-passage + :is(.rr-text, .rr-note) { margin-top: 12px; }
-.rr-row.here .rr-passage ~ .rr-editor:has(turbo-frame[complete]) { margin-top: 12px; }
-.rr-text { margin-top: 8px; font-size: 18px; line-height: 1.5; }
-.rr-row.here .rr-text { font-size: 21px; }
+.rr-passage { order: -1; max-width: 36rem; margin: 0; font-size: 19px; line-height: 1.45; color: var(--ink); white-space: pre-line; }
+.rr-passage.rr-long { font-size: 17.5px; }
+.rr-text, .rr-editor { max-width: 38rem; }
+.rr-text { margin-top: 10px; }
 .rr-text .rr-note { margin: 0; font-size: inherit; }
-.rr-note { margin-top: 8px; font-size: 18px; line-height: 1.5; }
-.rr-row.here .rr-note { font-size: 21px; }
+.rr-note { margin-top: 10px; font-size: 17px; line-height: 1.55; }
+.rr-row .rr-text, .rr-row .rr-note, .rr-editor.composer lexxy-editor { font-size: 17px; }
 .rr-note .lexxy-content > :first-child { margin-top: 0; }
 .rr-note .lexxy-content > :last-child { margin-bottom: 0; }
-
-/* The note you're on, in the reader's editor once it has loaded (the current focus's notes only). */
-.rr-editor { display: none; }
-.rr-row.here .rr-editor:has(turbo-frame[complete]) { display: block; margin-top: 8px; }
-.rr-row.here:has(.rr-editor turbo-frame[complete]) .rr-text { display: none; }
-.rr-editor.composer lexxy-editor { font-size: 21px; line-height: 1.5; font-family: var(--serif); }
-.rr-divide { display: none; }
-
-/* Read as a commonplace book: each entry headed by its passage in full ink, the reference under it, then the note.
-   The one you're on is a band of paper across the page (the column's padding on either side), ruled in accent above
-   and below, with a hairline between passage and note running its whole width; the text keeps its measure.
-   Comparing keeps it: the held-up note's band becomes the card, the row at the cursor a quieter band (below). */
-.reread .rr-run { max-width: none; }
-.reread :is(.rr-new, .rr-gone) { max-width: var(--measure); }
-.reread .rr-row { display: flex; flex-direction: column; }
-.reread .rr-row > * { max-width: calc(var(--measure) - var(--pad-l) - var(--pad-r)); }
-.reread .rr-row .rr-passage {
-  order: -1; max-width: 36rem; margin: 0; padding: 0; border: 0; font-size: 18px; line-height: 1.45; color: var(--ink);
+/* Under a passage, a short rule where the note begins: nothing like the line between entries. */
+.rr-row:has(.rr-passage) :is(.rr-text, .rr-editor:has(turbo-frame[complete])) { margin-top: 16px; }
+.rr-row:has(.rr-passage) :is(.rr-text, .rr-editor:has(turbo-frame[complete]))::before {
+  content: ""; display: block; width: 2.5em; height: 1px; margin-bottom: 14px; background: var(--ink-faint); opacity: .6;
 }
-.reread .rr-row.here .rr-passage { font-size: 22px; }
-.reread .rr-row.here .rr-passage.rr-long { font-size: 19px; }
-.reread .rr-row:has(.rr-passage) .rr-head { margin-top: 8px; }
-.reread .rr-row :is(.rr-text, .rr-editor) { max-width: 38rem; }
-.reread .rr-row :is(.rr-text, .rr-note) { font-size: 16.5px; }
-.reread .rr-row .rr-text { margin-top: 10px; }
-.reread .rr-row.here :is(.rr-text, .rr-note), .reread .rr-editor.composer lexxy-editor { font-size: 18.5px; }
-.reread .rr-row.here {
+
+/* The cursor: the entry on a band of paper from the rail to the window's right edge, its text where it was. */
+.rr-cursor-on .rr-row.here {
   margin-left: calc(-1 * var(--bleed-l)); margin-right: calc(-1 * var(--bleed-r));
   padding-left: calc(var(--pad-l) + var(--bleed-l)); padding-right: calc(var(--pad-r) + var(--bleed-r));
-  border-block: 1px solid var(--accent); border-radius: 0; box-shadow: none;
+  background: var(--paper);
 }
-.reread .rr-row.here .rr-divide {
-  display: block; align-self: stretch; max-width: none; height: 0;
-  margin: 16px calc(-1 * (var(--pad-r) + var(--bleed-r))) 0 calc(-1 * (var(--pad-l) + var(--bleed-l)));
-  border: 0; border-top: 1px solid var(--rule);
-}
-.reread .rr-row.here .rr-divide ~ :is(.rr-text, .rr-editor:has(turbo-frame[complete])) { margin-top: 14px; }
+.rr-cursor-on .rr-row.here .rr-num { right: calc(100% - var(--pad-l) - var(--bleed-l) + 16px); }
+/* Pointing at a label (in the panel) lights the notes that carry it, wherever they are. */
+.reread.lighting:not(.comparing) .rr-row:not(.lit) { opacity: .3; }
+
+/* A note's editor (Edit, or e), in place of its text until you move on or press Esc. */
+.rr-editor { display: none; }
+.rr-editor:has(turbo-frame[complete]) { display: block; }
+.rr-row:has(.rr-editor turbo-frame[complete]) .rr-text { display: none; }
+.rr-editor.composer lexxy-editor { line-height: 1.55; font-family: var(--serif); }
 .rr-editor.composer .lexxy-editor__content { min-height: 1lh; overflow: visible; }
 .rr-editor.composer .lexxy-editor__content > :first-child { margin-top: 0; }
 .rr-editor.composer .lexxy-editor__content > p:last-of-type { margin-bottom: 0; }
@@ -153,39 +151,47 @@
 /* Shorter still where a line holds several: the tabs, the card's groups. */
 :is(.cmp-tab-ref, .rr-cmp-card) .ref-name { max-width: 7em; }
 
-/* A note's labels as pills under it, quiet; on the note you're on, a little larger, to take off (×), with + label. */
+/* A note's labels as pills under it, quiet; at the right end of their line, the note's verbs (+ label, Compare, Edit),
+   shown when it's pointed at, tapped, or the cursor is on it, and kept together on one line, wrapping to a line of
+   their own when the pills leave no room. */
 .rr-labels { font-family: var(--sans); font-size: 12px; }
-.rr-row .rr-labels:has(.rr-chip) { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
-.rr-row.here .rr-labels { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; font-size: 12.5px; }
+.rr-row .rr-labels { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: 38rem; margin-top: 12px; }
+.rr-row .rr-labels:not(:has(.rr-chip, .rr-acts)) { display: none; }
 .rr-chip { display: inline-flex; align-items: center; color: var(--ink-faint); white-space: nowrap; }
 .rr-row .rr-chip { padding: 1px 9px; border: 1px solid var(--rule); border-radius: 999px; }
-.rr-chip-take, .rr-add { display: none; }
-.rr-row.here .rr-chip { gap: 2px; min-height: 26px; padding: 2px 10px; color: var(--ink-soft); }
+.rr-chip-take { display: none; }
 /* A pill rereads only its label's notes; the label already being reread is outlined in accent. */
 .rr-chip-face { color: inherit; text-decoration: none; }
 .rr-row .rr-chip:has(.rr-chip-face:hover), .rr-row .rr-chip.current { border-color: var(--accent); color: var(--accent); }
-.rr-row:not(.here) .rr-chip:has(.rr-chip-face:hover) { background: var(--paper); }
+.rr-row .rr-chip:has(.rr-chip-face:hover) { background: var(--paper); }
 .comparing .rr-chip-face { pointer-events: none; }
-/* On the note you're on, that label's pill is divided: the label, then its right side filled in accent to remove it. */
-.rr-row.here .rr-chip.current:has(.rr-chip-take) { align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
-.rr-row.here .rr-chip.current .rr-chip-face { display: inline-flex; align-items: center; padding: 2px 10px 2px 11px; }
-.rr-row.here .rr-chip.current .rr-chip-take {
-  display: inline-flex; align-items: center; border: 0; padding: 0 11px 0 9px; background: var(--accent); color: var(--bg); font: 600 11.5px var(--sans);
+/* While rereading one label, its pill on the note pointed at is divided: the label, then its right side filled in
+   accent to remove it. */
+:is(.rr-row:is(:hover, :focus-within, .tapped), .rr-cursor-on .rr-row.here) .rr-chip.current:has(.rr-chip-take),
+.rr-row .rr-chip.removed:has(.rr-chip-take) { align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
+:is(.rr-row:is(:hover, :focus-within, .tapped), .rr-cursor-on .rr-row.here) .rr-chip.current:has(.rr-chip-take) .rr-chip-face,
+.rr-row .rr-chip.removed .rr-chip-face { display: inline-flex; align-items: center; padding: 1px 9px 1px 10px; }
+:is(.rr-row:is(:hover, :focus-within, .tapped), .rr-cursor-on .rr-row.here) .rr-chip.current .rr-chip-take,
+.rr-row .rr-chip.removed .rr-chip-take {
+  display: inline-flex; align-items: center; border: 0; padding: 0 10px 0 8px; background: var(--accent); color: var(--bg); font: 600 11.5px var(--sans);
 }
-.rr-row.here .rr-chip.current .rr-chip-take:hover { filter: brightness(1.12); }
+.rr-row .rr-chip.current .rr-chip-take:hover { filter: brightness(1.12); }
 /* Removed: crossed out, until you move on, with the way to put it back. */
-.rr-row.here .rr-chip.removed { border-style: dashed; }
+.rr-row .rr-chip.removed { border-style: dashed; }
 .rr-chip.removed .rr-chip-face { text-decoration: line-through; color: var(--ink-faint); }
-.rr-row.here .rr-chip.removed .rr-chip-take { background: none; color: var(--accent); font-weight: 400; }
-.rr-row.here .rr-chip.removed .rr-chip-take:hover { filter: none; text-decoration: underline; }
-.rr-labels:has(.rr-chip.removed)::after { content: "Leaves the run when you move on."; flex-basis: 100%; font-style: italic; color: var(--ink-faint); }
-.rr-row.here .rr-add {
-  display: inline-block; min-height: 26px; padding: 2px 10px; border: 1px dashed var(--rule); border-radius: 999px; background: none; color: var(--ink-faint);
-}
-.rr-row.here .rr-add:hover { color: var(--accent); border-color: var(--accent); }
+.rr-row .rr-chip.removed .rr-chip-take { background: none; color: var(--accent); font-weight: 400; }
+.rr-row .rr-chip.removed .rr-chip-take:hover { filter: none; text-decoration: underline; }
+.rr-labels:has(.rr-chip.removed)::after { content: "Leaves the run when you move on."; flex-basis: 100%; order: 2; font-style: italic; color: var(--ink-faint); }
 
-/* Notes on the focus as a whole, after those on passages; a new one is written in a row of its own. */
-.rr-free-notes:not(:has(.rr-row)) .rr-free-head { display: none; }
+.rr-acts { flex: none; display: flex; gap: 14px; margin-left: auto; padding-left: 12px; white-space: nowrap; font-size: 12.5px; visibility: hidden; }
+.rr-acts button { border: 0; background: none; padding: 0; color: var(--ink-faint); }
+.rr-acts button:hover { color: var(--accent); }
+.rr-row:is(:hover, :focus-within, .tapped) .rr-acts, .rr-cursor-on .rr-row.here .rr-acts { visibility: visible; }
+/* Edit only where the note has an editor here; Compare once a new note is saved. */
+.rr-row[data-editor-url=""] .rr-edit, .rr-unsaved .rr-find { display: none; }
+
+/* Notes on the focus as a whole, after those on passages, unheaded; a new one is written in a row of its own. The
+   detached notes' head is set as theirs was. */
 .rr-free-head { margin: 34px 0 8px 24px; font: 600 10px var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
 .rr-ref.rr-whole { color: var(--ink-soft); }
 /* At the end of the run, a blank slip to write on (as "A new question" is on the focuses page). */
@@ -196,15 +202,14 @@
 .rr-new:hover { border-color: var(--accent); color: var(--accent); }
 .rr-unsaved .rr-note { display: none; }
 
-/* Detached notes, after the run: read-only, never lit, so set apart rather than dimmed. */
-.rr-gone { padding: 18px 20px 18px 24px; color: var(--ink-soft); opacity: .55; transition: opacity .25s; }
-.rr-gone:is(:hover, :focus-within) { opacity: 1; }
+/* Detached notes, after the run under a head of their own: read-only, unnumbered, in a softer ink. */
+.rr-gone { padding: 18px 20px 18px 24px; color: var(--ink-soft); }
 .rr-gone + .rr-gone { border-top: 1px solid var(--rule); }
 .rr-gone .rr-ref { color: var(--ink-faint); }
 .rr-why { margin: 2px 0 0; font: 12px var(--sans); color: var(--ink-faint); }
 .rr-gone { display: flex; flex-direction: column; }
 .rr-gone > * { max-width: 38rem; }
-.reread .rr-gone .rr-passage { order: -1; margin: 0 0 8px; padding: 0; border: 0; font-size: 17px; line-height: 1.45; -webkit-line-clamp: 4; }
+.reread .rr-gone .rr-passage { order: -1; margin: 0 0 8px; padding: 0; border: 0; font-size: 17px; line-height: 1.45; }
 .rr-gone .rr-labels { max-width: none; }
 .rr-gone .rr-labels { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
 .rr-gone .rr-chip + .rr-chip::before { content: "·"; margin-right: 6px; }
@@ -379,16 +384,8 @@
 /* An unnamed label by its letter, "group D": the word quiet, the letter, which you match by eye, a little heavier. */
 .lf-letter { font-weight: 600; letter-spacing: .02em; }
 .rr-row .rr-chip .lf-letter { color: var(--ink-soft); }
-.rr-row.here .rr-chip .lf-letter { color: var(--ink); }
-.rr-row.here .rr-chip .lf { max-width: 26em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rr-row .rr-chip .lf { max-width: 26em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rr-tally-name .lf-word { color: var(--ink-soft); }
-
-/* The way into comparing the other notes with the one you're on, beside + label. */
-.rr-find { display: none; }
-.rr-row.here:not(.rr-unsaved) .rr-find {
-  display: inline-block; min-height: 26px; padding: 2px 10px; border: 1px dashed var(--rule); border-radius: 999px; background: none; color: var(--accent);
-}
-.rr-row.here .rr-find:hover { border-color: var(--accent); }
 
 /* ---------- comparing notes (the compare controller) ---------- */
 /* Up to three notes to compare with, under tabs on a card at the top of the column: the held note's band, as on the page, cut to a
@@ -396,11 +393,17 @@
    with a button per group, + for a new group of the two and "Compare with this" after its pills. */
 .rr-cmp-lede, .rr-cmp-acts, .rr-cmp-hold { display: none; }
 .comparing .rr-cmp-lede { display: block; }
-.comparing .rr-lede:not(.rr-cmp-lede), .comparing .rr-new, .comparing .rr-new-phone, .comparing .rr-row .rr-add, .comparing .rr-row .rr-find { display: none; }
+.comparing .rr-lede:not(.rr-cmp-lede), .comparing .rr-new, .comparing .rr-new-phone, .comparing .rr-row .rr-acts { display: none; }
 .comparing .rr-row.here { display: none; }
 .comparing .rr-row { opacity: 1; scroll-margin-top: var(--covered, 0px); scroll-margin-bottom: 12px; }
 .comparing .rr-row:hover { background: color-mix(in srgb, var(--paper) 55%, transparent); }
 .comparing .rr-row:not(.cursor):not(.along) .rr-note { color: var(--ink-soft); }
+/* Each row's passage cut to two lines, to compare by the notes; one cut off opens over it (below). */
+.comparing .rr-row .rr-passage { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 18px; }
+/* The cursor's band is ruled on its own: no line or ornament of the run's on either side of it. */
+.comparing .rr-row.cursor::before, .comparing .rr-row.cursor::after,
+.comparing .rr-row.cursor + .rr-row::before, .comparing .rr-row.cursor + .rr-row::after { display: none; }
+.comparing .rr-row.cursor .rr-num { right: calc(100% - var(--pad-l) - var(--bleed-l) + 16px); }
 /* The row at the cursor: a band across the page as the note you're on is, but quieter, ruled in the rule colour, so
    it's never taken for the held note. */
 .comparing .rr-row.cursor {
@@ -564,9 +567,13 @@
   .rr-lede, .reread .page-empty, .rr-free-head { margin-left: 16px; }
   .rr-toast { bottom: 76px; max-width: calc(100vw - 32px); }
   .rr-keys { display: none; }
-  .rr-row { --pad-l: 16px; --pad-r: 12px; padding-block: 14px; }
+  .rr-row { --pad-l: 16px; --pad-r: 12px; padding-block: 24px; }
+  /* No margin to hang the number in: "7 of 13" on a line of its own over the passage. */
+  .rr-num, .rr-cursor-on .rr-row.here .rr-num, .comparing .rr-row.cursor .rr-num {
+    position: static; order: -2; margin-bottom: 6px; font-size: 11.5px; text-align: left;
+  }
+  .rr-num small { display: inline; margin: 0 0 0 .3em; font-size: inherit; }
   .rr-gone { padding: 14px 12px 14px 16px; }
-  .reread .rr-row.here { margin-block: 12px; }
   .rr-pad-tools-phone { display: flex; position: absolute; top: 15px; right: 44px; z-index: 2; }
   .reread-pad .panel-handle .preview { margin-right: 120px; }
   .reread-pad { overflow: visible; }

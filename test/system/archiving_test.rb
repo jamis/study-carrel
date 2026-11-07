@@ -34,7 +34,7 @@ class ArchivingSystemTest < ApplicationSystemTestCase
     assert_selector ".rr-row.here", text: "Stillness"
     assert_selector ".rr-row.here .rr-chip", exact_text: "quiet"
 
-    find("body").send_keys "j"
+    find("body").send_keys "j", "j" # the cursor up on the first, then on
     assert_selector ".rr-row.here", text: "Nothing like it"
     find("body").send_keys "l"
     find("body").send_keys "n"

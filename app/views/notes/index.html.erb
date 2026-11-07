@@ -1,8 +1,9 @@
 <% content_for :title, "Notes · #{@focus.title} · Study Carrel" %>
 <%# A focus's notes page (the current focus's or a past one's), where they're reread: those on passages in reading
-    order down the column, then those on the focus as a whole, the one you're on lit and the rest dimmed in place, each
-    note's labels as pills under it, each rereading only its label's notes (?label=, with a band over the run saying so;
-    there Remove takes the label off the note you're on). The focus's scratchpad is put away behind a tab at the right edge (a bottom sheet on
+    order down the column, then those on the focus as a whole, every one in full, each numbered in the margin ("7 of
+    13") with its labels as pills under it, each rereading only its label's notes (?label=, with a band over the run
+    saying so; there a pill's Remove takes the label off its note). Nothing is lit: j/k bring up a cursor, a band of
+    paper, and a note's verbs (+ label, Compare, Edit) show when it's pointed at. The focus's scratchpad is put away behind a tab at the right edge (a bottom sheet on
     phones); the labels in use, as a cloud or as tallies, come up over its foot, or on their own. Notes on the whole
     focus can be written and edited here, and so can the current focus's notes on passages, as in the reader.
     "Compare" (g) turns the column into a comparison: up to three notes to compare with, under tabs on a card at
@@ -48,7 +49,7 @@
           <%= button_to "Unarchive", unarchive_focus_path(@focus, back: "notes"), method: :patch, form_class: "inline-form" %></span>
         <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>c</kbd> for the labels, <kbd>s</kbd> the scratchpad</span>
       <% else %>
-        <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to compare, <kbd>c</kbd> for the labels,<% if @label %> <kbd>r</kbd> to name this one,<% end %> <kbd>n</kbd> for a new note, <kbd>s</kbd> the scratchpad</span>
+        <span class="rr-keys">· <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>l</kbd> to label, <kbd>g</kbd> to compare, <kbd>e</kbd> to edit, <kbd>c</kbd> for the labels,<% if @label %> <kbd>r</kbd> to name this one,<% end %> <kbd>n</kbd> for a new note, <kbd>s</kbd> the scratchpad</span>
       <% end %>
     </div>
     <%# Rereading one label, or the notes without one: saying so over the run, with Rename (r) for a label and the way
@@ -88,9 +89,8 @@
         <%= render "rereads/row", note:, focus: @focus, here: note == @here %>
       <% end %>
       <%# Notes on the focus as a whole: what you see across the passages, written here or made of a line in the
-          scratchpad. New ones join the end. %>
+          scratchpad. They follow on in the run, unheaded. New ones join the end. %>
       <section class="rr-free-notes" id="reread_free" aria-label="On the whole focus">
-        <h2 class="rr-free-head">On the whole focus</h2>
         <% free_notes.each do |note| %>
           <%= render "rereads/row", note:, focus: @focus, here: note == @here %>
         <% end %>
@@ -101,7 +101,8 @@
       <%# A new note on the whole focus, before its first save makes it (removed again if you move on with it empty). %>
       <% unless archived %>
       <template data-reread-target="newRow">
-        <article class="rr-row rr-free rr-unsaved" data-reread-target="row" data-editor-url="<%= new_focus_note_path(@focus) %>" data-action="click->reread#pick">
+        <article class="rr-row rr-free rr-unsaved" data-reread-target="row" data-editor-url="<%= new_focus_note_path(@focus) %>">
+          <span class="rr-num" aria-hidden="true"></span>
           <div class="rr-head"><span class="rr-ref rr-whole">New note</span></div>
           <div class="rr-text"><div class="rr-note"></div></div>
           <div class="rr-editor composer"></div>
