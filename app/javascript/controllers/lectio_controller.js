@@ -17,8 +17,6 @@ export default class extends Controller {
   connect() {
     this.bodies = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.textContent.trim()]))
     this.numbers = [...this.bodies.keys()].sort((a, b) => a - b)
-    // Longer units step down in size; the server decides which (ReadingsHelper#unit_size_class).
-    this.sizes = new Map(this.unitTargets.map(u => [Number(u.dataset.number), u.dataset.size]))
 
     this.unitIds = new Map(this.unitTargets.map(u => [Number(u.dataset.number), Number(u.dataset.unitId)]))
     // How each unit is cited ("12:3" for a sentence, else its number), its paragraph, and whether it opens one.
@@ -144,7 +142,7 @@ export default class extends Controller {
     this.clause = Math.max(0, Math.min(this.clauses.length - 1, this.clause))
     const split = this.splitting
 
-    this.nowTarget.className = ["now", this.sizes.get(n), split && "clauses"].filter(Boolean).join(" ")
+    this.nowTarget.classList.toggle("clauses", Boolean(split))
     const marks = this.found.get(n)
     if (split) {
       let at = 0 // where each clause starts in the passage, for its marks

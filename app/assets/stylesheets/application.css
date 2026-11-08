@@ -56,16 +56,17 @@
   .icon-btn:hover { background: var(--accent-soft); }
 
   /* ---------- focus: stands directly over the passage, in soft italic, set off from it by a rule across the column ---------- */
-  .focus { position: relative; max-width: 34em; margin: calc(22px + 5vh) 0 14px; }
+  /* Its distance from the passage follows the window's width: 30px on a phone, up to 60px on a wide screen. */
+  .focus { position: relative; max-width: var(--measure); margin: 0 0 clamp(30px, calc(30px + 30 * (100vw - 390px) / 1050), 60px); }
   .focus::after { content: ""; display: block; height: 1px; margin-top: 14px; background: var(--rule); }
-  /* The way back to the search a result was opened from: a tinted band over the focus, pushing it down. Put away, it
-     closes up and the focus rises to its usual place. */
+  /* The way back to the search a result was opened from: a tinted band over the focus, growing upward from it (see
+     .over). Put away, it closes up; the focus and passage stay where they are. */
   .back-slip {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; max-width: 34em; margin-top: 12px; padding: 7px 6px 7px 12px; overflow: hidden;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; max-width: var(--measure); margin-bottom: 12px; padding: 7px 6px 7px 12px; overflow: hidden;
     border-radius: 8px; background: var(--accent-soft); font-family: var(--sans); font-size: 13px;
-    transition: height .2s, margin-top .2s, padding .2s, opacity .2s;
+    transition: height .2s, margin-bottom .2s, padding .2s, opacity .2s;
   }
-  .back-slip.closing { margin-top: 0; padding-top: 0; padding-bottom: 0; opacity: 0; }
+  .back-slip.closing { margin-bottom: 0; padding-top: 0; padding-bottom: 0; opacity: 0; }
   .back-slip[hidden] { display: none; }
   .back-slip > a { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); text-decoration: none; }
   .back-slip > a:hover { color: var(--accent); }
@@ -87,8 +88,6 @@
   .back-slip-where { flex: 1 0 auto; padding: 0 6px; text-align: center; color: var(--ink-faint); white-space: nowrap; }
   .back-slip-where b { font-weight: 500; color: var(--ink-soft); }
   .back-slip-where .short { display: none; }
-  .back-slip + .focus { transition: margin-top .2s; }
-  .back-slip:not([hidden], .closing) + .focus { margin-top: calc(10px + 5vh); }
   .focus-head {
     display: flex; align-items: flex-start; gap: 7px;
     width: 100%; padding: 0; border: 0; background: none; text-align: left;
@@ -351,14 +350,28 @@
   .trail-sides .trail-next { margin-left: auto; }
   .menu-trail { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--rule); }
 
-  /* The reading column: the focus over the passage; the reference row sticks to the top while a long passage scrolls. */
-  .reader-col { min-width: 0; padding: 0 56px 110px 44px; } /* room at the foot for the steps */
+  /* The reading column: the focus over the passage; the reference row sticks to the top while a long passage scrolls.
+     The measure is centred in the column's room (the text still ragged right), and the steps and margins move with it. */
+  .reader {
+    --measure: 40rem;
+    --indent: max(0px, (100vw - 52px - var(--panel-w) - 44px - 56px - var(--measure)) / 2);
+    /* One type size for every passage, 22px on a phone growing to 28px at 1200px wide; a long one scrolls. */
+    --type: clamp(22px, calc(22px + 6 * (100vw - 390px) / 810), 28px);
+  }
+  .reader-col { min-width: 0; padding: 0 56px 110px calc(44px + var(--indent)); } /* room at the foot for the steps */
+
+  /* The way back to a search and the focus hang over the passage, which starts where its first line's baseline falls
+     at 44% of the window, whatever their height: a focus on two lines, or the way back opening, grows upward and the
+     passage stays put. Down to it: the reference row (its padding, the ribbon, its margin: 46px) and the first line's
+     half-leading and ascent (about 1.1em). */
+  .over {
+    display: flex; flex-direction: column; justify-content: flex-end;
+    min-height: calc(44dvh - 46px - 1.1 * var(--type)); padding-top: 22px;
+  }
 
   /* ---------- lectio: one passage, large ---------- */
-  .lectio { max-width: 34em; touch-action: pan-y; }
-  .now { white-space: pre-line; color: var(--ink); font-weight: 500; --band: var(--bg); font-size: clamp(24px, 3.9vw, 35px); line-height: 1.5; text-wrap: pretty; hyphens: auto; }
-  .now.mid { font-size: clamp(21px, 3.2vw, 29px); line-height: 1.55; }
-  .now.long { font-size: clamp(18px, 2.6vw, 23px); line-height: 1.7; }
+  .lectio { max-width: var(--measure); touch-action: pan-y; }
+  .now { white-space: pre-line; color: var(--ink); font-weight: 500; --band: var(--bg); font-size: var(--type); line-height: 1.55; text-wrap: pretty; hyphens: auto; }
   .now .ref {
     display: block; font-family: var(--sans); font-size: 12px; letter-spacing: .14em;
     text-transform: uppercase; color: var(--accent);
@@ -370,13 +383,13 @@
      arrows are in the same place whatever the passage's length; the text of a long one scrolls under it and fades out. */
   .steps {
     position: fixed; z-index: 10; left: 52px; right: var(--panel-w); bottom: 0; display: flex; align-items: center; gap: 4px;
-    padding: 14px 56px 18px 34px; font-family: var(--sans); background: linear-gradient(transparent, var(--bg) 16px);
+    padding: 14px 56px 18px calc(34px + var(--indent)); font-family: var(--sans); background: linear-gradient(transparent, var(--bg) 16px);
   }
   .step { border: 0; border-radius: 8px; background: none; padding: 6px 10px; font-size: 16px; line-height: 1.2; color: var(--ink-faint); }
   .step[hidden] { display: block; visibility: hidden; } /* a missing arrow keeps its room, so nothing slides sideways */
 
   /* The margins step too: a strip either side of the passage, the height of the window. The right one stands just past
-     the measure (34em of the reading column, or less when the column is narrower). */
+     the measure (or the reading column, when that's narrower). */
   .side {
     position: fixed; z-index: 1; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; width: 44px;
     padding: 0; border: 0; background: transparent; font: 26px/1 var(--sans); color: var(--ink-faint); cursor: pointer;
@@ -385,8 +398,8 @@
   /* Pointing anywhere in the strip lights only its arrow, on a disc like the row's: a lit strip the height of the window distracts. */
   .side span { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding-bottom: 3px; border-radius: 50%; transition: background-color .15s, color .15s; }
   .side:hover span { color: var(--accent); background: var(--accent-soft); }
-  .side-prev { left: 52px; }
-  .side-next { left: calc(52px + 44px + min(34rem, 100vw - 52px - var(--panel-w) - 100px) + 4px); }
+  .side-prev { left: calc(52px + var(--indent)); }
+  .side-next { left: calc(52px + 44px + var(--indent) + min(var(--measure), 100vw - 52px - var(--panel-w) - 100px) + 4px); }
   .step-of { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
   .step:hover, .step[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
   .unit-grid {
@@ -599,20 +612,21 @@
 
   /* Phones: the reading column alone; the ⋯ floats top right (see the rail) and the note is a bottom sheet. */
   @media (max-width: 899px) {
-    .reader { display: block; }
+    .reader { display: block; --indent: 0px; }
     .reader-col { padding: 0 16px 140px; }
     /* The steps stand on the sheet's handle, the two one footer; the sheet covers them when it opens. No margins to
        step in: swiping does that. */
     .steps { left: 0; right: 0; bottom: calc(52px + env(safe-area-inset-bottom)); padding: 2px 16px 0 6px; background: var(--bg); }
     .steps .step { min-width: 44px; min-height: 44px; }
     .side { display: none; }
-    /* The focus starts level with the ⋯ and keeps clear of it; its rule still runs the column's width. */
-    .focus { margin-top: 18px; padding-right: 44px; }
+    /* On a short window (a phone on its side) the focus can come up level with the ⋯: it keeps clear of it, its rule still
+       running the column's width. */
+    .over { padding-top: 18px; }
+    .focus { padding-right: 44px; }
+    .focus::after { margin-right: -44px; }
     .back-slip { margin-right: 40px; }
     .back-slip-where .long { display: none; }
     .back-slip-where .short { display: inline; }
-    .back-slip:not([hidden], .closing) + .focus { margin-top: 10px; }
-    .focus::after { margin-right: -44px; }
     .pilcrow { position: static; transform: none; margin-right: .2em; }
 
     .panel {

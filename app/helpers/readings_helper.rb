@@ -61,9 +61,4 @@ module ReadingsHelper
     number = which == :previous ? section.units.last.number : section.units.first.number
     reading_path(section.work.slug, section.number, number)
   end
-
-  # Longer units step down in size so prose paragraphs stay readable.
-  def unit_size_class(body)
-    body.length > 450 ? "long" : body.length > 180 ? "mid" : ""
-  end
 end

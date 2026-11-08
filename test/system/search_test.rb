@@ -94,16 +94,15 @@ class SearchTest < ApplicationSystemTestCase
     visit search_path(q: "light")
     click_on "Genesis 1:2"
     assert_selector ".back-slip"
-    focus_top = "document.querySelector('.focus').getBoundingClientRect().top"
-    with_band = evaluate_script(focus_top)
+    tops = "['.focus', '.now'].map((s) => document.querySelector(s).getBoundingClientRect().top)"
+    with_band = evaluate_script(tops)
     find(".back-slip-x").click
     assert_no_selector ".back-slip"
-    assert_operator evaluate_script(focus_top), :<, with_band
-    closed_up = evaluate_script(focus_top)
+    with_band.zip(evaluate_script(tops)).each { |was, now| assert_in_delta was, now, 1, "the band grows up from the focus, which stays put" }
     refresh
     assert_selector ".lectio"
     assert_no_selector ".back-slip"
-    assert_in_delta closed_up, evaluate_script(focus_top), 1, "the focus is back in its usual place"
+    with_band.zip(evaluate_script(tops)).each { |was, now| assert_in_delta was, now, 1 }
 
     visit search_path(q: "light")
     click_on "Genesis 1:2"

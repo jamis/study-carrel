@@ -6,7 +6,7 @@ A web application, usable from laptop and phone, with the same functionality on 
 
 ## Design reference
 
-**Committed** (2026-10-02): `prototype/index.html` is the reference for look and feel: lectio-only, compact sticky focus, left-aligned text with length-adaptive sizing.
+**Committed** (2026-10-02): `prototype/index.html` is the reference for look and feel: lectio-only, compact sticky focus, left-aligned text with length-adaptive sizing (the sizing superseded 2026-11-08: see [Text placement and size](#text-placement-and-size)).
 
 **Reader revised** (2026-10-05) after five layouts were tried in `prototype/reader/` (A desk, B open book, C single column, D rail and ruler, E rail and steps): **E** was chosen, `prototype/reader/e.html` (D's rail and docked note with A's `‹ 3 of 31 ›`; D's hairline ruler was dropped). Its focus is out of date: since 2026-10-12 the focus stands over the passage, not sticky at the top (see [foci-and-notes.md](foci-and-notes.md)).
 
@@ -48,9 +48,21 @@ Visual tone (ideas, not decisions): quiet study desk, not a productivity tool. S
 - Breaks at `.` `?` `!` (a verse can hold several sentences, as Jonah 4:2 does; not after an abbreviation or an initial, though "I." still ends one), at `,` `;` `:` (each needing a space after, so 1,000 and 3:16 hold), after `—`, and around `( )` (off by default). A lone word joins the next clause; two words stand alone ("no invention, no hope"), since splitting too often beats too seldom.
 - A pip per clause after the ; shows where you are and opens **Break at**, where each mark can be turned off. That choice is kept in the browser (localStorage), not on the server.
 
-## Text alignment
+## Text placement and size
 
-Left-aligned (ragged right), not centered, and flush with the focus. The text keeps a ~34em measure at every width (revised 2026-10-05). Type size steps down for longer units (long sentences of prose). Demo of long prose: open `prototype/index.html?text=prose`.
+**One type size, a steady place on the page** (decided 2026-11-08).
+
+- **One size for every passage**: 22px on a phone (390px wide), growing evenly to 28px at 1200px wide and staying there; line height 1.55. A passage too long for the window scrolls under the steps, as before.
+- **The measure is 40rem**, or the column's width when that's narrower (a phone).
+- **Left-aligned (ragged right) and flush with the focus**, but the block as a whole is centred in the reading column's room between the rail and the note; the steps and the margin strips move with it. Not centred on phones.
+- **The first line's baseline sits at 44% of the window's height**, on every passage. The focus (and the way back to a search, when it's up) hangs over the passage from there: a focus on two lines, or the way back opening, grows upward and the passage keeps its place. If they're too tall for the room (a short window), the passage moves down rather than overlapping them. Done in CSS, from the reference row's height and the first line's offset (about 1.1em), so it can be a few pixels off on another serif face; it is the same on every passage either way.
+- **The gap between the focus's rule and the passage** follows the window's width: 30px on a phone, up to 60px at 1440px wide.
+
+Why: the type stepped down at 180 and 450 characters (35, 29 and 23px) and everything hung from the top of the window, so most passages (69% are 180 characters or fewer) were a few large lines over a void that changed size with each one, and the page's weight jumped whenever a passage crossed a threshold. The step-down existed so long passages wouldn't scroll, but scrolling hasn't been a problem in practice. Whatever the size and placement, some passages will fall a line or two short of fitting, and moving the line only moves which ones, so the placement isn't tuned to avoid it.
+
+Prototyped as `prototype/reader/space.html` (not kept), on Isaiah 40, Montaigne's "Of Sorrow" and "The Raven": A, today; B, today's sizes starting lower; **C, one size starting lower**, chosen; C′, C with one step down for the very longest (over ~800 characters), not needed. Tried and set aside: centring each passage vertically (the focus and reference would have moved with every passage, the problem the steps had); having a passage too long for the room rise to the top (the focus then jumps between short and long passages); the 34em measure, which left a wide empty band beside the text on a wide screen.
+
+Before (2026-10-05 to 2026-11-08): left-aligned at a ~34em measure at every width, flush to the column's left edge, type stepping down for longer units. Demo of long prose was `prototype/index.html?text=prose`.
 
 ## Navigation
 

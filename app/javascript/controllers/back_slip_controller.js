@@ -127,7 +127,7 @@ export default class extends Controller {
     this.whereTarget.replaceChildren()
   }
 
-  // Closes up (see .closing), the focus rising into its place, then goes.
+  // Closes up (see .closing), then goes; the focus and passage under it stay where they are.
   dismiss() {
     lastSearch.slip = false
     this.dispatch("marks", { detail: { marks: [] } })

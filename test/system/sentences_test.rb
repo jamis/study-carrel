@@ -51,7 +51,7 @@ class SentencesTest < ApplicationSystemTestCase
   end
 
   test "the whole paragraph opens upward when there's no room for it below" do
-    page.current_window.resize_to(1400, 360)
+    page.current_window.resize_to(1400, 480)
     visit reading_path("walden", 2, 3)
     execute_script("document.querySelector('.steps').scrollIntoView({ block: 'end' })") # the steps at the bottom of the window
     find("body").send_keys "p"
@@ -64,7 +64,7 @@ class SentencesTest < ApplicationSystemTestCase
   end
 
   test "the verse grid opens upward when there's no room for it below" do
-    page.current_window.resize_to(1400, 360)
+    page.current_window.resize_to(1400, 480)
     visit reading_path("walden", 2, 3)
     execute_script("document.querySelector('.steps').scrollIntoView({ block: 'end' })") # the steps at the bottom of the window
     find(".step-of").click

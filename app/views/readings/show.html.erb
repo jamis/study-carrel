@@ -21,7 +21,7 @@
 
   <div hidden>
     <% @units.each do |u| %>
-      <span data-lectio-target="unit" data-number="<%= u.number %>" data-label="<%= u.label %>" data-paragraph="<%= u.paragraph %>" data-opens="<%= u.sentence == 1 %>" data-unit-id="<%= u.id %>" data-size="<%= unit_size_class(u.body) %>"><%= u.body %></span>
+      <span data-lectio-target="unit" data-number="<%= u.number %>" data-label="<%= u.label %>" data-paragraph="<%= u.paragraph %>" data-opens="<%= u.sentence == 1 %>" data-unit-id="<%= u.id %>"><%= u.body %></span>
     <% end %>
   </div>
 
@@ -29,22 +29,25 @@
   <% prev_unit = (@units[at - 1] if at.positive?) %>
   <% next_unit = @units[at + 1] %>
   <div class="reader-col">
-    <%# Up after opening a search result, until you leave the reader (see lib/last_search). Under the way back, the
-        results either side of where you are, to step to with [ and ]. %>
-    <div class="back-slip" data-controller="back-slip" hidden
-         data-back-slip-around-url-value="<%= search_around_path(section: @section.id) %>" data-back-slip-number-value="<%= @current.number %>"
-         data-action="lectio:changed@window->back-slip#moved keydown@document->back-slip#key">
-      <a href="<%= search_path %>" data-back-slip-target="link">← Back to results for <q data-back-slip-target="query"></q></a>
-      <button class="back-slip-x" type="button" title="Put this away" aria-label="Put this away" data-action="back-slip#dismiss">×</button>
-      <nav class="back-slip-results" aria-label="Results" data-back-slip-target="results">
-        <a class="back-slip-step" data-back-slip-target="previous" hidden><span>‹ </span><span class="back-slip-name"></span><span></span></a>
-        <span class="back-slip-where" data-back-slip-target="where"></span>
-        <a class="back-slip-step" data-back-slip-target="next" hidden><span class="back-slip-name"></span><span></span><span> ›</span></a>
-      </nav>
+    <%# The way back to a search and the focus hang over the passage, which keeps its place under them. %>
+    <div class="over">
+      <%# Up after opening a search result, until you leave the reader (see lib/last_search). Under the way back, the
+          results either side of where you are, to step to with [ and ]. %>
+      <div class="back-slip" data-controller="back-slip" hidden
+           data-back-slip-around-url-value="<%= search_around_path(section: @section.id) %>" data-back-slip-number-value="<%= @current.number %>"
+           data-action="lectio:changed@window->back-slip#moved keydown@document->back-slip#key">
+        <a href="<%= search_path %>" data-back-slip-target="link">← Back to results for <q data-back-slip-target="query"></q></a>
+        <button class="back-slip-x" type="button" title="Put this away" aria-label="Put this away" data-action="back-slip#dismiss">×</button>
+        <nav class="back-slip-results" aria-label="Results" data-back-slip-target="results">
+          <a class="back-slip-step" data-back-slip-target="previous" hidden><span>‹ </span><span class="back-slip-name"></span><span></span></a>
+          <span class="back-slip-where" data-back-slip-target="where"></span>
+          <a class="back-slip-step" data-back-slip-target="next" hidden><span class="back-slip-name"></span><span></span><span> ›</span></a>
+        </nav>
+      </div>
+      <%= render "foci/band", focus: @focus, unit: @current, others: @other_foci %>
     </div>
-    <%= render "foci/band", focus: @focus, unit: @current, others: @other_foci %>
     <article class="lectio" data-action="touchstart->lectio#touchStart touchend->lectio#touchEnd keydown@document->lectio#key">
-      <div class="now <%= unit_size_class(@current.body) %>" aria-live="polite" data-lectio-target="now"><div class="now-head"><%= render "keeps/ribbon", unit: @current, kept: @kept %><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span></div><span class="pilcrow" aria-hidden="true" data-lectio-target="pilcrow" <%= "hidden" unless @current.sentence == 1 %>>¶</span><span data-lectio-target="body" data-action="click->lectio#pickClause"><%= @current.body %></span></div>
+      <div class="now" aria-live="polite" data-lectio-target="now"><div class="now-head"><%= render "keeps/ribbon", unit: @current, kept: @kept %><span class="ref" title="<%= unit_ref(@section, @current) %>" data-lectio-target="ref"><%= unit_ref_parts(@section, @current) %></span></div><span class="pilcrow" aria-hidden="true" data-lectio-target="pilcrow" <%= "hidden" unless @current.sentence == 1 %>>¶</span><span data-lectio-target="body" data-action="click->lectio#pickClause"><%= @current.body %></span></div>
 
       <%# ‹ 25 of 31 ›: the number opens a grid of every verse (a dot = has a note, a ribbon = kept). Past either end, the arrows carry on into the next chapter.
           Prose is read a sentence at a time: its grid has a row per paragraph, and ¶ shows the whole paragraph. %>

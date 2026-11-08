@@ -31,6 +31,17 @@ class StepsTest < ApplicationSystemTestCase
     assert_equal of, place(".step-of")
   end
 
+  test "every passage starts in the same place, in the same size, whatever its length" do
+    visit reading_path("proverbs", 1, 1)
+    size = "getComputedStyle(document.querySelector('.now')).fontSize"
+    start, short = place(".now-head"), evaluate_script(size)
+
+    click_on "Sentence 1:2" # the long one
+    assert_selector ".step-of", text: "2 of 3"
+    assert_equal start, place(".now-head")
+    assert_equal short, evaluate_script(size)
+  end
+
   test "the margins either side of the passage step, gone at either end" do
     visit reading_path("proverbs", 1, 1)
     assert_no_selector ".side-prev", visible: true
