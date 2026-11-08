@@ -357,16 +357,18 @@
     --indent: max(0px, (100vw - 52px - var(--panel-w) - 44px - 56px - var(--measure)) / 2);
     /* One type size for every passage, 22px on a phone growing to 28px at 1200px wide; a long one scrolls. */
     --type: clamp(22px, calc(22px + 6 * (100vw - 390px) / 810), 28px);
+    /* Where the passage's first baseline falls: 44% of the window, 35% on a phone (see the phone block). */
+    --baseline: 44dvh;
   }
   .reader-col { min-width: 0; padding: 0 56px 110px calc(44px + var(--indent)); touch-action: pan-y pinch-zoom; } /* room at the foot for the steps; a sideways swipe steps */
 
   /* The way back to a search and the focus hang over the passage, which starts where its first line's baseline falls
-     at 44% of the window, whatever their height: a focus on two lines, or the way back opening, grows upward and the
-     passage stays put. Down to it: the reference row (its padding, the ribbon, its margin: 46px) and the first line's
+     at --baseline, whatever their height: a focus on two lines, or the way back opening, grows upward and the passage
+     stays put. Down to it: the reference row (its padding, the ribbon, its margin: 46px) and the first line's
      half-leading and ascent (about 1.1em). */
   .over {
     display: flex; flex-direction: column; justify-content: flex-end;
-    min-height: calc(44dvh - 46px - 1.1 * var(--type)); padding-top: 22px;
+    min-height: calc(var(--baseline) - 46px - 1.1 * var(--type)); padding-top: 22px;
   }
 
   /* ---------- lectio: one passage, large ---------- */
@@ -392,7 +394,7 @@
 
   /* The margins step too: a strip either side of the passage, the height of the window. The right one stands just past
      the measure (or the reading column, when that's narrower). */
-  /* Its arrow stands level with the passage's first line (its baseline at 44% of the window, see .over), and holds
+  /* Its arrow stands level with the passage's first line (its baseline at --baseline, see .over), and holds
      still there while a long passage scrolls. */
   .side {
     position: fixed; z-index: 1; top: 0; bottom: 0; display: flex; align-items: flex-start; justify-content: center; width: 44px;
@@ -401,7 +403,7 @@
   .side[hidden] { display: none; }
   /* Pointing anywhere in the strip lights only its arrow, on a disc like the row's: a lit strip the height of the window distracts. */
   .side span {
-    display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; margin-top: calc(44dvh - .3 * var(--type) - 18px);
+    display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; margin-top: calc(var(--baseline) - .3 * var(--type) - 18px);
     padding-bottom: 3px; border-radius: 50%; transition: background-color .15s, color .15s;
   }
   .side:hover span { color: var(--accent); background: var(--accent-soft); }
@@ -619,7 +621,8 @@
 
   /* Phones: the reading column alone; the ⋯ floats top right (see the rail) and the note is a bottom sheet. */
   @media (max-width: 899px) {
-    .reader { display: block; --indent: 0px; }
+    /* The passage sits higher on a phone: at 44% the gap over the focus is too much for the small screen. */
+    .reader { display: block; --indent: 0px; --baseline: 35dvh; }
     .reader-col { padding: 0 16px 140px; }
     /* The steps stand on the sheet's handle, the two one footer; the sheet covers them when it opens. No margins to
        step in: swiping does that. */
