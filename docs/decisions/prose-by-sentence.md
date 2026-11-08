@@ -11,7 +11,7 @@
 
 ## Display
 
-- A group's first sentence opens with a ¶, hung in the left margin (inline on phones).
+- A group's first sentence opens with a ¶, set in the line before it. (Until 2026-11-08 it hung in the left margin off phones, where it fought with the margin's ‹ once that came level with the first line; see [reader.md](reader.md#text-placement-and-size).)
 - The verse grid has a row per group.
 - A ¶ button after the arrows (or `p`) shows the whole group with the current sentence marked and each sentence a link.
 

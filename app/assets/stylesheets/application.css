@@ -358,7 +358,7 @@
     /* One type size for every passage, 22px on a phone growing to 28px at 1200px wide; a long one scrolls. */
     --type: clamp(22px, calc(22px + 6 * (100vw - 390px) / 810), 28px);
   }
-  .reader-col { min-width: 0; padding: 0 56px 110px calc(44px + var(--indent)); } /* room at the foot for the steps */
+  .reader-col { min-width: 0; padding: 0 56px 110px calc(44px + var(--indent)); touch-action: pan-y pinch-zoom; } /* room at the foot for the steps; a sideways swipe steps */
 
   /* The way back to a search and the focus hang over the passage, which starts where its first line's baseline falls
      at 44% of the window, whatever their height: a focus on two lines, or the way back opening, grows upward and the
@@ -370,14 +370,16 @@
   }
 
   /* ---------- lectio: one passage, large ---------- */
-  .lectio { max-width: var(--measure); touch-action: pan-y; }
+  .lectio { max-width: var(--measure); }
   .now { white-space: pre-line; color: var(--ink); font-weight: 500; --band: var(--bg); font-size: var(--type); line-height: 1.55; text-wrap: pretty; hyphens: auto; }
+  /* The reference keeps to one line, so the passage under it starts in the same place: too long, the section name
+     ellipsizes (the work title and the number stay whole). The whole of it is its tooltip. */
   .now .ref {
-    display: block; font-family: var(--sans); font-size: 12px; letter-spacing: .14em;
+    display: flex; min-width: 0; font-family: var(--sans); font-size: 12px; letter-spacing: .14em;
     text-transform: uppercase; color: var(--accent);
   }
-  /* A paragraph's first sentence opens with a pilcrow, hung in the margin so the text stays flush. */
-  .pilcrow { position: absolute; transform: translateX(calc(-100% - .3em)); font-weight: 400; color: var(--accent); opacity: .7; }
+  /* A paragraph's first sentence opens with a pilcrow, set in the line before it. */
+  .pilcrow { margin-right: .2em; font-weight: 400; color: var(--accent); opacity: .7; }
 
   /* ‹ 25 of 31 ›, and the grid of every verse behind the number. Pinned to the foot of the window under the column, so the
      arrows are in the same place whatever the passage's length; the text of a long one scrolls under it and fades out. */
@@ -390,13 +392,18 @@
 
   /* The margins step too: a strip either side of the passage, the height of the window. The right one stands just past
      the measure (or the reading column, when that's narrower). */
+  /* Its arrow stands level with the passage's first line (its baseline at 44% of the window, see .over), and holds
+     still there while a long passage scrolls. */
   .side {
-    position: fixed; z-index: 1; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; width: 44px;
+    position: fixed; z-index: 1; top: 0; bottom: 0; display: flex; align-items: flex-start; justify-content: center; width: 44px;
     padding: 0; border: 0; background: transparent; font: 26px/1 var(--sans); color: var(--ink-faint); cursor: pointer;
   }
   .side[hidden] { display: none; }
   /* Pointing anywhere in the strip lights only its arrow, on a disc like the row's: a lit strip the height of the window distracts. */
-  .side span { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding-bottom: 3px; border-radius: 50%; transition: background-color .15s, color .15s; }
+  .side span {
+    display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; margin-top: calc(44dvh - .3 * var(--type) - 18px);
+    padding-bottom: 3px; border-radius: 50%; transition: background-color .15s, color .15s;
+  }
   .side:hover span { color: var(--accent); background: var(--accent-soft); }
   .side-prev { left: calc(52px + var(--indent)); }
   .side-next { left: calc(52px + 44px + var(--indent) + min(var(--measure), 100vw - 52px - var(--panel-w) - 100px) + 4px); }
@@ -507,10 +514,10 @@
   .panel-head .panel-label::after { content: "·"; margin-left: .5em; }
   .panel .ref { display: flex; min-width: 0; font-family: var(--sans); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
   /* Too narrow for the whole reference: the work title goes first (lectio_controller adds .tight), then the section name ellipsizes. */
-  .panel .ref-work { flex: none; white-space: pre; }
+  :is(.panel, .now-head) .ref-work { flex: none; white-space: pre; }
   .panel .ref.tight .ref-work { display: none; }
-  .panel .ref-section { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .panel .ref-unit { flex: none; white-space: pre; }
+  :is(.panel, .now-head) .ref-section { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  :is(.panel, .now-head) .ref-unit { flex: none; white-space: pre; }
 
   /* The reader's sheet turns between two tabs, small caps like a label: the passage's note and the focus. */
   .tabs { flex: none; display: flex; gap: 2px; margin: -6px -10px 14px; font-family: var(--sans); }
@@ -627,7 +634,6 @@
     .back-slip { margin-right: 40px; }
     .back-slip-where .long { display: none; }
     .back-slip-where .short { display: inline; }
-    .pilcrow { position: static; transform: none; margin-right: .2em; }
 
     .panel {
       position: fixed; left: 0; right: 0; bottom: var(--kb, 0px); top: auto; z-index: 30;

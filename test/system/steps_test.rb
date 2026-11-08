@@ -42,6 +42,31 @@ class StepsTest < ApplicationSystemTestCase
     assert_equal short, evaluate_script(size)
   end
 
+  test "a long reference keeps to one line, and the margins' arrows stand level with the first line" do
+    TextLoader.new(<<~TXT).load
+      work: Talks
+      unit: sentence
+      group: paragraph
+
+      section: 4
+      label: Quick to Help, Slow to Judge: The Savior Helps (and Does Not Judge) the Woman at the Well
+      1.1 What did Christ focus on instead?
+      1.2 He saw her need.
+    TXT
+    visit reading_path("proverbs", 1, 1)
+    start = place(".now-head")
+    visit reading_path("talks", 4, 1)
+    assert_selector ".now-head .ref-work", text: /talks/i # the work title stays; the section name ellipsizes
+    assert evaluate_script("(s => s.scrollWidth > s.clientWidth)(document.querySelector('.now-head .ref-section'))")
+    assert_equal start, place(".now-head")
+
+    line, arrow = evaluate_script(<<~JS)
+      [document.querySelector("[data-lectio-target=body]").getClientRects()[0], document.querySelector(".side-next span").getBoundingClientRect()]
+        .map((r) => [r.top, r.bottom])
+    JS
+    assert_in_delta (line.sum / 2), (arrow.sum / 2), 3
+  end
+
   test "the margins either side of the passage step, gone at either end" do
     visit reading_path("proverbs", 1, 1)
     assert_no_selector ".side-prev", visible: true
@@ -68,7 +93,33 @@ class StepsTest < ApplicationSystemTestCase
     page.current_window.resize_to(1400, 1000)
   end
 
+  test "on a phone, a swipe anywhere below the focus steps, but not one on the focus" do
+    page.current_window.resize_to(400, 800)
+    visit reading_path("proverbs", 1, 1)
+    focus, passage = evaluate_script(<<~JS)
+      [".focus", ".now"].map((s) => document.querySelector(s).getBoundingClientRect()).map((r) => [r.top + r.height / 2, r.bottom])
+    JS
+
+    swipe(at: focus[0])
+    assert_selector ".step-of", text: "1 of 3"
+
+    swipe(at: passage[1] + 150) # the empty room under a short passage
+    assert_selector ".step-of", text: "2 of 3"
+  ensure
+    page.current_window.resize_to(1400, 1000)
+  end
+
   private
+    # A leftward swipe across the middle of the window, at that height.
+    def swipe(at:)
+      execute_script(<<~JS, at)
+        const y = arguments[0], x = innerWidth / 2, target = document.elementFromPoint(x, y)
+        const touch = (x) => new Touch({ identifier: 1, target, clientX: x, clientY: y })
+        target.dispatchEvent(new TouchEvent("touchstart", { bubbles: true, touches: [touch(x + 100)] }))
+        target.dispatchEvent(new TouchEvent("touchend", { bubbles: true, changedTouches: [touch(x - 100)] }))
+      JS
+    end
+
     # Where something is in the window, as [left, top].
     def place(selector)
       evaluate_script("(r => [Math.round(r.left), Math.round(r.top)])(document.querySelector(#{selector.to_json}).getBoundingClientRect())")

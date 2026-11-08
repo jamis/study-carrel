@@ -344,14 +344,14 @@ export default class extends Controller {
     button.setAttribute("aria-label", label)
   }
 
+  // A swipe turns the page from anywhere below the focus's rule, the empty room under a short passage included, so it
+  // needn't land on the text. Not from the focus or the way back to a search over it, nor from the steps (scrolling the
+  // verse grid or the whole paragraph), the note sheet, the keep's remark or the menus.
   touchStart(event) {
-    // Scrolling the verse grid or the whole paragraph must not also turn the page.
-    if (this.gridTarget.contains(event.target) || (this.hasWholeTarget && this.wholeTarget.contains(event.target))) {
-      this.touchStartPoint = undefined
-      return
-    }
     const { clientX, clientY } = event.touches[0]
-    this.touchStartPoint = { x: clientX, y: clientY }
+    const below = clientY > (this.element.querySelector(".focus")?.getBoundingClientRect().bottom ?? 0)
+    const elsewhere = event.target.closest(".over, .steps, .panel, .keep, .rail, .menu-panel")
+    this.touchStartPoint = below && !elsewhere ? { x: clientX, y: clientY } : undefined
   }
 
   // Only a mostly-horizontal swipe turns the page; scrolling a long passage drifts sideways too.

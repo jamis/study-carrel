@@ -32,7 +32,7 @@ class SearchTest < ApplicationSystemTestCase
     end
 
     find("body").send_keys("]")
-    assert_selector ".ref", text: /Lamps 1:3/i
+    assert_selector ".now-head .ref[title='Lamps 1:3']" # the whole reference; its parts sit in a row
     assert_current_path reading_path("lamps", 1, 3)
     within(".back-slip-results") { assert_text "2 of 3" }
 
@@ -43,7 +43,7 @@ class SearchTest < ApplicationSystemTestCase
       assert_selector ".back-slip-step[aria-label='Previous result: Lamps 1:3 ([)']"
     end
     find("body").send_keys("]")
-    assert_selector ".ref", text: /Lamps 2:2/i
+    assert_selector ".now-head .ref[title='Lamps 2:2']"
     within(".back-slip-results") { assert_text "3 of 3" }
     assert_no_selector ".back-slip-step[aria-label^='Next']"
 
