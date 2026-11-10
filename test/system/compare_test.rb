@@ -9,7 +9,6 @@ class CompareTest < ApplicationSystemTestCase
     @stands = @focus.notes.create!(unit: verse(8), content: "The word stands")
     @counsel = @focus.notes.create!(unit: verse(13), content: "Who hath directed the Spirit?")
     @group = @fade.group_with!(@wither)
-    @focus.update!(reread_note: @wither)
     sign_in_as users(:one)
   end
 
@@ -17,7 +16,7 @@ class CompareTest < ApplicationSystemTestCase
   def keys(*keys) = page.driver.browser.action.send_keys(*keys).perform
 
   test "comparing notes: into a group of its, a new group of two, naming one, and back" do
-    visit focus_notes_path(@focus)
+    visit focus_notes_path(@focus, at: @wither.id) # opened on 40:7, the cursor on it
     assert_selector ".rr-row.here", text: "The withering"
 
     keys "g"
@@ -71,8 +70,7 @@ class CompareTest < ApplicationSystemTestCase
 
   test "the card keeps the held note to a line each, the whole entry over it with p or a click; Esc closes it, then goes back" do
     measured = @focus.notes.create!(unit: verse(12), content: "The scale is the point")
-    @focus.update!(reread_note: measured)
-    visit focus_notes_path(@focus)
+    visit focus_notes_path(@focus, at: measured.id)
     find(".rr-row.here").hover # its verbs, shown on the note pointed at
     within(".rr-row.here") { click_on "Compare" }
     assert_selector ".rr-cmp-card .cmp-band.cut"
@@ -105,7 +103,7 @@ class CompareTest < ApplicationSystemTestCase
     @focus.notes.create!(unit: verse(12), content: "The scale is the point")
     # Narrow enough that 40:12 runs past the two lines a row keeps.
     page.current_window.resize_to(900, 1000)
-    visit focus_notes_path(@focus)
+    visit focus_notes_path(@focus, at: @wither.id)
     keys "g"
     keys "j", "j", "j"
     assert_selector ".rr-row.cursor", text: "The scale is the point"
@@ -133,7 +131,7 @@ class CompareTest < ApplicationSystemTestCase
   end
 
   test "comparing with other notes under tabs: back and forth between them, the one used longest ago giving way, x putting one away" do
-    visit focus_notes_path(@focus)
+    visit focus_notes_path(@focus, at: @wither.id)
     keys "g"
     assert_selector ".cmp-tab", count: 1
     assert_selector ".cmp-tab.on .cmp-tab-ref", text: /40:7/
@@ -170,7 +168,7 @@ class CompareTest < ApplicationSystemTestCase
   end
 
   test "leaving with notes still under tabs leaves no Compare with this buttons behind on their rows" do
-    visit focus_notes_path(@focus)
+    visit focus_notes_path(@focus, at: @wither.id)
     keys "g"
     find(".rr-row", text: "Who hath directed").find(".rr-cmp-hold").click
     find(".rr-row", text: "The word stands").find(".rr-cmp-hold").click
@@ -182,7 +180,7 @@ class CompareTest < ApplicationSystemTestCase
   end
 
   test "coming back on a note held keeps the tabs; on any other note starts afresh" do
-    visit focus_notes_path(@focus)
+    visit focus_notes_path(@focus, at: @wither.id)
     keys "g"
     find(".rr-row", text: "Who hath directed").find(".rr-cmp-hold").click
     assert_equal %w[40:7 40:13], all(".cmp-tab-ref").map { it.text.strip }
@@ -202,7 +200,7 @@ class CompareTest < ApplicationSystemTestCase
   test "a note's labels as pills on every note, and a note on the card shown when pointed at" do
     whole = @focus.notes.create!(content: "Fading and standing")
     whole.join!(@group)
-    visit focus_notes_path(@focus)
+    visit focus_notes_path(@focus, at: @wither.id)
 
     within(".rr-row.here") { assert_selector ".rr-chip .lf", exact_text: "group A" }
     within("#reread_note_#{@fade.id}") do

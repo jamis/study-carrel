@@ -12,10 +12,10 @@ const PICKER_LEAST = 150, PICKER_TALLEST = 340 // px of the picker's cloud
 // The note you're on (here) is the one you last acted on; it's shown only as a cursor, a band of paper, which j/k (or
 // the arrows) bring up and move and Esc or a click elsewhere puts away. A note's verbs, + label (l), Compare (g) and
 // Edit (e), show when it's pointed at (tapped, on a phone); acting on a note makes it the one you're on, and the keys
-// act on the cursor's note, or with no cursor on the note pointed at (failing that, the one you're on). Edit opens its editor in place, if it has one here
+// act on the cursor's note, or with no cursor on the note pointed at (failing that, the one at the top of the window). Edit opens its editor in place, if it has one here
 // (data-editor-url), until you move on or press Esc.
 // The labels panel (c) shows the labels in use as a cloud or as tallies; pointing at a label lights the notes that
-// carry it, and tapping it rereads only them. Where you are is saved, so the reread opens there again. A new note on the whole focus (n) is written in a row of its own, and a
+// carry it, and tapping it rereads only them. The page opens at the top, unless it's opened on a note (?at=). A new note on the whole focus (n) is written in a row of its own, and a
 // selection in the scratchpad can be made one ("Make a note of this"). A label's pill rereads only the notes carrying it
 // (filter), as does a label in the panel; there, Remove on a note's pill takes it off, the note staying (to put back) until you move on, and the
 // band over the run names or renames the label (r). The notes without a label are reread the same way (filter "none"):
@@ -25,18 +25,17 @@ const PICKER_LEAST = 150, PICKER_TALLEST = 340 // px of the picker's cloud
 export default class extends Controller {
   static targets = ["row", "newRow", "noteLabels", "labelsBody", "picker", "pickerInput", "pickerOptions", "pickerFoot", "labelForm", "pad", "labelsPanel",
     "lift", "toast", "count", "removed", "empty", "filterMenu", "band", "nameInput", "nameError"]
-  static values = { positionUrl: String, labelsUrlTemplate: String, liftUrl: String, readOnly: Boolean, filter: String, renameUrl: String }
+  static values = { labelsUrlTemplate: String, liftUrl: String, readOnly: Boolean, filter: String, renameUrl: String }
 
   connect() {
     let view = "cloud"
     try { view = localStorage.getItem(VIEW_KEY) || view } catch {}
     this.#setView(view)
-    if (this.here) {
-      // Opened on a note (?at=, from a pill or the band): the cursor on it, so you see where you came from, and the reread
-      // is there now. Otherwise the page only opens where you left off, nothing shown.
-      const at = new URLSearchParams(location.search).has("at")
-      const bring = () => this.here?.scrollIntoView({ block: at ? "center" : "start" })
-      if (at) { this.#show(); this.#savePosition() }
+    if (this.here && new URLSearchParams(location.search).has("at")) {
+      // Opened on a note (?at=, from a pill or the band): the cursor on it, so you see where you came from. Otherwise the
+      // page opens at the top, nothing shown.
+      const bring = () => this.here?.scrollIntoView({ block: "center" })
+      this.#show()
       bring()
       // Turbo scrolls the page (to the top, or where it was) after it's rendered, so again once the visit is done.
       this.centreOnLoad = bring
@@ -49,7 +48,6 @@ export default class extends Controller {
   }
 
   disconnect() {
-    clearTimeout(this.saveTimer)
     document.removeEventListener("turbo:load", this.centreOnLoad)
     window.removeEventListener("pagehide", this.letGoOnLeaving)
     this.#letGo()
@@ -78,11 +76,11 @@ export default class extends Controller {
   get #shown() { return this.element.classList.contains("rr-cursor-on") }
   #show(on = true) { this.element.classList.toggle("rr-cursor-on", on) }
 
-  // The note to act on: the cursor's; with no cursor, the note pointed at, which becomes the one you're on, or failing
-  // that the one you're on (where the page opened).
+  // The note to act on: the cursor's; with no cursor, the note pointed at, or failing that the one at the top of the
+  // window, which becomes the one you're on. Never one out of sight, for the page to jump to.
   aim() {
     const pointed = this.rowTargets.find(row => row.matches(":hover") || row.classList.contains("tapped"))
-    const row = this.#shown ? this.here : pointed || this.here
+    const row = this.#shown ? this.here : pointed || this.#topRow()
     if (row) this.take(row)
     return row
   }
@@ -124,13 +122,19 @@ export default class extends Controller {
   #step(by) {
     const rows = this.rowTargets
     if (!this.#shown) {
-      const top = rows.find(row => row.getBoundingClientRect().bottom > 80) || rows.at(-1)
+      const top = this.#topRow()
       if (!top) return
       this.#show()
       return top === this.here ? this.#scrollTo(top, "nearest") : this.#go(top, { scroll: "nearest" })
     }
     const to = rows[rows.indexOf(this.here) + by]
     if (to) this.#go(to, { scroll: "nearest" })
+  }
+
+  // The note at the top of the window: the first whose foot is below the top few lines.
+  #topRow() {
+    const rows = this.rowTargets
+    return rows.find(row => row.getBoundingClientRect().bottom > 80) || rows.at(-1)
   }
 
   #scrollTo(row, block) {
@@ -155,7 +159,6 @@ export default class extends Controller {
     if (left !== row) this.#closeEditor()
     if (unwritten) left.remove()
     this.#mark()
-    this.#savePosition()
   }
 
   // Edit (e): the note's editor, in place, the caret at the end of it once it's in.
@@ -282,20 +285,6 @@ export default class extends Controller {
     toast.hidden = false
     clearTimeout(this.toastTimer)
     this.toastTimer = setTimeout(() => { toast.hidden = true }, 6000)
-  }
-
-  // Tell the server where the reread is (debounced), so it opens here next time.
-  #savePosition() {
-    clearTimeout(this.saveTimer)
-    this.saveTimer = setTimeout(() => {
-      if (!this.here?.dataset.noteId) return
-      fetch(this.positionUrlValue, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken() },
-        body: JSON.stringify({ note_id: this.here.dataset.noteId }),
-        keepalive: true
-      })
-    }, 600)
   }
 
   // ---------- labelling ----------

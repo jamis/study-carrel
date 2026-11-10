@@ -35,8 +35,8 @@ Rails.application.routes.draw do
       get :export, on: :collection
       resources :labels, only: %i[create destroy], controller: "note_labels"
     end
-    # Where the reread of its notes left off (show is the old address of the notes page).
-    resource :reread, only: %i[show update]
+    # The old address of the notes page.
+    resource :reread, only: :show
     # Naming a label (or an unnamed group of notes), or renaming it, from the reread.
     resources :labels, only: :update
     resource :scratchpad, only: :update

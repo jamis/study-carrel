@@ -5,7 +5,6 @@ class Focus < ApplicationRecord
   # carries them (a label lasts only while some note does).
   has_many :detached_notes, -> { ordered }, dependent: :destroy
   belongs_to :last_unit, class_name: "Unit", optional: true
-  belongs_to :reread_note, class_name: "Note", optional: true
 
   # Rough thoughts while rereading this focus's notes.
   has_rich_text :scratchpad

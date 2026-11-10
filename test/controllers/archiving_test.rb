@@ -162,10 +162,6 @@ class ArchivingTest < ActionDispatch::IntegrationTest
     delete detached_note_path(detached)
     assert_response :forbidden
     assert DetachedNote.exists?(detached.id)
-
-    # Where its reread is up to still moves.
-    patch focus_reread_path(@old), params: { note_id: free.id }, as: :json
-    assert_response :no_content
   end
 
   test "in the reader, archived focuses aren't offered to note under, but their notes are still named, read-only" do

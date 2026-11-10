@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_27_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_09_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -90,11 +90,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_120000) do
     t.datetime "updated_at", null: false
     t.integer "last_unit_id"
     t.integer "user_id", null: false
-    t.integer "reread_note_id"
     t.integer "free_notes_numbered", default: 0, null: false
     t.datetime "archived_at"
     t.index ["last_unit_id"], name: "index_foci_on_last_unit_id"
-    t.index ["reread_note_id"], name: "index_foci_on_reread_note_id"
     t.index ["user_id", "archived_at", "made_current_at"], name: "index_foci_on_user_id_and_archived_at_and_made_current_at"
   end
 
@@ -257,7 +255,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_120000) do
   add_foreign_key "collections", "users"
   add_foreign_key "detached_notes", "foci", on_delete: :nullify
   add_foreign_key "detached_notes", "users"
-  add_foreign_key "foci", "notes", column: "reread_note_id", on_delete: :nullify
   add_foreign_key "foci", "units", column: "last_unit_id", on_delete: :nullify
   add_foreign_key "foci", "users"
   add_foreign_key "invitations", "users", column: "created_by_id"

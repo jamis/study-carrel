@@ -20,7 +20,7 @@ class RereadTest < ApplicationSystemTestCase
     assert_selector ".rr-row:first-child .rr-num", text: "1\nof 2"
     assert_selector ".rr-row", text: "The incomparable"
 
-    find("body").send_keys "l" # with no cursor and nothing pointed at, on the note the page opened on
+    find("body").send_keys "l" # with no cursor and nothing pointed at, on the note at the top of the window
     assert_selector ".rr-cursor-on .rr-row.here", text: "The wilderness"
     find(".rr-picker input").send_keys "Empty places", :enter
     assert_selector ".rr-row.here .rr-chip", text: "Empty places"
@@ -109,8 +109,6 @@ class RereadTest < ApplicationSystemTestCase
     assert_selector ".rr-filter-band", text: "Only the 2 notes labelled “waiting”"
     assert_selector ".rr-row[data-note-id]", count: 2
     assert_selector ".rr-row.here", text: "Renewed"
-    sleep 1 # past the position save's debounce
-    assert_equal third, @focus.reload.reread_note
 
     within(".rr-row.here") { click_on "× Remove" }
     assert_selector ".rr-row.here .rr-chip.removed", text: "waiting"
@@ -271,38 +269,30 @@ class RereadTest < ApplicationSystemTestCase
     assert_selector ".rr-cursor-on .rr-row.here", text: "The wilderness"
     find("body").send_keys "j"
     assert_selector ".rr-row.here", text: "The incomparable"
-    sleep 1 # past the position save's debounce
-    visit focus_notes_path(@focus)
-    assert_selector ".rr-row.here", text: "The incomparable"
-    assert_no_selector ".rr-cursor-on" # only scrolled to
   end
 
-  test "coming back to a note far down, it stands in view" do
+  test "opens at the top, not where you were; with no cursor, l acts on the note in view, not on one out of sight" do
     (4..24).each { |n| @focus.notes.create!(unit: verse(n), content: "Note on verse #{n}") }
-    @focus.update!(reread_note_id: @second.id)
-    visit foci_path
-    find(".card-notes a[href='#{focus_notes_path(@focus)}']").click # a Turbo visit, which scrolls the page after rendering it
-    assert_selector ".rr-row.here", text: "The incomparable"
-    sleep 0.3
-    assert page.evaluate_script(<<~JS)
-      (() => { const box = document.querySelector(".rr-row.here").getBoundingClientRect(); return box.top >= 0 && box.top < innerHeight })()
-    JS
-  end
-
-  test "opens again on a note on the whole focus, coming back from the focuses page" do
-    whole = @focus.notes.create!(content: "Across it all")
+    @focus.notes.create!(content: "Across it all")
     visit focus_notes_path(@focus)
-    find(".rr-row", text: "Across it all").click
-    assert_no_selector ".rr-row.here", text: "Across it all" # a click only reads
     find(".rr-row", text: "Across it all").hover
-    within(".rr-row", text: "Across it all") { click_on "+ label" } # acting on it does
-    keys :escape
-    assert_selector ".rr-cursor-on .rr-row.here", text: "Across it all"
-    sleep 1 # past the position save's debounce
+    within(".rr-row", text: "Across it all") { click_on "+ label" }
+    keys :escape, :escape # the picker, then the cursor
+    assert_no_selector ".rr-cursor-on"
+
+    # Scrolled back to the top, l labels the note there, not the one acted on last (far below).
+    page.execute_script("scrollTo(0, 0)")
+    find("h1").hover # pointing at no note
+    find("body").send_keys "l"
+    assert_selector ".rr-cursor-on .rr-row.here", text: "The wilderness"
+    keys :escape, :escape
+
     visit foci_path
-    find(".card-notes a[href='#{focus_notes_path(@focus)}']", match: :first).click
-    assert_selector ".rr-row.here", text: "Across it all"
-    assert_equal whole.id, @focus.reload.reread_note_id
+    find(".card-notes a[href='#{focus_notes_path(@focus)}']", match: :first).click # a Turbo visit
+    assert_selector ".rr-row.here", text: "The wilderness"
+    assert_no_selector ".rr-cursor-on"
+    sleep 0.3
+    assert_equal 0, page.evaluate_script("scrollY")
   end
 
   test "the scratchpad is put away behind its tab, and saves as you write" do

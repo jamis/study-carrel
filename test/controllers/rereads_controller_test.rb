@@ -20,21 +20,6 @@ class RereadsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".rr-row .rr-ref[href=?]", reading_path("isaiah-kjv", 40, 25)
   end
 
-  test "opens where it left off" do
-    patch focus_reread_path(@focus), params: { note_id: @late.id }, as: :json
-    assert_response :no_content
-    assert_equal @late, @focus.reload.reread_note
-
-    get focus_notes_path(@focus)
-    assert_select "#reread_note_#{@late.id}.here"
-  end
-
-  test "where it left off is one of the focus's own notes" do
-    other = users(:one).foci.start!(title: "Rest").notes.create!(unit: verse(31), content: "Renewed")
-    patch focus_reread_path(@focus), params: { note_id: other.id }, as: :json
-    assert_response :not_found
-  end
-
   test "rereads only the notes carrying one label" do
     waiting = @late.label!("waiting")
     get focus_notes_path(@focus, label: waiting.id)

@@ -14,7 +14,6 @@
 <% archived = @focus.archived? %>
 <% filtered = @label || @unlabelled %>
 <main class="reader reread" data-controller="reread<%= " compare peek" unless archived %>"
-      data-reread-position-url-value="<%= focus_reread_path(@focus) %>"
       data-reread-read-only-value="<%= archived %>"
       data-reread-filter-value="<%= @unlabelled ? "none" : @label&.id %>"
       <% if @label %>data-reread-rename-url-value="<%= focus_label_path(@focus, @label) %>"<% end %>

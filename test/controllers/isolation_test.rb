@@ -244,10 +244,6 @@ class IsolationTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     get focus_notes_path(mine, label: label.id)
     assert_response :not_found
-    patch focus_reread_path(@owner_focus), params: { note_id: @owner_note.id }, as: :json
-    assert_response :not_found
-    patch focus_reread_path(mine), params: { note_id: @owner_note.id }, as: :json
-    assert_response :not_found
     put focus_scratchpad_path(@owner_focus), params: { scratchpad: { content: "Hijacked" } }, as: :json
     assert_response :not_found
     post focus_note_labels_path(@owner_focus, @owner_note), params: { name: "Hijacked" }, as: :turbo_stream
@@ -263,6 +259,5 @@ class IsolationTest < ActionDispatch::IntegrationTest
     assert_no_match "Owner's scratch", response.body
     assert_equal [ label ], @owner_note.labels.reload
     assert_equal "Owner's scratch", @owner_focus.reload.scratchpad.to_plain_text
-    assert_nil @owner_focus.reread_note
   end
 end

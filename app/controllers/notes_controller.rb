@@ -15,7 +15,7 @@ class NotesController < ApplicationController
     elsif @unlabelled then @all.select { it.label_ids.empty? }
     else @all
     end
-    @here = @notes.find { it.id == params[:at].to_i } || @notes.find { it.id == @focus.reread_note_id } || @notes.first
+    @here = @notes.find { it.id == params[:at].to_i } || @notes.first
     @detached = @focus.detached_notes.includes(:rich_text_content) unless @label || @unlabelled
   end
 
