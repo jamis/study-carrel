@@ -67,4 +67,4 @@ end
 
 gem "lexxy", "~> 1.0"
 
-gem "reverse_markdown", "~> 3.0"
+gem "reverse_markdown", "~> 3.1"
